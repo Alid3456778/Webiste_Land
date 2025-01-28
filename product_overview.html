@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Medicine Website Navigation</title>
+    <link rel="stylesheet" href="./assets/css/navbar_footer.css" />
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="navbar-left">
+        <!-- Hamburger Icon -->
+        <button id="hamburger-menu" class="hamburger-menu">☰</button>
+        <!-- Logo -->
+        <div class="logo"><img src="./assets/image2/logo.png" alt=""></div>
+      </div>
+      <div class="navbar-right">
+        <!-- Search Bar -->
+        <input
+          type="text"
+          placeholder="Search products..."
+          class="search-bar"
+          id="search-input"
+        />
+        <button class="search-button" id="search-button">Search</button>
+        <!-- Cart Icon -->
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
+          alt="Cart"
+          class="cart-icon"
+        />
+      </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+      <button id="close-sidebar" class="close-btn">✖</button>
+      <div class="sidebar-content">
+        <h2>Menu</h2>
+        <ul>
+          <li><a href="#">Home</a></li>
+          <li><a href="#">Products</a></li>
+          <li><a href="#">About Us</a></li>   
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="product-overview">
+      <!-- Left Side: Product Image -->
+      <div class="product-image">
+        <div class="carousel-container">
+          <img src="./assets/image/Alprazolam-USA-to-USA-01.jpg" alt="Image 1" />
+          <img
+            src="https://mednowpharma.com/wp-content/uploads/2024/12/Alprazolam-USA-to-USA-02.jpg"
+            alt="Image 2"
+          />
+          <img src="./Alprazolam-USA-to-USA-01.jpg" alt="Image 3" />
+        </div>
+        <button class="arrow left">&lt;</button>
+        <button class="arrow right">&gt;</button>
+      </div>
+
+      <!-- Right Side: Product Details -->
+      <div class="product-details">
+        <div class="right1">
+          <h2>Alprazolam USA to USA</h2>
+          <!-- <p>For Alterations of Intestinal Bacterial Flora & Stomach Care</p> -->
+
+          <!-- MG Selection -->
+          <div class="option-section">
+            <div class="option-title">MG</div>
+            <div class="option-buttons mg-buttons">
+              <button data-mg="1" class="mg-button">1</button>
+              <button data-mg="2" class="mg-button">2</button>
+              <button data-mg="3" class="mg-button">3</button>
+              <button data-mg="4" class="mg-button active">4</button>
+              <button data-mg="5" class="mg-button">5</button>
+            </div>  
+          </div>
+
+          <div class="custom-selection">
+            <h2>Select Custom MG and Quantity </h2>
+            <div class="selection-container">
+              <!-- MG Selection -->
+              <div class="select-group">
+                <label for="mg-select">Choose MG:</label>
+                <select id="mg-select">
+                  <option value="1">1 MG</option>
+                  <option value="2">2 MG</option>
+                  <option value="3">3 MG</option>
+                  <option value="4">4 MG</option>
+                  <option value="5">5 MG</option>
+                </select>
+              </div>
+
+              <!-- Quantity Selection -->
+              <div class="select-group">
+                <label for="quantity-select">Choose Quantity:</label>
+                <input type="text" placeholder="Quantity" class="quat-input" />
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="submit-container">
+              <button id="submit-selection">Submit</button>
+            </div>
+          </div>
+        </div>
+        <div class="right2">
+          <h2>Select The Streangth & Quantity 💊</h2>
+          <div class="product-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>MG</th>
+                  <th>QTY</th>
+                  <th>Description</th>
+                  <th>Price</th>
+                  <th>Add To cart</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1mg</td>
+                  <td>60</td>
+                  <td>
+                    <span class="old-price">$4.54</span>
+                    <span class="new-price">$3.18 PER PILL</span>
+                  </td>
+                  <td>1200</td>
+                  <td><button class="add-tocart">Add To cart</button></td>
+                </tr>
+                <tr>
+                  <td>1mg</td>
+                  <td>90</td>
+                  <td>
+                    <span class="old-price">$4.29</span>
+                    <span class="new-price">$3.00 PER PILL</span>
+                  </td>
+                  <td>1200</td>
+                  <td><button class="add-tocart">Add To cart</button></td>
+                </tr>
+                <tr>
+                  <td>1mg</td>
+                  <td>180</td>
+                  <td>
+                    <span class="old-price">$3.16</span>
+                    <span class="new-price">$2.21 PER PILL</span>
+                  </td>
+                  <td>1200</td>
+                  <td><button class="add-tocart">Add To cart</button></td>
+                </tr>
+                <tr>
+                  <td>1mg</td>
+                  <td>360</td>
+                  <td>
+                    <span class="old-price">$3.01</span>
+                    <span class="new-price">$2.11 PER PILL</span>
+                  </td>
+                  <td>1200</td>
+                  <td><button class="add-tocart">Add To cart</button></td>
+                </tr>
+                <tr>
+                  <td>1mg</td>
+                  <td>540</td>
+                  <td>
+                    <span class="old-price">$2.96</span>
+                    <span class="new-price">$2.07 PER PILL</span>
+                  </td>
+                  <td>1200</td>
+                  <td><button class="add-tocart">Add To cart</button></td>
+                </tr>
+                <tr>
+                  <td>1mg</td>
+                  <td>720</td>
+                  <td>
+                    <span class="old-price">$2.84</span>
+                    <span class="new-price">$1.99 PER PILL</span>
+                  </td>
+                  <td>1200</td>
+                  <td><button class="add-tocart">Add To cart</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="three-box-section">
+      <div class="box">
+        <h3>Product Details</h3>
+        <p>
+          Paracetamol 500mg is a widely used medicine for reducing fever and
+          relieving mild to moderate pain.
+        </p>
+      </div>
+      <div class="box">
+        <h3>Use's For</h3>
+        <p>
+          It relieves muscle strain and joint pain It helps reduce swelling It
+          provides warmth and firm support to the affected area
+        </p>
+      </div>
+      <div class="box">
+        <h3>Safety Information:</h3>
+        <p>
+          Wash carefully in lukewarm water and remove excess water by squeezing
+          gently Allow it to dry without stretching Do not iron
+        </p>
+      </div>
+    </section>
+
+    <section class="recommendation-section">
+      <h2>Recommended for You</h2>
+      <ul class="recommendation-list">
+        <li class="category">
+          Health Corner
+          <ul class="sub-points">
+            <li><a href="#">Immunity Boosters</a></li>
+            <li><a href="#">Heart Health</a></li>
+            <li><a href="#">Diabetes Care</a></li>
+          </ul>
+        </li>
+        <li class="category">
+          Beauty
+          <ul class="sub-points">
+            <li><a href="#">Skin Care</a></li>
+            <li><a href="#">Hair Care</a></li>
+            <li><a href="#">Cosmetics</a></li>
+          </ul>
+        </li>
+        <li class="category">
+          Lab Tests
+          <ul class="sub-points">
+            <li><a href="#">Blood Test</a></li>
+            <li><a href="#">Thyroid Test</a></li>
+            <li><a href="#">Vitamin Deficiency</a></li>
+          </ul>
+        </li>
+        <li class="category">
+          Wellness
+          <ul class="sub-points">
+            <li><a href="#">Mental Health</a></li>
+            <li><a href="#">Fitness & Gym</a></li>
+            <li><a href="#">Sleep Aids</a></li>
+          </ul>
+        </li>
+        <li class="category">
+          Medicine
+          <ul class="sub-points">
+            <li><a href="#">Prescription Medicine</a></li>
+            <li><a href="#">OTC Medicine</a></li>
+            <li><a href="#">Pain Relief</a></li>
+          </ul>
+        </li>
+      </ul>
+    </section>
+
+    <div class="flop">
+      <section class="faqs">
+        <h2>Frequently Asked Questions</h2>
+        <div class="faq-item">
+          <h3>What is Paracetamol 500mg used for?</h3>
+          <p>It is used for pain relief and fever reduction.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Are there any side effects?</h3>
+          <p>
+            Common side effects include nausea, dizziness, or allergic
+            reactions. Consult a doctor if symptoms persist.
+          </p>
+        </div>
+        <div class="faq-item">
+          <h3>How It works ?</h3>
+          <p>
+            Common side effects include nausea, dizziness, or allergic
+            reactions. Consult a doctor if symptoms persist.
+          </p>
+        </div>
+      </section>
+
+      <section class="reviews-section">
+        <h2>Customer Reviews</h2>
+
+        <!-- Review Form -->
+        <div class="review-form">
+          <h3>Write a Review</h3>
+          <form>
+            <label for="name">Name:</label>
+            <input type="text" id="name" placeholder="Your name" required />
+
+            <label for="rating">Rating:</label>
+            <select id="rating" required>
+              <option value="5">★★★★★ (5 stars)</option>
+              <option value="4">★★★★☆ (4 stars)</option>
+              <option value="3">★★★☆☆ (3 stars)</option>
+              <option value="2">★★☆☆☆ (2 stars)</option>
+              <option value="1">★☆☆☆☆ (1 star)</option>
+            </select>
+
+            <label for="review">Review:</label>
+            <textarea
+              id="review"
+              placeholder="Write your review here..."
+              required
+            ></textarea>
+
+            <button type="submit">Submit Review</button>
+          </form>
+        </div>
+
+        <!-- Average Rating -->
+        <div class="average-rating">
+          <span class="stars">★★★★☆</span>
+          <p>4.5 out of 5 stars</p>
+          <p>Based on 1234 customer ratings</p>
+        </div>
+
+        <!-- Reviews -->
+        <div class="reviews-list">
+          <!-- Review 1 -->
+          <div class="review-item">
+            <div class="review-header">
+              <span class="stars">★★★★☆</span>
+              <h3>Great Product!</h3>
+              <button class="toggle-review">Show Review ▼</button>
+            </div>
+            <p class="review-author">
+              Reviewed by <strong>John Doe</strong> on January 10, 2025
+            </p>
+            <p class="review-text hidden">
+              This medicine works exactly as described. I noticed a significant
+              improvement within a week. Highly recommend it to anyone looking
+              for reliable pain relief.
+            </p>
+          </div>
+
+          <!-- Review 2 -->
+          <div class="review-item">
+            <div class="review-header">
+              <span class="stars">★★★☆☆</span>
+              <h3>Good, but some side effects</h3>
+              <button class="toggle-review">Show Review ▼</button>
+            </div>
+            <p class="review-author">
+              Reviewed by <strong>Jane Smith</strong> on January 8, 2025
+            </p>
+            <p class="review-text hidden">
+              The product is effective, but I experienced slight nausea after
+              using it. Consult your doctor if you have a sensitive stomach.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-section resources">
+          <h3>Resources</h3>
+          <ul>
+            <li><a href="#">Shipping</a></li>
+            <li><a href="#">Returns & Refunds</a></li>
+            <li><a href="#">Payment Methods</a></li>
+            <li><a href="#">FAQs</a></li>
+          </ul>
+        </div>
+        <div class="footer-section legal">
+          <h3>Legal</h3>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">Terms & Conditions</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Cancellation Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-section support">
+          <h3>Support 24/7</h3>
+          <p><i class="fa fa-envelope"></i> support@mclandpharma.com</p>
+          <p><i class="fa fa-phone"></i> +1 315 666 5976</p>
+        </div>
+        <div class="footer-section disclaimer">
+          <h3>Disclaimer</h3>
+          <p>
+            The services on Mcland Pharma are available for millions of people
+            solely presented for informative, qualitative, quantitative, and
+            affordable medicinal purposes. Here we believe The Doctor’s advice =
+            The Best Advice for medicinal needs by following protocol
+            accordingly by people suffering from different conditions.
+          </p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-left">
+          <p class="copyright">
+            &copy; 2024 Mcland Pharma. All rights reserved.
+          </p>
+          <p>© 2024 All rights reserved. Mcland Pharma</p>
+          <p>
+            Mcland Pharma has been working on a change towards healthcare and
+            improving health. We are on a mission Encouraging Healthcare –
+            Improving Health since 2013. We have covered the finest medicines
+            for the mission towards cure with a few simple steps at
+            budget-friendly prices.
+          </p>
+        </div>
+        <div class="footer-right">
+          <h3>Payment modes</h3>
+          <div class="payment-icons">
+            <img src="./assets/image/cash_app.png" alt="Cash App" />
+            <img src="./assets/image/zelle.png" alt="Zelle" />
+            <img src="./assets/image/venmo.png" alt="Venmo" />
+            <!-- <img src="./assets/image/apple_pay.png" alt="Apple Pay">
+          <img src="./assets/image/Gpay.png" alt="Google Pay"> -->
+            <img src="./assets/image/pay_pal.jpg" alt="Paypal" />
+            <!-- <img src="./assets/image/wire_transfer.png" alt="Wire Transfer"> -->
+            <img src="./assets/image/bitcoin.png" alt="Bitcoin" />
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script src="./assets/js/script.js"></script>
+  </body>
+</html>

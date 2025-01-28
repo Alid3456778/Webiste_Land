@@ -1,0 +1,525 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Proza+Libre:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&display=swap");
+
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", serif;
+  }
+  
+  body {
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .headd,h2{
+    font-family: "Proza Libre", serif;
+  }
+a{
+  text-decoration: none;
+  
+}
+  /* search bar */
+  .search_card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    width: 95%;
+    height: 170px;
+    display: flex;
+    align-self: center;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    margin-top: 10px;
+    /* box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); */
+    /* transition: transform 0.3s ease;     */
+  }
+  .searchbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40%;
+    border-radius: 30px;
+    background-color: #8acaff;
+    color: #000000;
+  }
+
+  .serach_text {
+    display: flex;
+    /* align-self: flex-start; */
+    width: 40%;
+  }
+
+  .search_btn {
+    display: flex;
+    background-color: transparent;
+    border: none;
+    color: white;
+    padding: 8px;
+    font-size: 18px;
+  }
+
+  ::placeholder {
+    color: rgb(0, 0, 0);
+    opacity: 1; /* Firefox */
+  }
+
+  .searchbar input {
+    border: 1px solid #8acaff;
+    display: flex;
+    align-self: center;
+    padding: 8px;
+    /* border-radius: 10px 0px 0px 10px; */
+    border-radius: 30px 0px 0px 30px;
+    width: 100%;
+    height: 50px;
+    background-color: #ffffff;
+    /* background-image: linear-gradient(#436df7, #b3abf8); */
+  }
+.Cart{
+  background-color: white;
+  color: black;
+}
+
+.Cart img{
+  width: 24px;
+  height: 24px;
+  
+}
+  /* Popup Overlay */
+  .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* Dark semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    visibility: hidden; /* Initially hidden */
+    opacity: 0;
+    transition: visibility 0s, opacity 0.3s ease-in-out;
+  }
+  
+  /* Popup Content */
+  .popup-content {
+    background: #fff;
+    padding: 20px 60px 20px 60px;
+    border-radius: 10px;
+    text-align: center;
+    /* width: 90%;
+    max-width: 400px; */
+    height: 60vh;
+    width: auto;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .popup-content img{
+      height: 50%;
+      width: auto;
+  }
+
+  /* Close Button */
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #333;
+  }
+  
+  /* Button Styling */
+  .btn {
+    background-color: #8acaff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  .btn:hover {
+    background-color: #0062b3;
+  }
+  
+  /* Visible Popup */
+  .popup-overlay.visible {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  /* Banner
+  .banner {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin: 20px;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+  .banner-item {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+  }
+  
+  .offer, .savings {
+    text-align: left;
+    width: 250px;
+  }
+  
+  .offer h2, .savings h2 {
+    color: #8acaff;
+  }
+  
+  .offer button {
+    background-color: #8acaff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin-top: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .banner-image img {
+    max-width: 250px;
+  }
+  
+  .savings img {
+    max-width: 200px;
+  } */
+
+  /* Slider Styles */
+  #transit_slide {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin: 20px;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    position: relative;
+    width: 98%;
+    max-width: 2000px;
+    margin: 20px; /* Centering the slider */
+    overflow: hidden;
+    border-radius: 10px;
+    height: fit-content;
+    /* position: relative;
+    width: 100%;
+    max-width: 800px;
+    margin: auto; */
+  }
+  #slider {
+    max-height: 400px;
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    overflow: hidden;
+    position: relative;
+  }
+  .slide {
+    display: none;
+    min-width: 100%;
+    transition: opacity 0.5s ease;
+  }
+  .slide img {
+    width: 90vw;
+    height: 80%;
+    
+    display: flex;
+    border-radius: 10px; /* Rounded corners */
+  }
+  .controls {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 30px;
+    color: #333;
+    cursor: pointer;
+  }
+  #left-arrow {
+    left: 20px;
+  }
+  #right-arrow {
+    right: 20px;
+  }
+  #dots-con {
+    text-align: center;
+    margin-top: 10px;
+  }
+  .dot {
+    height: 10px;
+    width: 10px;
+    margin: 0 5px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    cursor: pointer;
+  }
+  .dot.active {
+    background-color: #333;
+  }
+
+  @media (max-width: 768px) {
+
+    /* Slider adjustments */
+    #slider {
+        width: 100%;
+        margin: auto;
+    }
+    #slider img {
+        width: 100%;
+        height: auto;
+    }
+    
+    
+    #pre_slider{
+        height: fit-content;
+    }
+  }
+
+  /* offers banner styling */
+  .offerbtn {
+    background-color: #f4a259;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 5px;
+  }
+
+  .offerbtn:hover {
+    background-color: #0c8d00;
+  }
+  
+  /* Banners */
+  .banners {
+    text-align: center;
+    padding: 60px 20px;
+    background: #f4f4f4;
+    margin: 20px 0;
+  }
+  
+  #offers.offers-banner {
+    text-align: center;
+    padding: 60px 20px;
+    background: #8acaff;
+    margin: 20px 0;
+    /* background: url('/assets/image/Merry_Christmas_offer.png'); */
+    color: #fff;
+  }
+
+  .shop-by-categories{
+    font-size: 24px;
+    text-align: center;
+    padding: 20px;
+    background: #f4f4f4;
+    margin: 20px 0;
+    background-color: #e5f4f8;
+  }
+  
+  .what-we-offer {
+    font-size: 24px;
+    text-align: center;
+    padding: 0px 20px;
+    background: #f4f4f4;
+    margin: 20px 0;
+    background-color: #e5f4f8;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    white-space: nowrap; /* Prevent content from wrapping */
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+    -ms-overflow-style: none; /* Hide scrollbar for IE */
+  }
+
+  .what-we-offer::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome, Safari, and Edge */
+  }
+  
+  .offer-grid {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+  }
+  
+  .offer-item img {
+    width: 80px;
+    height: 80px;
+  }
+  
+  /* Products */
+  .product-section {
+    padding:20px;
+    text-align: center;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    white-space: nowrap; /* Prevent content from wrapping */
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+    -ms-overflow-style: none; /* Hide scrollbar for IE */
+  }
+  
+  .product-grid {
+    display: inline-flex;
+    /* display: grid; */
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+  }
+  
+   /* Product Card Styles */
+.product-card {
+  background: linear-gradient(135deg, #ffffff, #f9f9f9);
+  border: 1px solid #e0e0e0;
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  width: auto; /* Adjust size as needed */
+  /* height: auto; */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.right_side{
+  display: flex;
+  gap: 5px;
+}
+
+.left_side{
+  display: flex;
+  justify-content: space-evenly;
+}
+.left_side a{
+  color: white;
+}
+
+.product-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.product-card img {
+  width: 150px;
+  height: 150px;
+  margin-bottom: 15px;
+  border-radius: 10px; /* Rounded image corners */
+  object-fit: cover; /* Ensures image fits the container */
+}
+
+.product-card p {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 10px 0;
+}
+
+.product-card span {
+  display: block;
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 15px;
+}
+
+.product-card button {
+  background: linear-gradient(135deg, #8acaff, #0062b3);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+  width: 45%;
+}
+
+.product-card button:hover {
+  background-color: #8acaff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+  /* Section Styling */
+  .categories {
+    text-align: center;
+    padding: 20px;
+  }
+
+  .categories h2 {
+    font-size: 24px;
+    color: #1a9693;
+    margin-bottom: 30px;
+  }
+
+  /* Card Container */
+  .card-container {
+    display: inline-flex; /* Align cards horizontally */
+    gap: 20px; /* Spacing between cards */
+    padding: 20px; /* Add padding inside the container */
+  }
+
+/* Card Styling */
+  .card {
+    background-color: #fff;
+    border-radius: 20px;
+    width: 200px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    flex-shrink: 0; /* Prevent cards from shrinking */
+    cursor: pointer;
+  }
+
+  .card img {
+    width: 70%;
+    height: 65%;
+    border-radius: 50%;
+  }
+
+  .card>a>img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+  }
+
+  .card p {
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .card:hover {
+    transform: scale(1.1);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .card {
+        width: 140px;
+        height: 140px;
+    }
+
+    .card img {
+        width: 60%;
+        height: 60%;
+    }
+
+    .card p {
+        font-size: 10px;
+    }
+  }

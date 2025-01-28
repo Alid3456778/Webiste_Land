@@ -3,6 +3,7 @@
     background-color: #ffffff;
     color: #2eb9b5;
     padding: 10px 20px;
+   
   }
   
   .navbar-top {
@@ -17,8 +18,8 @@
     gap: 10px;
   }
   .logo img{
-    width: 70%;
-    height: 60%;
+    width: 50px;
+    height: auto;
   }
   
   .delivery {
@@ -44,23 +45,27 @@
     text-decoration: none;
     color: #8acaff;
     font-size: 17px;
+    background-color: #1e5787;
+    padding: 10px 20px;
+    border-radius: 50px;
   }
   /* General Link Styles */
   .aa {
     text-decoration: none;
     color: white;
     display: block;
-    padding: 8px 15px;
+    /* padding: 8px 15px; */
+    padding: 2px;
     position: relative;
   }
 
   /* Navbar Styling */
   .navbar-bottom ul {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     list-style: none;
-    background-color: #1e5787;
-    padding: 10px 0;
+    /* background-color: #1e5787; */
+    /* padding: 10px 0; */
     margin: 0;
   }
 
@@ -68,7 +73,12 @@
     position: relative;
     color: white;
     cursor: pointer;
-    font-size: 22px;
+    font-size: 15px;
+  }
+
+  .navbar-bottom a{
+    color: black;
+    margin: 10px;
   }
 
   .navbar-bottom ul li ul {
@@ -82,6 +92,7 @@
     top: 100%; /* Position below the parent item */
     left: 0;
     background-color: #f4f4f4;
+    border-radius: 15px;
     list-style: none;
     padding: 0;
     margin: 0;
@@ -105,6 +116,7 @@
   .dropdown li a:hover {
     background-color: #1e5787;
     color: white;
+    border-radius: 15px;
   }
 
   /* Responsive Design */

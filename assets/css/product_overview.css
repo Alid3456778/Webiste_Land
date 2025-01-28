@@ -1,0 +1,219 @@
+/* General Styles */
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: #f9f9f9;
+  }
+
+  /* Breadcrumb */
+  .breadcrumb {
+    margin: 20px;
+    font-size: 14px;
+  }
+  
+  .breadcrumb a {
+    text-decoration: none;
+    color: #007bff;
+  }
+  
+  /* Product Section */
+  .product-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    background-color: white;
+    margin: 10px 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+  }
+  
+  .product-images {
+    width: 40%;
+  }
+  
+  .product-images img {
+    width: 100%;
+    margin-bottom: 10px;
+    border-radius: 8px;
+  }
+  
+  .additional-images {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .additional-images img {
+    width: 80px;
+    height: 80px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .product-details {
+    width: 55%;
+  }
+  
+  .product-details h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  .variation-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+  }
+  
+  .variation-table th, .variation-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .add-to-cart-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .add-to-cart-btn:hover {
+    background-color: #218838;
+  }
+  
+  .btn button{
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .container {
+    /* text-align: center; */
+    /* margin-top: 50px; */
+  }
+
+  /* Style for the hidden div */
+  .hidden-div {
+    display: none; /* Initially hidden */
+    /* margin-top: 20px; */
+    padding: 40px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 300px;
+    margin: 20px auto;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Style for input fields */
+  .hidden-div input[type="text"] {
+    display: block;
+    width: 90%;
+    margin: 10px auto;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  /* Style for the submit button */
+  .hidden-div button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  /* Hover effect for the submit button */
+  .hidden-div button:hover {
+    background-color: #45a049;
+  }
+
+
+  /* Product Description */
+  .product-description {
+    margin: 20px;
+    background-color: white;
+    padding: 15px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+  }
+  
+  .product-description h2 {
+    margin-bottom: 10px;
+  }
+
+  .toggle_power{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    gap: 40px;
+    padding-bottom: 10px;
+  }
+
+  .toggle_power_button{
+    background-color: transparent;
+    text-decoration: none;
+    width: 20%;
+    height: 100%;
+    border-radius: 10px;
+    font-size: 20px;
+    border: none;
+  }
+
+  .toggle_power_button a{
+    text-decoration: none;
+    color: #000000;
+  }
+
+  .toggle_power_button a:hover{
+    text-decoration: underline;
+  }
+  .toggle_power_button:hover{
+    background-color: #b9faff;
+    border: #b9faff;
+    border-radius: 10px;
+  }
+  .toggle_power_button a , .toggle_power_button:checked{
+    background-color: #b9faff;
+    border: #b9faff;
+    border-radius: 10px;
+  }
+  /* .toggle_power_button a ; .toggle_power_button::selection{
+    text-decoration: underline;
+  } */
+  
+  /* FAQs */
+  .faqs {
+    margin: 20px;
+    background-color: white;
+    padding: 15px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+  }
+  
+  .faqs h2 {
+    margin-bottom: 10px;
+  }
+  
+  .faq-item h3 {
+    margin: 0;
+  }
+  
+  .faq-item p {
+    margin: 5px 0 15px;
+  }

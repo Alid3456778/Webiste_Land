@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>McLand Pharma - Product Listing & Grievances</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #E6F7FF;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #036280;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+        .container {
+            padding: 20px;
+        }
+        .product-card {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+        }
+        .product-card h3 {
+            margin: 0 0 10px;
+            color: #036280;
+        }
+        .product-card button {
+            background-color: #28A745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .product-card button:hover {
+            background-color: #218838;
+        }
+        .grievance-form {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: white;
+        }
+        .grievance-form h3 {
+            color: #036280;
+        }
+        .grievance-form label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        .grievance-form input, .grievance-form textarea, .grievance-form button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .grievance-form button {
+            background-color: #036280;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .grievance-form button:hover {
+            background-color: #024961;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>McLand Pharma - Product Listing & Grievances</h1>
+    </header>
+    <div class="container">
+        <div id="product-list">
+            <!-- Dynamic content will be injected here -->
+        </div>
+        <div class="grievance-form">
+            <h3>Submit a Grievance</h3>
+            <form id="grievanceForm">
+                <label for="grievanceName">Your Name:</label>
+                <input type="text" id="grievanceName" name="grievanceName" required>
+
+                <label for="grievanceEmail">Your Email:</label>
+                <input type="email" id="grievanceEmail" name="grievanceEmail" required>
+
+                <label for="grievanceMessage">Message:</label>
+                <textarea id="grievanceMessage" name="grievanceMessage" rows="5" required></textarea>
+
+                <button type="submit">Submit Grievance</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Sample product data (this will come from the backend in the real application)
+        const products = [
+            { id: 1, name: "Paracetamol", price: 2.99 },
+            { id: 2, name: "Aspirin", price: 3.49 },
+            { id: 3, name: "Amoxicillin", price: 4.99 }
+        ];
+
+        const productList = document.getElementById('product-list');
+
+        function renderProducts() {
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+
+                productCard.innerHTML = `
+                    <div>
+                        <h3>${product.name}</h3>
+                        <p>Price: $${product.price.toFixed(2)}</p>
+                    </div>
+                    <button onclick="addToCart(${product.id})">Add to Cart</button>
+                `;
+
+                productList.appendChild(productCard);
+            });
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            alert(`${product.name} has been added to your cart!`);
+            // Here we will call the backend to add the item to the user's cart
+        }
+
+        // Handle grievance form submission
+        document.getElementById('grievanceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('grievanceName').value;
+            const email = document.getElementById('grievanceEmail').value;
+            const message = document.getElementById('grievanceMessage').value;
+
+            alert('Thank you for your grievance submission! Our team will get back to you shortly.');
+            console.log({ name, email, message });
+
+            // Here we will send the grievance data to the backend
+        });
+
+        // Initial rendering
+        renderProducts();
+    </script>
+</body>
+</html>

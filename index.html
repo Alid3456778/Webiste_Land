@@ -1,362 +1,618 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Medicine Website Navigation</title>
-  <link rel="stylesheet" href="navbar_footer.css">
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <!-- Navigation Bar -->
-  <nav class="navbar">
-    <div class="navbar-left">
-      <!-- Hamburger Icon -->
-      <button id="hamburger-menu" class="hamburger-menu">
-        ☰
-      </button>
-      <!-- Logo -->
-      <div class="logo">MediCare</div>
-    </div>
-    <div class="navbar-right">
-      <!-- Search Bar -->
-      <input type="text" placeholder="Search products..." class="search-bar" id="search-input" />
-      <button class="search-button" id="search-button">Search</button>
-      <!-- Cart Icon -->
-      <img src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" alt="Cart" class="cart-icon" />
-    </div>
-  </nav>
-
-  <!-- Sidebar -->
-  <div id="sidebar" class="sidebar">
-    <button id="close-sidebar" class="close-btn">✖</button>
-    <div class="sidebar-content">
-      <h2>Menu</h2>
-      <ul>
-        <li><a href="#">Home</a></li>
-        <li><a href="#">Products</a></li>
-        <li><a href="#">About Us</a></li>
-        <li><a href="#">Contact</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="product-overview">
-    <!-- Left Side: Product Image -->
-    <div class="product-image">
-      <img src="./Alprazolam-USA-to-USA-01.jpg" alt="Product Image">
-    </div>
-    
-    <!-- Right Side: Product Details -->
-    <div class="product-details">
-        <div class="right1">
-      <h2>Enterogermina Probiotic Supplement</h2>
-      <p>For Alterations of Intestinal Bacterial Flora & Stomach Care</p>
-
-      <!-- MG Selection -->
-<div class="option-section">
-    <div class="option-title">MG</div>
-    <div class="option-buttons mg-buttons">
-      <button data-mg="1">1</button>
-      <button data-mg="2">2</button>
-      <button data-mg="3">3</button>
-      <button data-mg="4" class="active">4</button>
-      <button data-mg="5">5</button>
-    </div>
-    <div class="custom-input">Custom: <input type="number" class="mg-custom" placeholder="Enter MG"></div>
-  </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MCland Pharma</title>
+    <link rel="stylesheet" href="./assets/css/index.css" />
+    <link rel="stylesheet" href="./assets/css/styles.css">
+    <link rel="stylesheet" href="./assets/css/navbar_footer.css" />
+  </head>
+  <body>
+    <!-- Navbar -->
+    <header>
+      <nav class="navbar">
+        <div class="navbar-left">
+          <!-- Hamburger Icon -->
+          <button id="hamburger-menu" class="hamburger-menu">☰</button>
+          <!-- Logo -->
+          <div class="logo"><img src="./assets/image2/logo.png" alt=""></div>
+        </div>
+        <div class="navbar-right">
+          <!-- Search Bar -->
+          <input
+            type="text"
+            placeholder="Search products..."
+            class="search-bar"
+            id="search-input"
+          />
+          <button class="search-button" id="search-button">Search</button>
+          <!-- Cart Icon -->
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
+            alt="Cart"
+            class="cart-icon"
+          />
+        </div>
+      </nav>
   
-  <!-- Quantity Selection -->
-  <div class="option-section">
-    <div class="option-title">Quantity</div>
-    <div class="option-buttons quantity-buttons">
-      <button data-quantity="10">10</button>
-      <button data-quantity="30">30</button>
-      <button data-quantity="60">60</button>
-      <button data-quantity="100" class="active">100</button>
-      <button data-quantity="140">140</button>
-    </div>
-    <div class="custom-input">Custom: <input type="number" class="quantity-custom" placeholder="Enter Quantity"></div>
-  </div>
-  
-  
-
-      <!-- Add to Cart and Price -->
-      <button class="add-to-cart">Add to Cart</button>
-      <div class="price-section">
-        <p class="price" id="price">$1,200/-</p>
-        <p class="discount">Discount: 28%</p>
-      </div>
-    </div>
-    <div class="right2">
-        <h2>Product's Summery And Discription's</h2>
-        <div class="product-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>MG</th>
-                  <th>QTY</th>
-                  <th>Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1mg</td>
-                  <td>60</td>
-                  <td><span class="old-price">$4.54</span> <span class="new-price">$3.18 PER PILL</span></td>
-                  
-                </tr>
-                <tr>
-                  <td>1mg</td>
-                  <td>90</td>
-                  <td><span class="old-price">$4.29</span> <span class="new-price">$3.00 PER PILL</span></td>
-                  
-                </tr>
-                <tr>
-                  <td>1mg</td>
-                  <td>180</td>
-                  <td><span class="old-price">$3.16</span> <span class="new-price">$2.21 PER PILL</span></td>
-                  
-                </tr>
-                <tr>
-                  <td>1mg</td>
-                  <td>360</td>
-                  <td><span class="old-price">$3.01</span> <span class="new-price">$2.11 PER PILL</span></td>
-                  
-                </tr>
-                <tr>
-                  <td>1mg</td>
-                  <td>540</td>
-                  <td><span class="old-price">$2.96</span> <span class="new-price">$2.07 PER PILL</span></td>
-                  
-                </tr>
-                <tr>
-                  <td>1mg</td>
-                  <td>720</td>
-                  <td><span class="old-price">$2.84</span> <span class="new-price">$1.99 PER PILL</span></td>
-                  
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          
-    </div>
-
-    </div>
-  </div>
-
-  <section class="three-box-section">
-    <div class="box">
-      <h3>Product Details</h3>
-      <p>Paracetamol 500mg is a widely used medicine for reducing fever and relieving mild to moderate pain.</p>
-    </div>
-    <div class="box">
-      <h3>Use's For</h3>
-      <p>It relieves muscle strain and joint pain
-        It helps reduce swelling
-        It provides warmth and firm support to the affected area</p>
-    </div>
-    <div class="box">
-      <h3>Safety Information:</h3>
-      <p>Wash carefully in lukewarm water and remove excess water by squeezing gently
-        Allow it to dry without stretching
-        Do not iron</p>
-    </div>
-  </section>
-
-  <section class="recommendation-section">
-    <h2>Recommended for You</h2>
-    <ul class="recommendation-list">
-      <li class="category">
-        Health Corner
-        <ul class="sub-points">
-          <li><a href="#">Immunity Boosters</a></li>
-          <li><a href="#">Heart Health</a></li>
-          <li><a href="#">Diabetes Care</a></li>
-        </ul>
-      </li>
-      <li class="category">
-        Beauty
-        <ul class="sub-points">
-          <li><a href="#">Skin Care</a></li>
-          <li><a href="#">Hair Care</a></li>
-          <li><a href="#">Cosmetics</a></li>
-        </ul>
-      </li>
-      <li class="category">
-        Lab Tests
-        <ul class="sub-points">
-          <li><a href="#">Blood Test</a></li>
-          <li><a href="#">Thyroid Test</a></li>
-          <li><a href="#">Vitamin Deficiency</a></li>
-        </ul>
-      </li>
-      <li class="category">
-        Wellness
-        <ul class="sub-points">
-          <li><a href="#">Mental Health</a></li>
-          <li><a href="#">Fitness & Gym</a></li>
-          <li><a href="#">Sleep Aids</a></li>
-        </ul>
-      </li>
-      <li class="category">
-        Medicine
-        <ul class="sub-points">
-          <li><a href="#">Prescription Medicine</a></li>
-          <li><a href="#">OTC Medicine</a></li>
-          <li><a href="#">Pain Relief</a></li>
-        </ul>
-      </li>
-    </ul>
-  </section>
-  
-
-
-  
-  <section class="faqs">
-    <h2>Frequently Asked Questions</h2>
-    <div class="faq-item">
-      <h3>What is Paracetamol 500mg used for?</h3>
-      <p>It is used for pain relief and fever reduction.</p>
-    </div>
-    <div class="faq-item">
-      <h3>Are there any side effects?</h3>
-      <p>Common side effects include nausea, dizziness, or allergic reactions. Consult a doctor if symptoms persist.</p>
-    </div>
-    <div class="faq-item">
-      <h3>How It works ?</h3>
-      <p>Common side effects include nausea, dizziness, or allergic reactions. Consult a doctor if symptoms persist.</p>
-    </div>
-
-  </section>
-
-  
-  <section class="reviews-section">
-    <h2>Customer Reviews</h2>
-  
-    <!-- Average Rating -->
-    <div class="average-rating">
-      <span class="stars">
-        ★★★★☆
-      </span>
-      <p>4.5 out of 5 stars</p>
-      <p>Based on 1234 customer ratings</p>
-    </div>
-  
-    <!-- Review 1 -->
-    <div class="review-item">
-      <div class="review-header">
-        <span class="stars">★★★★☆</span>
-        <h3>Great Product!</h3>
-      </div>
-      <p class="review-author">Reviewed by <strong>John Doe</strong> on January 10, 2025</p>
-      <p class="review-text">
-        This medicine works exactly as described. I noticed a significant improvement within a week. Highly recommend it to anyone looking for reliable pain relief.
-      </p>
-    </div>
-  
-    <!-- Review 2 -->
-    <div class="review-item">
-      <div class="review-header">
-        <span class="stars">★★★☆☆</span>
-        <h3>Good, but some side effects</h3>
-      </div>
-      <p class="review-author">Reviewed by <strong>Jane Smith</strong> on January 8, 2025</p>
-      <p class="review-text">
-        The product is effective, but I experienced slight nausea after using it. Consult your doctor if you have a sensitive stomach.
-      </p>
-    </div>
-  
-    <!-- Review Form -->
-    <div class="review-form">
-      <h3>Write a Review</h3>
-      <form>
-        <label for="name">Name:</label>
-        <input type="text" id="name" placeholder="Your name" required />
-  
-        <label for="rating">Rating:</label>
-        <select id="rating" required>
-          <option value="5">★★★★★ (5 stars)</option>
-          <option value="4">★★★★☆ (4 stars)</option>
-          <option value="3">★★★☆☆ (3 stars)</option>
-          <option value="2">★★☆☆☆ (2 stars)</option>
-          <option value="1">★☆☆☆☆ (1 star)</option>
-        </select>
-  
-        <label for="review">Review:</label>
-        <textarea id="review" placeholder="Write your review here..." required></textarea>
-  
-        <button type="submit">Submit Review</button>
-      </form>
-    </div>
-  </section>
-  
-      
-
-
-  <footer class="footer">
-    <div class="footer-content">
-      <div class="footer-section resources">
-        <h3>Resources</h3>
-        <ul>
-          <li><a href="#">Shipping</a></li>
-          <li><a href="#">Returns & Refunds</a></li>
-          <li><a href="#">Payment Methods</a></li>
-          <li><a href="#">FAQs</a></li>
-        </ul>
-      </div>
-      <div class="footer-section legal">
-        <h3>Legal</h3>
-        <ul>
-          <li><a href="#">About Us</a></li>
-          <li><a href="#">Contact Us</a></li>
-          <li><a href="#">Terms & Conditions</a></li>
-          <li><a href="#">Privacy Policy</a></li>
-          <li><a href="#">Cancellation Policy</a></li>
-        </ul>
-      </div>
-      <div class="footer-section support">
-        <h3>Support 24/7</h3>
-        <p><i class="fa fa-envelope"></i> support@mclandpharma.com</p>
-        <p><i class="fa fa-phone"></i> +1 315 666 5976</p>
-      </div>
-      <div class="footer-section disclaimer">
-        <h3>Disclaimer</h3>
-        <p>
-          The services on Mcland Pharma are available for millions of people solely presented for
-          informative, qualitative, quantitative, and affordable medicinal purposes. Here we believe 
-          The Doctor’s advice = The Best Advice for medicinal needs by following protocol accordingly 
-          by people suffering from different conditions.
-        </p>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <div class="footer-left">
-        <p class="copyright">
-          &copy; 2024 Mcland Pharma. All rights reserved.
-        </p>
-        <p>© 2024 All rights reserved. Mcland Pharma</p>
-        <p>
-          Mcland Pharma has been working on a change towards healthcare and improving health. We are 
-          on a mission Encouraging Healthcare – Improving Health since 2013. We have covered the finest 
-          medicines for the mission towards cure with a few simple steps at budget-friendly prices.
-        </p>
-      </div>
-      <div class="footer-right">
-        <h3>Payment modes</h3>
-        <div class="payment-icons">
-          <img src="./assets/image/cash_app.png" alt="Cash App">
-          <img src="./assets/image/zelle.png" alt="Zelle">
-          <img src="./assets/image/venmo.png" alt="Venmo">
-          <!-- <img src="./assets/image/apple_pay.png" alt="Apple Pay">
-          <img src="./assets/image/Gpay.png" alt="Google Pay"> -->
-          <img src="./assets/image/pay_pal.jpg" alt="Paypal">
-          <!-- <img src="./assets/image/wire_transfer.png" alt="Wire Transfer"> -->
-          <img src="./assets/image/bitcoin.png" alt="Bitcoin">
+      <!-- Sidebar -->
+      <div id="sidebar" class="sidebar">
+        <button id="close-sidebar" class="close-btn">✖</button>
+        <div class="sidebar-content">
+          <h2>Menu</h2>
+          <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Products</a></li>
+            <li><a href="#">About Us</a></li>   
+            <li><a href="#">Contact</a></li>
+          </ul>
         </div>
       </div>
+      
+    </header>
+    <nav class="navbar-bottom">
+      <ul>
+        <li>
+          <a class="aa headd" href="#">Medicine</a>
+          <ul class="dropdown">
+            <li><a href="#">Cardiac Care</a></li>
+            <li><a href="#">General Health Care</a></li>
+            <li><a href="#">Pain Medication</a></li>
+          </ul>
+        </li>
+        <li>
+          <a class="aa headd" href="#">Wellness</a>
+          <ul class="dropdown">
+            <li><a href="#">Mental Health</a></li>
+            <li><a href="#">Sexual Wellness</a></li>
+            <li><a href="#">Skincare</a></li>
+          </ul>
+        </li>
+        <li>
+          <a class="aa headd" href="#">Lab Tests</a>
+          <ul class="dropdown">
+            <li><a href="#">Blood Test</a></li>
+            <li><a href="#">Urine Test</a></li>
+            <li><a href="#">Hormone Test</a></li>
+          </ul>
+        </li>
+        <li>
+          <a class="aa headd" href="#">Beauty</a>
+          <ul class="dropdown">
+            <li><a href="#">Skin Care</a></li>
+            <li><a href="#">Hair Care</a></li>
+          </ul>
+        </li>
+        <li>
+          <a class="aa headd" href="#">Health Corner</a>
+          <ul class="dropdown">
+            <li><a href="#">Nutrition</a></li>
+            <li><a href="#">Exercise</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- <section class="search_card">
+    <div class="serach_text">
+      <h2>Your Partner in Healthcare</h2>
+
     </div>
-  </footer>
-  <script src="script.js"></script>
-</body>
+    <div class="searchbar">
+      <input type="text" placeholder="Search for medicine...">
+      <button class="search_btn" type="button"> Search</button>
+    </div>
+  </section> -->
+
+    <!-- Banner -->
+    <!-- <div class="banner-item">
+      <div class="offer">
+        <h2>Flat 25% off +</h2>
+        <p>up to 10% cash-in-wallet + <strong>free shipping</strong></p>
+        <span>Code: <strong>NMSNEW</strong></span>
+        <button>Shop now</button>
+      </div>
+      <div class="banner-image">
+        <img src="./assets/image/sample banner.webp" alt="Offer Image">
+      </div> 
+      </div> 
+     <div class="banner-item">
+      <div class="savings">
+        <h2>NovemBest Savings</h2>
+        <img src="./assets/image/banner_sample_2.avif" alt="Savings Image">
+      </div>
+    </div> -->
+
+    <section id="transit_slide">
+      <div id="pre_slider">
+        <div id="slider">
+          <!-- Add your images as slides -->
+          <div class="slide" style="display: none">
+            <img
+              src="./assets/image2/Pharmacy - vector illustration - Design Template Place.jpg"
+              alt="Stock Image 1"
+            />
+          </div>
+          <div class="slide" style="display: block">
+            <img
+              src="./assets/image2/Pharmacy tech online training for pharmacist tiny person neubrutalism concept.jpg"
+              alt="Stock Image 2"
+            />
+          </div>
+          <div class="slide" style="display: none">
+            <img
+              src="./assets/image/Merry_Christmas_offer.png"
+              alt="Stock Image 3"
+            />
+          </div>
+          <div class="slide" style="display: none">
+            <img
+              src="./assets/image2/Download pharmacy with pharmacist and client in counter for free.jpg"
+              alt="Stock Image 4"
+            />
+          </div>
+          <div class="slide" style="display: none">
+            <img
+              src="./assets/image/Merry_Christmas_offer.png"
+              alt="Stock Image 5"
+            />
+          </div>
+
+          <!-- Controlling arrows -->
+          <span class="controls" onclick="changeSlide(-1)" id="left-arrow">
+            <i class="fa fa-arrow-left" aria-hidden="true"></i>
+          </span>
+          <span class="controls" id="right-arrow" onclick="changeSlide(1)">
+            <i class="fa fa-arrow-right" aria-hidden="true"></i>
+          </span>
+        </div>
+        <!-- Dot navigation -->
+        <div id="dots-con">
+          <span class="dot" onclick="setCurrentSlide(1)"></span>
+          <span class="dot active" onclick="setCurrentSlide(2)"></span>
+          <span class="dot" onclick="setCurrentSlide(3)"></span>
+          <span class="dot" onclick="setCurrentSlide(4)"></span>
+          <span class="dot" onclick="setCurrentSlide(5)"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- pop up -->
+    <div id="popup" class="popup-overlay">
+      <div class="popup-content">
+        <img
+          src="./assets/image2/Gemini_Generated_Image_s3achms3achms3ac.jpg"
+          alt=""
+        />
+        <span class="close-btn" onclick="closePopup()">&times;</span>
+        <h2 class="headd">Special Offer!</h2>
+        <p>
+          Flat 25% off + up to 10% cash-in-wallet +
+          <strong>free shipping</strong>
+        </p>
+        <span>Code: <strong>NMSNEW</strong></span>
+        <br />
+        <button class="btn" onclick="closePopup()">Claim Offer</button>
+      </div>
+    </div>
+
+    <!-- Offers Banner -->
+    <!-- <section id="offers" class="offers-banner">
+    <h2>Exclusive Offers</h2>
+    <p>Up to 30% off on premium USA products!</p>
+    <button class="offerbtn">Shop Now</button>
+  </section> -->
+
+    <!-- What We Offer -->
+    <!-- <h2>Shop By Categories</h2> -->
+    <section id="what-we-offer" class="shop-by-categories">
+      <h2 class="headd">Shop By Categories</h2>
+      <div class="what-we-offer">
+        <div class="card-container">
+          <!-- Card 1 -->
+          <div
+            class="card"
+            onclick="this.querySelector('a').click(); return true;"
+          >
+            <img src="./assets/image/USA-Premium.png" alt="USA Premium" />
+            <p>USA Premium</p>
+            <a href="./categories.html"></a>
+          </div>
+          <!-- Card 2 -->
+          <div
+            class="card"
+            onclick="this.querySelector('a').click(); return true;"
+          >
+            <img src="./assets/image/cardiac-care.png" alt="Cardiac Care" />
+            <p>Cardiac Care</p>
+            <a href="./categories.html"></a>
+          </div>
+          <!-- Card 3 -->
+          <div
+            class="card"
+            onclick="this.querySelector('a').click(); return true;"
+          >
+            <img
+              src="./assets/image/general-health.png"
+              alt="General Health Care"
+            />
+            <p>General Health Care</p>
+            <a href="./categories.html"></a>
+          </div>
+          <!-- Card 4 -->
+          <div
+            class="card"
+            onclick="this.querySelector('a').click(); return true;"
+          >
+            <img src="./assets/image/mens-health.png" alt="Men's Health" />
+            <p>Mens Health</p>
+            <a href="./categories.html"></a>
+          </div>
+          <!-- Card 5 -->
+          <div
+            class="card"
+            onclick="this.querySelector('a').click(); return true;"
+          >
+            <img src="./assets/image/mental-health.png" alt="Mental Health" />
+            <p>Mental Health</p>
+            <a href="./categories.html"></a>
+          </div>
+          <!-- Card 6 -->
+          <div
+            class="card"
+            onclick="this.querySelector('a').click(); return true;"
+          >
+            <img
+              src="./assets/image/pain-medication.png"
+              alt="Pain Medication"
+            />
+            <p>Pain Medication</p>
+            <a href="./categories.html"></a>
+          </div>
+          <!-- Card 7 -->
+          <div
+            class="card"
+            onclick="this.querySelector('a').click(); return true;"
+          >
+            <img
+              src="./assets/image/sexual-wellness.png"
+              alt="Sexual Wellness"
+            />
+            <p>Sexual Wellness</p>
+            <a href="./categories.html"></a>
+          </div>
+          <!-- Card 8 -->
+          <div
+            class="card"
+            onclick="this.querySelector('a').click(); return true;"
+          >
+            <img src="./assets/image/skincare.png" alt="Skincare" />
+            <p>Skincare</p>
+            <a href="./categories.html"></a>
+          </div>
+          <!-- Card 9 -->
+          <div
+            class="card"
+            onclick="this.querySelector('a').click(); return true;"
+          >
+            <img src="./assets/image/steroids.png" alt="Steroids" />
+            <p>Steroids</p>
+            <a href="./categories.html"></a>
+          </div>
+          <!-- Card 10 -->
+          <div
+            class="card"
+            onclick="this.querySelector('a').click(); return true;"
+          >
+            <img src="./assets/image/women-health.png" alt="Womens Health" />
+            <p>Womens Health</p>
+            <a href="./categories.html"></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- New Arrivals -->
+    <section id="new-arrivals" class="product-section">
+      <div><h2>New Arrivals</h2></div>
+
+      <div class="product-grid">
+        <div class="product-card">
+          <div class="right_side">
+            <div>
+              <img
+                src="./assets/image/Alprazolam-USA-to-USA-01.jpg"
+                alt="Product 1"
+              />
+            </div>
+            <div>
+              <p>Product Name 1</p>
+              <span>$25.99</span>
+              <a href="product_overview.html">Learn More</a>
+            </div>
+          </div>
+          <div class="left_side">
+            <button ><a href="checkout.html">Buy</a></button>
+            <button> <a href="cart.html">Add to Cart</a></button>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="right_side">
+            <div>
+              <img
+                src="./assets/image/Alprazolam-USA-to-USA-01.jpg"
+                alt="Product 1"
+              />
+            </div>
+            <div>
+              <p>Product Name 1</p>
+              <span>$25.99</span>
+              <a href="product_overview.html">Learn More</a>
+            </div>
+          </div>
+          <div class="left_side">
+            <button>Buy</button>
+            <button>Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="right_side">
+            <div>
+              <img
+                src="./assets/image/Alprazolam-USA-to-USA-01.jpg"
+                alt="Product 1"
+              />
+            </div>
+            <div>
+              <p>Product Name 1</p>
+              <span>$25.99</span>
+              <a href="product_overview.html">Learn More</a>
+            </div>
+          </div>
+          <div class="left_side">
+            <button>Buy</button>
+            <button>Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="right_side">
+            <div>
+              <img
+                src="./assets/image/Alprazolam-USA-to-USA-01.jpg"
+                alt="Product 1"
+              />
+            </div>
+            <div>
+              <p>Product Name 1</p>
+              <span>$25.99</span>
+              <a href="product_overview.html">Learn More</a>
+            </div>
+          </div>
+          <div class="left_side">
+            <button>Buy</button>
+            <button>Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="right_side">
+            <div>
+              <img
+                src="./assets/image/Alprazolam-USA-to-USA-01.jpg"
+                alt="Product 1"
+              />
+            </div>
+            <div>
+              <p>Product Name 1</p>
+              <span>$25.99</span>
+            </div>
+          </div>
+          <div class="left_side">
+            <button>Buy</button>
+            <button>Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="right_side">
+            <div>
+              <img
+                src="./assets/image/Alprazolam-USA-to-USA-01.jpg"
+                alt="Product 1"
+              />
+            </div>
+            <div>
+              <p>Product Name 1</p>
+              <span>$25.99</span>
+            </div>
+          </div>
+          <div class="left_side">
+            <button>Buy</button>
+            <button>Add to Cart</button>
+          </div>
+        </div>
+        
+      </div>
+    </section>
+
+    <!-- Most Popular Products -->
+    <section id="popular-products" class="product-section">
+      <h2>Most Popular Products</h2>
+      <div class="product-grid">
+        <div class="product-card">
+          <img src="./assets/product4.png" alt="Product 4" />
+          <p>Product Name 4</p>
+          <span>$45.99</span>
+        </div>
+        <div class="product-card">
+          <img src="./assets/product5.png" alt="Product 5" />
+          <p>Product Name 5</p>
+          <span>$29.49</span>
+        </div>
+        <div class="product-card">
+          <img src="./assets/product6.png" alt="Product 6" />
+          <p>Product Name 6</p>
+          <span>$39.99</span>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-section resources">
+          <h3>Resources</h3>
+          <ul>
+            <li><a href="#">Shipping</a></li>
+            <li><a href="#">Returns & Refunds</a></li>
+            <li><a href="#">Payment Methods</a></li>
+            <li><a href="#">FAQs</a></li>
+          </ul>
+        </div>
+        <div class="footer-section legal">
+          <h3>Legal</h3>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">Terms & Conditions</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Cancellation Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-section support">
+          <h3>Support 24/7</h3>
+          <p><i class="fa fa-envelope"></i> support@mclandpharma.com</p>
+          <p><i class="fa fa-phone"></i> +1 315 666 5976</p>
+        </div>
+        <div class="footer-section disclaimer">
+          <h3>Disclaimer</h3>
+          <p>
+            The services on Mcland Pharma are available for millions of people
+            solely presented for informative, qualitative, quantitative, and
+            affordable medicinal purposes. Here we believe The Doctor’s advice =
+            The Best Advice for medicinal needs by following protocol
+            accordingly by people suffering from different conditions.
+          </p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-left">
+          <p class="copyright">
+            &copy; 2024 Mcland Pharma. All rights reserved.
+          </p>
+          <p>© 2024 All rights reserved. Mcland Pharma</p>
+          <p>
+            Mcland Pharma has been working on a change towards healthcare and
+            improving health. We are on a mission Encouraging Healthcare –
+            Improving Health since 2013. We have covered the finest medicines
+            for the mission towards cure with a few simple steps at
+            budget-friendly prices.
+          </p>
+        </div>
+        <div class="footer-right">
+          <h3>Payment modes</h3>
+          <div class="payment-icons">
+            <img src="./assets/image/cash_app.png" alt="Cash App" />
+            <img src="./assets/image/zelle.png" alt="Zelle" />
+            <img src="./assets/image/venmo.png" alt="Venmo" />
+            <!-- <img src="./assets/image/apple_pay.png" alt="Apple Pay">
+          <img src="./assets/image/Gpay.png" alt="Google Pay"> -->
+            <img src="./assets/image/pay_pal.jpg" alt="Paypal" />
+            <!-- <img src="./assets/image/wire_transfer.png" alt="Wire Transfer"> -->
+            <img src="./assets/image/bitcoin.png" alt="Bitcoin" />
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Auto-Slide Functionality
+      let currentSlideIndex = 0;
+
+      function showSlide(index) {
+        const slides = document.querySelectorAll(".slide");
+        const dots = document.querySelectorAll(".dot");
+        if (index >= slides.length) currentSlideIndex = 0;
+        if (index < 0) currentSlideIndex = slides.length - 1;
+
+        slides.forEach((slide) => (slide.style.display = "none"));
+        dots.forEach((dot) => dot.classList.remove("active"));
+
+        slides[currentSlideIndex].style.display = "block";
+        dots[currentSlideIndex].classList.add("active");
+      }
+
+      function changeSlide(n) {
+        showSlide((currentSlideIndex += n));
+      }
+
+      function setCurrentSlide(n) {
+        currentSlideIndex = n - 1;
+        showSlide(currentSlideIndex);
+      }
+
+      function autoSlide() {
+        changeSlide(1);
+        setTimeout(autoSlide, 3000); // Auto-slide every 3 seconds
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        showSlide(currentSlideIndex);
+        autoSlide();
+      });
+    </script>
+
+    <script>
+      document.querySelectorAll(".navbar-bottom li").forEach((item) => {
+        item.addEventListener("click", function (e) {
+          const dropdown = this.querySelector(".dropdown");
+          if (dropdown) {
+            e.stopPropagation(); // Prevents clicks from propagating to other elements
+            dropdown.style.display =
+              dropdown.style.display === "block" ? "none" : "block";
+          }
+        });
+
+        item.addEventListener("mouseover", function () {
+          const dropdown = this.querySelector(".dropdown");
+          if (dropdown) {
+            dropdown.style.display = "block";
+          }
+        });
+
+        item.addEventListener("mouseout", function () {
+          const dropdown = this.querySelector(".dropdown");
+          if (dropdown) {
+            dropdown.style.display = "none";
+          }
+        });
+      });
+
+      // Close dropdowns when clicking outside
+      document.addEventListener("click", () => {
+        document.querySelectorAll(".dropdown").forEach((dropdown) => {
+          dropdown.style.display = "none";
+        });
+      });
+    </script>
+    <script>
+      // Function to show the popup
+      function showPopup() {
+        const popup = document.getElementById("popup");
+        popup.classList.add("visible");
+      }
+
+      // Function to close the popup
+      function closePopup() {
+        const popup = document.getElementById("popup");
+        popup.classList.remove("visible");
+      }
+
+      // Automatically show the popup after 3 seconds (optional)
+      window.onload = function () {
+        setTimeout(showPopup, 1000); // Popup will appear after 3 seconds
+      };
+    </script>
+    <script src="./assets/js/index.js"></script>
+    <script src="./assets/js/script.js"></script>
+  </body>
 </html>

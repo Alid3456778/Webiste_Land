@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | Mcland Pharma</title>
+    <link rel="stylesheet" href="./assets/css/navbar_footer.css">
+    <link rel="stylesheet" href="./assets/css/checkout.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-top">
+          <div class="logo" onclick="this.querySelector('a').click(); return true;">
+            <img src="./assets/image2/logo.png" alt="MCland Pharma Logo">
+            <a href="./index.html"></a>
+          </div>
+          <!-- <div class="delivery">
+            <span>Deliver to <strong>110002</strong></span>
+          </div> -->
+          <div class="navbar-top-right">
+            <!-- <div class="search-bar">
+              <input type="text" placeholder="Search for medicine...">
+            </div> -->
+            <div class="actions">
+              <!-- <button>Upload</button> -->
+              <!-- <button type="button"><a class="a offer" href="#">Offers</a></button> -->
+              <button type="button"><a class="a Cart" href="./cart.html"><img
+                src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
+                alt="Cart"
+                class="cart-icon"
+              /></a></button>
+              <button type="button"><a class="a signin_signup" href="#">Sign in / Sign up</a></button>
+            </div>
+          </div>
+        </div>
+       
+      </header>
+
+    <!-- Checkout Form -->
+  <main class="checkout-container">
+    <h1>Billing Details</h1>
+    <!-- <progress id="checkout-form" max="100" value="70">70%</progress> -->
+    <div class="checkout-card">
+      <form id="checkout-form" class="checkout-form">
+        <!-- Billing Details -->
+        <div class="form-group">
+          <label for="first-name">First Name <span>*</span></label>
+          <input type="text" id="first-name" name="firstName" required>
+        </div>
+        <div class="form-group">
+          <label for="last-name">Last Name <span>*</span></label>
+          <input type="text" id="last-name" name="lastName" required>
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone <span>*</span></label>
+          <input type="tel" id="phone" name="phone" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address <span>*</span></label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="company-name">Company Name (optional)</label>
+            <input type="text" id="company-name">
+          </div>
+          <div class="form-group">
+            <label for="country">Country / Region <span>*</span></label>
+            <select id="country" required>
+              <option value="United States">United States (US)</option>
+              <option value="India">India</option>
+              <option value="Canada">Canada</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="street-address">Street Address <span>*</span></label>
+            <input type="text" id="street-address" name="billingStreetAddress" placeholder="House number and street name" required>
+          </div>
+          <div class="form-group">
+            <label for="apartment">Apartment, suite, unit, etc. (optional)</label>
+            <input type="text" id="apartment">
+          </div>
+          <div class="form-group">
+            <label for="city">Town / City <span>*</span></label>
+            <input type="text" id="city" name="billingCity" required>
+          </div>
+          <div class="form-group">
+            <label for="state">State <span>*</span></label>
+            <select id="state" name="billingState" required>
+              <option value="California">California</option>
+              <option value="New York">New York</option>
+              <option value="Texas">Texas</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="zip-code">ZIP Code <span>*</span></label>
+            <input type="text" id="zip-code" name="billingZip" required>
+          </div>
+        <!-- Shipping Address Checkbox -->
+        <div class="form-group-shipping">
+          <input type="checkbox" id="different-address">
+          <label for="different-address">Ship to a different address?</label>
+        </div>
+        <!-- Additional Address Form -->
+        <div id="shipping-address-form" style="display: none;">
+          <h2>Shipping Address</h2>
+          <div class="form-group">
+            <label for="ship-street-address">Street Address <span>*</span></label>
+            <input type="text" id="ship-street-address" name="shipStreetAddress">
+          </div>
+          <div class="form-group">
+            <label for="ship-city">City <span>*</span></label>
+            <input type="text" id="ship-city" name="shipCity">
+          </div>
+          <div class="form-group">
+            <label for="ship-zip">ZIP Code <span>*</span></label>
+            <input type="text" id="ship-zip" name="shipZip">
+          </div>
+        </div>
+      </form>
+
+      <!-- Order Summary -->
+      <section class="order-summary">
+        <h2>Your Order</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Codeine 200mg x 1</td>
+              <td>₹200.00</td>
+            </tr>
+            <tr>
+              <td>Shipping</td>
+              <td>₹50.00</td>
+            </tr>
+            <tr>
+              <td>Total</td>
+              <td>₹250.00</td>
+            </tr>
+          </tbody>
+        </table>
+        <button id="place-order-btn" class="place-order-btn">Place Order</button>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section resources">
+        <h3>Resources</h3>
+        <ul>
+          <li><a href="#">Shipping</a></li>
+          <li><a href="#">Returns & Refunds</a></li>
+          <li><a href="#">Payment Methods</a></li>
+          <li><a href="#">FAQs</a></li>
+        </ul>
+      </div>
+      <div class="footer-section legal">
+        <h3>Legal</h3>
+        <ul>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="#">Terms & Conditions</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Cancellation Policy</a></li>
+        </ul>
+      </div>
+      <div class="footer-section support">
+        <h3>Support 24/7</h3>
+        <p><i class="fa fa-envelope"></i> support@mclandpharma.com</p>
+        <p><i class="fa fa-phone"></i> +1 315 666 5976</p>
+      </div>
+      <div class="footer-section disclaimer">
+        <h3>Disclaimer</h3>
+        <p>
+          The services on Mcland Pharma are available for millions of people solely presented for
+          informative, qualitative, quantitative, and affordable medicinal purposes. Here we believe 
+          The Doctor’s advice = The Best Advice for medicinal needs by following protocol accordingly 
+          by people suffering from different conditions.
+        </p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-left">
+        <p class="copyright">
+          &copy; 2024 Mcland Pharma. All rights reserved.
+        </p>
+        <p>© 2024 All rights reserved. Mcland Pharma</p>
+        <p>
+          Mcland Pharma has been working on a change towards healthcare and improving health. We are 
+          on a mission Encouraging Healthcare – Improving Health since 2013. We have covered the finest 
+          medicines for the mission towards cure with a few simple steps at budget-friendly prices.
+        </p>
+      </div>
+      <div class="footer-right">
+        <h3>Payment modes</h3>
+        <div class="payment-icons">
+          <img src="./assets/image/cash_app.png" alt="Cash App">
+          <img src="./assets/image/zelle.png" alt="Zelle">
+          <img src="./assets/image/venmo.png" alt="Venmo">
+          <!-- <img src="./assets/image/apple_pay.png" alt="Apple Pay">
+          <img src="./assets/image/Gpay.png" alt="Google Pay"> -->
+          <img src="./assets/image/pay_pal.jpg" alt="Paypal">
+          <!-- <img src="./assets/image/wire_transfer.png" alt="Wire Transfer"> -->
+          <img src="./assets/image/bitcoin.png" alt="Bitcoin">
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('.navbar-bottom li').forEach((item) => {
+    item.addEventListener('click', function (e) {
+      const dropdown = this.querySelector('.dropdown');
+      if (dropdown) {
+        e.stopPropagation(); // Prevents clicks from propagating to other elements
+        dropdown.style.display =
+          dropdown.style.display === 'block' ? 'none' : 'block';
+      }
+    });
+  
+    item.addEventListener('mouseover', function () {
+      const dropdown = this.querySelector('.dropdown');
+      if (dropdown) {
+        dropdown.style.display = 'block';
+      }
+    });
+  
+    item.addEventListener('mouseout', function () {
+      const dropdown = this.querySelector('.dropdown');
+      if (dropdown) {
+        dropdown.style.display = 'none';
+      }
+    });
+  });
+  
+  // Close dropdowns when clicking outside
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.dropdown').forEach((dropdown) => {
+      dropdown.style.display = 'none';
+    });
+  });
+    
+  </script>
+
+  <script src="./assets/js/checkout.js"></script>
+
+</body>
+</html>
