@@ -5,198 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Dashboard - McLand Pharma</title>
     <style>
-        :root {
-            --blue-sapphire: #126180;
-            --light-sky-blue: #87CEEB;
-            --white: #FFFFFF;
-            --black: #000000;
-            --sandy-brown: #F4A460;
-            --blue-green: #0D98BA;
-            --metallic-seaweed: #0A7E8C;
-            --american-green: #34B334;
-            --forest-green: #228B22;
-            --india-green: #138808;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--light-sky-blue);
-            color: var(--black);
-        }
-
-        header {
-            background-color: var(--blue-sapphire);
-            color: var(--white);
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 1.5rem;
-        }
-
-        nav {
-            display: flex;
-            gap: 15px;
-        }
-
-        nav a {
-            color: var(--white);
-            text-decoration: none;
-            font-size: 1rem;
-        }
-
-        nav a:hover {
-            text-decoration: underline;
-        }
-
-        .container {
-            padding: 20px;
-        }
-
-        .card {
-            background-color: var(--white);
-            border: 1px solid var(--blue-green);
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-
-        .card h2 {
-            margin-top: 0;
-            color: var(--blue-sapphire);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        table th, table td {
-            border: 1px solid var(--sandy-brown);
-            padding: 10px;
-            text-align: left;
-        }
-
-        table th {
-            background-color: var(--metallic-seaweed);
-            color: var(--white);
-        }
-        .action{
-            display: flex;
-            justify-content: space-around;
-        }
-        .action button{
-            margin: 0px 10px 0px 10px;
-        }
-
-        button {
-            background-color: var(--forest-green);
-            color: var(--white);
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: var(--india-green);
-        }
-
-        #manage-products{
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        #product-form{
-            display: flex;
-            flex-direction: row;
-            gap: 20px;
-        }
-
-        #product-form-section{
-            width: 25%;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        #product-form-items{
-            width: 100%;
-        }
-
-        #variation-section{
-            width: 25%;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        #variation-items{
-            display: flex;
-            width: 100%;
-        }
-
-        #faq-section{
-            width: 25%;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin-left: 10px;
-        }
-
-        #faq-items{
-            display: flex;
-            width: 100%;
-        }
-
-        #submit_btn{
-            width: 25%;
-            display: flex;
-            justify-content: flex-end;
-            flex-direction: column;
-        }
-
-        #submit_btn button{
-            width: 100%;
-        }
-
-        #existing-products-table{
-            overflow-x: auto; /* Enable horizontal scrolling */
-        white-space: nowrap; /* Prevent content from wrapping */
-        scrollbar-width: none; /* Hide scrollbar for Firefox */
-        -ms-overflow-style: none; /* Hide scrollbar for IE */
-        }
-        
-        
-label {
-    font-size: 14px;
-    color: #555;
-}
-
-input, textarea, select, button {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-}
-#variation-section{
-    margin-left: 10px;
-}
-.customerAssistance{
-    width: fit-content;
-}
-        
+              
     </style>
+    <link rel="stylesheet" href="./assets/css/employee.css">
 </head>
 <body>
     <header>
@@ -499,5 +310,67 @@ input, textarea, select, button {
             </form>
         </section>
     </div>
+    <script>
+        document.getElementById('product-form').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    // Gather main product details
+    const formData = {
+        category_id: document.getElementById('category-id').value,
+        category_name: document.getElementById('category-name').value,
+        product_name: document.getElementById('product-name').value,
+        product_description: document.getElementById('product-description').value,
+        trade_names: document.getElementById('trade-names').value,
+        ingredients: document.getElementById('ingredients').value,
+        manufactured_by: document.getElementById('manufactured-by').value,
+        packaging_details: document.getElementById('packaging-details').value,
+        how_to_use: document.getElementById('how-to-use').value,
+        drug_interaction: document.getElementById('drug-interaction').value,
+        side_effects: document.getElementById('side-effects').value,
+        warnings_precautions: document.getElementById('warnings-precautions').value,
+        withdrawal_symptoms: document.getElementById('withdrawal-symptoms').value,
+        drug_abuse: document.getElementById('drug-abuse').value,
+        storage: document.getElementById('storage').value,
+    };
+
+    // Gather variations
+    formData.variations = Array.from(document.querySelectorAll('.variation-item')).map(variation => ({
+        unit_type: variation.querySelector('[name="unit_type[]"]').value,
+        unit_value: variation.querySelector('[name="unit_value[]"]').value,
+        qty: variation.querySelector('[name="qty[]"]').value,
+        price_per_pill: variation.querySelector('[name="price_per_pill[]"]').value,
+        price_per_box: variation.querySelector('[name="price_per_box[]"]').value,
+        delivery_time: variation.querySelector('[name="delivery_time[]"]').value,
+    }));
+
+    // Gather FAQs
+    formData.faqs = Array.from(document.querySelectorAll('.faq-item')).map(faq => ({
+        question: faq.querySelector('[name="faq_question[]"]').value,
+        answer: faq.querySelector('[name="faq_answer[]"]').value,
+    }));
+
+    try {
+        // Send data to the backend API using Fetch
+        const response = await fetch('http://localhost:3000/products', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            alert('Product added successfully!');
+        } else {
+            alert('Failed to add product: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while adding the product.');
+    }
+});
+
+    </script>
 </body>
 </html>

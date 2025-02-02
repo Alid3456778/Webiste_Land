@@ -5,7 +5,7 @@ function filterCategory() {
   
     medicines.forEach((medicine) => {
       if (category === 'all' || medicine.classList.contains(category)) {
-        medicine.style.display = 'block';
+        medicine.style.display = 'flex';
       } else {
         medicine.style.display = 'none';
       }
@@ -19,7 +19,7 @@ function filterCategory() {
   
     medicines.forEach((medicine) => {
       if (medicine.textContent.toLowerCase().includes(query)) {
-        medicine.style.display = 'block';
+        medicine.style.display = 'flex';
       } else {
         medicine.style.display = 'none';
       }

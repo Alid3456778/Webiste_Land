@@ -75,7 +75,7 @@ body {
   gap: 20px;
   padding: 20px;
 }
-.medicine-card {
+/* .medicine-card {
   width: calc(25% - 20px);
   background-color: #fff;
   border: 1px solid #ccc;
@@ -87,7 +87,7 @@ body {
 }
 .medicine-card:hover {
   transform: scale(1.05);
-}
+} */
 
 /* Product Grid Section */
 #product-grid {
@@ -117,8 +117,8 @@ body {
 
 /* Product Image */
 .product-card img {
-  width: 100px;
-  height: 100px;
+  width: 200px;
+  height: 200px;
   object-fit: cover;
   border-radius: 5px;
   margin-right: 15px; /* Space between image and details */
