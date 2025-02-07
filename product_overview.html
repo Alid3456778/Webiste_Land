@@ -6,6 +6,9 @@
     <title>Medicine Website Navigation</title>
     <link rel="stylesheet" href="./assets/css/navbar_footer.css" />
     <link rel="stylesheet" href="./assets/css/styles.css" />
+    <style>
+      
+    </style>
   </head>
   <body>
     <!-- Navigation Bar -->
@@ -14,7 +17,7 @@
         <!-- Hamburger Icon -->
         <button id="hamburger-menu" class="hamburger-menu">☰</button>
         <!-- Logo -->
-        <div class="logo"><img src="./assets/image2/logo.png" alt=""></div>
+        <div class="logo"><img src="./assets/image2/logo.png" alt="" /></div>
       </div>
       <div class="navbar-right">
         <!-- Search Bar -->
@@ -42,7 +45,7 @@
         <ul>
           <li><a href="#">Home</a></li>
           <li><a href="#">Products</a></li>
-          <li><a href="#">About Us</a></li>   
+          <li><a href="#">About Us</a></li>
           <li><a href="#">Contact</a></li>
         </ul>
       </div>
@@ -52,7 +55,10 @@
       <!-- Left Side: Product Image -->
       <div class="product-image">
         <div class="carousel-container">
-          <img src="./assets/image/Alprazolam-USA-to-USA-01.jpg" alt="Image 1" />
+          <img
+            src="./assets/image/Alprazolam-USA-to-USA-01.jpg"
+            alt="Image 1"
+          />
           <img
             src="https://mednowpharma.com/wp-content/uploads/2024/12/Alprazolam-USA-to-USA-02.jpg"
             alt="Image 2"
@@ -78,35 +84,60 @@
               <button data-mg="3" class="mg-button">3</button>
               <button data-mg="4" class="mg-button active">4</button>
               <button data-mg="5" class="mg-button">5</button>
-            </div>  
+            </div>
           </div>
+          <div>
+            <button id="showButton">Show Box</button>
+            <div class="overlay" id="overlay"></div>
+            <div id="toggleBox">
+              <h2>Select Custom MG and Quantity</h2>
+              <div class="selection-container">
+                <!-- MG Selection -->
+                <div class="select-group">
+                  <label for="mg-select">Choose MG:</label>
+                  <select id="mg-select">
+                    <option value="1">1 MG</option>
+                    <option value="2">2 MG</option>
+                    <option value="3">3 MG</option>
+                    <option value="4">4 MG</option>
+                    <option value="5">5 MG</option>
+                  </select>
+                </div>
 
-          <div class="custom-selection">
-            <h2>Select Custom MG and Quantity </h2>
-            <div class="selection-container">
-              <!-- MG Selection -->
-              <div class="select-group">
-                <label for="mg-select">Choose MG:</label>
-                <select id="mg-select">
-                  <option value="1">1 MG</option>
-                  <option value="2">2 MG</option>
-                  <option value="3">3 MG</option>
-                  <option value="4">4 MG</option>
-                  <option value="5">5 MG</option>
-                </select>
+                <!-- Quantity Selection -->
+                <div class="select-group">
+                  <label for="quantity-select">Choose Quantity:</label>
+                  <input
+                    type="text"
+                    placeholder="Quantity"
+                    class="quat-input"
+                  />
+                </div>
               </div>
 
-              <!-- Quantity Selection -->
-              <div class="select-group">
-                <label for="quantity-select">Choose Quantity:</label>
-                <input type="text" placeholder="Quantity" class="quat-input" />
+              <!-- Submit Button -->
+              <div class="submit-container">
+                <button id="submit-selection">Submit</button>
               </div>
             </div>
 
-            <!-- Submit Button -->
-            <div class="submit-container">
-              <button id="submit-selection">Submit</button>
-            </div>
+            <script>
+              const button = document.getElementById("showButton");
+              const box = document.getElementById("toggleBox");
+              const overlay = document.getElementById("overlay");
+
+              // Show the box and overlay when the button is clicked
+              button.addEventListener("click", () => {
+                box.style.display = "block";
+                overlay.style.display = "block";
+              });
+
+              // Hide the box and overlay when clicking on the overlay
+              overlay.addEventListener("click", () => {
+                box.style.display = "none";
+                overlay.style.display = "none";
+              });
+            </script>
           </div>
         </div>
         <div class="right2">
@@ -213,6 +244,134 @@
         </p>
       </div>
     </section>
+
+    <section class="differ">
+      <div class="rightside">
+        <div class="box">
+          <h3>Product Details</h3>
+          <p>
+            Paracetamol 500mg is a widely used medicine for reducing fever and
+            relieving mild to moderate pain.
+          </p>
+          <ul>
+            <li>
+              <h4>Product Name</h4>
+              <p>Paracetamol 500mg</p>
+            </li>
+            <li>
+              <h4>Product Description</h4>
+              <p>
+                A widely used medicine for reducing fever and mild to moderate
+                pain.
+              </p>
+            </li>
+            <li>
+              <h4>Trade Names</h4>
+              <p>Calpol, Panadol, Crocin</p>
+            </li>
+            <li>
+              <h4>Ingredients</h4>
+              <p>Paracetamol, Excipients</p>
+            </li>
+            <li>
+              <h4>Manufactured By</h4>
+              <p>ABC Pharmaceuticals</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="leftside">
+        <div class="box">
+          <h3>Usage & Instructions</h3>
+          <ul>
+            <li>
+              <h4>Packaging Details</h4>
+              <p>10 tablets per strip, 20 strips per box</p>
+            </li>
+            <li>
+              <h4>How to Use</h4>
+              <p>Take one tablet every 6-8 hours with water, after meals.</p>
+            </li>
+            <li>
+              <h4>Drug Interaction</h4>
+              <p>May interact with blood thinners like Warfarin.</p>
+            </li>
+            <li>
+              <h4>Side Effects</h4>
+              <p>Nausea, dizziness, allergic reactions in rare cases.</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <!-- <section class="three-box-section">
+      <div class="box">
+        <h3>Product Details</h3>
+        <p>
+          Paracetamol 500mg is a widely used medicine for reducing fever and
+          relieving mild to moderate pain.
+        </p>
+        <ul>
+          <li>
+            <h4>Product Name</h4>
+            <p>Paracetamol 500mg</p>
+          </li>
+          <li>
+            <h4>Product Description</h4>
+            <p>
+              A widely used medicine for reducing fever and mild to moderate
+              pain.
+            </p>
+          </li>
+          <li>
+            <h4>Trade Names</h4>
+            <p>Calpol, Panadol, Crocin</p>
+          </li>
+          <li>
+            <h4>Ingredients</h4>
+            <p>Paracetamol, Excipients</p>
+          </li>
+          <li>
+            <h4>Manufactured By</h4>
+            <p>ABC Pharmaceuticals</p>
+          </li>
+        </ul>
+      </div>
+
+      <div class="box">
+        <h3>Usage & Instructions</h3>
+        
+        <h4>Packaging Details</h4>
+        <p>10 tablets per strip, 20 strips per box</p>
+        <h4>How to Use</h4>
+        <p>Take one tablet every 6-8 hours with water, after meals.</p>
+        <h4>Drug Interaction</h4>
+        <p>May interact with blood thinners like Warfarin.</p>
+        <h4>Side Effects</h4>
+        <p>Nausea, dizziness, allergic reactions in rare cases.</p>
+      </div>
+
+      <div class="box">
+        <h3>Additional Information</h3>
+        <h4>Warnings & Precautions</h4>
+        <p>
+          Avoid exceeding the prescribed dose. Not recommended for children
+          under 6 years.
+        </p>
+        <h4>Withdrawal Symptoms</h4>
+        <p>None reported with recommended use.</p>
+        <h4>Drug Abuse</h4>
+        <p>High doses may cause liver damage or toxicity.</p>
+        <h4>Storage</h4>
+        <p>Store in a cool, dry place away from sunlight.</p>
+        <h4>Created By</h4>
+        <p>John Doe</p>
+        <h4>Created At</h4>
+        <p>2025-02-06</p>
+        <h4>Updated At</h4>
+        <p>2025-02-06</p>
+      </div>
+    </section> -->
 
     <section class="recommendation-section">
       <h2>Recommended for You</h2>
@@ -423,6 +582,7 @@
         </div>
       </div>
     </footer>
+
     <script src="./assets/js/script.js"></script>
   </body>
 </html>

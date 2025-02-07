@@ -7,7 +7,6 @@
     background-color: #f9f9f9;
   }
 
-  /* Breadcrumb */
   .breadcrumb {
     margin: 20px;
     font-size: 14px;
@@ -52,6 +51,8 @@
     cursor: pointer;
   }
   
+  
+
   .product-details {
     width: 55%;
   }
