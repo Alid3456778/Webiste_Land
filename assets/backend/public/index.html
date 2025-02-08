@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Form</title>
+</head>
+<body>
+    <h2>Add a Product</h2>
+    <form id="productForm">
+        <input type="text" id="category_id" placeholder="Category ID" required><br>
+        <input type="text" id="category_name" placeholder="Category Name" required><br>
+        <input type="text" id="product_name" placeholder="Product Name" required><br>
+        <input type="text" id="product_description" placeholder="Product Description" required><br>
+        <input type="text" id="trade_names" placeholder="Trade Names" required><br>
+        <input type="text" id="ingredients" placeholder="Ingredients" required><br>
+        <input type="text" id="manufactured_by" placeholder="Manufactured By" required><br>
+        <input type="text" id="packaging_details" placeholder="Packaging Details" required><br>
+        <input type="text" id="how_to_use" placeholder="How to Use" required><br>
+        <input type="text" id="drug_interaction" placeholder="Drug Interaction" required><br>
+        <input type="text" id="side_effects" placeholder="Side Effects" required><br>
+        <input type="text" id="warnings_precautions" placeholder="Warnings & Precautions" required><br>
+        <input type="text" id="withdrawal_symptoms" placeholder="Withdrawal Symptoms" required><br>
+        <input type="text" id="drug_abuse" placeholder="Drug Abuse" required><br>
+        <input type="text" id="storage" placeholder="Storage" required><br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        document.getElementById("productForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const formData = {
+                category_id: document.getElementById("category_id").value,
+                category_name: document.getElementById("category_name").value,
+                product_name: document.getElementById("product_name").value,
+                product_description: document.getElementById("product_description").value,
+                trade_names: document.getElementById("trade_names").value,
+                ingredients: document.getElementById("ingredients").value,
+                manufactured_by: document.getElementById("manufactured_by").value,
+                packaging_details: document.getElementById("packaging_details").value,
+                how_to_use: document.getElementById("how_to_use").value,
+                drug_interaction: document.getElementById("drug_interaction").value,
+                side_effects: document.getElementById("side_effects").value,
+                warnings_precautions: document.getElementById("warnings_precautions").value,
+                withdrawal_symptoms: document.getElementById("withdrawal_symptoms").value,
+                drug_abuse: document.getElementById("drug_abuse").value,
+                storage: document.getElementById("storage").value,
+            };
+
+            try {
+                const response = await fetch("http://localhost:3000/products", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formData),
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert("Product added successfully!");
+                } else {
+                    alert("Failed to add product.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Error submitting the form.");
+            }
+        });
+    </script>
+</body>
+</html>

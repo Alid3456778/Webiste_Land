@@ -6,9 +6,7 @@
     <title>Medicine Website Navigation</title>
     <link rel="stylesheet" href="./assets/css/navbar_footer.css" />
     <link rel="stylesheet" href="./assets/css/styles.css" />
-    <style>
-      
-    </style>
+    <style></style>
   </head>
   <body>
     <!-- Navigation Bar -->
@@ -26,7 +24,14 @@
           placeholder="Search products..."
           class="search-bar"
           id="search-input"
+          list="search_list"
         />
+        <datalist id="search_list">
+          <option value="anazol">anazol</option>
+          <option value="Armandilo">Armandilo</option>
+          <option value="Pain Killer">Pain Killer</option>
+          <option value="Medistic">Medtistic</option>
+        </datalist>
         <button class="search-button" id="search-button">Search</button>
         <!-- Cart Icon -->
         <img
@@ -87,7 +92,7 @@
             </div>
           </div>
           <div>
-            <button id="showButton">Show Box</button>
+            <button id="showButton">Custom Order</button>
             <div class="overlay" id="overlay"></div>
             <div id="toggleBox">
               <h2>Select Custom MG and Quantity</h2>
@@ -373,7 +378,7 @@
       </div>
     </section> -->
 
-    <section class="recommendation-section">
+    <!-- <section class="recommendation-section">
       <h2>Recommended for You</h2>
       <ul class="recommendation-list">
         <li class="category">
@@ -417,7 +422,7 @@
           </ul>
         </li>
       </ul>
-    </section>
+    </section> -->
 
     <div class="flop">
       <section class="faqs">
