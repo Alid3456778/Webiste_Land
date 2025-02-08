@@ -1,150 +1,228 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Employee Dashboard - McLand Pharma</title>
-    <style>
-              
-    </style>
-    <link rel="stylesheet" href="./assets/css/employee.css">
-</head>
-<body>
+    <style></style>
+    <link rel="stylesheet" href="./assets/css/employee.css" />
+  </head>
+  <body>
     <header>
-        <h1>McLand Pharma - Employee Dashboard</h1>
-        <nav>
-            <a href="#dashboard">Dashboard</a>
-            <a href="#manage-products">Manage Products</a>
-            <a href="#process-requests">Process Requests</a>
-            <a href="#customer-assistance">Customer Assistance</a>
-        </nav>
+      <h1>McLand Pharma - Employee Dashboard</h1>
+      <nav>
+        <a href="#dashboard">Dashboard</a>
+        <a href="#manage-products">Manage Products</a>
+        <a href="#process-requests">Process Requests</a>
+        <a href="#customer-assistance">Customer Assistance</a>
+      </nav>
     </header>
 
     <div class="container">
-        <!-- Dashboard Section -->
-        <section id="dashboard" class="card">
-            <h2>Dashboard</h2>
-            <p><strong>Clients Handled:</strong> 50</p>
-            <p><strong>Orders:</strong></p>
-            <ul>
-                <li>Payment Pending: 10</li>
-                <li>Payment Done, Delivery Pending: 5</li>
-                <li>Transferred to Higher-Ups: 3</li>
-                <li>Pending Requests: 8</li>
-            </ul>
-        </section>
+      <!-- Dashboard Section -->
+      <section id="dashboard" class="card">
+        <h2>Dashboard</h2>
+        <p><strong>Clients Handled:</strong> 50</p>
+        <p><strong>Orders:</strong></p>
+        <ul>
+          <li>Payment Pending: 10</li>
+          <li>Payment Done, Delivery Pending: 5</li>
+          <li>Transferred to Higher-Ups: 3</li>
+          <li>Pending Requests: 8</li>
+        </ul>
+      </section>
 
-        <!-- Manage Products Section -->
-        <section id="manage-products" class="card">
-            <h2>Manage Products</h2>
-            <form id="product-form">
-                <div id="product-form-section">
-                    <h2>Product Details</h2>
-                    <div id="product-form-items">
-                        <label for="category-id">Category ID:</label><br>
-                        <input type="number" id="category-id" name="category_id" required><br><br>
+      <!-- Manage Products Section -->
+      <section id="manage-products" class="card">
+        <h2>Manage Products</h2>
+        <form id="product-form">
+          <div id="product-form-section">
+            <h2>Product Details</h2>
+            <div id="product-form-items">
+              <label for="category-id">Product ID:</label><br />
+              <input
+                type="number"
+                id="product-id"
+                name="category_id"
+                required
+              /><br /><br />
 
-                        <label for="category-name">Category Name:</label><br>
-                        <input type="text" id="category-name" name="category_name" required><br><br>
-                    
-                        <label for="product-name">Product Name:</label><br>
-                        <input type="text" id="product-name" name="product_name" required><br><br>
-                    
-                        <label for="product-description">Product Description:</label><br>
-                        <textarea id="product-description" name="product_description" required></textarea><br><br>
-                    
-                        <label for="trade-names">Trade Names:</label><br>
-                        <textarea id="trade-names" name="trade_names"></textarea><br><br>
-                    
-                        <label for="ingredients">Ingredients:</label><br>
-                        <textarea id="ingredients" name="ingredients"></textarea><br><br>
-                    
-                        <label for="manufactured-by">Manufactured By:</label><br>
-                        <input type="text" id="manufactured-by" name="manufactured_by"><br><br>
-                    
-                        <label for="packaging-details">Packaging Details:</label><br>
-                        <textarea id="packaging-details" name="packaging_details"></textarea><br><br>
-                    
-                        <label for="how-to-use">How to Use:</label><br>
-                        <textarea id="how-to-use" name="how_to_use"></textarea><br><br>
-                    
-                        <label for="drug-interaction">Drug Interaction:</label><br>
-                        <textarea id="drug-interaction" name="drug_interaction"></textarea><br><br>
-                    
-                        <label for="side-effects">Side Effects:</label><br>
-                        <textarea id="side-effects" name="side_effects"></textarea><br><br>
-                    
-                        <label for="warnings-precautions">Warnings & Precautions:</label><br>
-                        <textarea id="warnings-precautions" name="warnings_precautions"></textarea><br><br>
-                    
-                        <label for="withdrawal-symptoms">Withdrawal Symptoms:</label><br>
-                        <textarea id="withdrawal-symptoms" name="withdrawal_symptoms"></textarea><br><br>
-                    
-                        <label for="drug-abuse">Drug Abuse:</label><br>
-                        <textarea id="drug-abuse" name="drug_abuse"></textarea><br><br>
-                    
-                        <label for="storage">Storage:</label><br>
-                        <textarea id="storage" name="storage"></textarea><br><br>
-        
-                        </div>
-                </div>
-        
-                <div id="variation-section">
-                    <h2>Variations</h2>
-                    <div class="variation-item">
-                        <label for="unit-type-1">Unit Type:</label><br>
-                        <select id="unit-type-1" name="unit_type[]">
-                            <option value="GM">GM</option>
-                            <option value="IU">IU</option>
-                            <option value="MG">MG</option>
-                            <option value="MCG">MCG</option>
-                            <option value="ML">ML</option>
-                        </select><br><br>
-            
-                        <label for="unit-value-1">Unit Value:</label><br>
-                        <input type="number" id="unit-value-1" name="unit_value[]" step="0.01"><br><br>
-            
-                        <label for="qty-1">Quantity:</label><br>
-                        <input type="number" id="qty-1" name="qty[]"><br><br>
-            
-                        <label for="price-per-pill-1">Price per Pill:</label><br>
-                        <input type="number" id="price-per-pill-1" name="price_per_pill[]" step="0.01"><br><br>
-            
-                        <label for="price-per-box-1">Price per Box:</label><br>
-                        <input type="number" id="price-per-box-1" name="price_per_box[]" step="0.01"><br><br>
-            
-                        <label for="delivery-time-1">Delivery Time:</label><br>
-                        <input type="text" id="delivery-time-1" name="delivery_time[]"><br><br>
+              <label for="category-id">Category ID:</label><br />
+              <input
+                type="number"
+                id="category-id"
+                name="category_id"
+                required
+              /><br /><br />
 
-                        <button type="button" onclick="addVariation()">Add Another Variation</button><br><br>
-                    </div>
-                </div>
-            
-                <div id="faq-section">
-                    <h2>FAQs</h2>
-                    <div class="faq-item">
-                        <label for="faq-question-1">FAQ Question:</label><br>
-                        <input type="text" id="faq-question-1" name="faq_question[]"><br><br>
-            
-                        <label for="faq-answer-1">FAQ Answer:</label><br>
-                        <textarea id="faq-answer-1" name="faq_answer[]"></textarea><br><br>
+              <label for="category-name">Category Name:</label><br />
+              <input
+                type="text"
+                id="category-name"
+                name="category_name"
+                required
+              /><br /><br />
 
-                        <button type="button" onclick="addFaq()">Add Another FAQ</button><br><br>
-                    </div>
-                </div>
-                <div id="submit_btn">
-                    <button type="submit">Submit</button>
-                </div>
-            </form>
-            
-            <script>
-            function addVariation() {
-                const variationSection = document.getElementById('variation-section');
-                const variationCount = variationSection.children.length + 1;
-            
-                const newVariation = document.createElement('div');
-                newVariation.classList.add('variation-item');
-                newVariation.innerHTML = `
+              <label for="product-name">Product Name:</label><br />
+              <input
+                type="text"
+                id="product-name"
+                name="product_name"
+                required
+              /><br /><br />
+
+              <label for="product-description">Product Description:</label
+              ><br />
+              <textarea
+                id="product-description"
+                name="product_description"
+                required
+              ></textarea
+              ><br /><br />
+
+              <label for="trade-names">Trade Names:</label><br />
+              <textarea id="trade-names" name="trade_names"></textarea
+              ><br /><br />
+
+              <label for="ingredients">Ingredients:</label><br />
+              <textarea id="ingredients" name="ingredients"></textarea
+              ><br /><br />
+
+              <label for="manufactured-by">Manufactured By:</label><br />
+              <input
+                type="text"
+                id="manufactured-by"
+                name="manufactured_by"
+              /><br /><br />
+
+              <label for="packaging-details">Packaging Details:</label><br />
+              <textarea
+                id="packaging-details"
+                name="packaging_details"
+              ></textarea
+              ><br /><br />
+
+              <label for="how-to-use">How to Use:</label><br />
+              <textarea id="how-to-use" name="how_to_use"></textarea
+              ><br /><br />
+
+              <label for="drug-interaction">Drug Interaction:</label><br />
+              <textarea id="drug-interaction" name="drug_interaction"></textarea
+              ><br /><br />
+
+              <label for="side-effects">Side Effects:</label><br />
+              <textarea id="side-effects" name="side_effects"></textarea
+              ><br /><br />
+
+              <label for="warnings-precautions">Warnings & Precautions:</label
+              ><br />
+              <textarea
+                id="warnings-precautions"
+                name="warnings_precautions"
+              ></textarea
+              ><br /><br />
+
+              <label for="withdrawal-symptoms">Withdrawal Symptoms:</label
+              ><br />
+              <textarea
+                id="withdrawal-symptoms"
+                name="withdrawal_symptoms"
+              ></textarea
+              ><br /><br />
+
+              <label for="drug-abuse">Drug Abuse:</label><br />
+              <textarea id="drug-abuse" name="drug_abuse"></textarea
+              ><br /><br />
+
+              <label for="storage">Storage:</label><br />
+              <textarea id="storage" name="storage"></textarea><br /><br />
+            </div>
+          </div>
+
+          <div id="variation-section">
+            <h2>Variations</h2>
+            <div class="variation-item">
+              <label for="unit-type-1">Unit Type:</label><br />
+              <select id="unit-type-1" name="unit_type[]">
+                <option value="GM">GM</option>
+                <option value="IU">IU</option>
+                <option value="MG">MG</option>
+                <option value="MCG">MCG</option>
+                <option value="ML">ML</option></select
+              ><br /><br />
+
+              <label for="unit-value-1">Unit Value:</label><br />
+              <input
+                type="number"
+                id="unit-value-1"
+                name="unit_value[]"
+                step="0.01"
+              /><br /><br />
+
+              <label for="qty-1">Quantity:</label><br />
+              <input type="number" id="qty-1" name="qty[]" /><br /><br />
+
+              <label for="price-per-pill-1">Price per Pill:</label><br />
+              <input
+                type="number"
+                id="price-per-pill-1"
+                name="price_per_pill[]"
+                step="0.01"
+              /><br /><br />
+
+              <label for="price-per-box-1">Price per Box:</label><br />
+              <input
+                type="number"
+                id="price-per-box-1"
+                name="price_per_box[]"
+                step="0.01"
+              /><br /><br />
+
+              <label for="delivery-time-1">Delivery Time:</label><br />
+              <input
+                type="text"
+                id="delivery-time-1"
+                name="delivery_time[]"
+              /><br /><br />
+
+              <button type="button" onclick="addVariation()">
+                Add Another Variation</button
+              ><br /><br />
+            </div>
+          </div>
+
+          <div id="faq-section">
+            <h2>FAQs</h2>
+            <div class="faq-item">
+              <label for="faq-question-1">FAQ Question:</label><br />
+              <input
+                type="text"
+                id="faq-question-1"
+                name="faq_question[]"
+              /><br /><br />
+
+              <label for="faq-answer-1">FAQ Answer:</label><br />
+              <textarea id="faq-answer-1" name="faq_answer[]"></textarea
+              ><br /><br />
+
+              <button type="button" onclick="addFaq()">Add Another FAQ</button
+              ><br /><br />
+            </div>
+          </div>
+          <div id="submit_btn">
+            <button type="submit">Submit</button>
+          </div>
+        </form>
+
+        <script>
+          function addVariation() {
+            const variationSection =
+              document.getElementById("variation-section");
+            const variationCount = variationSection.children.length + 1;
+
+            const newVariation = document.createElement("div");
+            newVariation.classList.add("variation-item");
+            newVariation.innerHTML = `
                     <label for="unit-type-${variationCount}">Unit Type:</label><br>
                     <select id="unit-type-${variationCount}" name="unit_type[]">
                         <option value="GM">GM</option>
@@ -169,208 +247,229 @@
                     <label for="delivery-time-${variationCount}">Delivery Time:</label><br>
                     <input type="text" id="delivery-time-${variationCount}" name="delivery_time[]"><br><br>
                 `;
-                variationSection.appendChild(newVariation);
-            }
-            
-            function addFaq() {
-                const faqSection = document.getElementById('faq-section');
-                const faqCount = faqSection.children.length + 1;
-            
-                const newFaq = document.createElement('div');
-                newFaq.classList.add('faq-item');
-                newFaq.innerHTML = `
+            variationSection.appendChild(newVariation);
+          }
+
+          function addFaq() {
+            const faqSection = document.getElementById("faq-section");
+            const faqCount = faqSection.children.length + 1;
+
+            const newFaq = document.createElement("div");
+            newFaq.classList.add("faq-item");
+            newFaq.innerHTML = `
                     <label for="faq-question-${faqCount}">FAQ Question:</label><br>
                     <input type="text" id="faq-question-${faqCount}" name="faq_question[]"><br><br>
             
                     <label for="faq-answer-${faqCount}">FAQ Answer:</label><br>
                     <textarea id="faq-answer-${faqCount}" name="faq_answer[]"></textarea><br><br>
                 `;
-                faqSection.appendChild(newFaq);
-            }
-            </script>
-        </section>
-        <section id="existing-products" class="card">
-            <h3>Existing Products</h3>
-            <div id="existing-products-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Category ID</th>
-                            <th>Category Name</th>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Trade Names</th>
-                            <th>Ingredients</th>
-                            <th>Manufactured By</th>
-                            <th>Packaging Details</th>
-                            <th>How to Use</th>
-                            <th>Drug Interaction</th>
-                            <th>Side Effects</th>
-                            <th>Warnings & Precautions</th>
-                            <th>Withdrawal Symptoms</th>
-                            <th>Drug Abuse</th>
-                            <th>Storage</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Replace this static row with dynamic rows populated from the database -->
-                        <tr>
-                            <td>1</td> <!-- Example Category ID -->
-                            <td>Pain Medication</td>
-                            <td>Paracetamol</td>
-                            <td>Used to relieve pain and fever</td>
-                            <td>Calpol, Panadol</td>
-                            <td>Paracetamol 500mg</td>
-                            <td>XYZ Pharma</td>
-                            <td>Box of 10 strips</td>
-                            <td>Take one pill every 6 hours</td>
-                            <td>Avoid with alcohol or anticoagulants</td>
-                            <td>Nausea, dizziness</td>
-                            <td>Consult a doctor if pregnant</td>
-                            <td>Rebound headaches</td>
-                            <td>Risk of overdose with misuse</td>
-                            <td>Store in a cool, dry place</td>
-                            <td>
-                                <button>Edit</button>
-                                <button>Delete</button>
-                            </td>
-                        </tr>
-                        <!-- Additional rows will be added dynamically for each product -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
+            faqSection.appendChild(newFaq);
+          }
+        </script>
+      </section>
+      <section id="existing-products" class="card">
+        <h3>Existing Products</h3>
+        <div id="existing-products-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Category ID</th>
+                <th>Category Name</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Trade Names</th>
+                <th>Ingredients</th>
+                <th>Manufactured By</th>
+                <th>Packaging Details</th>
+                <th>How to Use</th>
+                <th>Drug Interaction</th>
+                <th>Side Effects</th>
+                <th>Warnings & Precautions</th>
+                <th>Withdrawal Symptoms</th>
+                <th>Drug Abuse</th>
+                <th>Storage</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Replace this static row with dynamic rows populated from the database -->
+              <tr>
+                <td>1</td>
+                <!-- Example Category ID -->
+                <td>Pain Medication</td>
+                <td>Paracetamol</td>
+                <td>Used to relieve pain and fever</td>
+                <td>Calpol, Panadol</td>
+                <td>Paracetamol 500mg</td>
+                <td>XYZ Pharma</td>
+                <td>Box of 10 strips</td>
+                <td>Take one pill every 6 hours</td>
+                <td>Avoid with alcohol or anticoagulants</td>
+                <td>Nausea, dizziness</td>
+                <td>Consult a doctor if pregnant</td>
+                <td>Rebound headaches</td>
+                <td>Risk of overdose with misuse</td>
+                <td>Store in a cool, dry place</td>
+                <td>
+                  <button>Edit</button>
+                  <button>Delete</button>
+                </td>
+              </tr>
+              <!-- Additional rows will be added dynamically for each product -->
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-        <!-- Process Requests Section -->
-        <section id="process-requests" class="card">
-            <h2>Process Requests</h2>
-            <!-- <ul>
+      <!-- Process Requests Section -->
+      <section id="process-requests" class="card">
+        <h2>Process Requests</h2>
+        <!-- <ul>
                 <li>Request #1 - Pending <button>Process</button></li>
                 <li>Request #2 - Pending <button>Process</button></li>
             </ul> -->
-            <div id="existing-products-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Order No.</th>
-                            <th>Customer Name</th>
-                            <th>Cost</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Replace this static row with dynamic rows populated from the database -->
-                        <tr>
-                            <td>1</td> <!-- Example Category ID -->
-                            <td>Manmohan Sign</td>
-                            <td>1,200</td>
-                            <td class="action">
-                                <button>Update Process</button>
-                                <button>Delete</button>
-                            </td>
-                        </tr>
-                        <!-- Additional rows will be added dynamically for each product -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
+        <div id="existing-products-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Order No.</th>
+                <th>Customer Name</th>
+                <th>Cost</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Replace this static row with dynamic rows populated from the database -->
+              <tr>
+                <td>1</td>
+                <!-- Example Category ID -->
+                <td>Manmohan Sign</td>
+                <td>1,200</td>
+                <td class="action">
+                  <button>Update Process</button>
+                  <button>Delete</button>
+                </td>
+              </tr>
+              <!-- Additional rows will be added dynamically for each product -->
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-        <!-- Customer Assistance Section -->
-        <section id="customer-assistance" class="card">
-            <h2>Customer Assistance</h2>
-            <form>
-                <!-- <label for="customer-query">Customer Query:</label><br>
+      <!-- Customer Assistance Section -->
+      <section id="customer-assistance" class="card">
+        <h2>Customer Assistance</h2>
+        <form>
+          <!-- <label for="customer-query">Customer Query:</label><br>
                 <textarea id="customer-query" name="customer-query"></textarea><br><br>
                 <button type="submit">Assist Customer</button> -->
-                <div id="existing-products-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Customer Name</th>
-                                <th>Query Discription</th>
-                                <th>Chat History</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Replace this static row with dynamic rows populated from the database -->
-                            <tr>
-                                <td>Manmohan Sign</td>
-                                <td><textarea id="customer-query" name="customer-query" class="customerAssistance"></textarea></td>
-                                <td>Chat</td>
-                                <td >
-                                    <button>Assist Customer</button>
-                                </td>
-                            </tr>
-                            <!-- Additional rows will be added dynamically for each product -->
-                        </tbody>
-                    </table>
-                </div>
-            </form>
-        </section>
+          <div id="existing-products-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Customer Name</th>
+                  <th>Query Discription</th>
+                  <th>Chat History</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Replace this static row with dynamic rows populated from the database -->
+                <tr>
+                  <td>Manmohan Sign</td>
+                  <td>
+                    <textarea
+                      id="customer-query"
+                      name="customer-query"
+                      class="customerAssistance"
+                    ></textarea>
+                  </td>
+                  <td>Chat</td>
+                  <td>
+                    <button>Assist Customer</button>
+                  </td>
+                </tr>
+                <!-- Additional rows will be added dynamically for each product -->
+              </tbody>
+            </table>
+          </div>
+        </form>
+      </section>
     </div>
     <script>
-        document.getElementById('product-form').addEventListener('submit', async function(event) {
-    event.preventDefault();
+      document
+        .getElementById("product-form")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
 
-    // Gather main product details
-    const formData = {
-        category_id: document.getElementById('category-id').value,
-        category_name: document.getElementById('category-name').value,
-        product_name: document.getElementById('product-name').value,
-        product_description: document.getElementById('product-description').value,
-        trade_names: document.getElementById('trade-names').value,
-        ingredients: document.getElementById('ingredients').value,
-        manufactured_by: document.getElementById('manufactured-by').value,
-        packaging_details: document.getElementById('packaging-details').value,
-        how_to_use: document.getElementById('how-to-use').value,
-        drug_interaction: document.getElementById('drug-interaction').value,
-        side_effects: document.getElementById('side-effects').value,
-        warnings_precautions: document.getElementById('warnings-precautions').value,
-        withdrawal_symptoms: document.getElementById('withdrawal-symptoms').value,
-        drug_abuse: document.getElementById('drug-abuse').value,
-        storage: document.getElementById('storage').value,
-    };
+          // Gather main product details
+          const formData = {
+            category_id: document.getElementById("category-id").value,
+            category_name: document.getElementById("category-name").value,
+            product_name: document.getElementById("product-name").value,
+            product_description: document.getElementById("product-description")
+              .value,
+            trade_names: document.getElementById("trade-names").value,
+            ingredients: document.getElementById("ingredients").value,
+            manufactured_by: document.getElementById("manufactured-by").value,
+            packaging_details:
+              document.getElementById("packaging-details").value,
+            how_to_use: document.getElementById("how-to-use").value,
+            drug_interaction: document.getElementById("drug-interaction").value,
+            side_effects: document.getElementById("side-effects").value,
+            warnings_precautions: document.getElementById(
+              "warnings-precautions"
+            ).value,
+            withdrawal_symptoms: document.getElementById("withdrawal-symptoms")
+              .value,
+            drug_abuse: document.getElementById("drug-abuse").value,
+            storage: document.getElementById("storage").value,
+          };
 
-    // Gather variations
-    formData.variations = Array.from(document.querySelectorAll('.variation-item')).map(variation => ({
-        unit_type: variation.querySelector('[name="unit_type[]"]').value,
-        unit_value: variation.querySelector('[name="unit_value[]"]').value,
-        qty: variation.querySelector('[name="qty[]"]').value,
-        price_per_pill: variation.querySelector('[name="price_per_pill[]"]').value,
-        price_per_box: variation.querySelector('[name="price_per_box[]"]').value,
-        delivery_time: variation.querySelector('[name="delivery_time[]"]').value,
-    }));
+          // Gather variations
+          formData.variations = Array.from(
+            document.querySelectorAll(".variation-item")
+          ).map((variation) => ({
+            unit_type: variation.querySelector('[name="unit_type[]"]').value,
+            unit_value: variation.querySelector('[name="unit_value[]"]').value,
+            qty: variation.querySelector('[name="qty[]"]').value,
+            price_per_pill: variation.querySelector('[name="price_per_pill[]"]')
+              .value,
+            price_per_box: variation.querySelector('[name="price_per_box[]"]')
+              .value,
+            delivery_time: variation.querySelector('[name="delivery_time[]"]')
+              .value,
+          }));
 
-    // Gather FAQs
-    formData.faqs = Array.from(document.querySelectorAll('.faq-item')).map(faq => ({
-        question: faq.querySelector('[name="faq_question[]"]').value,
-        answer: faq.querySelector('[name="faq_answer[]"]').value,
-    }));
+          // Gather FAQs
+          formData.faqs = Array.from(
+            document.querySelectorAll(".faq-item")
+          ).map((faq) => ({
+            question: faq.querySelector('[name="faq_question[]"]').value,
+            answer: faq.querySelector('[name="faq_answer[]"]').value,
+          }));
 
-    try {
-        // Send data to the backend API using Fetch
-        const response = await fetch('http://localhost:3000/products', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData),
+          try {
+            // Send data to the backend API using Fetch
+            const response = await fetch("http://localhost:3000/products", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(formData),
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+              alert("Product added successfully!");
+            } else {
+              alert("Failed to add product: " + data.message);
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            alert("An error occurred while adding the product.");
+          }
         });
-
-        const data = await response.json();
-        if (response.ok) {
-            alert('Product added successfully!');
-        } else {
-            alert('Failed to add product: ' + data.message);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred while adding the product.');
-    }
-});
-
     </script>
-</body>
+  </body>
 </html>

@@ -6,6 +6,9 @@
     <title>Checkout | Mcland Pharma</title>
     <link rel="stylesheet" href="./assets/css/navbar_footer.css">
     <link rel="stylesheet" href="./assets/css/checkout.css">
+    <style>
+    
+    </style>
 </head>
 <body>
     <header class="navbar">
@@ -143,7 +146,32 @@
             </tr>
           </tbody>
         </table>
-        <button id="place-order-btn" class="place-order-btn">Place Order</button>
+        <!-- Place Order Button -->
+<button id="place-order-btn" class="place-order-btn">Place Order</button>
+
+<!-- Popup Div -->
+<div id="popup-div" class="popup-div">
+  <div class="popup-content">
+    <main class="invoice-container">
+      <div class="invoice-header">
+        <h2>Thank you. Your order has been received.</h2>
+        <div class="order-summary">
+          <p><strong>ORDER NUMBER:</strong> <span id="order-number"></span></p>
+          <p><strong>DATE:</strong> <span id="order-date"></span></p>
+          <p><strong>EMAIL:</strong> <span id="order-email"></span></p>
+          <p><strong>TOTAL:</strong> <span id="order-total"></span></p>
+        </div>
+      </div>
+      <div id="invoice-details">
+        <!-- JavaScript will populate product details here -->
+      </div>
+    </main>
+    <button id="close-popup-btn" class="close-popup-btn">Close</button>
+    <button class="download-btn" >Download</button>
+  </div>
+</div>
+
+
       </section>
     </div>
   </main>
