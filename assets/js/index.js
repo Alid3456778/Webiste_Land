@@ -2,6 +2,7 @@
 document.querySelector(".search-bar input").addEventListener("focus", () => {
     console.log("Search bar focused!");
   });
+
   
   // Add additional interactions if necessary
   

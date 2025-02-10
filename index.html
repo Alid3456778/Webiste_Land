@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MCland Pharma</title>
     <link rel="stylesheet" href="./assets/css/index.css" />
-    <link rel="stylesheet" href="./assets/css/styles.css">
+    <link rel="stylesheet" href="./assets/css/styles.css" />
     <link rel="stylesheet" href="./assets/css/navbar_footer.css" />
   </head>
   <body>
@@ -16,7 +16,7 @@
           <!-- Hamburger Icon -->
           <button id="hamburger-menu" class="hamburger-menu">☰</button>
           <!-- Logo -->
-          <div class="logo"><img src="./assets/image2/logo.png" alt=""></div>
+          <div class="logo"><img src="./assets/image2/logo.png" alt="" /></div>
         </div>
         <div class="navbar-right">
           <!-- Search Bar -->
@@ -35,16 +35,16 @@
           </datalist>
           <button class="search-button" id="search-button">Search</button>
           <!-- Cart Icon -->
-           <a href="cart.html">
-          <img
-            src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
-            alt="Cart"
-            class="cart-icon"
-          />
-        </a>
+          <a href="cart.html">
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
+              alt="Cart"
+              class="cart-icon"
+            />
+          </a>
         </div>
       </nav>
-  
+
       <!-- Sidebar -->
       <div id="sidebar" class="sidebar">
         <button id="close-sidebar" class="close-btn">✖</button>
@@ -53,12 +53,11 @@
           <ul>
             <li><a href="#">Home</a></li>
             <li><a href="#">Products</a></li>
-            <li><a href="#">About Us</a></li>   
+            <li><a href="#">About Us</a></li>
             <li><a href="#">Contact</a></li>
           </ul>
         </div>
       </div>
-      
     </header>
     <nav class="navbar-bottom">
       <ul>
@@ -342,8 +341,8 @@
             </div>
           </div>
           <div class="left_side">
-            <button ><a href="checkout.html">Buy</a></button>
-            <button> <a href="cart.html">Add to Cart</a></button>
+            <button><a href="checkout.html">Buy</a></button>
+            <button><a href="cart.html">Add to Cart</a></button>
           </div>
         </div>
 
@@ -440,7 +439,6 @@
             <button>Add to Cart</button>
           </div>
         </div>
-        
       </div>
     </section>
 
@@ -604,22 +602,49 @@
       });
     </script>
     <script>
+      // // Function to show the popup
+      // function showPopup() {
+      //   const popup = document.getElementById("popup");
+      //   popup.classList.add("visible");
+      // }
+
+      // // Function to close the popup
+      // function closePopup() {
+      //   const popup = document.getElementById("popup");
+      //   popup.classList.remove("visible");
+      // }
+
+      // // Automatically show the popup after 3 seconds (optional)
+      // window.onload = function () {
+      //   setTimeout(showPopup, 1000); // Popup will appear after 3 seconds
+      // };
       // Function to show the popup
-      function showPopup() {
-        const popup = document.getElementById("popup");
-        popup.classList.add("visible");
-      }
+function showPopup() {
+  const popup = document.getElementById("popup");
+  popup.classList.add("visible");
 
-      // Function to close the popup
-      function closePopup() {
-        const popup = document.getElementById("popup");
-        popup.classList.remove("visible");
-      }
+  // Store the current timestamp as the last shown time
+  localStorage.setItem("lastPopupTime", Date.now());
+}
 
-      // Automatically show the popup after 3 seconds (optional)
-      window.onload = function () {
-        setTimeout(showPopup, 1000); // Popup will appear after 3 seconds
-      };
+// Function to close the popup
+function closePopup() {
+  const popup = document.getElementById("popup");
+  popup.classList.remove("visible");
+}
+
+// Automatically show the popup if 15 minutes have passed
+window.onload = function () {
+  const lastPopupTime = localStorage.getItem("lastPopupTime");
+  const now = Date.now();
+  const fifteenMinutes = 15 * 60 * 1000; // 15 minutes in milliseconds
+
+  // Show popup if it has never been shown or 15 minutes have passed
+  if (!lastPopupTime || now - lastPopupTime > fifteenMinutes) {
+    setTimeout(showPopup, 1000); // Popup will appear after 1 second
+  }
+};
+
     </script>
     <script src="./assets/js/index.js"></script>
     <script src="./assets/js/script.js"></script>
