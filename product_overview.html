@@ -83,12 +83,12 @@
           <!-- MG Selection -->
           <div class="option-section">
             <div class="option-title">MG</div>
-            <div class="option-buttons mg-buttons">
-              <button data-mg="1" class="mg-button">1</button>
+            <div class="option-buttons mg-buttons" id="button-container">
+              <!-- <button data-mg="1" class="mg-button">1</button>
               <button data-mg="2" class="mg-button">2</button>
               <button data-mg="3" class="mg-button">3</button>
               <button data-mg="4" class="mg-button active">4</button>
-              <button data-mg="5" class="mg-button">5</button>
+              <button data-mg="5" class="mg-button">5</button> -->
             </div>
           </div>
           <div>
@@ -147,8 +147,20 @@
         </div>
         <div class="right2">
           <h2>Select The Streangth & Quantity 💊</h2>
-          <div class="product-table">
+          <div class="product-table" >
             <table>
+              <thead>
+                <tr>
+                  <th>MG</th>
+                  <th>QTY</th>
+                  <th>Description</th>
+                  <th>Price</th>
+                  <th>Add To cart</th>
+                </tr>
+              </thead>
+            </table>
+            <div id="popil"></div>
+            <!-- <table>
               <thead>
                 <tr>
                   <th>MG</th>
@@ -220,67 +232,84 @@
                   <td><button class="add-tocart">Add To cart</button></td>
                 </tr>
               </tbody>
-            </table>
+            </table> -->
           </div>
         </div>
       </div>
     </div>
+    
+    <div id="rright"></div>
+    <div id="dummy"></div>
 
-    <section class="three-box-section">
-      <div class="box">
-        <h3>Product Details</h3>
-        <p>
-          Paracetamol 500mg is a widely used medicine for reducing fever and
-          relieving mild to moderate pain.
-        </p>
-      </div>
-      <div class="box">
-        <h3>Use's For</h3>
-        <p>
-          It relieves muscle strain and joint pain It helps reduce swelling It
-          provides warmth and firm support to the affected area
-        </p>
-      </div>
-      <div class="box">
-        <h3>Safety Information:</h3>
-        <p>
-          Wash carefully in lukewarm water and remove excess water by squeezing
-          gently Allow it to dry without stretching Do not iron
-        </p>
-      </div>
-    </section>
+    <section class="differ" id="differ"></section>
+    <section class="three-box-section" id="three-box-section"></section>
 
-    <section class="differ">
-      <div class="rightside">
+    <script>
+      async function fetchProductDetails() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const productID = urlParams.get("product_ID");
+
+        const sheetID = "1XVbrA6eUv85eOoJO6mziJ35LI8x2copV_ka7qil2ycU"; // Your Sheet ID
+        const apiKey = "AIzaSyD7mumdGgofUc1DE_bgaYJtOKK4i421iA8"; // Your API Key
+        const range = "Sheet1!A5:V"; // Adjust as needed
+        const range2 = "Sheet1!Y5:AF";
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
+        const url2 = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range2}?key=${apiKey}`;
+
+        try {
+          const response2 = await fetch(url2);
+          const data2 = await response2.json();
+
+          const response = await fetch(url);
+          const data = await response.json();
+
+          if (!data.values || !data2.values) {
+            throw new Error("No data found.");
+          }
+
+          const product = data.values.find((row) => row[0] === productID); // Assuming product_ID is in the first column
+          const row2 = data2.values;
+
+          if (!product) {
+            document.getElementById("product-details").innerHTML =
+              "<p>Product not found.</p>";
+            return;
+          }
+
+          const productHTML = `
+          <div class="rightside">
         <div class="box">
           <h3>Product Details</h3>
-          <p>
-            Paracetamol 500mg is a widely used medicine for reducing fever and
-            relieving mild to moderate pain.
-          </p>
           <ul>
             <li>
               <h4>Product Name</h4>
-              <p>Paracetamol 500mg</p>
+              <p>${product[2] || "Product Name"}</p>
             </li>
             <li>
               <h4>Product Description</h4>
               <p>
-                A widely used medicine for reducing fever and mild to moderate
-                pain.
+                ${product[3] || "Product Description"}
               </p>
             </li>
             <li>
               <h4>Trade Names</h4>
-              <p>Calpol, Panadol, Crocin</p>
+              <p>${product[4] || "Trade Name"}</p>
             </li>
             <li>
               <h4>Ingredients</h4>
-              <p>Paracetamol, Excipients</p>
+              <p>${product[5] || "Product Ingredients"}</p>
             </li>
             <li>
               <h4>Manufactured By</h4>
-              <p>ABC Pharmaceuticals</p>
+              <p>${product[6] || "Product Manifacturation"}</p>
+            </li>
+            <li>
+              <h4>Drug Abuse</h4>
+              <p>${product[13] || "Product Manifacturation"}</p>
+            </li>
+            <li>
+              <h4>Storage</h4>
+              <p>${product[14] || "Product Manifacturation"}</p>
             </li>
           </ul>
         </div>
@@ -291,138 +320,123 @@
           <ul>
             <li>
               <h4>Packaging Details</h4>
-              <p>10 tablets per strip, 20 strips per box</p>
+              <p>${product[7] || "Product Details"}</p>
             </li>
             <li>
               <h4>How to Use</h4>
-              <p>Take one tablet every 6-8 hours with water, after meals.</p>
+              <p>${product[8] || "Product How to Use"}</p>
             </li>
             <li>
               <h4>Drug Interaction</h4>
-              <p>May interact with blood thinners like Warfarin.</p>
+              <p>${product[9] || "Product Instruction"}</p>
             </li>
             <li>
               <h4>Side Effects</h4>
-              <p>Nausea, dizziness, allergic reactions in rare cases.</p>
+              <p>${product[10] || "Product Side Effects"}</p>
             </li>
           </ul>
         </div>
       </div>
-    </section>
-    <!-- <section class="three-box-section">
-      <div class="box">
+        `;
+
+          document.getElementById("differ").innerHTML = productHTML;
+          document.getElementById("three-box-section").innerHTML = `
+        <div class="box">
         <h3>Product Details</h3>
         <p>
-          Paracetamol 500mg is a widely used medicine for reducing fever and
-          relieving mild to moderate pain.
+          ${product[3] || "Product Detail"}
         </p>
-        <ul>
-          <li>
-            <h4>Product Name</h4>
-            <p>Paracetamol 500mg</p>
-          </li>
-          <li>
-            <h4>Product Description</h4>
-            <p>
-              A widely used medicine for reducing fever and mild to moderate
-              pain.
-            </p>
-          </li>
-          <li>
-            <h4>Trade Names</h4>
-            <p>Calpol, Panadol, Crocin</p>
-          </li>
-          <li>
-            <h4>Ingredients</h4>
-            <p>Paracetamol, Excipients</p>
-          </li>
-          <li>
-            <h4>Manufactured By</h4>
-            <p>ABC Pharmaceuticals</p>
-          </li>
-        </ul>
       </div>
-
       <div class="box">
-        <h3>Usage & Instructions</h3>
-        
-        <h4>Packaging Details</h4>
-        <p>10 tablets per strip, 20 strips per box</p>
-        <h4>How to Use</h4>
-        <p>Take one tablet every 6-8 hours with water, after meals.</p>
-        <h4>Drug Interaction</h4>
-        <p>May interact with blood thinners like Warfarin.</p>
-        <h4>Side Effects</h4>
-        <p>Nausea, dizziness, allergic reactions in rare cases.</p>
-      </div>
-
-      <div class="box">
-        <h3>Additional Information</h3>
-        <h4>Warnings & Precautions</h4>
+        <h3>Withdrawal Symptoms</h3>
         <p>
-          Avoid exceeding the prescribed dose. Not recommended for children
-          under 6 years.
+          ${product[12] || "Product Withdrawal Symptoms"}
         </p>
-        <h4>Withdrawal Symptoms</h4>
-        <p>None reported with recommended use.</p>
-        <h4>Drug Abuse</h4>
-        <p>High doses may cause liver damage or toxicity.</p>
-        <h4>Storage</h4>
-        <p>Store in a cool, dry place away from sunlight.</p>
-        <h4>Created By</h4>
-        <p>John Doe</p>
-        <h4>Created At</h4>
-        <p>2025-02-06</p>
-        <h4>Updated At</h4>
-        <p>2025-02-06</p>
       </div>
-    </section> -->
+      <div class="box">
+        <h3>Safety Information:</h3>
+        <p>
+          ${product[11] || "Product Warning Information"}
+        </p>
+      </div>
+        `;
 
-    <!-- <section class="recommendation-section">
-      <h2>Recommended for You</h2>
-      <ul class="recommendation-list">
-        <li class="category">
-          Health Corner
-          <ul class="sub-points">
-            <li><a href="#">Immunity Boosters</a></li>
-            <li><a href="#">Heart Health</a></li>
-            <li><a href="#">Diabetes Care</a></li>
-          </ul>
-        </li>
-        <li class="category">
-          Beauty
-          <ul class="sub-points">
-            <li><a href="#">Skin Care</a></li>
-            <li><a href="#">Hair Care</a></li>
-            <li><a href="#">Cosmetics</a></li>
-          </ul>
-        </li>
-        <li class="category">
-          Lab Tests
-          <ul class="sub-points">
-            <li><a href="#">Blood Test</a></li>
-            <li><a href="#">Thyroid Test</a></li>
-            <li><a href="#">Vitamin Deficiency</a></li>
-          </ul>
-        </li>
-        <li class="category">
-          Wellness
-          <ul class="sub-points">
-            <li><a href="#">Mental Health</a></li>
-            <li><a href="#">Fitness & Gym</a></li>
-            <li><a href="#">Sleep Aids</a></li>
-          </ul>
-        </li>
-        <li class="category">
-          Medicine
-          <ul class="sub-points">
-            <li><a href="#">Prescription Medicine</a></li>
-            <li><a href="#">OTC Medicine</a></li>
-            <li><a href="#">Pain Relief</a></li>
-          </ul>
-        </li>
-      </ul>
-    </section> -->
+          let rip = [];
+
+          row2.forEach((row2) => {
+            if (row2[1] == productID) {
+              rip.push(row2[3]);
+            }
+          });
+          rip = rip.filter((value, index) => rip.indexOf(value) === index);
+
+         
+
+          const buttonContainer = document.getElementById("button-container");
+
+          // Define a global variable to store the selected value
+          let selectedValue = null;
+
+          // Function to handle button clicks
+          function handleButtonClick(rip) {
+            selectedValue = rip; // Update the selected value
+            console.log("Button clicked with value:", selectedValue);
+
+            const tableBody = document.getElementById("popil");
+            tableBody.innerHTML = "";
+
+            row2.forEach((row2) => {
+              if (row2[1] == productID && row2[3] == selectedValue) {
+                const rope = `
+      <table>
+             
+              
+              <tbody>
+                <tr>
+                  <td>${row2[3]}mg</td>
+                  <td>${row2[4]}</td>
+                  <td>
+                    <span class="new-price">${row2[5]} PER PILL</span>
+                  </td>
+                  <td>${row2[5]}</td>
+                  <td><button class="add-tocart">Add To cart</button></td>
+                </tr>
+              </tbody>
+            </table> 
+            `;
+
+                tableBody.innerHTML += rope;
+              }
+            });
+          }
+
+          // Dynamically create buttons based on the array
+          rip.forEach((mg, index) => {
+            const button = document.createElement("button");
+            button.className = "mg-button";
+            button.textContent = mg;
+            button.setAttribute("data-mg", mg);
+
+            // Add click event listener to the button
+            button.addEventListener("click", () => {
+              handleButtonClick(mg); // Save clicked button value
+            });
+
+            // Append the button to the container
+            buttonContainer.appendChild(button);
+
+            // Automatically select the 0th index value
+            if (index === 0) {
+              handleButtonClick(mg); // Trigger click functionality for the 0th element
+            }
+          });
+        } catch (error) {
+          console.error("Error fetching product details:", error);
+        }
+      }
+
+      fetchProductDetails();
+    </script>
 
     <div class="flop">
       <section class="faqs">

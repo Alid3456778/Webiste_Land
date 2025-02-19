@@ -13,6 +13,11 @@ body {
   line-height: 1.6;
 }
 
+a {
+  text-decoration: none;
+  color: white;
+}
+
 /* Filter and Search Section */
 .filter-search {
   padding: 20px;
