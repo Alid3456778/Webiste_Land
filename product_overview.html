@@ -58,8 +58,8 @@
 
     <div class="product-overview">
       <!-- Left Side: Product Image -->
-      <div class="product-image" id="product_images_sinf" >
-        <!-- <div class="carousel-container">
+      <div class="product-image"  >
+        <div class="carousel-container" id="product_images_sinf">
           <img
             src="./assets/image/Alprazolam-USA-to-USA-01.jpg"
             alt="Image 1"
@@ -71,7 +71,7 @@
           <img src="./Alprazolam-USA-to-USA-01.jpg" alt="Image 3" />
         </div>
         <button class="arrow left">&lt;</button>
-        <button class="arrow right">&gt;</button> -->
+        <button class="arrow right">&gt;</button>
       </div>
 
       <!-- Right Side: Product Details -->
@@ -271,7 +271,7 @@
       </div>
         `;
         document.getElementById("product_images_sinf").innerHTML =`
-        <div class="carousel-container">
+        
           <img
             src="${product[15] || "Product Side Effects"}"
           />
@@ -280,9 +280,7 @@
             alt="Image 2"
           />
           <img src="${product[17] || "Product Side Effects"}" alt="Image 3" />
-        </div>
-        <button class="arrow left">&lt;</button>
-        <button class="arrow right">&gt;</button>
+      
         `;
 
           document.getElementById("differ").innerHTML = productHTML;
@@ -344,7 +342,7 @@
                   <td>${row2[3]}${row2[2]}</td>
                   <td>${row2[4]}</td>
                   <td>
-                    <span class="new-price">${row2[5]} PER PILL</span>
+                    <span class="new-price">${row2[5]}</span>
                   </td>
                   <td>${row2[6]}</td>
                   <td><button class="add-tocart">Add To cart</button></td>

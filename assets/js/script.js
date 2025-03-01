@@ -85,8 +85,7 @@ searchButton.addEventListener('click', () => {
    });
  
    // Initialize with default active button
-   const defaultMg = document.querySelector('.mg-button.active').dataset.mg;
-   updateTable(defaultMg);
+   https://lh3.googleusercontent.com/d/1duiTewov1jsyyUaEnuGboshwFlHtLt3A
 
 
    document.addEventListener("DOMContentLoaded", () => {

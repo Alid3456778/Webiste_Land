@@ -346,7 +346,7 @@ input {
   cursor: pointer;
   font-size: 14px;
   transition: all 0.3s;
-  width: 50px;
+  width: auto;
 }
 
 .option-buttons button.active {
