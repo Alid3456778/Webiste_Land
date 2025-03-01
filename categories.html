@@ -57,8 +57,8 @@
         <label for="categories">Filter by Category:</label>
         <select id="categories" onchange="filterCategory()">
           <option value="all">All Categories</option>
-          <option value="usa-premium">USA Premium</option>
-          <option value="cardiac-care">Cardiac Care</option>
+          <option value="1">USA Premium</option>
+          <option value="2">Cardiac Care</option>
           <option value="general-health-care">General Health Care</option>
           <option value="mens-health">Men's Health</option>
           <option value="mental-health">Mental Health</option>
@@ -82,6 +82,8 @@
           const url2 = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range2}?key=${apiKey}`;
           const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
 
+          const category = document.getElementById('categories').value;
+          console.log("this is the option chosen",category);
           try {
             const response2 = await fetch(url2);
             const data2 = await response2.json();
@@ -110,8 +112,10 @@
                 }
               });
 
+              
+
               const rowHTML = `
-              <div class="product-card medicine-card usa-premium">
+              <div class="product-card medicine-card ${row[1] || "all"}">
               <img src="${row[15] || ""}" alt="Product 1" />
               <div class="product-details">
               <h3>${row[2] || ""}</h3>

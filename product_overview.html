@@ -58,8 +58,8 @@
 
     <div class="product-overview">
       <!-- Left Side: Product Image -->
-      <div class="product-image">
-        <div class="carousel-container">
+      <div class="product-image" id="product_images_sinf" >
+        <!-- <div class="carousel-container">
           <img
             src="./assets/image/Alprazolam-USA-to-USA-01.jpg"
             alt="Image 1"
@@ -71,24 +71,17 @@
           <img src="./Alprazolam-USA-to-USA-01.jpg" alt="Image 3" />
         </div>
         <button class="arrow left">&lt;</button>
-        <button class="arrow right">&gt;</button>
+        <button class="arrow right">&gt;</button> -->
       </div>
 
       <!-- Right Side: Product Details -->
       <div class="product-details">
         <div class="right1">
-          <h2>Alprazolam USA to USA</h2>
-          <!-- <p>For Alterations of Intestinal Bacterial Flora & Stomach Care</p> -->
+          <h2 id="nameing_of_product" ></h2>
 
-          <!-- MG Selection -->
           <div class="option-section">
             <div class="option-title">MG</div>
             <div class="option-buttons mg-buttons" id="button-container">
-              <!-- <button data-mg="1" class="mg-button">1</button>
-              <button data-mg="2" class="mg-button">2</button>
-              <button data-mg="3" class="mg-button">3</button>
-              <button data-mg="4" class="mg-button active">4</button>
-              <button data-mg="5" class="mg-button">5</button> -->
             </div>
           </div>
           <div>
@@ -151,7 +144,7 @@
             <table>
               <thead>
                 <tr>
-                  <th>MG</th>
+                  <th id="unit_Type" >MG</th>
                   <th>QTY</th>
                   <th>Description</th>
                   <th>Price</th>
@@ -160,79 +153,7 @@
               </thead>
             </table>
             <div id="popil"></div>
-            <!-- <table>
-              <thead>
-                <tr>
-                  <th>MG</th>
-                  <th>QTY</th>
-                  <th>Description</th>
-                  <th>Price</th>
-                  <th>Add To cart</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1mg</td>
-                  <td>60</td>
-                  <td>
-                    <span class="old-price">$4.54</span>
-                    <span class="new-price">$3.18 PER PILL</span>
-                  </td>
-                  <td>1200</td>
-                  <td><button class="add-tocart">Add To cart</button></td>
-                </tr>
-                <tr>
-                  <td>1mg</td>
-                  <td>90</td>
-                  <td>
-                    <span class="old-price">$4.29</span>
-                    <span class="new-price">$3.00 PER PILL</span>
-                  </td>
-                  <td>1200</td>
-                  <td><button class="add-tocart">Add To cart</button></td>
-                </tr>
-                <tr>
-                  <td>1mg</td>
-                  <td>180</td>
-                  <td>
-                    <span class="old-price">$3.16</span>
-                    <span class="new-price">$2.21 PER PILL</span>
-                  </td>
-                  <td>1200</td>
-                  <td><button class="add-tocart">Add To cart</button></td>
-                </tr>
-                <tr>
-                  <td>1mg</td>
-                  <td>360</td>
-                  <td>
-                    <span class="old-price">$3.01</span>
-                    <span class="new-price">$2.11 PER PILL</span>
-                  </td>
-                  <td>1200</td>
-                  <td><button class="add-tocart">Add To cart</button></td>
-                </tr>
-                <tr>
-                  <td>1mg</td>
-                  <td>540</td>
-                  <td>
-                    <span class="old-price">$2.96</span>
-                    <span class="new-price">$2.07 PER PILL</span>
-                  </td>
-                  <td>1200</td>
-                  <td><button class="add-tocart">Add To cart</button></td>
-                </tr>
-                <tr>
-                  <td>1mg</td>
-                  <td>720</td>
-                  <td>
-                    <span class="old-price">$2.84</span>
-                    <span class="new-price">$1.99 PER PILL</span>
-                  </td>
-                  <td>1200</td>
-                  <td><button class="add-tocart">Add To cart</button></td>
-                </tr>
-              </tbody>
-            </table> -->
+        
           </div>
         </div>
       </div>
@@ -268,6 +189,7 @@
           }
 
           const product = data.values.find((row) => row[0] === productID); // Assuming product_ID is in the first column
+          const rows = data.values;
           const row2 = data2.values;
 
           if (!product) {
@@ -275,6 +197,16 @@
               "<p>Product not found.</p>";
             return;
           }
+          
+          const tableBody = document.getElementById("search_list");
+            tableBody.innerHTML = ""; // Clear table
+
+            rows.forEach((row) => {
+              const rowHTML = `<option value="${row[2] || "Product Name"} ${row[1] || "Product Name"} ">${row[1] || "Product Name"}</option>`;
+              tableBody.innerHTML += rowHTML;
+            });
+
+            document.getElementById("nameing_of_product").innerHTML =`${product[2] || "Product Name"}`;
 
           const productHTML = `
           <div class="rightside">
@@ -338,6 +270,20 @@
         </div>
       </div>
         `;
+        document.getElementById("product_images_sinf").innerHTML =`
+        <div class="carousel-container">
+          <img
+            src="${product[15] || "Product Side Effects"}"
+          />
+          <img
+            src="${product[16] || "Product Side Effects"}"
+            alt="Image 2"
+          />
+          <img src="${product[17] || "Product Side Effects"}" alt="Image 3" />
+        </div>
+        <button class="arrow left">&lt;</button>
+        <button class="arrow right">&gt;</button>
+        `;
 
           document.getElementById("differ").innerHTML = productHTML;
           document.getElementById("three-box-section").innerHTML = `
@@ -377,6 +323,8 @@
           // Define a global variable to store the selected value
           let selectedValue = null;
 
+           
+
           // Function to handle button clicks
           function handleButtonClick(rip) {
             selectedValue = rip; // Update the selected value
@@ -393,12 +341,12 @@
               
               <tbody>
                 <tr>
-                  <td>${row2[3]}mg</td>
+                  <td>${row2[3]}${row2[2]}</td>
                   <td>${row2[4]}</td>
                   <td>
                     <span class="new-price">${row2[5]} PER PILL</span>
                   </td>
-                  <td>${row2[5]}</td>
+                  <td>${row2[6]}</td>
                   <td><button class="add-tocart">Add To cart</button></td>
                 </tr>
               </tbody>
