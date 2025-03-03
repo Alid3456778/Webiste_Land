@@ -16,16 +16,16 @@ closeSidebar.addEventListener('click', () => {
 });
 
 // Search Button Click Event
-searchButton.addEventListener('click', () => {
-  const query = searchInput.value.trim();
-  if (query) {
-    alert(`Searching for: ${query}`);
+// searchButton.addEventListener('click', () => {
+//   const query = searchInput.value.trim();
+//   if (query) {
+//     alert(`Searching for: ${query}`);
     
-    // You can replace the alert with your actual search logic
-  } else {
-    alert('Please enter a search term.');
-  }
-});
+//     // You can replace the alert with your actual search logic
+//   } else {
+//     alert('Please enter a search term.');
+//   }
+// });
 
 
   // Toggle FAQ answer visibility

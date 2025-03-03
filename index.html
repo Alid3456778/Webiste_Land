@@ -325,7 +325,7 @@
     <section id="new-arrivals" class="product-section">
       <div><h2>New Arrivals</h2></div>
 
-      <div class="product-grid">
+      <div class="product-grid" id="product-grids">
         <div class="product-card">
           <div class="right_side">
             <div>
@@ -421,7 +421,7 @@
             <button>Add to Cart</button>
           </div>
         </div>
-        <div class="product-card">
+        <div class="product-card" id="product-cards">
           <div class="right_side">
             <div>
               <img
@@ -441,7 +441,186 @@
         </div>
       </div>
     </section>
+    <!-- <script>
+      async function loadSheetData() {
+          const sheetID = "1XVbrA6eUv85eOoJO6mziJ35LI8x2copV_ka7qil2ycU"; // Replace with your Sheet ID
+          const apiKey = "AIzaSyD7mumdGgofUc1DE_bgaYJtOKK4i421iA8"; // Replace with your Google API Key
+          
+          const range2 = "Sheet1!Y5:AF"; 
+          const range = "Sheet1!A5:V"; // Adjust based on your data range
+          const url2 = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range2}?key=${apiKey}`;
+          const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
 
+          // const category = document.getElementById('categories').value;
+          // console.log("this is the option chosen",category);
+          try {
+            const response2 = await fetch(url2);
+            const data2 = await response2.json();
+
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (!data.values || !data2.values) {
+              throw new Error("No data found in the specified range.");
+            }
+
+            const rows = data.values;
+            const row2 = data2.values;
+
+            const tableBody = document.getElementById("product-grids");
+            tableBody.innerHTML = ""; // Clear table
+
+            rows.forEach((row) => {
+              const productID = row[0]; 
+              let price=0;
+              let p=0;
+              row2.forEach((row2)=>{
+                if(row2[1] == row[0] && p == 0){
+                  price = row2[6];
+                  p=p+1;
+                }
+              });
+
+              
+
+              const rowHTML = `
+              <div class="product-card" id="product-cards" >
+          <div class="right_side">
+            <div>
+              <img
+                src="${row[15] || ""}"
+                alt="Product 1"
+              />
+            </div>
+            <div>
+              <p>${row[2] || ""}</p>
+              <span>${price}</span>
+            </div>
+          </div>
+          <div class="left_side">
+            <button><a href="./product_overview.html?product_ID=${productID}">Buy</a></button>
+            <button>Add to Cart</button>
+          </div>
+        </div>
+        `
+        ;
+
+              tableBody.innerHTML += rowHTML;
+            });
+          } catch (error) {
+            console.error("Error fetching data:", error);
+          }
+        }
+
+        loadSheetData();
+    </script> -->
+    <script>
+      const sheetID = "1XVbrA6eUv85eOoJO6mziJ35LI8x2copV_ka7qil2ycU"; // Replace with your Sheet ID
+      const apiKey = "AIzaSyD7mumdGgofUc1DE_bgaYJtOKK4i421iA8"; // Replace with your API Key
+
+      const range2 = "Sheet1!Y5:AF";
+      const range = "Sheet1!A5:V";
+
+      const url2 = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range2}?key=${apiKey}`;
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
+
+      const tableBody = document.getElementById("product-grids");
+
+      function showSkeletonLoaders() {
+        for (let i = 0; i < 6; i++) {
+          const skeletonHTML = `
+      <div class="product-card skeleton">
+        <div class="right_side">
+          <div class="image-placeholder"></div>
+          <div class="text-placeholder"></div>
+        </div>
+        <div class="left_side">
+          <button class="button-placeholder"></button>
+          <button class="button-placeholder"></button>
+        </div>
+      </div>
+    `;
+          tableBody.innerHTML += skeletonHTML;
+        }
+      }
+
+      async function fetchData() {
+        showSkeletonLoaders(); // Display skeleton loaders
+
+        try {
+          // Fetch data in parallel
+          const [response, response2] = await Promise.all([
+            fetch(url),
+            fetch(url2),
+          ]);
+          const [data, data2] = await Promise.all([
+            response.json(),
+            response2.json(),
+          ]);
+
+          if (!data.values || !data2.values) {
+            throw new Error("No data found in the specified range.");
+          }
+
+          const rows = data.values;
+          const row2 = data2.values;
+
+          // Map row2 for faster lookup
+          const priceMap = row2.reduce((map, row) => {
+            map[row[1]] = row[6]; // Assuming row[1] is productID and row[6] is price
+            return map;
+          }, {});
+
+          // Remove skeleton loaders
+          tableBody.innerHTML = "";
+
+          // Batch rendering for better UI responsiveness
+          const BATCH_SIZE = 10;
+          for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+            const batch = rows.slice(i, i + BATCH_SIZE);
+            renderBatch(batch, priceMap);
+            await new Promise((resolve) => setTimeout(resolve, 0)); // Yield to the UI thread
+          }
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
+
+      function renderBatch(batch, priceMap) {
+        let batchHTML = "";
+        batch.forEach((row) => {
+          const productID = row[0];
+          const price = priceMap[productID] || "Price not available";
+
+          const rowHTML = `
+      <div class="product-card">
+        <div class="right_side">
+          <div>
+            <img
+              src="${row[15] || ""}"
+              alt="Product Image"
+            />
+          </div>
+          <div>
+            <p>${row[2] || "No Description"}</p>
+            <span>${price}</span>
+          </div>
+        </div>
+        <div class="left_side">
+          <button><a href="./product_overview.html?product_ID=${productID}">Buy</a></button>
+          <button>Add to Cart</button>
+        </div>
+      </div>
+    `;
+          batchHTML += rowHTML;
+        });
+
+        tableBody.innerHTML += batchHTML; // Append the batch to the DOM
+      }
+
+      // Call fetchData
+      fetchData();
+    </script>
     <!-- Most Popular Products -->
     <section id="popular-products" class="product-section">
       <h2>Most Popular Products</h2>
@@ -619,32 +798,31 @@
       //   setTimeout(showPopup, 1000); // Popup will appear after 3 seconds
       // };
       // Function to show the popup
-function showPopup() {
-  const popup = document.getElementById("popup");
-  popup.classList.add("visible");
+      function showPopup() {
+        const popup = document.getElementById("popup");
+        popup.classList.add("visible");
 
-  // Store the current timestamp as the last shown time
-  localStorage.setItem("lastPopupTime", Date.now());
-}
+        // Store the current timestamp as the last shown time
+        localStorage.setItem("lastPopupTime", Date.now());
+      }
 
-// Function to close the popup
-function closePopup() {
-  const popup = document.getElementById("popup");
-  popup.classList.remove("visible");
-}
+      // Function to close the popup
+      function closePopup() {
+        const popup = document.getElementById("popup");
+        popup.classList.remove("visible");
+      }
 
-// Automatically show the popup if 15 minutes have passed
-window.onload = function () {
-  const lastPopupTime = localStorage.getItem("lastPopupTime");
-  const now = Date.now();
-  const fifteenMinutes = 15 * 60 * 1000; // 15 minutes in milliseconds
+      // Automatically show the popup if 15 minutes have passed
+      window.onload = function () {
+        const lastPopupTime = localStorage.getItem("lastPopupTime");
+        const now = Date.now();
+        const fifteenMinutes = 15 * 60 * 1000; // 15 minutes in milliseconds
 
-  // Show popup if it has never been shown or 15 minutes have passed
-  if (!lastPopupTime || now - lastPopupTime > fifteenMinutes) {
-    setTimeout(showPopup, 1000); // Popup will appear after 1 second
-  }
-};
-
+        // Show popup if it has never been shown or 15 minutes have passed
+        if (!lastPopupTime || now - lastPopupTime > fifteenMinutes) {
+          setTimeout(showPopup, 1000); // Popup will appear after 1 second
+        }
+      };
     </script>
     <script src="./assets/js/index.js"></script>
     <script src="./assets/js/script.js"></script>

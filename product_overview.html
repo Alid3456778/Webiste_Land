@@ -58,7 +58,7 @@
 
     <div class="product-overview">
       <!-- Left Side: Product Image -->
-      <div class="product-image"  >
+      <div class="product-image">
         <div class="carousel-container" id="product_images_sinf">
           <img
             src="./assets/image/Alprazolam-USA-to-USA-01.jpg"
@@ -77,12 +77,11 @@
       <!-- Right Side: Product Details -->
       <div class="product-details">
         <div class="right1">
-          <h2 id="nameing_of_product" ></h2>
+          <h2 id="nameing_of_product"></h2>
 
           <div class="option-section">
             <div class="option-title">MG</div>
-            <div class="option-buttons mg-buttons" id="button-container">
-            </div>
+            <div class="option-buttons mg-buttons" id="button-container"></div>
           </div>
           <div>
             <button id="showButton">Custom Order</button>
@@ -140,11 +139,11 @@
         </div>
         <div class="right2">
           <h2>Select The Streangth & Quantity 💊</h2>
-          <div class="product-table" >
+          <div class="product-table">
             <table>
               <thead>
                 <tr>
-                  <th id="unit_Type" >MG</th>
+                  <th id="unit_Type">MG</th>
                   <th>QTY</th>
                   <th>Description</th>
                   <th>Price</th>
@@ -153,12 +152,11 @@
               </thead>
             </table>
             <div id="popil"></div>
-        
           </div>
         </div>
       </div>
     </div>
-    
+
     <div id="rright"></div>
     <div id="dummy"></div>
 
@@ -197,16 +195,34 @@
               "<p>Product not found.</p>";
             return;
           }
-          
+
           const tableBody = document.getElementById("search_list");
-            tableBody.innerHTML = ""; // Clear table
+          tableBody.innerHTML = ""; // Clear table
 
+          rows.forEach((row) => {
+            const rowHTML = `<option value="${row[2] || "Product Name"} ">${
+              row[2] || "Product Name"
+            }</option>`;
+            tableBody.innerHTML += rowHTML;
+          });
+          searchButton.addEventListener("click", () => {
+            const query = searchInput.value.trim();
             rows.forEach((row) => {
-              const rowHTML = `<option value="${row[2] || "Product Name"} ${row[1] || "Product Name"} ">${row[1] || "Product Name"}</option>`;
-              tableBody.innerHTML += rowHTML;
-            });
+              console.log(row[0]);
+              if (query == row[2]) {
+                // let proname = row[2];
+                // console.log("this is ", row[2]);
+                // alert("Search is ", row[1]);
+                window.location.href = `./product_overview.html?product_ID=${row[0]}`;
 
-            document.getElementById("nameing_of_product").innerHTML =`${product[2] || "Product Name"}`;
+                // You can replace the alert with your actual search logic
+              }
+            });
+          });
+
+          document.getElementById("nameing_of_product").innerHTML = `${
+            product[2] || "Product Name"
+          }`;
 
           const productHTML = `
           <div class="rightside">
@@ -270,7 +286,7 @@
         </div>
       </div>
         `;
-        document.getElementById("product_images_sinf").innerHTML =`
+          document.getElementById("product_images_sinf").innerHTML = `
         
           <img
             src="${product[15] || "Product Side Effects"}"
@@ -314,14 +330,10 @@
           });
           rip = rip.filter((value, index) => rip.indexOf(value) === index);
 
-         
-
           const buttonContainer = document.getElementById("button-container");
 
           // Define a global variable to store the selected value
           let selectedValue = null;
-
-           
 
           // Function to handle button clicks
           function handleButtonClick(rip) {
