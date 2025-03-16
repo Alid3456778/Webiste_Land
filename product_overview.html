@@ -163,7 +163,7 @@
     <section class="differ" id="differ"></section>
     <section class="three-box-section" id="three-box-section"></section>
 
-    <script>
+     <!-- <script>
       async function fetchProductDetails() {
         const urlParams = new URLSearchParams(window.location.search);
         const productID = urlParams.get("product_ID");
@@ -394,8 +394,299 @@
       }
 
       fetchProductDetails();
-    </script>
+    </script> -->
+    <script>
+      // Optimized function to fetch and display product details
+async function fetchProductDetails() {
+  // Show loading indicators
+  document.getElementById("nameing_of_product").innerHTML = "Loading...";
+  document.getElementById("differ").innerHTML = '<div class="loading-spinner"></div>';
+  document.getElementById("three-box-section").innerHTML = '<div class="loading-spinner"></div>';
+  
+  // Get product ID from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const productID = urlParams.get("product_ID");
+  
+  if (!productID) {
+    showError("Product ID not found in URL");
+    return;
+  }
+  
+  const sheetID = "1XVbrA6eUv85eOoJO6mziJ35LI8x2copV_ka7qil2ycU";
+  const apiKey = "AIzaSyD7mumdGgofUc1DE_bgaYJtOKK4i421iA8";
+  
+  try {
+    // Fetch only the necessary data ranges
+    // 1. Fetch product details and variants in parallel
+    const [productDataResponse, variantDataResponse] = await Promise.all([
+      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/Sheet1!A5:V?key=${apiKey}`),
+      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/Sheet1!Y5:AF?key=${apiKey}`)
+    ]);
+    
+    const productData = await productDataResponse.json();
+    const variantData = await variantDataResponse.json();
+    
+    if (!productData.values || !variantData.values) {
+      throw new Error("No data found in the spreadsheet.");
+    }
+    
+    // 2. Find the product we're looking for
+    const product = productData.values.find(row => row[0] === productID);
+    
+    if (!product) {
+      throw new Error("Product not found.");
+    }
+    
+    // 3. Filter out just the variants for this product (do this once)
+    const productVariants = variantData.values.filter(row => row[1] === productID);
+    
+    // 4. Build the product search index
+    buildProductSearch(productData.values);
+    
+    // 5. Update the UI with the product data
+    updateProductUI(product, productVariants);
+    
+  } catch (error) {
+    console.error("Error fetching product details:", error);
+    showError("Failed to load product details. Please try again later.");
+  }
+}
 
+// Function to build the product search index
+function buildProductSearch(products) {
+  const searchList = document.getElementById("search_list");
+  searchList.innerHTML = "";
+  
+  // Create a document fragment for better performance
+  const fragment = document.createDocumentFragment();
+  
+  // Build search options
+  products.forEach(product => {
+    const option = document.createElement("option");
+    option.value = product[2] || "Product Name";
+    option.textContent = product[2] || "Product Name";
+    fragment.appendChild(option);
+  });
+  
+  // Add all options at once
+  searchList.appendChild(fragment);
+  
+  // Set up search functionality
+  const searchButton = document.getElementById("search-button");
+  const searchInput = document.getElementById("search-input");
+  
+  searchButton.addEventListener("click", () => {
+    const query = searchInput.value.trim();
+    const matchingProduct = products.find(product => product[2] === query);
+    
+    if (matchingProduct) {
+      window.location.href = `./product_overview.html?product_ID=${matchingProduct[0]}`;
+    } else {
+      alert("No matching product found.");
+    }
+  });
+}
+
+// Function to update the UI with product data
+function updateProductUI(product, variants) {
+  // 1. Update product name
+  document.getElementById("nameing_of_product").textContent = product[2] || "Product Name";
+  
+  // 2. Update product images
+  document.getElementById("product_images_sinf").innerHTML = `
+    <img src="${product[15] || './assets/image/placeholder.png'}" alt="${product[2]}" loading="lazy" />
+    <img src="${product[16] || './assets/image/placeholder.png'}" alt="${product[2]}" loading="lazy" />
+    <img src="${product[17] || './assets/image/placeholder.png'}" alt="${product[2]}" loading="lazy" />
+  `;
+
+
+  // 3. Update product details
+  document.getElementById("differ").innerHTML = `
+    <div class="rightside">
+      <div class="box">
+        <h3>Product Details</h3>
+        <ul>
+          <li><h4>Product Name</h4><p>${product[2] || "Product Name"}</p></li>
+          <li><h4>Product Description</h4><p>${product[3] || "Product Description"}</p></li>
+          <li><h4>Trade Names</h4><p>${product[4] || "Trade Name"}</p></li>
+          <li><h4>Ingredients</h4><p>${product[5] || "Product Ingredients"}</p></li>
+          <li><h4>Manufactured By</h4><p>${product[6] || "Product Manufacturer"}</p></li>
+          <li><h4>Drug Abuse</h4><p>${product[13] || "No information available"}</p></li>
+          <li><h4>Storage</h4><p>${product[14] || "No information available"}</p></li>
+        </ul>
+      </div>
+    </div>
+    <div class="leftside">
+      <div class="box">
+        <h3>Usage & Instructions</h3>
+        <ul>
+          <li><h4>Packaging Details</h4><p>${product[7] || "No information available"}</p></li>
+          <li><h4>How to Use</h4><p>${product[8] || "No information available"}</p></li>
+          <li><h4>Drug Interaction</h4><p>${product[9] || "No information available"}</p></li>
+          <li><h4>Side Effects</h4><p>${product[10] || "No information available"}</p></li>
+        </ul>
+      </div>
+    </div>
+  `;
+  
+  // 4. Update product safety information
+  document.getElementById("three-box-section").innerHTML = `
+    <div class="box">
+      <h3>Product Details</h3>
+      <p>${product[3] || "No information available"}</p>
+    </div>
+    <div class="box">
+      <h3>Withdrawal Symptoms</h3>
+      <p>${product[12] || "No information available"}</p>
+    </div>
+    <div class="box">
+      <h3>Safety Information:</h3>
+      <p>${product[11] || "No information available"}</p>
+    </div>
+  `;
+  
+  // 5. Process variants
+  setupProductVariants(variants);
+}
+
+// Function to set up product variants
+function setupProductVariants(variants) {
+  // Get unique MG values
+  const mgValues = [...new Set(variants.map(variant => variant[3]))];
+  const buttonContainer = document.getElementById("button-container");
+  buttonContainer.innerHTML = "";
+  
+  // Create buttons for each MG value
+  mgValues.forEach((mg, index) => {
+    const button = document.createElement("button");
+    button.className = "mg-button";
+    button.textContent = mg;
+    button.setAttribute("data-mg", mg);
+    
+    button.addEventListener("click", () => {
+      // Visual feedback - mark active button
+      document.querySelectorAll(".mg-button").forEach(btn => btn.classList.remove("active"));
+      button.classList.add("active");
+      
+      // Display variant options
+      displayVariantOptions(variants, mg);
+    });
+    
+    buttonContainer.appendChild(button);
+    
+    // Select first option by default
+    if (index === 0) {
+      button.classList.add("active");
+      displayVariantOptions(variants, mg);
+    }
+  });
+}
+
+// Function to display variant options
+function displayVariantOptions(variants, selectedMg) {
+  const tableBody = document.getElementById("popil");
+  tableBody.innerHTML = "";
+  
+  // Filter variants by selected MG
+  const matchingVariants = variants.filter(variant => variant[3] === selectedMg);
+  
+  // Create table rows for matching variants
+  const fragment = document.createDocumentFragment();
+  
+  matchingVariants.forEach(variant => {
+    const tr = document.createElement("tr");
+    
+    tr.innerHTML = `
+      <table class="tab" >
+        <tbody>
+          <tr>
+            <td>${variant[3]}${variant[2]}</td>
+            <td>${variant[4]}</td>
+            <td><span class="new-price">${variant[5]}</span></td>
+            <td>${variant[6]}</td>
+            <td><button class="add-tocart" data-variant-id="${variant[0]}">Add To Cart</button></td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+    
+    fragment.appendChild(tr);
+  });
+  
+  tableBody.appendChild(fragment);
+  
+  // Set up add to cart functionality
+  setupAddToCartButtons();
+}
+
+// Function to set up add to cart buttons
+function setupAddToCartButtons() {
+  document.querySelectorAll(".add-tocart").forEach(button => {
+    button.addEventListener("click", function() {
+      const variantId = this.getAttribute("data-variant-id");
+      addToCart(variantId);
+    });
+  });
+}
+
+// Function to add item to cart
+function addToCart(variantId) {
+  // Cart implementation goes here
+  console.log("Added to cart: ", variantId);
+  alert("Item added to cart!");
+}
+
+// Function to show errors
+function showError(message) {
+  const errorElements = [
+    document.getElementById("nameing_of_product"),
+    document.getElementById("differ"),
+    document.getElementById("three-box-section"),
+    document.getElementById("product_images_sinf")
+  ];
+  
+  errorElements.forEach(element => {
+    if (element) {
+      element.innerHTML = `<div class="error-message">${message}</div>`;
+    }
+  });
+}
+
+// Add event listener for sidebar toggle
+document.addEventListener("DOMContentLoaded", function() {
+  // Initialize product details
+  fetchProductDetails();
+  
+  // Set up sidebar toggle
+  const hamburgerMenu = document.getElementById("hamburger-menu");
+  const sidebar = document.getElementById("sidebar");
+  const closeSidebar = document.getElementById("close-sidebar");
+  
+  hamburgerMenu.addEventListener("click", () => {
+    sidebar.classList.add("active");
+  });
+  
+  closeSidebar.addEventListener("click", () => {
+    sidebar.classList.remove("active");
+  });
+  
+  // Review toggle functionality
+  // const toggleButtons = document.querySelectorAll(".toggle-review");
+  
+  // toggleButtons.forEach(button => {
+  //   button.addEventListener("click", function() {
+  //     const reviewText = this.parentElement.nextElementSibling.nextElementSibling;
+  //     if (reviewText.classList.contains("hidden")) {
+  //       reviewText.classList.remove("hidden");
+  //       this.textContent = "Hide Review ▲";
+  //     } else {
+  //       reviewText.classList.add("hidden");
+  //       this.textContent = "Show Review ▼";
+  //     }
+  //   });
+  // });
+});
+    </script> 
     <div class="flop">
       <section class="faqs">
         <h2>Frequently Asked Questions</h2>

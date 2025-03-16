@@ -1,4 +1,8 @@
 // Filter medicines by category
+
+const urlParams = new URLSearchParams(window.location.search);
+const catogeriesID = urlParams.get("catogeries_ID");
+
 function filterCategory() {
     const category = document.getElementById('categories').value;
     const medicines = document.querySelectorAll('.medicine-card');

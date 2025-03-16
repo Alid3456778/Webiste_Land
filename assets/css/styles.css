@@ -475,11 +475,12 @@ input {
   margin-top: 20px;
 }
 
-table {
+table,.tab {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
 }
+
 
 thead th {
   background-color: #f4f4f4;
@@ -487,6 +488,11 @@ thead th {
   padding: 10px;
   text-align: left;
   border: 1px solid #ddd;
+}
+#popil td{
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
 }
 
 tbody td {

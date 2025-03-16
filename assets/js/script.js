@@ -85,7 +85,7 @@ closeSidebar.addEventListener('click', () => {
    });
  
    // Initialize with default active button
-   https://lh3.googleusercontent.com/d/1duiTewov1jsyyUaEnuGboshwFlHtLt3A
+   //https://lh3.googleusercontent.com/d/1duiTewov1jsyyUaEnuGboshwFlHtLt3A
 
 
    document.addEventListener("DOMContentLoaded", () => {
@@ -96,7 +96,7 @@ closeSidebar.addEventListener('click', () => {
   
     let currentIndex = 0;
     const imageCount = images.length;
-    const imageWidth = images[0].clientWidth;
+    let imageWidth = images[0].clientWidth;
   
     // Move to a specific slide
     const moveToSlide = (index) => {
