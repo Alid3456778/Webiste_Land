@@ -1,31 +1,29 @@
 // Filter medicines by category
-
-const urlParams = new URLSearchParams(window.location.search);
-const catogeriesID = urlParams.get("catogeries_ID");
-
-function filterCategory() {
-    const category = document.getElementById('categories').value;
-    const medicines = document.querySelectorAll('.medicine-card');
+// function filterCategory() {
+//     const category = document.getElementById('categories').value;
+//     const medicines = document.querySelectorAll('.medicine-card');
   
-    medicines.forEach((medicine) => {
-      if (category === 'all' || medicine.classList.contains(category)) {
-        medicine.style.display = 'flex';
-      } else {
-        medicine.style.display = 'none';
-      }
-    });
-  }
+//     medicines.forEach((medicine) => {
+//       if (category === 'all' || medicine.classList.contains(category)) {
+//         medicine.style.display = 'flex';
+//       } else {
+//         medicine.style.display = 'none';
+//       }
+//     });
+//   }
   
   // Search for medicines
   function searchMedicines() {
     const query = document.getElementById('searchInput').value.toLowerCase();
     const medicines = document.querySelectorAll('.medicine-card');
-  
+    console.log(query);
     medicines.forEach((medicine) => {
       if (medicine.textContent.toLowerCase().includes(query)) {
         medicine.style.display = 'flex';
       } else {
         medicine.style.display = 'none';
+        const tableBody = document.getElementById("product-grid");
+        tableBody.innerHTML = `<p>No medicines found with the name "${query}".</p>`; 
       }
     });
   }

@@ -43,6 +43,8 @@
       </div>
     </header>
 
+   
+
     <!-- Filter and Search Section -->
     <div class="filter-search">
       <div class="search-bar">
@@ -72,7 +74,7 @@
     </div>
 
     <section id="product-grid">  
-    <!-- <script>
+      <!-- <script>
         async function loadSheetData() {
           
           const sheetID = "1XVbrA6eUv85eOoJO6mziJ35LI8x2copV_ka7qil2ycU"; // Replace with your Sheet ID
@@ -138,122 +140,400 @@
         }
 
         loadSheetData();
-      </script> -->
-      <script>
+      </script>  -->
+      <!-- <script>
         async function loadSheetData() {
-  const sheetID = "1XVbrA6eUv85eOoJO6mziJ35LI8x2copV_ka7qil2ycU";
-  const apiKey = "AIzaSyD7mumdGgofUc1DE_bgaYJtOKK4i421iA8";
+          const sheetID = "1XVbrA6eUv85eOoJO6mziJ35LI8x2copV_ka7qil2ycU"; // Replace with your Sheet ID
+          const apiKey = "AIzaSyD7mumdGgofUc1DE_bgaYJtOKK4i421iA8"; // Replace with your Google API Key
+          const range2 = "Sheet1!Y5:AF";
+          const range = "Sheet1!A5:V";
   
-  const category = document.getElementById('categories').value;
-  console.log("Category selected:", category);
+          const url2 = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range2}?key=${apiKey}`;
+          const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
   
-  try {
-    // Show loading indicator
-    const tableBody = document.getElementById("product-grid");
-    tableBody.innerHTML = "<div class='loading'>Loading products...</div>";
-    
-    // Fetch both datasets in parallel
-    const [priceData, productData] = await Promise.all([
-      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/Sheet1!Y5:AF?key=${apiKey}`)
-        .then(response => response.json()),
-      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/Sheet1!A5:V?key=${apiKey}`)
-        .then(response => response.json())
-    ]);
-    
-    if (!productData.values || !priceData.values) {
-      throw new Error("No data found in the specified range.");
-    }
-    
-    // Process all price data first and store in a map for O(1) lookups
-    const priceMap = new Map();
-    priceData.values.forEach(row => {
-      if (row[1]) { // Product ID is at index 1
-        priceMap.set(row[1], row[6]); // Price is at index 6
+          try {
+            const response2 = await fetch(url2);
+            const data2 = await response2.json();
+            const response = await fetch(url);
+            const data = await response.json();
+  
+            if (!data.values || !data2.values) {
+              throw new Error("No data found in the specified range.");
+            }
+  
+            const rows = data.values;
+            const row2 = data2.values;
+  
+            const tableBody = document.getElementById("product-grid");
+            const loadingMessage = document.getElementById("loading-message");
+  
+            loadingMessage.innerText = "LOADING FIRST 20 PRODUCTS...";
+            displayBatch(rows, row2, 0, 20, tableBody);
+  
+            let start = 20;
+            while (start < rows.length) {
+              loadingMessage.innerText = `LOADING NEXT 20 PRODUCTS (${start + 1}/${rows.length})...`;
+              await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate delay for smoother loading
+              displayBatch(rows, row2, start, start + 20, tableBody);
+              start += 20;
+            }
+  
+            loadingMessage.style.display = "none"; // Hide loading message when all rows are loaded
+          } catch (error) {
+            console.error("Error fetching data:", error);
+          }
+        }
+  
+        function displayBatch(rows, row2, start, end, tableBody) {
+          const batch = rows.slice(start, end);
+  
+          batch.forEach((row) => {
+            const productID = row[0];
+            let price = 0;
+  
+            row2.forEach((r2) => {
+              if (r2[1] === row[0]) {
+                price = r2[6];
+              }
+            });
+  
+            const rowHTML = `
+              <div class="product-card medicine-card ${row[1] || "all"}">
+                <img src="${row[15] || ""}" alt="Product Image" />
+                <div class="product-details">
+                  <h3>${row[2] || "No Description"}</h3>
+                  <p class="price">${price || "Price not available"}</p>
+                  <div class="product-buttons">
+                    <button class="buy-btn"><a href="./product_overview.html?product_ID=${productID}">Buy</a></button>
+                    <button class="cart-btn">Add to Cart</button>
+                  </div>
+                </div>
+              </div>
+            `;
+  
+            tableBody.innerHTML += rowHTML;
+          });
+        }
+  
+        loadSheetData();
+      </script> -->
+      <!-- <script>
+        async function loadSheetData() {
+          const sheetID = "1XVbrA6eUv85eOoJO6mziJ35LI8x2copV_ka7qil2ycU"; // Replace with your Sheet ID
+          const apiKey = "AIzaSyD7mumdGgofUc1DE_bgaYJtOKK4i421iA8"; // Replace with your Google API Key
+          const range2 = "Sheet1!Y5:AF";
+          const range = "Sheet1!A5:V";
+  
+          const url2 = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range2}?key=${apiKey}`;
+          const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
+  
+          // Get the category ID from the URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const categoryID = urlParams.get("catogeries_ID");
+          console.log("Selected Category ID:", categoryID);
+  
+          try {
+            const response2 = await fetch(url2);
+            const data2 = await response2.json();
+            const response = await fetch(url);
+            const data = await response.json();
+  
+            if (!data.values || !data2.values) {
+              throw new Error("No data found in the specified range.");
+            }
+  
+            const rows = data.values;
+            const row2 = data2.values;
+  
+            const tableBody = document.getElementById("product-grid");
+            const loadingMessage = document.getElementById("loading-message");
+  
+            loadingMessage.innerText = "LOADING PRODUCTS...";
+            
+            // Filter rows based on the selected category ID
+            const filteredRows = categoryID
+              ? rows.filter((row) => row[1] === categoryID)
+              : rows;
+  
+            if (filteredRows.length === 0) {
+              tableBody.innerHTML = `<p>No products found for the selected category.</p>`;
+              loadingMessage.style.display = "none";
+              return;
+            }
+  
+            displayBatch(filteredRows, row2, 0, 20, tableBody);
+  
+            let start = 20;
+            while (start < filteredRows.length) {
+              loadingMessage.innerText = `LOADING NEXT 20 PRODUCTS (${start + 1}/${filteredRows.length})...`;
+              await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate delay for smoother loading
+              displayBatch(filteredRows, row2, start, start + 20, tableBody);
+              start += 20;
+            }
+  
+            loadingMessage.style.display = "none"; // Hide loading message when all rows are loaded
+          } catch (error) {
+            console.error("Error fetching data:", error);
+          }
+        }
+  
+        function displayBatch(rows, row2, start, end, tableBody) {
+          const batch = rows.slice(start, end);
+  
+          batch.forEach((row) => {
+            const productID = row[0];
+            let price = 0;
+  
+            row2.forEach((r2) => {
+              if (r2[1] === row[0]) {
+                price = r2[6];
+              }
+            });
+  
+            const rowHTML = `
+              <div class="product-card medicine-card ${row[1] || "all"}">
+                <img src="${row[15] || ""}" alt="Product Image" />
+                <div class="product-details">
+                  <h3>${row[2] || "No Description"}</h3>
+                  <p class="price">${price || "Price not available"}</p>
+                  <div class="product-buttons">
+                    <button class="buy-btn"><a href="./product_overview.html?product_ID=${productID}">Buy</a></button>
+                    <button class="cart-btn">Add to Cart</button>
+                  </div>
+                </div>
+              </div>
+            `;
+  
+            tableBody.innerHTML += rowHTML;
+          });
+        }
+  
+        loadSheetData();
+      </script> -->
+      <!-- <script>
+      // Fetch data based on category from URL
+      async function loadSheetData() {
+        const sheetID = "1XVbrA6eUv85eOoJO6mziJ35LI8x2copV_ka7qil2ycU"; // Replace with your Sheet ID
+        const apiKey = "AIzaSyD7mumdGgofUc1DE_bgaYJtOKK4i421iA8"; // Replace with your Google API Key
+        const range2 = "Sheet1!Y5:AF";
+        const range = "Sheet1!A5:V";
+
+        const url2 = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range2}?key=${apiKey}`;
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
+
+        // Get the category ID from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const categoryID = urlParams.get("categories_ID");
+        console.log("Selected Category ID:", categoryID);
+
+        try {
+          const response2 = await fetch(url2);
+          const data2 = await response2.json();
+          const response = await fetch(url);
+          const data = await response.json();
+
+          if (!data.values || !data2.values) {
+            throw new Error("No data found in the specified range.");
+          }
+
+          const rows = data.values;
+          const row2 = data2.values;
+
+          const tableBody = document.getElementById("product-grid");
+          const loadingMessage = document.getElementById("loading-message");
+
+          loadingMessage.innerText = "LOADING PRODUCTS...";
+          
+          // Filter rows based on the selected category ID
+          const filteredRows = categoryID && categoryID !== "all"
+            ? rows.filter((row) => row[1] === categoryID)
+            : rows;
+
+          if (filteredRows.length === 0) {
+            tableBody.innerHTML = `<p>No products found for the selected category.</p>`;
+            loadingMessage.style.display = "none";
+            return;
+          }
+
+          displayBatch(filteredRows, row2, 0, 20, tableBody);
+
+          let start = 20;
+          while (start < filteredRows.length) {
+            loadingMessage.innerText = `LOADING NEXT 20 PRODUCTS (${start + 1}/${filteredRows.length})...`;
+            await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate delay for smoother loading
+            displayBatch(filteredRows, row2, start, start + 20, tableBody);
+            start += 20;
+          }
+
+          loadingMessage.style.display = "none"; // Hide loading message when all rows are loaded
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
       }
-    });
-    
-    // Filter by category if needed
-    let filteredProducts = productData.values;
-    if (category !== 'all') {
-      filteredProducts = productData.values.filter(row => row[1] === category);
-    }
-    
-    // Create document fragment for better performance
-    const fragment = document.createDocumentFragment();
-    
-    // Build HTML with batch processing
-    const batchSize = 20;
-    tableBody.innerHTML = ""; // Clear the loading indicator
-    
-    for (let i = 0; i < filteredProducts.length; i += batchSize) {
-      // Process in batches to prevent UI freezing
-      setTimeout(() => {
-        const batch = filteredProducts.slice(i, i + batchSize);
-        
-        batch.forEach(row => {
+
+      // Display a batch of rows
+      function displayBatch(rows, row2, start, end, tableBody) {
+        const batch = rows.slice(start, end);
+
+        batch.forEach((row) => {
           const productID = row[0];
-          const price = priceMap.get(productID) || "Price not available";
-          
-          const productCard = document.createElement('div');
-          productCard.className = `product-card medicine-card ${row[1] || "all"}`;
-          
-          productCard.innerHTML = `
-          
-            <img src="${row[15] || ""}" alt="Product" loading="lazy" />
-            <div class="product-details">
-              <h3>${row[2] || ""}</h3>
-              <p class="price">${price}</p>
-              <div class="product-buttons">
-                <button class="buy-btn"><a href="./product_overview.html?product_ID=${productID}">Buy</a></button>
-                <button class="cart-btn">Add to Cart</button>
+          let price = 0;
+
+          row2.forEach((r2) => {
+            if (r2[1] === row[0]) {
+              price = r2[6];
+            }
+          });
+
+          const rowHTML = `
+            <div class="product-card medicine-card ${row[1] || "all"}">
+              <img src="${row[15] || ""}" alt="Product Image" />
+              <div class="product-details">
+                <h3>${row[2] || "No Description"}</h3>
+                <p class="price">${price || "Price not available"}</p>
+                <div class="product-buttons">
+                  <button class="buy-btn"><a href="./product_overview.html?product_ID=${productID}">Buy</a></button>
+                  <button class="cart-btn">Add to Cart</button>
+                </div>
               </div>
             </div>
           `;
-          
-          fragment.appendChild(productCard);
+
+          tableBody.innerHTML += rowHTML;
         });
-        
-        tableBody.appendChild(fragment.cloneNode(true));
-      }, 0);
-    }
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    document.getElementById("product-grid").innerHTML = 
-      "<div class='error'>Error loading products. Please try again later.</div>";
-  }
-}
+      }
 
-// Search function
-function searchMedicines() {
-  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-  const productCards = document.querySelectorAll('.product-card');
-  
-  productCards.forEach(card => {
-    const productName = card.querySelector('h3').textContent.toLowerCase();
-    if (productName.includes(searchTerm)) {
-      card.style.display = 'block';
-    } else {
-      card.style.display = 'none';
-    }
-  });
-}
+      // Function to handle category filtering
+      function filterCategory() {
+        const selectedCategory = document.getElementById("categories").value;
+        const urlParams = new URLSearchParams(window.location.search);
 
-// Filter function
-function filterCategory() {
-  loadSheetData();
-}
+        if (selectedCategory === "all") {
+          urlParams.delete("categories_ID");
+        } else {
+          urlParams.set("categories_ID", selectedCategory);
+        }
 
-// Add event listener for search input
-document.getElementById('searchInput').addEventListener('input', searchMedicines);
+        // Reload the page with updated category parameter
+        window.location.search = urlParams.toString();
+      }
 
-// Initialize data loading
-document.addEventListener('DOMContentLoaded', loadSheetData);
-      </script>
+      loadSheetData();
+    </script> -->
       
+    <script>
+      // Fetch data based on category from URL
+      async function loadSheetData(categoryID) {
+        const sheetID = "1XVbrA6eUv85eOoJO6mziJ35LI8x2copV_ka7qil2ycU"; // Replace with your Sheet ID
+        const apiKey = "AIzaSyD7mumdGgofUc1DE_bgaYJtOKK4i421iA8"; // Replace with your Google API Key
+        const range2 = "Sheet1!Y5:AF";
+        const range = "Sheet1!A5:V";
 
+        const url2 = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range2}?key=${apiKey}`;
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
 
-      <!-- Add more product cards as needed -->
+        try {
+          const response2 = await fetch(url2);
+          const data2 = await response2.json();
+          const response = await fetch(url);
+          const data = await response.json();
+
+          if (!data.values || !data2.values) {
+            throw new Error("No data found in the specified range.");
+          }
+
+          const rows = data.values;
+          const row2 = data2.values;
+
+          const tableBody = document.getElementById("product-grid");
+          const loadingMessage = document.getElementById("loading-message");
+
+          loadingMessage.innerText = "LOADING PRODUCTS...";
+
+          // Filter rows based on the selected category ID
+          const filteredRows = categoryID && categoryID !== "all"
+            ? rows.filter((row) => row[1] === categoryID)
+            : rows;
+
+          tableBody.innerHTML = ""; // Clear the previous data
+
+          if (filteredRows.length === 0) {
+            tableBody.innerHTML = `<p>No products found for the selected category.</p>`;
+            loadingMessage.style.display = "none";
+            return;
+          }
+
+          displayBatch(filteredRows, row2, 0, 20, tableBody);
+
+          let start = 20;
+          while (start < filteredRows.length) {
+            loadingMessage.innerText = `LOADING NEXT 20 PRODUCTS (${start + 1}/${filteredRows.length})...`;
+            await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate delay for smoother loading
+            displayBatch(filteredRows, row2, start, start + 20, tableBody);
+            start += 20;
+          }
+
+          loadingMessage.style.display = "none"; // Hide loading message when all rows are loaded
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
+
+      // Display a batch of rows
+      function displayBatch(rows, row2, start, end, tableBody) {
+        const batch = rows.slice(start, end);
+
+        batch.forEach((row) => {
+          const productID = row[0];
+          let price = 0;
+
+          row2.forEach((r2) => {
+            if (r2[1] === row[0]) {
+              price = r2[6];
+            }
+          });
+
+          const rowHTML = `
+            <div class="product-card medicine-card ${row[1] || "all"}">
+              <img src="${row[15] || ""}" alt="Product Image" />
+              <div class="product-details">
+                <h3>${row[2] || "No Description"}</h3>
+                <p class="price">${price || "Price not available"}</p>
+                <div class="product-buttons">
+                  <button class="buy-btn"><a href="./product_overview.html?product_ID=${productID}">Buy</a></button>
+                  <button class="cart-btn">Add to Cart</button>
+                </div>
+              </div>
+            </div>
+          `;
+
+          tableBody.innerHTML += rowHTML;
+        });
+      }
+
+      // Function to handle category filtering
+      function filterCategory() {
+        const selectedCategory = document.getElementById("categories").value;
+
+        // Update the data dynamically without reloading
+        loadSheetData(selectedCategory);
+      }
+
+      // Load data on initial page load
+      const urlParams = new URLSearchParams(window.location.search);
+      const initialCategoryID = urlParams.get("catogeries_ID") || "all";
+
+      // Pre-select the category in the dropdown based on the URL
+      document.getElementById("categories").value = initialCategoryID;
+
+      // Load data for the initial category
+      loadSheetData(initialCategoryID);
+    </script>
+    
+    
+    <!-- Add more product cards as needed -->
     </section>
+    <div id="loading-message" class="loading-message">LOADING...</div>
 
     <footer class="footer">
       <div class="footer-content">
