@@ -496,17 +496,16 @@
 
             const rowHTML = `
             <div class="product-card medicine-card ${row[1] || "all"}">
-  
-    <img src="${row[15] || ""}" alt="Product Image" />
-    <div class="product-details">
-      <h3>${row[2] || "No Description"}</h3>
-      <p class="price">${price || "Price not available"}</p>
-      <div class="product-buttons">
-        <button class="buy-btn"><a href="./product_overview.html?product_ID=${productID}">Buy</a></button>
-        <button class="cart-btn">Add to Cart</button>
-      </div>
-    
-  </div>
+              <img src="${row[15] || ""}" alt="Product Image" />
+              <div class="product-details">
+                <h3>${row[2] || "No Description"}</h3>
+                <p class="price">${price || "Price not available"}</p>
+                <div class="product-buttons">
+                  <button class="buy-btn"><a href="./product_overview.html?product_ID=${productID}">Buy</a></button>
+                  <button class="cart-btn">Add to Cart</button>
+                </div>
+              </div>
+            </div>
           `;
 
             tableBody.innerHTML += rowHTML;
