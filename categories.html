@@ -6,155 +6,6 @@
     <title>Categories | Mcland Pharma</title>
     <link rel="stylesheet" href="./assets/css/navbar_footer.css" />
     <link rel="stylesheet" href="./assets/css/categories.css" />
-    <style>
-      /* Product Grid Layout */
-#product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 40px; /* Increased gap between cards */
-  padding: 30px 60px;
-  background: #f9f9f9;
-}
-
-/* Product Card Base */
-.product-card {
-  position: relative;
-  width: 100%;
-  height: 220px;
-  perspective: 1500px; /* Increased perspective for better 3D effect */
-  margin: 0 auto; /* Center cards in grid cells */
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transform-style: preserve-3d;
-  transition: all 0.6s ease; /* Slowed down transition for smoother flip */
-}
-
-.product-card:hover {
-  transform: rotateY(180deg);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* Card front and back faces */
-.card-front, .card-back {
-  position: absolute;
-  top: 0;
-  left: 0;
-  /* width: 100%; */
-  height: 90%;
-  backface-visibility: hidden;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-/* Front face styling */
-.card-front {
-  display: flex;
-  justify-content: space-around;
-  padding: 10px;
-  z-index: 2;
-  background: #fff;
-}
-
-/* Back face styling - fixed visibility issue */
-.card-back {
-  width: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  background: #fff;
-  transform: rotateY(180deg);
-  z-index: 1;
-  overflow-y: auto; /* Enable vertical scrolling */
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: #ff7f50 #f0f0f0; /* Firefox */
-}
-.card p {
-  padding: auto;
-  width: auto;
-}
-
-/* Product Image */
-.product-card img {
-  width: 200px;
-  height: 200px;
-  object-fit: cover;
-  border-radius: 5px;
-  margin-right: 15px; /* Space between image and details */
-}
-
-/* Product Details */
-.product-details {
-
-  display: flex;
-  flex-direction: column; /* Align content vertically */
-  justify-content: center;
-}
-
-.product-details h3 {
-  font-size: 16px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 5px;
-}
-
-.product-details .price {
-  font-size: 14px;
-  font-weight: bold;
-  color: #ff6347;
-  margin-bottom: 10px;
-}
-
-/* Buttons */
-.product-buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.buy-btn, .cart-btn {
-  background: #ff7f50;
-  color: #fff;
-  border: none;
-  padding: 8px 12px;
-  font-size: 12px;
-  font-weight: bold;
-  border-radius: 25px;
-  cursor: pointer;
-  transition: background 0.3s ease, box-shadow 0.3s ease;
-}
-
-.buy-btn:hover, .cart-btn:hover {
-  background: #ff4500;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-}
-
-.buy-btn a {
-  color: white;
-  text-decoration: none;
-}
-
-/* Back side additional styles */
-.card-back h3 {
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 15px;
-}
-
-.card-back p {
-  text-align: center;
-  margin-bottom: 10px;
-  color: #555;
-  max-width: 90%;
-}
-
-.card-back .buy-btn {
-  margin-top: 10px;
-}
-      </style>
   </head>
   <body>
     <header class="navbar">
@@ -645,7 +496,7 @@
 
             const rowHTML = `
             <div class="product-card medicine-card ${row[1] || "all"}">
-  <div class="card-front">
+  
     <img src="${row[15] || ""}" alt="Product Image" />
     <div class="product-details">
       <h3>${row[2] || "No Description"}</h3>
@@ -654,15 +505,8 @@
         <button class="buy-btn"><a href="./product_overview.html?product_ID=${productID}">Buy</a></button>
         <button class="cart-btn">Add to Cart</button>
       </div>
-    </div>
-  </div>
-  <div class="card-back">
-
-    <p>${row[3]}</p>
     
-    <button class="buy-btn"><a href="./product_overview.html?product_ID=${productID}">Buy Now</a></button>
   </div>
-</div>
           `;
 
             tableBody.innerHTML += rowHTML;
