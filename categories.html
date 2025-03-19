@@ -6,6 +6,155 @@
     <title>Categories | Mcland Pharma</title>
     <link rel="stylesheet" href="./assets/css/navbar_footer.css" />
     <link rel="stylesheet" href="./assets/css/categories.css" />
+    <style>
+      /* Product Grid Layout */
+#product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 40px; /* Increased gap between cards */
+  padding: 30px 60px;
+  background: #f9f9f9;
+}
+
+/* Product Card Base */
+.product-card {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  perspective: 1500px; /* Increased perspective for better 3D effect */
+  margin: 0 auto; /* Center cards in grid cells */
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform-style: preserve-3d;
+  transition: all 0.6s ease; /* Slowed down transition for smoother flip */
+}
+
+.product-card:hover {
+  transform: rotateY(180deg);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Card front and back faces */
+.card-front, .card-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* width: 100%; */
+  height: 90%;
+  backface-visibility: hidden;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Front face styling */
+.card-front {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px;
+  z-index: 2;
+  background: #fff;
+}
+
+/* Back face styling - fixed visibility issue */
+.card-back {
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background: #fff;
+  transform: rotateY(180deg);
+  z-index: 1;
+  overflow-y: auto; /* Enable vertical scrolling */
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #ff7f50 #f0f0f0; /* Firefox */
+}
+.card p {
+  padding: auto;
+  width: auto;
+}
+
+/* Product Image */
+.product-card img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 5px;
+  margin-right: 15px; /* Space between image and details */
+}
+
+/* Product Details */
+.product-details {
+
+  display: flex;
+  flex-direction: column; /* Align content vertically */
+  justify-content: center;
+}
+
+.product-details h3 {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.product-details .price {
+  font-size: 14px;
+  font-weight: bold;
+  color: #ff6347;
+  margin-bottom: 10px;
+}
+
+/* Buttons */
+.product-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.buy-btn, .cart-btn {
+  background: #ff7f50;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.buy-btn:hover, .cart-btn:hover {
+  background: #ff4500;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+.buy-btn a {
+  color: white;
+  text-decoration: none;
+}
+
+/* Back side additional styles */
+.card-back h3 {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.card-back p {
+  text-align: center;
+  margin-bottom: 10px;
+  color: #555;
+  max-width: 90%;
+}
+
+.card-back .buy-btn {
+  margin-top: 10px;
+}
+      </style>
   </head>
   <body>
     <header class="navbar">
@@ -43,8 +192,6 @@
       </div>
     </header>
 
-   
-
     <!-- Filter and Search Section -->
     <div class="filter-search">
       <div class="search-bar">
@@ -73,7 +220,7 @@
       </div>
     </div>
 
-    <section id="product-grid">  
+    <section id="product-grid">
       <!-- <script>
         async function loadSheetData() {
           
@@ -420,118 +567,128 @@
 
       loadSheetData();
     </script> -->
-      
-    <script>
-      // Fetch data based on category from URL
-      async function loadSheetData(categoryID) {
-        const sheetID = "1XVbrA6eUv85eOoJO6mziJ35LI8x2copV_ka7qil2ycU"; // Replace with your Sheet ID
-        const apiKey = "AIzaSyD7mumdGgofUc1DE_bgaYJtOKK4i421iA8"; // Replace with your Google API Key
-        const range2 = "Sheet1!Y5:AF";
-        const range = "Sheet1!A5:V";
 
-        const url2 = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range2}?key=${apiKey}`;
-        const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
+      <script>
+        // Fetch data based on category from URL
+        async function loadSheetData(categoryID) {
+          const sheetID = "1XVbrA6eUv85eOoJO6mziJ35LI8x2copV_ka7qil2ycU"; // Replace with your Sheet ID
+          const apiKey = "AIzaSyD7mumdGgofUc1DE_bgaYJtOKK4i421iA8"; // Replace with your Google API Key
+          const range2 = "Sheet1!Y5:AF";
+          const range = "Sheet1!A5:V";
 
-        try {
-          const response2 = await fetch(url2);
-          const data2 = await response2.json();
-          const response = await fetch(url);
-          const data = await response.json();
+          const url2 = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range2}?key=${apiKey}`;
+          const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
 
-          if (!data.values || !data2.values) {
-            throw new Error("No data found in the specified range.");
-          }
+          try {
+            const response2 = await fetch(url2);
+            const data2 = await response2.json();
+            const response = await fetch(url);
+            const data = await response.json();
 
-          const rows = data.values;
-          const row2 = data2.values;
-
-          const tableBody = document.getElementById("product-grid");
-          const loadingMessage = document.getElementById("loading-message");
-
-          loadingMessage.innerText = "LOADING PRODUCTS...";
-
-          // Filter rows based on the selected category ID
-          const filteredRows = categoryID && categoryID !== "all"
-            ? rows.filter((row) => row[1] === categoryID)
-            : rows;
-
-          tableBody.innerHTML = ""; // Clear the previous data
-
-          if (filteredRows.length === 0) {
-            tableBody.innerHTML = `<p>No products found for the selected category.</p>`;
-            loadingMessage.style.display = "none";
-            return;
-          }
-
-          displayBatch(filteredRows, row2, 0, 20, tableBody);
-
-          let start = 20;
-          while (start < filteredRows.length) {
-            loadingMessage.innerText = `LOADING NEXT 20 PRODUCTS (${start + 1}/${filteredRows.length})...`;
-            await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate delay for smoother loading
-            displayBatch(filteredRows, row2, start, start + 20, tableBody);
-            start += 20;
-          }
-
-          loadingMessage.style.display = "none"; // Hide loading message when all rows are loaded
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      }
-
-      // Display a batch of rows
-      function displayBatch(rows, row2, start, end, tableBody) {
-        const batch = rows.slice(start, end);
-
-        batch.forEach((row) => {
-          const productID = row[0];
-          let price = 0;
-
-          row2.forEach((r2) => {
-            if (r2[1] === row[0]) {
-              price = r2[6];
+            if (!data.values || !data2.values) {
+              throw new Error("No data found in the specified range.");
             }
-          });
 
-          const rowHTML = `
+            const rows = data.values;
+            const row2 = data2.values;
+
+            const tableBody = document.getElementById("product-grid");
+            const loadingMessage = document.getElementById("loading-message");
+
+            loadingMessage.innerText = "LOADING PRODUCTS...";
+
+            // Filter rows based on the selected category ID
+            const filteredRows =
+              categoryID && categoryID !== "all"
+                ? rows.filter((row) => row[1] === categoryID)
+                : rows;
+
+            tableBody.innerHTML = ""; // Clear the previous data
+
+            if (filteredRows.length === 0) {
+              tableBody.innerHTML = `<p>No products found for the selected category.</p>`;
+              loadingMessage.style.display = "none";
+              return;
+            }
+
+            displayBatch(filteredRows, row2, 0, 20, tableBody);
+
+            let start = 20;
+            while (start < filteredRows.length) {
+              loadingMessage.innerText = `LOADING NEXT 20 PRODUCTS (${
+                start + 1
+              }/${filteredRows.length})...`;
+              await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate delay for smoother loading
+              displayBatch(filteredRows, row2, start, start + 20, tableBody);
+              start += 20;
+            }
+
+            loadingMessage.style.display = "none"; // Hide loading message when all rows are loaded
+          } catch (error) {
+            console.error("Error fetching data:", error);
+          }
+        }
+
+        // Display a batch of rows
+        function displayBatch(rows, row2, start, end, tableBody) {
+          const batch = rows.slice(start, end);
+
+          batch.forEach((row) => {
+            const productID = row[0];
+            let price = 0;
+
+            row2.forEach((r2) => {
+              if (r2[1] === row[0]) {
+                price = r2[6];
+              }
+            });
+
+            const rowHTML = `
             <div class="product-card medicine-card ${row[1] || "all"}">
-              <img src="${row[15] || ""}" alt="Product Image" />
-              <div class="product-details">
-                <h3>${row[2] || "No Description"}</h3>
-                <p class="price">${price || "Price not available"}</p>
-                <div class="product-buttons">
-                  <button class="buy-btn"><a href="./product_overview.html?product_ID=${productID}">Buy</a></button>
-                  <button class="cart-btn">Add to Cart</button>
-                </div>
-              </div>
-            </div>
+  <div class="card-front">
+    <img src="${row[15] || ""}" alt="Product Image" />
+    <div class="product-details">
+      <h3>${row[2] || "No Description"}</h3>
+      <p class="price">${price || "Price not available"}</p>
+      <div class="product-buttons">
+        <button class="buy-btn"><a href="./product_overview.html?product_ID=${productID}">Buy</a></button>
+        <button class="cart-btn">Add to Cart</button>
+      </div>
+    </div>
+  </div>
+  <div class="card-back">
+
+    <p>${row[3]}</p>
+    
+    <button class="buy-btn"><a href="./product_overview.html?product_ID=${productID}">Buy Now</a></button>
+  </div>
+</div>
           `;
 
-          tableBody.innerHTML += rowHTML;
-        });
-      }
+            tableBody.innerHTML += rowHTML;
+          });
+        }
 
-      // Function to handle category filtering
-      function filterCategory() {
-        const selectedCategory = document.getElementById("categories").value;
+        // Function to handle category filtering
+        function filterCategory() {
+          const selectedCategory = document.getElementById("categories").value;
 
-        // Update the data dynamically without reloading
-        loadSheetData(selectedCategory);
-      }
+          // Update the data dynamically without reloading
+          loadSheetData(selectedCategory);
+        }
 
-      // Load data on initial page load
-      const urlParams = new URLSearchParams(window.location.search);
-      const initialCategoryID = urlParams.get("catogeries_ID") || "all";
+        // Load data on initial page load
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialCategoryID = urlParams.get("catogeries_ID") || "all";
 
-      // Pre-select the category in the dropdown based on the URL
-      document.getElementById("categories").value = initialCategoryID;
+        // Pre-select the category in the dropdown based on the URL
+        document.getElementById("categories").value = initialCategoryID;
 
-      // Load data for the initial category
-      loadSheetData(initialCategoryID);
-    </script>
-    
-    
-    <!-- Add more product cards as needed -->
+        // Load data for the initial category
+        loadSheetData(initialCategoryID);
+      </script>
+
+      <!-- Add more product cards as needed -->
     </section>
     <div id="loading-message" class="loading-message">LOADING...</div>
 
