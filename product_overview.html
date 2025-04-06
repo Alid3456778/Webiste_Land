@@ -420,7 +420,7 @@ async function fetchProductDetails() {
     // 1. Fetch product details and variants in parallel
     const [productDataResponse, variantDataResponse] = await Promise.all([
       fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/Sheet1!A5:V?key=${apiKey}`),
-      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/Sheet1!Y5:AF?key=${apiKey}`)
+      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/Sheet1!AC5:AJ?key=${apiKey}`)
     ]);
     
     const productData = await productDataResponse.json();
