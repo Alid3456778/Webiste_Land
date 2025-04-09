@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Medicine Website Navigation</title>
+    <link rel="stylesheet" href="./assets/css/navbar_footer.css" />
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="navbar-left">
+        <!-- Hamburger Icon -->
+        <button id="hamburger-menu" class="hamburger-menu">☰</button>
+        <!-- Logo -->
+        <div class="logo">
+          <img src="./assets/image2/logo.png" alt="Logo" />
+        </div>
+      </div>
+      <div class="navbar-right">
+        <!-- Search Bar -->
+        <input
+          type="text"
+          placeholder="Search products..."
+          class="search-bar"
+          id="search-input"
+          list="search_list"
+        />
+        <datalist id="search_list">
+          <option value="anazol">anazol</option>
+          <option value="Armandilo">Armandilo</option>
+          <option value="Pain Killer">Pain Killer</option>
+          <option value="Medistic">Medtistic</option>
+        </datalist>
+        <button class="search-button" id="search-button">Search</button>
+        <!-- Cart Icon -->
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
+          alt="Cart"
+          class="cart-icon"
+        />
+      </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+      <button id="close-sidebar" class="close-btn">✖</button>
+      <div class="sidebar-content">
+        <h2>Menu</h2>
+        <ul>
+          <li><a href="#">Home</a></li>
+          <li><a href="#">Products</a></li>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Product Overview -->
+    <div class="product-overview">
+      <!-- Left Side: Product Image -->
+      <div class="product-image">
+        <div class="carousel-container" id="product_images_sinf">
+          <img
+            src="./assets/image/Alprazolam-USA-to-USA-01.jpg"
+            alt="Image 1"
+          />
+          <img
+            src="https://mednowpharma.com/wp-content/uploads/2024/12/Alprazolam-USA-to-USA-02.jpg"
+            alt="Image 2"
+          />
+          <img src="./Alprazolam-USA-to-USA-01.jpg" alt="Image 3" />
+        </div>
+        <button class="arrow left">&lt;</button>
+        <button class="arrow right">&gt;</button>
+      </div>
+
+      <!-- Right Side: Product Details -->
+      <div class="product-details">
+        <div class="right1">
+          <h2 id="nameing_of_product"></h2>
+          <div class="option-section">
+            <div class="option-title">MG</div>
+            <div class="option-buttons mg-buttons" id="button-container"></div>
+          </div>
+          <div>
+            <button id="showButton">Custom Order</button>
+            <div class="overlay" id="overlay"></div>
+            <div id="toggleBox">
+              <h2>Select Custom MG and Quantity</h2>
+              <div class="selection-container">
+                <!-- MG Selection -->
+                <div class="select-group">
+                  <label for="mg-select">Choose MG:</label>
+                  <select id="mg-select">
+                    <option value="1">1 MG</option>
+                    <option value="2">2 MG</option>
+                    <option value="3">3 MG</option>
+                    <option value="4">4 MG</option>
+                    <option value="5">5 MG</option>
+                  </select>
+                </div>
+                <!-- Quantity Selection -->
+                <div class="select-group">
+                  <label for="quantity-select">Choose Quantity:</label>
+                  <input
+                    type="text"
+                    placeholder="Quantity"
+                    class="quat-input"
+                  />
+                </div>
+              </div>
+              <!-- Submit Button -->
+              <div class="submit-container">
+                <button id="submit-selection">Submit</button>
+              </div>
+            </div>
+            <script>
+              const button = document.getElementById("showButton");
+              const box = document.getElementById("toggleBox");
+              const overlay = document.getElementById("overlay");
+              button.addEventListener("click", () => {
+                box.style.display = "block";
+                overlay.style.display = "block";
+              });
+              overlay.addEventListener("click", () => {
+                box.style.display = "none";
+                overlay.style.display = "none";
+              });
+            </script>
+          </div>
+        </div>
+        <div class="right2">
+          <h2>Select The Strength & Quantity 💊</h2>
+          <div class="product-table">
+            <table>
+              <thead>
+                <tr>
+                  <th id="unit_Type">MG</th>
+                  <th>QTY</th>
+                  <th>Description</th>
+                  <th>Price</th>
+                  <th>Add To Cart</th>
+                </tr>
+              </thead>
+            </table>
+            <div id="popil"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="rright"></div>
+    <div id="dummy"></div>
+
+    <section class="differ" id="differ"></section>
+    <section class="three-box-section" id="three-box-section"></section>
+
+    <script>
+      let name_dabba='';
+      // Fetch product details from Google Sheets based on the product_ID in the URL
+      async function fetchProductDetails() {
+        // Show loading indicators
+        document.getElementById("nameing_of_product").innerHTML = "Loading...";
+        document.getElementById("differ").innerHTML =
+          '<div class="loading-spinner"></div>';
+        document.getElementById("three-box-section").innerHTML =
+          '<div class="loading-spinner"></div>';
+
+        // Get product_ID from URL (expected format: /product?product_ID=5)
+        const urlParams = new URLSearchParams(window.location.search);
+        const productID = urlParams.get("product_ID");
+
+        if (!productID) {
+          showError("Product ID not found in URL");
+          return;
+        }
+
+        const sheetID = "1XVbrA6eUv85eOoJO6mziJ35LI8x2copV_ka7qil2ycU";
+        const apiKey = "AIzaSyD7mumdGgofUc1DE_bgaYJtOKK4i421iA8";
+
+        try {
+          // Fetch product details and variants from the Google Sheet in parallel
+          const [productDataResponse, variantDataResponse] = await Promise.all([
+            fetch(
+              `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/Sheet1!A5:V?key=${apiKey}`
+            ),
+            fetch(
+              `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/Sheet1!AC5:AJ?key=${apiKey}`
+            ),
+          ]);
+
+          const productData = await productDataResponse.json();
+          const variantData = await variantDataResponse.json();
+
+          if (!productData.values || !variantData.values) {
+            throw new Error("No data found in the spreadsheet.");
+          }
+
+          // Find the product using the productID from URL (compare as strings)
+          const product = productData.values.find(
+            (row) => row[0] === productID
+          );
+          if (!product) {
+            throw new Error("Product not found.");
+          }
+
+          // Filter variants for this product using productID (assumed in column 1 of variant data)
+          const productVariants = variantData.values.filter(
+            (row) => row[1] === productID
+          );
+
+          // Build search index and update UI
+          buildProductSearch(productData.values);
+          updateProductUI(product, productVariants);
+
+          // After updating UI, send the product detail to the backend for saving into PostgreSQL
+          storeProductToBackend(product);
+        } catch (error) {
+          console.error("Error fetching product details:", error);
+          showError("Failed to load product details. Please try again later.");
+        }
+      }
+
+      // Function to send the fetched product detail to your backend
+      function storeProductToBackend(product) {
+        const productPayload = {
+          id: product[0],
+          name: product[2],
+          description: product[3],
+          tradeNames: product[4],
+          ingredients: product[5],
+          manufacturer: product[6],
+          packaging: product[7],
+          usage: product[8],
+          interaction: product[9],
+          sideEffects: product[10],
+          safety: product[11],
+          withdrawal: product[12],
+          drugAbuse: product[13],
+          storage: product[14],
+          image1: product[15],
+          image2: product[16],
+          image3: product[17],
+        };
+
+        fetch("/store-product", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(productPayload),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Product stored in backend:", data);
+          })
+          .catch((error) => {
+            console.error("Error storing product to backend:", error);
+          });
+      }
+
+      // Build search options for the datalist
+      function buildProductSearch(products) {
+        const searchList = document.getElementById("search_list");
+        searchList.innerHTML = "";
+        const fragment = document.createDocumentFragment();
+        products.forEach((product) => {
+          const option = document.createElement("option");
+          option.value = product[2] || "Product Name";
+          option.textContent = product[2] || "Product Name";
+          fragment.appendChild(option);
+        });
+        searchList.appendChild(fragment);
+
+        const searchButton = document.getElementById("search-button");
+        const searchInput = document.getElementById("search-input");
+        searchButton.addEventListener("click", () => {
+          const query = searchInput.value.trim();
+          const matchingProduct = products.find(
+            (product) => product[2] === query
+          );
+          if (matchingProduct) {
+            // Navigate using the format: /product?product_ID=<id>
+            window.location.href = `product?product_ID=${matchingProduct[0]}`;
+          } else {
+            alert("No matching product found.");
+          }
+        });
+      }
+
+      // Update the UI with product details and variants
+      function updateProductUI(product, variants) {
+        document.getElementById("nameing_of_product").textContent =
+          product[2] || "Product Name";
+        document.getElementById("product_images_sinf").innerHTML = `
+          <img src="${product[15] || "./assets/image/placeholder.png"}" alt="${
+          product[2]
+        }" loading="lazy" />
+          <img src="${product[16] || "./assets/image/placeholder.png"}" alt="${
+          product[2]
+        }" loading="lazy" />
+          <img src="${product[17] || "./assets/image/placeholder.png"}" alt="${
+          product[2]
+        }" loading="lazy" />
+        `;
+        document.getElementById("differ").innerHTML = `
+          <div class="rightside">
+            <div class="box">
+              <h3>Product Details</h3>
+              <ul>
+                <li><h4>Product Name</h4><p>${
+                  product[2] || "Product Name"
+                }</p></li>
+                <li><h4>Product Description</h4><p>${
+                  product[3] || "Product Description"
+                }</p></li>
+                <li><h4>Trade Names</h4><p>${
+                  product[4] || "Trade Name"
+                }</p></li>
+                <li><h4>Ingredients</h4><p>${
+                  product[5] || "Product Ingredients"
+                }</p></li>
+                <li><h4>Manufactured By</h4><p>${
+                  product[6] || "Product Manufacturer"
+                }</p></li>
+                <li><h4>Drug Abuse</h4><p>${
+                  product[13] || "No information available"
+                }</p></li>
+                <li><h4>Storage</h4><p>${
+                  product[14] || "No information available"
+                }</p></li>
+              </ul>
+            </div>
+          </div>
+          <div class="leftside">
+            <div class="box">
+              <h3>Usage & Instructions</h3>
+              <ul>
+                <li><h4>Packaging Details</h4><p>${
+                  product[7] || "No information available"
+                }</p></li>
+                <li><h4>How to Use</h4><p>${
+                  product[8] || "No information available"
+                }</p></li>
+                <li><h4>Drug Interaction</h4><p>${
+                  product[9] || "No information available"
+                }</p></li>
+                <li><h4>Side Effects</h4><p>${
+                  product[10] || "No information available"
+                }</p></li>
+              </ul>
+            </div>
+          </div>
+        `
+;
+        document.getElementById("three-box-section").innerHTML = `
+          <div class="box">
+            <h3>Product Details</h3>
+            <p>${product[3] || "No information available"}</p>
+          </div>
+          <div class="box">
+            <h3>Withdrawal Symptoms</h3>
+            <p>${product[12] || "No information available"}</p>
+          </div>
+          <div class="box">
+            <h3>Safety Information:</h3>
+            <p>${product[11] || "No information available"}</p>
+          </div>
+        `;
+        
+        setupProductVariants(variants);
+      }
+
+      // Set up variant buttons and table rows using corrected indices
+      function setupProductVariants(variants) {
+        // Use variant[2] for MG value
+        const mgValues = [...new Set(variants.map((variant) => variant[2]))];
+        const buttonContainer = document.getElementById("button-container");
+        buttonContainer.innerHTML = "";
+        mgValues.forEach((mg, index) => {
+          const button = document.createElement("button");
+          button.className = "mg-button";
+          button.textContent = mg;
+          button.setAttribute("data-mg", mg);
+          button.addEventListener("click", () => {
+            document
+              .querySelectorAll(".mg-button")
+              .forEach((btn) => btn.classList.remove("active"));
+            button.classList.add("active");
+            displayVariantOptions(variants, mg);
+          });
+          buttonContainer.appendChild(button);
+          if (index === 0) {
+            button.classList.add("active");
+            displayVariantOptions(variants, mg);
+          }
+        });
+      }
+
+      // Display variant options using corrected mapping:
+      // variant[2]: MG, variant[3]: Quantity, variant[4]: Price, variant[5]: Extra info
+      function displayVariantOptions(variants, selectedMg) {
+        const tableBody = document.getElementById("popil");
+        tableBody.innerHTML = "";
+        const matchingVariants = variants.filter(
+          (variant) => variant[2] === selectedMg
+        );
+        const fragment = document.createDocumentFragment();
+        matchingVariants.forEach((variant) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${variant[3]}${variant[2]}</td>
+            <td>${variant[4]}</td>
+            <td><span class="new-price">${variant[5]}</span></td>
+            <td>${variant[6] || ""}</td>
+            <td>
+              <button class="add-tocart" data-variant-id="${variant[1]}"
+               data-quantity="${variant[4]}"
+               data-mg="${variant[3]}${variant[2]}"
+               data-price="${variant[6]}">
+                Add To Cart
+              </button>
+            </td>
+          `;
+          fragment.appendChild(tr);
+        });
+        tableBody.appendChild(fragment);
+        setupAddToCartButtons();
+      }
+
+      // Set up "Add To Cart" buttons to send correct variant ID and quantity to backend
+      function setupAddToCartButtons() {
+        
+
+        document.querySelectorAll(".add-tocart").forEach((button) => {
+          button.addEventListener("click", function () {
+            const variantId = this.getAttribute("data-variant-id");
+            const quantity = this.getAttribute("data-quantity") || 1;
+            const mg = this.getAttribute("data-mg") || "default_mg_value";
+            const price = this.getAttribute("data-price") || "default_price";
+            
+            console.log(name_dabba);
+            addToCart(variantId, quantity, mg, price,name);
+          });
+        });
+      }
+
+      // Send a POST request to add the item to cart (include correct quantity)
+      function addToCart(variantId, quantity, mg, price,name) {
+        fetch("/add-to-cart", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            productId: variantId,
+            quantity: quantity,
+            mg: mg,
+            price: price,
+            name:name
+          }),
+        })
+          .then((response) => response.json())
+          .then((result) => {
+            if (result.success) {
+              alert("Item added to cart!");
+            } else {
+              alert("Error: " + result.message);
+            }
+          })
+          .catch((error) => {
+            console.error("Error adding to cart:", error);
+            alert("Server error, please try again later.");
+          });
+      }
+
+      // Display error messages in designated areas
+      function showError(message) {
+        const errorElements = [
+          document.getElementById("nameing_of_product"),
+          document.getElementById("differ"),
+          document.getElementById("three-box-section"),
+          document.getElementById("product_images_sinf"),
+        ];
+        errorElements.forEach((element) => {
+          if (element) {
+            element.innerHTML = `<div class="error-message">${message}</div>`;
+          }
+        });
+      }
+
+      // Initialize product details and sidebar toggle on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        fetchProductDetails();
+        const hamburgerMenu = document.getElementById("hamburger-menu");
+        const sidebar = document.getElementById("sidebar");
+        const closeSidebar = document.getElementById("close-sidebar");
+        hamburgerMenu.addEventListener("click", () => {
+          sidebar.classList.add("active");
+        });
+        closeSidebar.addEventListener("click", () => {
+          sidebar.classList.remove("active");
+        });
+      });
+    </script>
+
+    <!-- FAQs and Reviews Section -->
+    <div class="flop">
+      <section class="faqs">
+        <h2>Frequently Asked Questions</h2>
+        <div class="faq-item">
+          <h3>What is Paracetamol 500mg used for?</h3>
+          <p>It is used for pain relief and fever reduction.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Are there any side effects?</h3>
+          <p>
+            Common side effects include nausea, dizziness, or allergic
+            reactions. Consult a doctor if symptoms persist.
+          </p>
+        </div>
+        <div class="faq-item">
+          <h3>How It works?</h3>
+          <p>
+            Consult a doctor if you have concerns about side effects and proper
+            usage.
+          </p>
+        </div>
+      </section>
+
+      <section class="reviews-section">
+        <h2>Customer Reviews</h2>
+        <!-- Review Form -->
+        <div class="review-form">
+          <h3>Write a Review</h3>
+          <form>
+            <label for="name">Name:</label>
+            <input type="text" id="name" placeholder="Your name" required />
+            <label for="rating">Rating:</label>
+            <select id="rating" required>
+              <option value="5">★★★★★ (5 stars)</option>
+              <option value="4">★★★★☆ (4 stars)</option>
+              <option value="3">★★★☆☆ (3 stars)</option>
+              <option value="2">★★☆☆☆ (2 stars)</option>
+              <option value="1">★☆☆☆☆ (1 star)</option>
+            </select>
+            <label for="review">Review:</label>
+            <textarea
+              id="review"
+              placeholder="Write your review here..."
+              required
+            ></textarea>
+            <button type="submit">Submit Review</button>
+          </form>
+        </div>
+        <!-- Average Rating -->
+        <div class="average-rating">
+          <span class="stars">★★★★☆</span>
+          <p>4.5 out of 5 stars</p>
+          <p>Based on 1234 customer ratings</p>
+        </div>
+        <!-- Reviews List -->
+        <div class="reviews-list">
+          <div class="review-item">
+            <div class="review-header">
+              <span class="stars">★★★★☆</span>
+              <h3>Great Product!</h3>
+              <button class="toggle-review">Show Review ▼</button>
+            </div>
+            <p class="review-author">
+              Reviewed by <strong>John Doe</strong> on January 10, 2025
+            </p>
+            <p class="review-text hidden">
+              This medicine works exactly as described. I noticed a significant
+              improvement within a week.
+            </p>
+          </div>
+          <div class="review-item">
+            <div class="review-header">
+              <span class="stars">★★★☆☆</span>
+              <h3>Good, but some side effects</h3>
+              <button class="toggle-review">Show Review ▼</button>
+            </div>
+            <p class="review-author">
+              Reviewed by <strong>Jane Smith</strong> on January 8, 2025
+            </p>
+            <p class="review-text hidden">
+              The product is effective, but I experienced slight nausea after
+              using it.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-section resources">
+          <h3>Resources</h3>
+          <ul>
+            <li><a href="#">Shipping</a></li>
+            <li><a href="#">Returns & Refunds</a></li>
+            <li><a href="#">Payment Methods</a></li>
+            <li><a href="#">FAQs</a></li>
+          </ul>
+        </div>
+        <div class="footer-section legal">
+          <h3>Legal</h3>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">Terms & Conditions</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Cancellation Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-section support">
+          <h3>Support 24/7</h3>
+          <p><i class="fa fa-envelope"></i> support@mclandpharma.com</p>
+          <p><i class="fa fa-phone"></i> +1 315 666 5976</p>
+        </div>
+        <div class="footer-section disclaimer">
+          <h3>Disclaimer</h3>
+          <p>
+            The services on Mcland Pharma are available for informational and
+            medicinal purposes only.
+          </p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-left">
+          <p class="copyright">
+            &copy; 2024 Mcland Pharma. All rights reserved.
+          </p>
+          <p>© 2024 All rights reserved. Mcland Pharma</p>
+          <p>Mcland Pharma is committed to providing affordable healthcare.</p>
+        </div>
+        <div class="footer-right">
+          <h3>Payment modes</h3>
+          <div class="payment-icons">
+            <img src="./assets/image/cash_app.png" alt="Cash App" />
+            <img src="./assets/image/zelle.png" alt="Zelle" />
+            <img src="./assets/image/venmo.png" alt="Venmo" />
+            <img src="./assets/image/pay_pal.jpg" alt="Paypal" />
+            <img src="./assets/image/bitcoin.png" alt="Bitcoin" />
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="./assets/js/script.js"></script>
+  </body>
+</html>
