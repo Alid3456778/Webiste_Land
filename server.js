@@ -105,6 +105,72 @@ app.get('/api/cart', async (req, res) => {
   }
 });
 
+
+// add in server.js
+// checkout API
+app.post('/api/checkout', async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const {
+      firstName,
+      lastName,
+      phone,
+      email,
+      companyName,
+      country,
+      streetAddress,
+      apartment,
+      city,
+      state,
+      zipCode,
+      differentAddress,
+      shippingAddress
+    } = req.body;
+
+    // Create or fetch user
+    let userResult = await client.query(
+      `INSERT INTO users (first_name, last_name, email, phone, address, country, role)
+       VALUES ($1, $2, $3, $4, $5, $6, 'Client')
+       ON CONFLICT (email) DO UPDATE SET phone = $4 RETURNING user_id`,
+      [firstName, lastName, email, phone, streetAddress, country]
+    );
+    const userId = userResult.rows[0].user_id;
+
+    // Calculate order total (you should fetch this from cart logic)
+    const totalAmount = 250.00; // Mocked amount
+
+    const orderResult = await client.query(
+      `INSERT INTO orders (client_id, total_amount, payment_status)
+       VALUES ($1, $2, $3) RETURNING order_id, created_at`,
+      [userId, totalAmount, totalAmount <= 200 ? 'Pay Later' : 'Paid']
+    );
+
+    const orderId = orderResult.rows[0].order_id;
+
+    // You should also store cart items from your session and move them to order_items
+    // For now, mocking
+    await client.query(
+      `INSERT INTO order_items (order_id, variation_id, quantity, price)
+       VALUES ($1, $2, $3, $4)`,
+      [orderId, 1, 1, 200.00]
+    );
+
+    return res.status(200).json({
+      orderNumber: orderId,
+      orderDate: orderResult.rows[0].created_at,
+      email,
+      totalAmount
+    });
+  } catch (err) {
+    console.error('Error in checkout:', err);
+    res.status(500).json({ message: 'Internal Server Error' });
+  } finally {
+    client.release();
+  }
+});
+
+
+
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
 

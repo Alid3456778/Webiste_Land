@@ -160,8 +160,11 @@
           const productID = item.product_id;
           const quantity = parseFloat(item.quantity) || 1;
           const mg = item.mg || "";
-          const price = item.price;
-          subtotal += quantity * price;
+          // const price = item.price;
+          const price = parseFloat(item.price.replace(/[^\d.-]/g, "")); // Remove non-numeric characters
+      
+          console.log("Price is ",price);
+          subtotal = price + subtotal;
 
           // Get product name and image from mapping
           const productName = productNameMap[productID] || "Unnamed Product";
@@ -191,9 +194,9 @@
 
         // Update bill summary
         const tax = subtotal * 0.05;
-        document.getElementById("subtotal").textContent = "₹" + subtotal.toFixed(2);
-        document.getElementById("tax").textContent = "₹" + tax.toFixed(2);
-        document.getElementById("total").textContent = "₹" + (subtotal + tax).toFixed(2);
+        document.getElementById("subtotal").textContent =  subtotal.toFixed(2);
+        document.getElementById("tax").textContent =  tax.toFixed(2);
+        document.getElementById("total").textContent =  (subtotal + tax).toFixed(2);
       } catch (error) {
         console.error("Error loading cart items:", error);
         document.getElementById("cart-items").innerHTML = "<p>Error loading cart items.</p>";
