@@ -165,19 +165,19 @@ body {
   border-radius: 25px;
   position: relative; /* For arrow positioning */
   overflow: hidden; /* To hide overflow of images */
+  height: fit-content;
 }
 
 .product-image .carousel-container {
   display: flex;
   transition: transform 0.4s ease-in-out;
-  height: 100%; /* Matches container height */
-  width: 100%; /* Matches container width */
+
 }
 
 .product-image .carousel-container img {
   flex-shrink: 0;
-  width: 100%;
-  height: 100%;
+  width: 500px;
+  height: 500px;
   object-fit: cover;
 }
 
@@ -194,6 +194,7 @@ body {
   z-index: 10;
   border-radius: 50%;
   font-size: 16px;
+  height: fit-content;
 }
 
 .product-image .arrow.left {

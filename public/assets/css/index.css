@@ -431,7 +431,7 @@ a{
 }
 
 .product-card button {
-  background: linear-gradient(135deg, #8acaff, #0062b3);
+  background: linear-gradient(135deg, #20c997, #20c997);
   color: #fff;
   border: none;
   padding: 10px 20px;
@@ -444,7 +444,7 @@ a{
 }
 
 .product-card button:hover {
-  background-color: #8acaff;
+  background-color: #218838;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 

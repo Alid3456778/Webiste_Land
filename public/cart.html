@@ -55,7 +55,7 @@
         <p>Total:</p>
         <p id="total">₹0</p>
       </div>
-      <a href="./checkout.html"><button class="checkout-btn">Proceed to Checkout</button></a>
+      <a href="./checkout1.html"><button class="checkout-btn">Proceed to Checkout</button></a>
     </aside>
   </main>
 
@@ -194,9 +194,9 @@
 
         // Update bill summary
         const tax = subtotal * 0.05;
-        document.getElementById("subtotal").textContent =  subtotal.toFixed(2);
-        document.getElementById("tax").textContent =  tax.toFixed(2);
-        document.getElementById("total").textContent =  (subtotal + tax).toFixed(2);
+        document.getElementById("subtotal").textContent = "$"+ subtotal.toFixed(2);
+        document.getElementById("tax").textContent = "$"+ tax.toFixed(2);
+        document.getElementById("total").textContent = "$"+ (subtotal + tax).toFixed(2);
       } catch (error) {
         console.error("Error loading cart items:", error);
         document.getElementById("cart-items").innerHTML = "<p>Error loading cart items.</p>";

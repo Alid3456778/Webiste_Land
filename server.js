@@ -73,10 +73,11 @@ app.delete('/remove-from-cart', async (req, res) => {
 app.post('/add-to-cart', async (req, res) => {
   const sessionId = req.cookies.sessionId;
   const { productId, name, quantity, mg, price, image_url } = req.body;
-
+ console.log(name);
   if (!productId) {
     return res.status(400).json({ success: false, message: 'Product ID is required' });
   }
+  console.log(req.body);
 
   try {
     await pool.query(
@@ -106,64 +107,138 @@ app.get('/api/cart', async (req, res) => {
 });
 
 
-// add in server.js
-// checkout API
-app.post('/api/checkout', async (req, res) => {
+// // add in server.js
+// // checkout API
+// app.post('/api/checkout', async (req, res) => {
+//   const client = await pool.connect();
+//   try {
+//     const {
+//       firstName,
+//       lastName,
+//       phone,
+//       email,
+//       companyName,
+//       country,
+//       streetAddress,
+//       apartment,
+//       city,
+//       state,
+//       zipCode,
+//       differentAddress,
+//       shippingAddress
+//     } = req.body;
+
+//     // Create or fetch user
+//     let userResult = await client.query(
+//       `INSERT INTO users (first_name, last_name, email, phone, address, country, role)
+//        VALUES ($1, $2, $3, $4, $5, $6, 'Client')
+//        ON CONFLICT (email) DO UPDATE SET phone = $4 RETURNING user_id`,
+//       [firstName, lastName, email, phone, streetAddress, country]
+//     );
+//     const userId = userResult.rows[0].user_id;
+
+//     const orderResult = await client.query(
+//       `INSERT INTO orders (client_id, total_amount, payment_status)
+//        VALUES ($1, $2, $3) RETURNING order_id, created_at`,
+//       [userId, totalAmount, totalAmount <= 200 ? 'Pay Later' : 'Paid']
+//     );
+
+//     const orderId = orderResult.rows[0].order_id;
+
+//     // Fetch cart items for the session
+//     const cartItemsResult = await client.query(
+//       'SELECT * FROM carts WHERE session_id = $1',
+//       [req.cookies.sessionId]
+//     );
+    
+//     let totalAmount = 0;
+//     for (const item of cartItemsResult.rows) {
+//       const itemTotal = parseFloat(item.price) * parseInt(item.quantity);
+//       totalAmount += itemTotal;
+    
+//       await client.query(
+//         `INSERT INTO order_items (order_id, variation_id, quantity, price)
+//          VALUES ($1, $2, $3, $4)`,
+//         [orderId, item.product_id, item.quantity, itemTotal]
+//       );
+//     }
+    
+//     // Clear cart after order placed
+//     await client.query('DELETE FROM carts WHERE session_id = $1', [req.cookies.sessionId]);
+    
+    
+//         return res.status(200).json({
+//           orderNumber: orderId,
+//           orderDate: orderResult.rows[0].created_at,
+//           email,
+//           totalAmount
+//         });
+//       } catch (err) {
+//         console.error('Error in checkout:', err);
+//         res.status(500).json({ message: 'Internal Server Error' });
+//       } finally {
+//         client.release();
+//       }
+//     });
+    
+// POST /api/checkout — save user + order + items
+app.post("/api/checkout", async (req, res) => {
+  const {
+    firstName, lastName, phone, email, companyName,
+    country, billingStreetAddress, apartment,
+    billingCity, billingState, billingZip,
+    cartItems, shippingCost, totalCost
+  } = req.body;
+
   const client = await pool.connect();
   try {
-    const {
-      firstName,
-      lastName,
-      phone,
-      email,
-      companyName,
-      country,
-      streetAddress,
-      apartment,
-      city,
-      state,
-      zipCode,
-      differentAddress,
-      shippingAddress
-    } = req.body;
+    await client.query("BEGIN");
 
-    // Create or fetch user
-    let userResult = await client.query(
-      `INSERT INTO users (first_name, last_name, email, phone, address, country, role)
-       VALUES ($1, $2, $3, $4, $5, $6, 'Client')
-       ON CONFLICT (email) DO UPDATE SET phone = $4 RETURNING user_id`,
-      [firstName, lastName, email, phone, streetAddress, country]
+    // 1) insert or find user
+    const userRes = await client.query(
+      `INSERT INTO users (
+         first_name,last_name,email,phone,company,country,
+         street,apartment,city,state,zip_code
+       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+       ON CONFLICT (email) DO UPDATE SET phone=EXCLUDED.phone
+       RETURNING user_id`,
+      [firstName, lastName, email, phone, companyName || null, country,
+       billingStreetAddress, apartment || null,
+       billingCity, billingState, billingZip]
     );
-    const userId = userResult.rows[0].user_id;
+    const userId = userRes.rows[0].user_id;
 
-    // Calculate order total (you should fetch this from cart logic)
-    const totalAmount = 250.00; // Mocked amount
-
-    const orderResult = await client.query(
-      `INSERT INTO orders (client_id, total_amount, payment_status)
-       VALUES ($1, $2, $3) RETURNING order_id, created_at`,
-      [userId, totalAmount, totalAmount <= 200 ? 'Pay Later' : 'Paid']
+    // 2) insert order
+    const orderRes = await client.query(
+      `INSERT INTO orders (user_id, total_amount, shipping)
+       VALUES ($1,$2,$3) RETURNING order_id`,
+      [userId, totalCost, shippingCost]
     );
+    const orderId = orderRes.rows[0].order_id;
 
-    const orderId = orderResult.rows[0].order_id;
+    // 3) insert items
+    const insertItemText = `
+      INSERT INTO order_items
+        (order_id, product_id, name, mg, quantity, price)
+      VALUES ($1,$2,$3,$4,$5,$6)
+    `;
+    for (const item of cartItems) {
+      await client.query(insertItemText, [
+        orderId,
+        item.product_id,
+        item.name,
+        item.mg,
+        item.quantity,
+        item.price
+      ]);
+    }
 
-    // You should also store cart items from your session and move them to order_items
-    // For now, mocking
-    await client.query(
-      `INSERT INTO order_items (order_id, variation_id, quantity, price)
-       VALUES ($1, $2, $3, $4)`,
-      [orderId, 1, 1, 200.00]
-    );
-
-    return res.status(200).json({
-      orderNumber: orderId,
-      orderDate: orderResult.rows[0].created_at,
-      email,
-      totalAmount
-    });
-  } catch (err) {
-    console.error('Error in checkout:', err);
-    res.status(500).json({ message: 'Internal Server Error' });
+    await client.query("COMMIT");
+    res.json({ success: true, orderId });
+  } catch (e) {
+    await client.query("ROLLBACK");
+    console.error("Checkout error:", e);
+    res.status(500).json({ success: false, error: "Server error" });
   } finally {
     client.release();
   }

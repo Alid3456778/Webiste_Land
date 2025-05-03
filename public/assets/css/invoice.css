@@ -9,6 +9,14 @@ body {
     padding: 0;
   }
   
+  .navbar{
+    height: 50px;
+
+  }
+  .navbar img{
+    height: 50px;
+  }
+
   .invoice-container {
     max-width: 900px;
     margin: 20px auto;
@@ -65,3 +73,17 @@ body {
     background-color: #f1f1f1;
   }
   
+  #download-btn{
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    font-size: 16px;
+    margin: 20px auto;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+  }

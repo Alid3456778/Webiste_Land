@@ -146,7 +146,7 @@ a {
 .product-details .price {
   font-size: 14px;
   font-weight: bold;
-  color: #ff6347;
+  color: #20c997;
   margin-bottom: 10px;
 }
 
@@ -157,7 +157,7 @@ a {
 }
 
 .buy-btn, .cart-btn {
-  background: #ff7f50;
+  background: #20c997;
   color: #fff;
   border: none;
   padding: 8px 12px;
@@ -166,9 +166,10 @@ a {
   border-radius: 25px;
   cursor: pointer;
   transition: background 0.3s ease, box-shadow 0.3s ease;
+  width: auto;
 }
 
 .buy-btn:hover, .cart-btn:hover {
-  background: #ff4500;
+  background: #218838;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 }

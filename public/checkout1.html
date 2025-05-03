@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout | Mcland Pharma</title>
+    <link rel="stylesheet" href="./assets/css/navbar_footer.css" />
+    <link rel="stylesheet" href="./assets/css/checkout.css" />
+    <style></style>
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="navbar-top">
+        <div
+          class="logo"
+          onclick="this.querySelector('a').click(); return true;"
+        >
+          <img src="./assets/image2/logo.png" alt="MCland Pharma Logo" />
+          <a href="./index.html"></a>
+        </div>
+        <!-- <div class="delivery">
+            <span>Deliver to <strong>110002</strong></span>
+          </div> -->
+        <div class="navbar-top-right">
+          <!-- <div class="search-bar">
+              <input type="text" placeholder="Search for medicine...">
+            </div> -->
+          <div class="actions">
+            <!-- <button>Upload</button> -->
+            <!-- <button type="button"><a class="a offer" href="#">Offers</a></button> -->
+            <button type="button">
+              <a class="a Cart" href="./cart.html"
+                ><img
+                  src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
+                  alt="Cart"
+                  class="cart-icon"
+              /></a>
+            </button>
+            <!-- <button type="button"><a class="a signin_signup" href="#">Sign in / Sign up</a></button> -->
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Checkout Form -->
+    <main class="checkout-container">
+      <h1>Billing Details</h1>
+      <!-- <progress id="checkout-form" max="100" value="70">70%</progress> -->
+      <div class="checkout-card">
+        <form id="checkout-form" class="checkout-form">
+          <!-- Billing Details -->
+          <div class="form-group">
+            <label for="first-name">First Name <span>*</span></label>
+            <input type="text" id="first-name" name="firstName" required />
+          </div>
+          <div class="form-group">
+            <label for="last-name">Last Name <span>*</span></label>
+            <input type="text" id="last-name" name="lastName" required />
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone <span>*</span></label>
+            <input type="tel" id="phone" name="phone" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address <span>*</span></label>
+            <input type="email" id="email" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="company-name">Company Name (optional)</label>
+            <input type="text" id="company-name" />
+          </div>
+          <div class="form-group">
+            <label for="country">Country / Region <span>*</span></label>
+            <select id="country" required>
+              <option value="United States">United States (US)</option>
+              <option value="India">India</option>
+              <option value="Canada">Canada</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="street-address">Street Address <span>*</span></label>
+            <input
+              type="text"
+              id="street-address"
+              name="billingStreetAddress"
+              placeholder="House number and street name"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="apartment"
+              >Apartment, suite, unit, etc. (optional)</label
+            >
+            <input type="text" id="apartment" />
+          </div>
+          <div class="form-group">
+            <label for="city">Town / City <span>*</span></label>
+            <input type="text" id="city" name="billingCity" required />
+          </div>
+          <div class="form-group">
+            <label for="state">State <span>*</span></label>
+            <select id="state" name="billingState" required>
+              <option value="California">California</option>
+              <option value="New York">New York</option>
+              <option value="Texas">Texas</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="zip-code">ZIP Code <span>*</span></label>
+            <input type="text" id="zip-code" name="billingZip" required />
+          </div>
+          <!-- Shipping Address Checkbox -->
+          <div class="form-group-shipping">
+            <input type="checkbox" id="different-address" />
+            <label for="different-address">Ship to a different address?</label>
+          </div>
+          <!-- Additional Address Form -->
+          <div id="shipping-address-form" style="display: none">
+            <h2>Shipping Address</h2>
+            <div class="form-group">
+              <label for="ship-street-address"
+                >Street Address <span>*</span></label
+              >
+              <input
+                type="text"
+                id="ship-street-address"
+                name="shipStreetAddress"
+              />
+            </div>
+            <div class="form-group">
+              <label for="ship-city">City <span>*</span></label>
+              <input type="text" id="ship-city" name="shipCity" />
+            </div>
+            <div class="form-group">
+              <label for="ship-zip">ZIP Code <span>*</span></label>
+              <input type="text" id="ship-zip" name="shipZip" />
+            </div>
+          </div>
+        </form>
+
+        <!-- Order Summary -->
+        <section class="order-summary">
+          
+
+          <h2>Your Order</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Subtotal</th>
+      </tr>
+    </thead>
+    <tbody id="cart-items">
+      <!-- Cart items will be dynamically injected here -->
+    </tbody>
+    <tfoot>
+      <tr>
+        <td>Shipping</td>
+        <td id="shipping-cost">$50.00</td>
+      </tr>
+      <tr>
+        <td>Total</td>
+        <td id="total-cost">$0.00</td>
+      </tr>
+    </tfoot>
+  </table>
+  <!-- Place Order Button -->
+  <button id="place-order-btn" class="place-order-btn">Place Order</button>               
+        </section>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-section resources">
+          <h3>Resources</h3>
+          <ul>
+            <li><a href="#">Shipping</a></li>
+            <li><a href="#">Returns & Refunds</a></li>
+            <li><a href="#">Payment Methods</a></li>
+            <li><a href="#">FAQs</a></li>
+          </ul>
+        </div>
+        <div class="footer-section legal">
+          <h3>Legal</h3>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">Terms & Conditions</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Cancellation Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-section support">
+          <h3>Support 24/7</h3>
+          <p><i class="fa fa-envelope"></i> support@mclandpharma.com</p>
+          <p><i class="fa fa-phone"></i> +1 315 666 5976</p>
+        </div>
+        <div class="footer-section disclaimer">
+          <h3>Disclaimer</h3>
+          <p>
+            The services on Mcland Pharma are available for millions of people
+            solely presented for informative, qualitative, quantitative, and
+            affordable medicinal purposes. Here we believe The Doctor’s advice =
+            The Best Advice for medicinal needs by following protocol
+            accordingly by people suffering from different conditions.
+          </p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-left">
+          <p class="copyright">
+            &copy; 2024 Mcland Pharma. All rights reserved.
+          </p>
+          <p>© 2024 All rights reserved. Mcland Pharma</p>
+          <p>
+            Mcland Pharma has been working on a change towards healthcare and
+            improving health. We are on a mission Encouraging Healthcare –
+            Improving Health since 2013. We have covered the finest medicines
+            for the mission towards cure with a few simple steps at
+            budget-friendly prices.
+          </p>
+        </div>
+        <div class="footer-right">
+          <h3>Payment modes</h3>
+          <div class="payment-icons">
+            <img src="./assets/image/cash_app.png" alt="Cash App" />
+            <img src="./assets/image/zelle.png" alt="Zelle" />
+            <img src="./assets/image/venmo.png" alt="Venmo" />
+            <!-- <img src="./assets/image/apple_pay.png" alt="Apple Pay">
+          <img src="./assets/image/Gpay.png" alt="Google Pay"> -->
+            <img src="./assets/image/pay_pal.jpg" alt="Paypal" />
+            <!-- <img src="./assets/image/wire_transfer.png" alt="Wire Transfer"> -->
+            <img src="./assets/image/bitcoin.png" alt="Bitcoin" />
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      document.querySelectorAll(".navbar-bottom li").forEach((item) => {
+        item.addEventListener("click", function (e) {
+          const dropdown = this.querySelector(".dropdown");
+          if (dropdown) {
+            e.stopPropagation(); // Prevents clicks from propagating to other elements
+            dropdown.style.display =
+              dropdown.style.display === "block" ? "none" : "block";
+          }
+        });
+
+        item.addEventListener("mouseover", function () {
+          const dropdown = this.querySelector(".dropdown");
+          if (dropdown) {
+            dropdown.style.display = "block";
+          }
+        });
+
+        item.addEventListener("mouseout", function () {
+          const dropdown = this.querySelector(".dropdown");
+          if (dropdown) {
+            dropdown.style.display = "none";
+          }
+        });
+      });
+
+      // Close dropdowns when clicking outside
+      document.addEventListener("click", () => {
+        document.querySelectorAll(".dropdown").forEach((dropdown) => {
+          dropdown.style.display = "none";
+        });
+      });
+
+
+      document.addEventListener('DOMContentLoaded', async () => {
+  const cartItemsElement = document.getElementById('cart-items');
+  const totalCostElement = document.getElementById('total-cost');
+  const shippingCost = 50.0; // Flat shipping cost
+
+  try {
+    const response = await fetch('/api/cart');
+    const result = await response.json();
+
+    if (result.success) {
+      const cartItems = result.data;
+      let total = 0;
+
+      // Clear the cart items element
+      cartItemsElement.innerHTML = '';
+
+      // Populate the cart items
+      cartItems.forEach(item => {
+        console.log(parseFloat(item.price));
+        const subtotal = parseFloat(item.price);
+        total += subtotal;
+        
+        const row = `
+          <tr>
+            <td>${item.name} ${item.mg || ''}mg x ${item.quantity}</td>
+            <td>$${item.price}</td>
+          </tr>
+        `;
+        cartItemsElement.innerHTML += row;
+      });
+
+      // Update the total cost
+      totalCostElement.textContent = `$${(total + shippingCost).toFixed(2)}`;
+    } else {
+      console.error('Failed to fetch cart items:', result.message);
+    }
+  } catch (error) {
+    console.error('Error fetching cart items:', error);
+  }
+});
+
+// checkout1.js
+document.getElementById("place-order-btn").addEventListener("click", async () => {
+  // collect billing details
+  const orderData = {
+    firstName:            document.getElementById("first-name").value,
+    lastName:             document.getElementById("last-name").value,
+    phone:                document.getElementById("phone").value,
+    email:                document.getElementById("email").value,
+    companyName:          document.getElementById("company-name").value,
+    country:              document.getElementById("country").value,
+    billingStreetAddress: document.getElementById("street-address").value,
+    apartment:            document.getElementById("apartment").value,
+    billingCity:          document.getElementById("city").value,
+    billingState:         document.getElementById("state").value,
+    billingZip:           document.getElementById("zip-code").value
+  };
+
+  // fetch cart items from the backend for this session
+  const cartRes = await fetch("/api/cart");
+  const cartJson = await cartRes.json();
+  if (!cartJson.success) {
+    return alert("Could not fetch cart items");
+  }
+  const cartItems = cartJson.data.map(item => ({
+    product_id: item.product_id,
+    name:       item.name,
+    mg:         item.mg,
+    quantity:   parseInt(item.quantity, 10),
+    price:      parseFloat(item.price)
+  }));
+
+  // compute totals
+  const shippingCost = 50.0;
+  const subtotal = cartItems.reduce((sum, it) => sum + it.price , 0);
+  const totalCost = subtotal + shippingCost;
+
+  // send everything to /api/checkout
+  const res = await fetch("/api/checkout", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      ...orderData,
+      cartItems,
+      shippingCost,
+      totalCost
+    })
+  });
+  const result = await res.json();
+  if (result.success) {
+    // alert("Order placed! ID: " + result.orderId);
+    // window.location.href = `/invoice1.html?orderId=${result.orderId}`;
+  } else {
+    alert("Error placing order");
+  }
+});
+
+
+
+  
+    </script>
+
+    <script src="./assets/js/checkout1.js"></script>
+  </body>
+</html>

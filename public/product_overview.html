@@ -35,11 +35,13 @@
         </datalist>
         <button class="search-button" id="search-button">Search</button>
         <!-- Cart Icon -->
+        <a href="cart">
         <img
           src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
           alt="Cart"
           class="cart-icon"
         />
+        </a>
       </div>
     </nav>
 
@@ -244,7 +246,7 @@
           image2: product[16],
           image3: product[17],
         };
-
+        name_dabba=productPayload.name;
         fetch("/store-product", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -417,7 +419,9 @@
               <button class="add-tocart" data-variant-id="${variant[1]}"
                data-quantity="${variant[4]}"
                data-mg="${variant[3]}${variant[2]}"
-               data-price="${variant[6]}">
+               data-price="${variant[6]}
+               
+               ">
                 Add To Cart
               </button>
             </td>
@@ -437,9 +441,9 @@
             const variantId = this.getAttribute("data-variant-id");
             const quantity = this.getAttribute("data-quantity") || 1;
             const mg = this.getAttribute("data-mg") || "default_mg_value";
-            const price = this.getAttribute("data-price") || "default_price";
-            
-            console.log(name_dabba);
+            const price = this.getAttribute("data-price").replace(/[^0-9,.]/g, '') || "default_price";
+            console.log(price.replace(/[^0-9,.,$]/g, ''));
+             const name = name_dabba;
             addToCart(variantId, quantity, mg, price,name);
           });
         });
