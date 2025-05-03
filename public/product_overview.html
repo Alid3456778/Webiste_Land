@@ -179,43 +179,38 @@
           return;
         }
 
-        const sheetID = "1XVbrA6eUv85eOoJO6mziJ35LI8x2copV_ka7qil2ycU";
-        const apiKey = "AIzaSyD7mumdGgofUc1DE_bgaYJtOKK4i421iA8";
-
+        // const sheetID = "1XVbrA6eUv85eOoJO6mziJ35LI8x2copV_ka7qil2ycU";
+        // const apiKey = "AIzaSyD7mumdGgofUc1DE_bgaYJtOKK4i421iA8";
+       
         try {
           // Fetch product details and variants from the Google Sheet in parallel
-          const [productDataResponse, variantDataResponse] = await Promise.all([
-            fetch(
-              `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/Sheet1!A5:V?key=${apiKey}`
-            ),
-            fetch(
-              `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/Sheet1!AC5:AJ?key=${apiKey}`
-            ),
-          ]);
+          const resp = await fetch(`/api/product?product_ID=${productID}`);
+          const { product, variants } = await resp.json();
 
-          const productData = await productDataResponse.json();
-          const variantData = await variantDataResponse.json();
+          const productData = await product;
+          const variantData = await variants;
 
-          if (!productData.values || !variantData.values) {
-            throw new Error("No data found in the spreadsheet.");
-          }
+          // if (!productData.values || !variantData.values) {
+          //   throw new Error("No data found in the spreadsheet.");
+          // }
 
           // Find the product using the productID from URL (compare as strings)
-          const product = productData.values.find(
-            (row) => row[0] === productID
-          );
-          if (!product) {
-            throw new Error("Product not found.");
-          }
+          // const prod = productData.values.find(
+          //   (row) => row[0] === productID
+          // );
+          // if (!product) {
+          //   throw new Error("Product not found.");
+          // }
 
           // Filter variants for this product using productID (assumed in column 1 of variant data)
-          const productVariants = variantData.values.filter(
-            (row) => row[1] === productID
-          );
-
+          // const productVariants = variantData.values.filter(
+          //   (row) => row[1] === productID
+          // );
+          console.log(product)
+          console.log(variants)
           // Build search index and update UI
-          buildProductSearch(productData.values);
-          updateProductUI(product, productVariants);
+          buildProductSearch(product);
+          updateProductUI(product, variants);
 
           // After updating UI, send the product detail to the backend for saving into PostgreSQL
           storeProductToBackend(product);
@@ -262,20 +257,27 @@
       }
 
       // Build search options for the datalist
-      function buildProductSearch(products) {
+      function buildProductSearch(prod) {
         const searchList = document.getElementById("search_list");
         searchList.innerHTML = "";
         const fragment = document.createDocumentFragment();
+
+        try{
+          const response =  fetch("/products");
+          const products =  response.json();
+        console.log("heloj",response);
+
         products.forEach((product) => {
           const option = document.createElement("option");
-          option.value = product[2] || "Product Name";
-          option.textContent = product[2] || "Product Name";
+          option.value = product.product_name || "Product Name";
+          option.textContent = product.product_name || "Product Name";
           fragment.appendChild(option);
         });
         searchList.appendChild(fragment);
 
         const searchButton = document.getElementById("search-button");
         const searchInput = document.getElementById("search-input");
+        
         searchButton.addEventListener("click", () => {
           const query = searchInput.value.trim();
           const matchingProduct = products.find(
@@ -289,14 +291,18 @@
           }
         });
       }
+      catch (error) {
+    console.error("Error building product search:", error);
+  }
+      }
 
       // Update the UI with product details and variants
       function updateProductUI(product, variants) {
         document.getElementById("nameing_of_product").textContent =
-          product[2] || "Product Name";
+          product.product_name || "Product Name";
         document.getElementById("product_images_sinf").innerHTML = `
           <img src="${product[15] || "./assets/image/placeholder.png"}" alt="${
-          product[2]
+          product.primary_img
         }" loading="lazy" />
           <img src="${product[16] || "./assets/image/placeholder.png"}" alt="${
           product[2]
@@ -311,25 +317,25 @@
               <h3>Product Details</h3>
               <ul>
                 <li><h4>Product Name</h4><p>${
-                  product[2] || "Product Name"
+                  product.product_name || "Product Name"
                 }</p></li>
                 <li><h4>Product Description</h4><p>${
-                  product[3] || "Product Description"
+                  product.product_description || "Product Description"
                 }</p></li>
                 <li><h4>Trade Names</h4><p>${
-                  product[4] || "Trade Name"
+                  product.trade_names || "Trade Name"
                 }</p></li>
                 <li><h4>Ingredients</h4><p>${
-                  product[5] || "Product Ingredients"
+                  product.ingredients || "Product Ingredients"
                 }</p></li>
                 <li><h4>Manufactured By</h4><p>${
-                  product[6] || "Product Manufacturer"
+                  product.manufactured_by || "Product Manufacturer"
                 }</p></li>
                 <li><h4>Drug Abuse</h4><p>${
-                  product[13] || "No information available"
+                  product.drug_abuse || "No information available"
                 }</p></li>
                 <li><h4>Storage</h4><p>${
-                  product[14] || "No information available"
+                  product.storage || "No information available"
                 }</p></li>
               </ul>
             </div>
@@ -339,16 +345,16 @@
               <h3>Usage & Instructions</h3>
               <ul>
                 <li><h4>Packaging Details</h4><p>${
-                  product[7] || "No information available"
+                  product.packaging_details || "No information available"
                 }</p></li>
                 <li><h4>How to Use</h4><p>${
-                  product[8] || "No information available"
+                  product.how_to_use || "No information available"
                 }</p></li>
                 <li><h4>Drug Interaction</h4><p>${
-                  product[9] || "No information available"
+                  product.drug_interaction || "No information available"
                 }</p></li>
                 <li><h4>Side Effects</h4><p>${
-                  product[10] || "No information available"
+                  product.side_effects || "No information available"
                 }</p></li>
               </ul>
             </div>
@@ -358,15 +364,15 @@
         document.getElementById("three-box-section").innerHTML = `
           <div class="box">
             <h3>Product Details</h3>
-            <p>${product[3] || "No information available"}</p>
+            <p>${product.packaging_details || "No information available"}</p>
           </div>
           <div class="box">
             <h3>Withdrawal Symptoms</h3>
-            <p>${product[12] || "No information available"}</p>
+            <p>${product.withdrawal_symptoms || "No information available"}</p>
           </div>
           <div class="box">
             <h3>Safety Information:</h3>
-            <p>${product[11] || "No information available"}</p>
+            <p>${product.warnings_precautions || "No information available"}</p>
           </div>
         `;
         
@@ -376,11 +382,12 @@
       // Set up variant buttons and table rows using corrected indices
       function setupProductVariants(variants) {
         // Use variant[2] for MG value
-        const mgValues = [...new Set(variants.map((variant) => variant[2]))];
+        const mgValues = [...new Set(variants.map((variant) => variant.unit_value))];
         const buttonContainer = document.getElementById("button-container");
         buttonContainer.innerHTML = "";
         mgValues.forEach((mg, index) => {
           const button = document.createElement("button");
+          console.log("mg is ",mg);
           button.className = "mg-button";
           button.textContent = mg;
           button.setAttribute("data-mg", mg);
@@ -405,21 +412,21 @@
         const tableBody = document.getElementById("popil");
         tableBody.innerHTML = "";
         const matchingVariants = variants.filter(
-          (variant) => variant[2] === selectedMg
+          (variant) => variant.unit_value === selectedMg
         );
         const fragment = document.createDocumentFragment();
         matchingVariants.forEach((variant) => {
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td>${variant[3]}${variant[2]}</td>
-            <td>${variant[4]}</td>
-            <td><span class="new-price">${variant[5]}</span></td>
-            <td>${variant[6] || ""}</td>
+            <td>${variant.unit_type}${variant.unit_value}</td>
+            <td>${variant.qty}</td>
+            <td><span class="new-price">${variant.price_per_pill}</span></td>
+            <td>${variant.price_per_box || ""}</td>
             <td>
-              <button class="add-tocart" data-variant-id="${variant[1]}"
-               data-quantity="${variant[4]}"
-               data-mg="${variant[3]}${variant[2]}"
-               data-price="${variant[6]}
+              <button class="add-tocart" data-variant-id="${variant.product_id}"
+               data-quantity="${variant.qty}"
+               data-mg="${variant.unit_type}${variant.unit_value}"
+               data-price="${variant.price_per_box}
                
                ">
                 Add To Cart

@@ -22,25 +22,25 @@ const pool = new Pool({
 });
 
 // Create carts table with name and image_url
-pool.query(`
-  CREATE TABLE IF NOT EXISTS carts (
-    id SERIAL PRIMARY KEY,
-    session_id VARCHAR(255) NOT NULL,
-    product_id VARCHAR(50) NOT NULL,
-    name VARCHAR(100),
-    quantity VARCHAR(20) DEFAULT '1',
-    mg VARCHAR(20),
-    price VARCHAR(20),
-    image_url VARCHAR(255),
-    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  );
-`, (err) => {
-  if (err) {
-    console.error('Error creating carts table:', err);
-  } else {
-    console.log('Carts table is ready.');
-  }
-});
+// pool.query(`
+//   CREATE TABLE IF NOT EXISTS carts (
+//     id SERIAL PRIMARY KEY,
+//     session_id VARCHAR(255) NOT NULL,
+//     product_id VARCHAR(50) NOT NULL,
+//     name VARCHAR(100),
+//     quantity VARCHAR(20) DEFAULT '1',
+//     mg VARCHAR(20),
+//     price VARCHAR(20),
+//     image_url VARCHAR(255),
+//     added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+//   );
+// `, (err) => {
+//   if (err) {
+//     console.error('Error creating carts table:', err);
+//   } else {
+//     console.log('Carts table is ready.');
+//   }
+// });
 
 // Middleware to assign session cookie
 app.use((req, res, next) => {
@@ -241,6 +241,74 @@ app.post("/api/checkout", async (req, res) => {
     res.status(500).json({ success: false, error: "Server error" });
   } finally {
     client.release();
+  }
+});
+
+// assume you already have `const pool = new Pool({...})`
+
+// in server.js, after your other routes:
+
+// GET /api/product?product_ID=5
+app.get('/api/product', async (req, res) => {
+  const { product_ID } = req.query;
+  if (!product_ID) return res.status(400).json({ error: 'product_ID missing' });
+
+  try {
+    // 1) fetch the main product row
+    const prodRes = await pool.query(
+      `SELECT * FROM products WHERE product_id = $1`,
+      [product_ID]
+    );
+    if (!prodRes.rows.length) return res.status(404).json({ error: 'not found' });
+
+    // 2) fetch its variants
+    const varRes = await pool.query(
+      `SELECT * FROM product_variants WHERE product_id = $1`,
+      [product_ID]
+    );
+    console.log(prodRes.rows);
+    // 3) return both
+    res.json({
+      product:  prodRes.rows[0],
+      variants: varRes.rows
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'server error' });
+  }
+});
+
+
+
+// API to fetch products based on category
+app.get("/products", async (req, res) => {
+  const categoryID = req.query.categoryID || "all";
+  try {
+    let query;
+    let params = [];
+    if (categoryID === "all") {
+      query = "SELECT * FROM products";
+    } else {
+      query = "SELECT * FROM products WHERE category_id = $1";
+      params = [categoryID];
+    }
+
+    const result = await pool.query(query, params);
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// API to fetch product prices
+app.get("/product-prices", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM product_variants");
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching product prices:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
