@@ -5,603 +5,187 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Medicine Website Navigation</title>
     <link rel="stylesheet" href="./assets/css/navbar_footer.css" />
-    <link rel="stylesheet" href="./assets/css/styles.css" />
+    <link rel="stylesheet" href="./assets/css/product_overview.css" />
   </head>
   <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-      <div class="navbar-left">
-        <!-- Hamburger Icon -->
-        <button id="hamburger-menu" class="hamburger-menu">☰</button>
-        <!-- Logo -->
-        <div class="logo">
-          <img src="./assets/image2/logo.png" alt="Logo" />
-        </div>
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header__brand">
+        <img src="assets/image2/logo.png" alt="MCLAND Logo" class="logo">
+        <span class="brand-name">MCLAND</span>
       </div>
-      <div class="navbar-right">
-        <!-- Search Bar -->
-        <input
-          type="text"
-          placeholder="Search products..."
-          class="search-bar"
-          id="search-input"
-          list="search_list"
-        />
-        <datalist id="search_list">
-          <option value="anazol">anazol</option>
-          <option value="Armandilo">Armandilo</option>
-          <option value="Pain Killer">Pain Killer</option>
-          <option value="Medistic">Medtistic</option>
-        </datalist>
-        <button class="search-button" id="search-button">Search</button>
-        <!-- Cart Icon -->
+      <div class="header__search-cart">
+        <div class="search">
+          <input
+            type="text"
+            placeholder="Search products…"
+            class="search__input"
+            id="search-input"
+            list="search_list"
+          >
+          <datalist id="search_list">
+            <!-- This will be populated dynamically -->
+          </datalist>
+          <button class="btn btn--search" id="search-button">
+            <!-- Inline SVG magnifier for crispness -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="search__icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M10 2a8 8 0 015.292 13.708l4.5 4.5a1 1 0 01-1.415 1.414l-4.5-4.5A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"/>
+            </svg>
+          </button>
+        </div>
         <a href="cart">
-        <img
-          src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
-          alt="Cart"
-          class="cart-icon"
-        />
+          <button class="btn btn--icon">
+            <img src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" alt="Cart">
+          </button>
         </a>
       </div>
-    </nav>
-
-    <!-- Sidebar -->
-    <div id="sidebar" class="sidebar">
-      <button id="close-sidebar" class="close-btn">✖</button>
-      <div class="sidebar-content">
-        <h2>Menu</h2>
-        <ul>
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Products</a></li>
-          <li><a href="#">About Us</a></li>
-          <li><a href="#">Contact</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Product Overview -->
-    <div class="product-overview">
-      <!-- Left Side: Product Image -->
-      <div class="product-image">
-        <div class="carousel-container" id="product_images_sinf">
-          <img
-            src="./assets/image/Alprazolam-USA-to-USA-01.jpg"
-            alt="Image 1"
-          />
-          <img
-            src="https://mednowpharma.com/wp-content/uploads/2024/12/Alprazolam-USA-to-USA-02.jpg"
-            alt="Image 2"
-          />
-          <img src="./Alprazolam-USA-to-USA-01.jpg" alt="Image 3" />
+    </header>
+  
+    <!-- MAIN PRODUCT SECTION -->
+    <main class="product-section">
+      <!-- IMAGE CAROUSEL -->
+      <div class="carousel">
+        <button id="prevSlide" class="carousel__nav carousel__nav--left">&#10094;</button>
+        <div class="carousel__slide" id="product_images_sinf">
+          <!-- Images will be loaded dynamically -->
         </div>
-        <button class="arrow left">&lt;</button>
-        <button class="arrow right">&gt;</button>
+        <button id="nextSlide" class="carousel__nav carousel__nav--right">&#10095;</button>
       </div>
-
-      <!-- Right Side: Product Details -->
-      <div class="product-details">
-        <div class="right1">
-          <h2 id="nameing_of_product"></h2>
-          <div class="option-section">
-            <div class="option-title">MG</div>
-            <div class="option-buttons mg-buttons" id="button-container"></div>
+  
+      <!-- PRODUCT DETAILS & DYNAMIC CONTENT -->
+      <div class="product-info">
+        <h1 class="product-info__title" id="nameing_of_product">
+          Loading... <!-- This will be replaced dynamically -->
+        </h1>
+  
+        <!-- STAR RATING -->
+        <div id="rating" class="rating">
+          <span data-value="1">★</span><span data-value="2">★</span>
+          <span data-value="3">★</span><span data-value="4">★</span>
+          <span data-value="5">★</span>
+          <small class="rating__count">(24 reviews)</small>
+        </div>
+  
+        <!-- Strength Selector -->
+        <div class="selector">
+          <label class="selector__label">MG</label>
+          <div class="selector__buttons" id="button-container">
+            <!-- MG buttons will be generated dynamically -->
           </div>
-          <div>
-            <button id="showButton">Custom Order</button>
-            <div class="overlay" id="overlay"></div>
-            <div id="toggleBox">
-              <h2>Select Custom MG and Quantity</h2>
-              <div class="selection-container">
-                <!-- MG Selection -->
-                <div class="select-group">
-                  <label for="mg-select">Choose MG:</label>
-                  <select id="mg-select">
-                    <option value="1">1 MG</option>
-                    <option value="2">2 MG</option>
-                    <option value="3">3 MG</option>
-                    <option value="4">4 MG</option>
-                    <option value="5">5 MG</option>
-                  </select>
-                </div>
-                <!-- Quantity Selection -->
-                <div class="select-group">
-                  <label for="quantity-select">Choose Quantity:</label>
-                  <input
-                    type="text"
-                    placeholder="Quantity"
-                    class="quat-input"
-                  />
-                </div>
-              </div>
-              <!-- Submit Button -->
-              <div class="submit-container">
-                <button id="submit-selection">Submit</button>
-              </div>
+        </div>
+  
+        <!-- TABS -->
+        <div class="tabs-wrapper">
+          <div class="tabs">
+            <button class="tabs__btn tabs__btn--active" data-tab="desc">Description</button>
+            <button class="tabs__btn" data-tab="benefits">Benefits</button>
+            <button class="tabs__btn" data-tab="details">Product Details</button>
+            <button class="tabs__btn" data-tab="usage">Usage</button>
+            <button class="tabs__btn" data-tab="reviews">Reviews</button>
+          </div>
+          <div class="tabs__content">
+            <div id="desc" class="tab">  
+              <p>Loading product description...</p>
             </div>
-            <script>
-              const button = document.getElementById("showButton");
-              const box = document.getElementById("toggleBox");
-              const overlay = document.getElementById("overlay");
-              button.addEventListener("click", () => {
-                box.style.display = "block";
-                overlay.style.display = "block";
-              });
-              overlay.addEventListener("click", () => {
-                box.style.display = "none";
-                overlay.style.display = "none";
-              });
-            </script>
-          </div>
-        </div>
-        <div class="right2">
-          <h2>Select The Strength & Quantity 💊</h2>
-          <div class="product-table">
-            <table>
-              <thead>
-                <tr>
-                  <th id="unit_Type">MG</th>
-                  <th>QTY</th>
-                  <th>Description</th>
-                  <th>Price</th>
-                  <th>Add To Cart</th>
-                </tr>
-              </thead>
-            </table>
-            <div id="popil"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="rright"></div>
-    <div id="dummy"></div>
-
-    <section class="differ" id="differ"></section>
-    <section class="three-box-section" id="three-box-section"></section>
-
-    <script>
-      let name_dabba='';
-      // Fetch product details from Google Sheets based on the product_ID in the URL
-      async function fetchProductDetails() {
-        // Show loading indicators
-        document.getElementById("nameing_of_product").innerHTML = "Loading...";
-        document.getElementById("differ").innerHTML =
-          '<div class="loading-spinner"></div>';
-        document.getElementById("three-box-section").innerHTML =
-          '<div class="loading-spinner"></div>';
-
-        // Get product_ID from URL (expected format: /product?product_ID=5)
-        const urlParams = new URLSearchParams(window.location.search);
-        const productID = urlParams.get("product_ID");
-
-        if (!productID) {
-          showError("Product ID not found in URL");
-          return;
-        }
-
-        // const sheetID = "1XVbrA6eUv85eOoJO6mziJ35LI8x2copV_ka7qil2ycU";
-        // const apiKey = "AIzaSyD7mumdGgofUc1DE_bgaYJtOKK4i421iA8";
-       
-        try {
-          // Fetch product details and variants from the Google Sheet in parallel
-          const resp = await fetch(`/api/product?product_ID=${productID}`);
-          const { product, variants } = await resp.json();
-
-          const productData = await product;
-          const variantData = await variants;
-
-          // if (!productData.values || !variantData.values) {
-          //   throw new Error("No data found in the spreadsheet.");
-          // }
-
-          // Find the product using the productID from URL (compare as strings)
-          // const prod = productData.values.find(
-          //   (row) => row[0] === productID
-          // );
-          // if (!product) {
-          //   throw new Error("Product not found.");
-          // }
-
-          // Filter variants for this product using productID (assumed in column 1 of variant data)
-          // const productVariants = variantData.values.filter(
-          //   (row) => row[1] === productID
-          // );
-          console.log(product)
-          console.log(variants)
-          // Build search index and update UI
-          buildProductSearch(product);
-          updateProductUI(product, variants);
-
-          // After updating UI, send the product detail to the backend for saving into PostgreSQL
-          storeProductToBackend(product);
-        } catch (error) {
-          console.error("Error fetching product details:", error);
-          showError("Failed to load product details. Please try again later.");
-        }
-      }
-
-      // Function to send the fetched product detail to your backend
-      function storeProductToBackend(product) {
-        const productPayload = {
-          id: product[0],
-          name: product[2],
-          description: product[3],
-          tradeNames: product[4],
-          ingredients: product[5],
-          manufacturer: product[6],
-          packaging: product[7],
-          usage: product[8],
-          interaction: product[9],
-          sideEffects: product[10],
-          safety: product[11],
-          withdrawal: product[12],
-          drugAbuse: product[13],
-          storage: product[14],
-          image1: product[15],
-          image2: product[16],
-          image3: product[17],
-        };
-        name_dabba=productPayload.name;
-        fetch("/store-product", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(productPayload),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            console.log("Product stored in backend:", data);
-          })
-          .catch((error) => {
-            console.error("Error storing product to backend:", error);
-          });
-      }
-
-      // Build search options for the datalist
-      function buildProductSearch(prod) {
-        const searchList = document.getElementById("search_list");
-        searchList.innerHTML = "";
-        const fragment = document.createDocumentFragment();
-
-        try{
-          const response =  fetch("/products");
-          const products =  response.json();
-        console.log("heloj",response);
-
-        products.forEach((product) => {
-          const option = document.createElement("option");
-          option.value = product.product_name || "Product Name";
-          option.textContent = product.product_name || "Product Name";
-          fragment.appendChild(option);
-        });
-        searchList.appendChild(fragment);
-
-        const searchButton = document.getElementById("search-button");
-        const searchInput = document.getElementById("search-input");
-        
-        searchButton.addEventListener("click", () => {
-          const query = searchInput.value.trim();
-          const matchingProduct = products.find(
-            (product) => product[2] === query
-          );
-          if (matchingProduct) {
-            // Navigate using the format: /product?product_ID=<id>
-            window.location.href = `product?product_ID=${matchingProduct[0]}`;
-          } else {
-            alert("No matching product found.");
-          }
-        });
-      }
-      catch (error) {
-    console.error("Error building product search:", error);
-  }
-      }
-
-      // Update the UI with product details and variants
-      function updateProductUI(product, variants) {
-        document.getElementById("nameing_of_product").textContent =
-          product.product_name || "Product Name";
-        document.getElementById("product_images_sinf").innerHTML = `
-          <img src="${product[15] || "./assets/image/placeholder.png"}" alt="${
-          product.primary_img
-        }" loading="lazy" />
-          <img src="${product[16] || "./assets/image/placeholder.png"}" alt="${
-          product[2]
-        }" loading="lazy" />
-          <img src="${product[17] || "./assets/image/placeholder.png"}" alt="${
-          product[2]
-        }" loading="lazy" />
-        `;
-        document.getElementById("differ").innerHTML = `
-          <div class="rightside">
-            <div class="box">
-              <h3>Product Details</h3>
-              <ul>
-                <li><h4>Product Name</h4><p>${
-                  product.product_name || "Product Name"
-                }</p></li>
-                <li><h4>Product Description</h4><p>${
-                  product.product_description || "Product Description"
-                }</p></li>
-                <li><h4>Trade Names</h4><p>${
-                  product.trade_names || "Trade Name"
-                }</p></li>
-                <li><h4>Ingredients</h4><p>${
-                  product.ingredients || "Product Ingredients"
-                }</p></li>
-                <li><h4>Manufactured By</h4><p>${
-                  product.manufactured_by || "Product Manufacturer"
-                }</p></li>
-                <li><h4>Drug Abuse</h4><p>${
-                  product.drug_abuse || "No information available"
-                }</p></li>
-                <li><h4>Storage</h4><p>${
-                  product.storage || "No information available"
-                }</p></li>
+            <div id="benefits" class="tab hidden">
+              <ul class="tab-list">
+                <li>Loading benefits...</li>
               </ul>
             </div>
-          </div>
-          <div class="leftside">
-            <div class="box">
-              <h3>Usage & Instructions</h3>
-              <ul>
-                <li><h4>Packaging Details</h4><p>${
-                  product.packaging_details || "No information available"
-                }</p></li>
-                <li><h4>How to Use</h4><p>${
-                  product.how_to_use || "No information available"
-                }</p></li>
-                <li><h4>Drug Interaction</h4><p>${
-                  product.drug_interaction || "No information available"
-                }</p></li>
-                <li><h4>Side Effects</h4><p>${
-                  product.side_effects || "No information available"
-                }</p></li>
-              </ul>
+            <div id="details" class="tab hidden">
+              <p>Loading product details...</p>
+            </div>
+            <div id="usage" class="tab hidden">
+              <ol class="tab-list">
+                <li>Loading usage information...</li>
+              </ol>
+            </div>
+            <div id="reviews" class="tab hidden">
+              <p>Loading reviews...</p>
             </div>
           </div>
-        `
-;
-        document.getElementById("three-box-section").innerHTML = `
-          <div class="box">
-            <h3>Product Details</h3>
-            <p>${product.packaging_details || "No information available"}</p>
-          </div>
-          <div class="box">
-            <h3>Withdrawal Symptoms</h3>
-            <p>${product.withdrawal_symptoms || "No information available"}</p>
-          </div>
-          <div class="box">
-            <h3>Safety Information:</h3>
-            <p>${product.warnings_precautions || "No information available"}</p>
-          </div>
-        `;
-        
-        setupProductVariants(variants);
-      }
-
-      // Set up variant buttons and table rows using corrected indices
-      function setupProductVariants(variants) {
-        // Use variant[2] for MG value
-        const mgValues = [...new Set(variants.map((variant) => variant.unit_value))];
-        const buttonContainer = document.getElementById("button-container");
-        buttonContainer.innerHTML = "";
-        mgValues.forEach((mg, index) => {
-          const button = document.createElement("button");
-          console.log("mg is ",mg);
-          button.className = "mg-button";
-          button.textContent = mg;
-          button.setAttribute("data-mg", mg);
-          button.addEventListener("click", () => {
-            document
-              .querySelectorAll(".mg-button")
-              .forEach((btn) => btn.classList.remove("active"));
-            button.classList.add("active");
-            displayVariantOptions(variants, mg);
-          });
-          buttonContainer.appendChild(button);
-          if (index === 0) {
-            button.classList.add("active");
-            displayVariantOptions(variants, mg);
-          }
-        });
-      }
-
-      // Display variant options using corrected mapping:
-      // variant[2]: MG, variant[3]: Quantity, variant[4]: Price, variant[5]: Extra info
-      function displayVariantOptions(variants, selectedMg) {
-        const tableBody = document.getElementById("popil");
-        tableBody.innerHTML = "";
-        const matchingVariants = variants.filter(
-          (variant) => variant.unit_value === selectedMg
-        );
-        const fragment = document.createDocumentFragment();
-        matchingVariants.forEach((variant) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${variant.unit_type}${variant.unit_value}</td>
-            <td>${variant.qty}</td>
-            <td><span class="new-price">${variant.price_per_pill}</span></td>
-            <td>${variant.price_per_box || ""}</td>
-            <td>
-              <button class="add-tocart" data-variant-id="${variant.product_id}"
-               data-quantity="${variant.qty}"
-               data-mg="${variant.unit_type}${variant.unit_value}"
-               data-price="${variant.price_per_box}
-               
-               ">
-                Add To Cart
-              </button>
-            </td>
-          `;
-          fragment.appendChild(tr);
-        });
-        tableBody.appendChild(fragment);
-        setupAddToCartButtons();
-      }
-
-      // Set up "Add To Cart" buttons to send correct variant ID and quantity to backend
-      function setupAddToCartButtons() {
-        
-
-        document.querySelectorAll(".add-tocart").forEach((button) => {
-          button.addEventListener("click", function () {
-            const variantId = this.getAttribute("data-variant-id");
-            const quantity = this.getAttribute("data-quantity") || 1;
-            const mg = this.getAttribute("data-mg") || "default_mg_value";
-            const price = this.getAttribute("data-price").replace(/[^0-9,.]/g, '') || "default_price";
-            console.log(price.replace(/[^0-9,.,$]/g, ''));
-             const name = name_dabba;
-            addToCart(variantId, quantity, mg, price,name);
-          });
-        });
-      }
-
-      // Send a POST request to add the item to cart (include correct quantity)
-      function addToCart(variantId, quantity, mg, price,name) {
-        fetch("/add-to-cart", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            productId: variantId,
-            quantity: quantity,
-            mg: mg,
-            price: price,
-            name:name
-          }),
-        })
-          .then((response) => response.json())
-          .then((result) => {
-            if (result.success) {
-              alert("Item added to cart!");
-            } else {
-              alert("Error: " + result.message);
-            }
-          })
-          .catch((error) => {
-            console.error("Error adding to cart:", error);
-            alert("Server error, please try again later.");
-          });
-      }
-
-      // Display error messages in designated areas
-      function showError(message) {
-        const errorElements = [
-          document.getElementById("nameing_of_product"),
-          document.getElementById("differ"),
-          document.getElementById("three-box-section"),
-          document.getElementById("product_images_sinf"),
-        ];
-        errorElements.forEach((element) => {
-          if (element) {
-            element.innerHTML = `<div class="error-message">${message}</div>`;
-          }
-        });
-      }
-
-      // Initialize product details and sidebar toggle on page load
-      document.addEventListener("DOMContentLoaded", function () {
-        fetchProductDetails();
-        const hamburgerMenu = document.getElementById("hamburger-menu");
-        const sidebar = document.getElementById("sidebar");
-        const closeSidebar = document.getElementById("close-sidebar");
-        hamburgerMenu.addEventListener("click", () => {
-          sidebar.classList.add("active");
-        });
-        closeSidebar.addEventListener("click", () => {
-          sidebar.classList.remove("active");
-        });
-      });
-    </script>
-
-    <!-- FAQs and Reviews Section -->
-    <div class="flop">
-      <section class="faqs">
-        <h2>Frequently Asked Questions</h2>
-        <div class="faq-item">
-          <h3>What is Paracetamol 500mg used for?</h3>
-          <p>It is used for pain relief and fever reduction.</p>
         </div>
-        <div class="faq-item">
-          <h3>Are there any side effects?</h3>
-          <p>
-            Common side effects include nausea, dizziness, or allergic
-            reactions. Consult a doctor if symptoms persist.
-          </p>
+  
+        <h2 class="product-info__subtitle">
+          Select The Strength & Quantity <span>💊</span>
+        </h2>
+  
+        <!-- TABLE -->
+        <div class="table-wrapper">
+          <table class="product-table">
+            <thead>
+              <tr>
+                <th id="unit_Type">MG</th>
+                <th>QTY</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Add To Cart</th>
+              </tr>
+            </thead>
+            <tbody id="popil">
+              <!-- Table rows will be loaded dynamically -->
+            </tbody>
+          </table>
         </div>
-        <div class="faq-item">
-          <h3>How It works?</h3>
-          <p>
-            Consult a doctor if you have concerns about side effects and proper
-            usage.
-          </p>
-        </div>
-      </section>
-
-      <section class="reviews-section">
-        <h2>Customer Reviews</h2>
-        <!-- Review Form -->
-        <div class="review-form">
-          <h3>Write a Review</h3>
-          <form>
-            <label for="name">Name:</label>
-            <input type="text" id="name" placeholder="Your name" required />
-            <label for="rating">Rating:</label>
-            <select id="rating" required>
-              <option value="5">★★★★★ (5 stars)</option>
-              <option value="4">★★★★☆ (4 stars)</option>
-              <option value="3">★★★☆☆ (3 stars)</option>
-              <option value="2">★★☆☆☆ (2 stars)</option>
-              <option value="1">★☆☆☆☆ (1 star)</option>
-            </select>
-            <label for="review">Review:</label>
-            <textarea
-              id="review"
-              placeholder="Write your review here..."
-              required
-            ></textarea>
-            <button type="submit">Submit Review</button>
-          </form>
-        </div>
-        <!-- Average Rating -->
-        <div class="average-rating">
-          <span class="stars">★★★★☆</span>
-          <p>4.5 out of 5 stars</p>
-          <p>Based on 1234 customer ratings</p>
-        </div>
-        <!-- Reviews List -->
-        <div class="reviews-list">
-          <div class="review-item">
-            <div class="review-header">
-              <span class="stars">★★★★☆</span>
-              <h3>Great Product!</h3>
-              <button class="toggle-review">Show Review ▼</button>
+        <button class="btn btn--accent btn--custom" id="showButton">Custom Order</button>
+  
+        <!-- Custom Order Modal -->
+        <div class="overlay" id="overlay"></div>
+        <div id="toggleBox" class="custom-order-modal">
+          <h2>Select Custom MG and Quantity</h2>
+          <div class="selection-container">
+            <!-- MG Selection -->
+            <div class="select-group">
+              <label for="mg-select">Choose MG:</label>
+              <select id="mg-select">
+                <option value="1">1 MG</option>
+                <option value="2">2 MG</option>
+                <option value="3">3 MG</option>
+                <option value="4">4 MG</option>
+                <option value="5">5 MG</option>
+              </select>
             </div>
-            <p class="review-author">
-              Reviewed by <strong>John Doe</strong> on January 10, 2025
-            </p>
-            <p class="review-text hidden">
-              This medicine works exactly as described. I noticed a significant
-              improvement within a week.
-            </p>
-          </div>
-          <div class="review-item">
-            <div class="review-header">
-              <span class="stars">★★★☆☆</span>
-              <h3>Good, but some side effects</h3>
-              <button class="toggle-review">Show Review ▼</button>
+            <!-- Quantity Selection -->
+            <div class="select-group">
+              <label for="quantity-select">Choose Quantity:</label>
+              <input
+                type="text"
+                placeholder="Quantity"
+                class="quat-input"
+                id="quantity-select"
+              >
             </div>
-            <p class="review-author">
-              Reviewed by <strong>Jane Smith</strong> on January 8, 2025
-            </p>
-            <p class="review-text hidden">
-              The product is effective, but I experienced slight nausea after
-              using it.
-            </p>
+          </div>
+          <!-- Submit Button -->
+          <div class="submit-container">
+            <button id="submit-selection">Submit</button>
           </div>
         </div>
-      </section>
-    </div>
-
+  
+        <!-- FAQ ACCORDION -->
+        <div class="faq">
+          <h3>FAQs</h3>
+          <div class="faq__item">
+            <button class="faq__q">How quickly does it work?</button>
+            <div class="faq__a hidden">Most patients feel relief within 15–20 minutes after ingestion.</div>
+          </div>
+          <div class="faq__item">
+            <button class="faq__q">Any common side effects?</button>
+            <div class="faq__a hidden">May include drowsiness, dizziness, or headache.</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  
+    <!-- Details Sections -->
+    <section class="differ" id="differ">
+      <!-- Will be filled dynamically -->
+    </section>
+    
+    <section class="three-box-section" id="three-box-section">
+      <!-- Will be filled dynamically -->
+    </section>
+  
     <!-- Footer -->
     <footer class="footer">
       <div class="footer-content">
@@ -657,7 +241,428 @@
         </div>
       </div>
     </footer>
-
-    <script src="./assets/js/script.js"></script>
+    
+    <script>
+      let name_dabba = '';
+      
+      // Fetch product details from API based on the product_ID in the URL
+      async function fetchProductDetails() {
+        // Show loading indicators
+        document.getElementById("nameing_of_product").innerHTML = "Loading...";
+        document.getElementById("differ").innerHTML = '<div class="loading-spinner"></div>';
+        document.getElementById("three-box-section").innerHTML = '<div class="loading-spinner"></div>';
+        
+        // Get product_ID from URL (expected format: /product?product_ID=5)
+        const urlParams = new URLSearchParams(window.location.search);
+        const productID = urlParams.get("product_ID");
+        
+        if (!productID) {
+          showError("Product ID not found in URL");
+          return;
+        }
+        
+        try {
+          // Fetch product details and variants from the API
+          const resp = await fetch(`/api/product?product_ID=${productID}`);
+          const { product, variants } = await resp.json();
+          
+          buildProductSearch();
+          updateProductUI(product, variants);
+          
+        } catch (error) {
+          console.error("Error fetching product details:", error);
+          showError("Failed to load product details. Please try again later.");
+        }
+      }
+      
+      // Build search options for the datalist
+      async function buildProductSearch() {
+        try {
+          const response = await fetch(`/products`);
+          const products = await response.json();
+          
+          const searchList = document.getElementById("search_list");
+          searchList.innerHTML = "";
+          const fragment = document.createDocumentFragment();
+          
+          products.forEach((product) => {
+            const option = document.createElement("option");
+            option.value = product.product_name || "Product Name";
+            option.textContent = product.product_name || "Product Name";
+            fragment.appendChild(option);
+          });
+          
+          searchList.appendChild(fragment);
+          
+          const searchButton = document.getElementById("search-button");
+          const searchInput = document.getElementById("search-input");
+          
+          searchButton.addEventListener("click", () => {
+            const query = searchInput.value.trim();
+            const matchingProduct = products.find(
+              (product) => product.product_name === query
+            );
+            
+            if (matchingProduct) {
+              window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
+            } else {
+              alert("No matching product found.");
+            }
+          });
+        } catch (error) {
+          console.error("Error is", error);
+        }
+      }
+      
+      // Update the UI with product details and variants
+      function updateProductUI(product, variants) {
+        name_dabba = product.product_name;
+        
+        // Update product name
+        document.getElementById("nameing_of_product").innerHTML = 
+          `${product.product_name || "Product Name"} <span class="accent">Capsules</span>`;
+        
+        // Update carousel images
+        document.getElementById("product_images_sinf").innerHTML = `
+          <img src="${product.primary_img || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
+          <img src="${product.primary_img || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
+          <img src="${product.primary_img || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
+        `;
+        
+        // Update tabs content
+        document.getElementById("desc").innerHTML = `
+          <p>${product.product_description || "No description available."}</p>
+        `;
+        
+        document.getElementById("benefits").innerHTML = `
+          <ul class="tab-list">
+            <li>Trade Names: ${product.trade_names || "N/A"}</li>
+            <li>Manufactured By: ${product.manufactured_by || "N/A"}</li>
+            <li>Available in multiple strengths</li>
+          </ul>
+        `;
+        
+        document.getElementById("details").innerHTML = `
+          <p>Ingredients: ${product.ingredients || "Not specified"}</p>
+          <p>Packaging Details: ${product.packaging_details || "Not specified"}</p>
+        `;
+        
+        document.getElementById("usage").innerHTML = `
+          <ol class="tab-list">
+            <li>${product.how_to_use || "Use as directed by your physician."}</li>
+            <li>Storage: ${product.storage || "Store in a cool, dry place."}</li>
+            <li>Drug Interaction: ${product.drug_interaction || "Consult your doctor about possible drug interactions."}</li>
+          </ol>
+        `;
+        
+        document.getElementById("reviews").innerHTML = `
+          <p><strong>Average Rating:</strong> 4.5/5 stars</p>
+          <p><strong>Recent Review:</strong> "This medication worked well for me!" - Recent Customer</p>
+        `;
+        
+        // Update detailed sections
+        document.getElementById("differ").innerHTML = `
+          <div class="rightside">
+            <div class="box">
+              <h3>Product Details</h3>
+              <ul>
+                <li><h4>Product Name</h4><p>${product.product_name || "Product Name"}</p></li>
+                <li><h4>Product Description</h4><p>${product.product_description || "Product Description"}</p></li>
+                <li><h4>Trade Names</h4><p>${product.trade_names || "Trade Name"}</p></li>
+                <li><h4>Ingredients</h4><p>${product.ingredients || "Product Ingredients"}</p></li>
+                <li><h4>Manufactured By</h4><p>${product.manufactured_by || "Product Manufacturer"}</p></li>
+                <li><h4>Drug Abuse</h4><p>${product.drug_abuse || "No information available"}</p></li>
+                <li><h4>Storage</h4><p>${product.storage || "No information available"}</p></li>
+              </ul>
+            </div>
+          </div>
+          <div class="leftside">
+            <div class="box">
+              <h3>Usage & Instructions</h3>
+              <ul>
+                <li><h4>Packaging Details</h4><p>${product.packaging_details || "No information available"}</p></li>
+                <li><h4>How to Use</h4><p>${product.how_to_use || "No information available"}</p></li>
+                <li><h4>Drug Interaction</h4><p>${product.drug_interaction || "No information available"}</p></li>
+                <li><h4>Side Effects</h4><p>${product.side_effects || "No information available"}</p></li>
+              </ul>
+            </div>
+          </div>
+        `;
+        
+        document.getElementById("three-box-section").innerHTML = `
+          <div class="box">
+            <h3>Product Details</h3>
+            <p>${product.packaging_details || "No information available"}</p>
+          </div>
+          <div class="box">
+            <h3>Withdrawal Symptoms</h3>
+            <p>${product.withdrawal_symptoms || "No information available"}</p>
+          </div>
+          <div class="box">
+            <h3>Safety Information:</h3>
+            <p>${product.warnings_precautions || "No information available"}</p>
+          </div>
+        `;
+        
+        setupProductVariants(variants);
+      }
+      
+      // Set up variant buttons and table rows
+      function setupProductVariants(variants) {
+        const mgValues = [...new Set(variants.map((variant) => variant.unit_value))];
+        const buttonContainer = document.getElementById("button-container");
+        buttonContainer.innerHTML = "";
+        
+        mgValues.forEach((mg, index) => {
+          const button = document.createElement("button");
+          button.className = "btn btn--toggle";
+          if (index === 0) button.classList.add("btn--active");
+          button.textContent = mg;
+          button.setAttribute("data-mg", mg);
+          
+          button.addEventListener("click", () => {
+            document.querySelectorAll(".btn--toggle").forEach((btn) => btn.classList.remove("btn--active"));
+            button.classList.add("btn--active");
+            displayVariantOptions(variants, mg);
+          });
+          
+          buttonContainer.appendChild(button);
+          
+          if (index === 0) {
+            displayVariantOptions(variants, mg);
+          }
+        });
+      }
+      
+      // Display variant options in the table
+      function displayVariantOptions(variants, selectedMg) {
+        const tableBody = document.getElementById("popil");
+        tableBody.innerHTML = "";
+        
+        const matchingVariants = variants.filter(
+          (variant) => variant.unit_value === selectedMg
+        );
+        
+        const fragment = document.createDocumentFragment();
+        
+        matchingVariants.forEach((variant) => {
+          const tr = document.createElement("tr");
+          tr.setAttribute("data-mg", variant.unit_value);
+          
+          tr.innerHTML = `
+            <td>${variant.unit_type}${variant.unit_value}</td>
+            <td>${variant.qty}</td>
+            <td>${variant.price_per_pill || "$0.00 per pill"}</td>
+            <td>${variant.price_per_box || "$0.00"}</td>
+            <td>
+              <button class="btn btn--add" 
+                data-variant-id="${variant.product_id}"
+                data-quantity="${variant.qty}"
+                data-mg="${variant.unit_type}${variant.unit_value}"
+                data-price="${variant.price_per_box}">
+                Add To Cart
+              </button>
+            </td>
+          `;
+          
+          fragment.appendChild(tr);
+        });
+        
+        tableBody.appendChild(fragment);
+        setupAddToCartButtons();
+      }
+      
+      // Set up "Add To Cart" buttons
+      function setupAddToCartButtons() {
+        document.querySelectorAll(".btn--add").forEach((button) => {
+          button.addEventListener("click", function() {
+            const variantId = this.getAttribute("data-variant-id");
+            const quantity = this.getAttribute("data-quantity") || 1;
+            const mg = this.getAttribute("data-mg") || "default_mg_value";
+            const price = this.getAttribute("data-price").replace(/[^0-9,.]/g, '') || "default_price";
+            const name = name_dabba;
+            
+            addToCart(variantId, quantity, mg, price, name);
+          });
+        });
+      }
+      
+      // Send a POST request to add the item to cart
+      function addToCart(variantId, quantity, mg, price, name) {
+        fetch("/add-to-cart", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            productId: variantId,
+            quantity: quantity,
+            mg: mg,
+            price: price,
+            name: name
+          }),
+        })
+        .then((response) => response.json())
+        .then((result) => {
+          if (result.success) {
+            alert("Item added to cart!");
+          } else {
+            alert("Error: " + result.message);
+          }
+        })
+        .catch((error) => {
+          console.error("Error adding to cart:", error);
+          alert("Server error, please try again later.");
+        });
+      }
+      
+      // Display error messages in designated areas
+      function showError(message) {
+        const errorElements = [
+          document.getElementById("nameing_of_product"),
+          document.getElementById("differ"),
+          document.getElementById("three-box-section"),
+          document.getElementById("product_images_sinf"),
+        ];
+        
+        errorElements.forEach((element) => {
+          if (element) {
+            element.innerHTML = `<div class="error-message">${message}</div>`;
+          }
+        });
+      }
+      
+      // Tabs functionality
+      function setupTabs() {
+        const tabButtons = document.querySelectorAll('.tabs__btn');
+        
+        tabButtons.forEach(button => {
+          button.addEventListener('click', () => {
+            // Remove active class from all buttons and tabs
+            document.querySelectorAll('.tabs__btn').forEach(btn => {
+              btn.classList.remove('tabs__btn--active');
+            });
+            
+            document.querySelectorAll('.tab').forEach(tab => {
+              tab.classList.add('hidden');
+            });
+            
+            // Add active class to clicked button
+            button.classList.add('tabs__btn--active');
+            
+            // Show corresponding tab
+            const tabId = button.getAttribute('data-tab');
+            document.getElementById(tabId).classList.remove('hidden');
+          });
+        });
+      }
+      
+      // FAQ accordion functionality
+      function setupFaqAccordion() {
+        const faqQuestions = document.querySelectorAll('.faq__q');
+        
+        faqQuestions.forEach(question => {
+          question.addEventListener('click', () => {
+            const answer = question.nextElementSibling;
+            answer.classList.toggle('hidden');
+          });
+        });
+      }
+      
+      // Image carousel functionality
+      function setupCarousel() {
+        const carousel = document.querySelector('.carousel__slide');
+        const prevButton = document.getElementById('prevSlide');
+        const nextButton = document.getElementById('nextSlide');
+        let currentSlide = 0;
+        
+        function showSlide(index) {
+          const slides = carousel.querySelectorAll('img');
+          if (slides.length === 0) return;
+          
+          // Hide all slides
+          slides.forEach(slide => {
+            slide.style.display = 'none';
+          });
+          
+          // Show the current slide
+          slides[index].style.display = 'block';
+        }
+        
+        // Initialize carousel
+        function initCarousel() {
+          const slides = carousel.querySelectorAll('img');
+          if (slides.length === 0) return;
+          
+          showSlide(currentSlide);
+          
+          prevButton.addEventListener('click', () => {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(currentSlide);
+          });
+          
+          nextButton.addEventListener('click', () => {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+          });
+        }
+        
+        // Run after images are loaded
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.type === 'childList' && carousel.querySelectorAll('img').length > 0) {
+              initCarousel();
+              observer.disconnect();
+            }
+          });
+        });
+        
+        observer.observe(carousel, { childList: true });
+      }
+      
+      // Custom order modal functionality
+      function setupCustomOrderModal() {
+        const showButton = document.getElementById('showButton');
+        const modal = document.getElementById('toggleBox');
+        const overlay = document.getElementById('overlay');
+        const submitButton = document.getElementById('submit-selection');
+        
+        showButton.addEventListener('click', () => {
+          modal.style.display = 'block';
+          overlay.style.display = 'block';
+        });
+        
+        overlay.addEventListener('click', () => {
+          modal.style.display = 'none';
+          overlay.style.display = 'none';
+        });
+        
+        submitButton.addEventListener('click', () => {
+          const mgSelect = document.getElementById('mg-select');
+          const quantityInput = document.getElementById('quantity-select');
+          
+          const selectedMg = mgSelect.value;
+          const selectedQuantity = quantityInput.value;
+          
+          if (!selectedQuantity || isNaN(selectedQuantity) || selectedQuantity <= 0) {
+            alert('Please enter a valid quantity');
+            return;
+          }
+          
+          // Handle custom order processing here
+          alert(`Custom order placed: ${selectedMg}MG, Quantity: ${selectedQuantity}`);
+          
+          modal.style.display = 'none';
+          overlay.style.display = 'none';
+        });
+      }
+      
+      // Initialize everything when the DOM is loaded
+      document.addEventListener('DOMContentLoaded', function() {
+        fetchProductDetails();
+        setupTabs();
+        setupFaqAccordion();
+        setupCarousel();
+        setupCustomOrderModal();
+      });
+    </script>
   </body>
 </html>

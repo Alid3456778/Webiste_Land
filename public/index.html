@@ -9,21 +9,98 @@
     <link rel="stylesheet" href="./assets/css/navbar_footer.css" />
   </head>
   <body>
-    <header>
-      <nav class="navbar">
-        <div class="navbar-left">
-          <!-- Hamburger Icon -->
-          <button id="hamburger-menu" class="hamburger-menu">☰</button>
-          <!-- Logo -->
-          <div class="logo"><img src="./assets/image2/logo.png" alt="" /></div>
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header__left">
+        <button class="btn btn--icon header__menu" id="hamburger-menu">
+          ☰
+        </button>
+        <img src="assets/image2/logo.png" alt="MCLAND Logo" class="logo" />
+        <span class="brand-name">MCLAND</span>
+      </div>
+      <nav class="header__nav">
+        <div class="nav__item">
+          <button class="nav__btn" data-menu="medicine">Medicine ▾</button>
+          <ul class="dropdown-menu" id="menu-medicine">
+            <li>
+              <a href="/cardiac-care" class="dropdown__link">Cardiac Care</a>
+            </li>
+            <li>
+              <a href="/general-health" class="dropdown__link"
+                >General Health Care</a
+              >
+            </li>
+            <li>
+              <a href="/pain-medication" class="dropdown__link"
+                >Pain Medication</a
+              >
+            </li>
+          </ul>
         </div>
-        <div class="navbar-right">
-          <!-- Search Bar -->
-           
+        <div class="nav__item">
+          <button class="nav__btn" data-menu="wellness">Wellness ▾</button>
+          <ul class="dropdown-menu" id="menu-wellness">
+            <li>
+              <a href="/mental-health" class="dropdown__link">Mental Health</a>
+            </li>
+            <li>
+              <a href="/sexual-wellness" class="dropdown__link"
+                >Sexual Wellness</a
+              >
+            </li>
+            <li><a href="/skincare" class="dropdown__link">Skincare</a></li>
+          </ul>
+        </div>
+        <div class="nav__item">
+          <button class="nav__btn" data-menu="beauty">Beauty ▾</button>
+          <ul class="dropdown-menu" id="menu-beauty">
+            <li><a href="/skin-care" class="dropdown__link">Skin Care</a></li>
+            <li><a href="/hair-care" class="dropdown__link">Hair Care</a></li>
+            <li><a href="/steroids" class="dropdown__link">Steriods</a></li>
+          </ul>
+        </div>
+      </nav>
+      <script>
+        // NAV DROPDOWN TOGGLE
+        const navButtons = document.querySelectorAll(".nav__btn");
+        document.addEventListener("click", (e) => {
+          // if clicked on a nav button, toggle its menu
+          const btn = e.target.closest(".nav__btn");
+          if (btn) {
+            const key = btn.dataset.menu;
+            const menu = document.getElementById(`menu-${key}`);
+
+            // close others
+            navButtons.forEach((b) => {
+              const other = document.getElementById(`menu-${b.dataset.menu}`);
+              if (b !== btn) {
+                b.classList.remove("active");
+                other.style.display = "none";
+              }
+            });
+
+            // toggle this one
+            const isOpen = btn.classList.toggle("active");
+            menu.style.display = isOpen ? "block" : "none";
+
+            return;
+          }
+
+          // click elsewhere? close all
+          navButtons.forEach((b) => {
+            const m = document.getElementById(`menu-${b.dataset.menu}`);
+            b.classList.remove("active");
+            m.style.display = "none";
+          });
+        });
+      </script>
+
+      <div class="header__right">
+        <div class="search">
           <input
             type="text"
             placeholder="Search products..."
-            class="search-bar"
+            class="search__input"
             id="search-input"
             list="search_list"
           />
@@ -33,160 +110,60 @@
             <option value="Pain Killer">Pain Killer</option>
             <option value="Medistic">Medtistic</option>
           </datalist>
-          <button class="search-button" id="search-button">Search</button>
-        
-          <!-- Cart Icon -->
-          <img
-            src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
-            alt="Cart"
-            class="cart-icon"
-          />
+          <button class="btn btn--search" id="search-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              fill="currentColor"
+            >
+              <path
+                d="M10 2a8 8 0 015.292 13.708l4.5 4.5a1 1 0 01-1.415 1.414l-4.5-4.5A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"
+              />
+            </svg>
+          </button>
         </div>
-      </nav>
-
-      <!-- Sidebar -->
-      <div id="sidebar" class="sidebar">
-        <button id="close-sidebar" class="close-btn">✖</button>
-        <div class="sidebar-content">
-          <h2>Menu</h2>
-          <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Products</a></li>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Contact</a></li>
-          </ul>
-        </div>
+        <a href="cart">
+        <button class="btn btn--icon">
+          <img src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" alt="Cart" class="cart-icon" />
+        </button>
+      </a>
       </div>
     </header>
-    <nav class="navbar-bottom">
-      <ul>
-        <li>
-          <a class="aa headd" href="#">Medicine</a>
-          <ul class="dropdown">
-            <li><a href="#">Cardiac Care</a></li>
-            <li><a href="#">General Health Care</a></li>
-            <li><a href="#">Pain Medication</a></li>
-          </ul>
-        </li>
-        <li>
-          <a class="aa headd" href="#">Wellness</a>
-          <ul class="dropdown">
-            <li><a href="#">Mental Health</a></li>
-            <li><a href="#">Sexual Wellness</a></li>
-            <li><a href="#">Skincare</a></li>
-          </ul>
-        </li>
-        <li>
-          <a class="aa headd" href="#">Lab Tests</a>
-          <ul class="dropdown">
-            <li><a href="#">Blood Test</a></li>
-            <li><a href="#">Urine Test</a></li>
-            <li><a href="#">Hormone Test</a></li>
-          </ul>
-        </li>
-        <li>
-          <a class="aa headd" href="#">Beauty</a>
-          <ul class="dropdown">
-            <li><a href="#">Skin Care</a></li>
-            <li><a href="#">Hair Care</a></li>
-          </ul>
-        </li>
-        <li>
-          <a class="aa headd" href="#">Health Corner</a>
-          <ul class="dropdown">
-            <li><a href="#">Nutrition</a></li>
-            <li><a href="#">Exercise</a></li>
-          </ul>
-        </li>
-      </ul>
-    </nav>
 
-    <!-- <section class="search_card">
-    <div class="serach_text">
-      <h2>Your Partner in Healthcare</h2>
-
-    </div>
-    <div class="searchbar">
-      <input type="text" placeholder="Search for medicine...">
-      <button class="search_btn" type="button"> Search</button>
-    </div>
-  </section> -->
-
-    <!-- Banner -->
-    <!-- <div class="banner-item">
-      <div class="offer">
-        <h2>Flat 25% off +</h2>
-        <p>up to 10% cash-in-wallet + <strong>free shipping</strong></p>
-        <span>Code: <strong>NMSNEW</strong></span>
-        <button>Shop now</button>
-      </div>
-      <div class="banner-image">
-        <img src="./assets/image/sample banner.webp" alt="Offer Image">
-      </div> 
-      </div> 
-     <div class="banner-item">
-      <div class="savings">
-        <h2>NovemBest Savings</h2>
-        <img src="./assets/image/banner_sample_2.avif" alt="Savings Image">
+    <!-- Sidebar
+    <div id="sidebar" class="sidebar">
+      <button id="close-sidebar" class="close-btn">✖</button>
+      <div class="sidebar-content">
+        <h2>Menu</h2>
+        <ul>
+          <li><a href="#">Home</a></li>
+          <li><a href="#">Products</a></li>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
       </div>
     </div> -->
 
-    <section id="transit_slide">
-      <div id="pre_slider">
-        <div id="slider">
-          <!-- Add your images as slides -->
-          <div class="slide" style="display: none">
-            <img
-              src="./assets/image2/Pharmacy - vector illustration - Design Template Place.jpg"
-              alt="Stock Image 1"
-            />
-          </div>
-          <div class="slide" style="display: block">
-            <img
-              src="./assets/image2/Pharmacy tech online training for pharmacist tiny person neubrutalism concept.jpg"
-              alt="Stock Image 2"
-            />
-          </div>
-          <div class="slide" style="display: none">
-            <img
-              src="./assets/image/Merry_Christmas_offer.png"
-              alt="Stock Image 3"
-            />
-          </div>
-          <div class="slide" style="display: none">
-            <img
-              src="./assets/image2/Download pharmacy with pharmacist and client in counter for free.jpg"
-              alt="Stock Image 4"
-            />
-          </div>
-          <div class="slide" style="display: none">
-            <img
-              src="./assets/image/Merry_Christmas_offer.png"
-              alt="Stock Image 5"
-            />
-          </div>
-
-          <!-- Controlling arrows -->
-          <span class="controls" onclick="changeSlide(-1)" id="left-arrow">
-            <i class="fa fa-arrow-left" aria-hidden="true"></i>
-          </span>
-          <span class="controls" id="right-arrow" onclick="changeSlide(1)">
-            <i class="fa fa-arrow-right" aria-hidden="true"></i>
-          </span>
-        </div>
-        <!-- Dot navigation -->
-        <div id="dots-con">
-          <span class="dot" onclick="setCurrentSlide(1)"></span>
-          <span class="dot active" onclick="setCurrentSlide(2)"></span>
-          <span class="dot" onclick="setCurrentSlide(3)"></span>
-          <span class="dot" onclick="setCurrentSlide(4)"></span>
-          <span class="dot" onclick="setCurrentSlide(5)"></span>
-        </div>
+    <!-- HERO -->
+    <section class="hero-alt">
+      <div class="hero-alt__bg">
+        <img
+          src="assets/image/Merry_Christmas_offer.png"
+          alt="Pharmacy Scene"
+        />
+        <div class="hero-alt__overlay"></div>
+      </div>
+      <div class="hero-alt__content">
+        <h1>Your Trusted Online Pharmacy</h1>
+        <p>Premium medicines, genuine quality, delivered fast & secure.</p>
+        <a href="#categories" class="btn btn--cta">Shop Now</a>
       </div>
     </section>
 
     <!-- pop up -->
-    <div id="popup" class="popup-overlay">
+    <!-- <div id="popup" class="popup-overlay">
       <div class="popup-content">
         <img
           src="./assets/image2/Gemini_Generated_Image_s3achms3achms3ac.jpg"
@@ -202,324 +179,249 @@
         <br />
         <button class="btn" onclick="closePopup()">Claim Offer</button>
       </div>
-    </div>
+    </div> -->
 
-    <!-- Offers Banner -->
-    <!-- <section id="offers" class="offers-banner">
-    <h2>Exclusive Offers</h2>
-    <p>Up to 30% off on premium USA products!</p>
-    <button class="offerbtn">Shop Now</button>
-  </section> -->
+    <!-- FEATURES -->
+    <section class="features">
+      <div class="features__item">
+        <img src="icon-certified.svg" alt="Certified Genuine" />
+        <h4>Certified Genuine</h4>
+        <p>All products sourced from licensed manufacturers.</p>
+      </div>
+      <div class="features__item">
+        <img src="icon-support.svg" alt="Expert Support" />
+        <h4>24/7 Expert Support</h4>
+        <p>Licensed pharmacists available round-the-clock.</p>
+      </div>
+      <div class="features__item">
+        <img src="icon-fast.svg" alt="Fast Delivery" />
+        <h4>Fast & Secure Delivery</h4>
+        <p>Next-day delivery with tamper-proof packaging.</p>
+      </div>
+    </section>
 
-    <!-- What We Offer -->
-    <!-- <h2>Shop By Categories</h2> -->
-    <section id="what-we-offer" class="shop-by-categories">
-      <h2 class="headd">Shop By Categories</h2>
-      <div class="what-we-offer">
-        <div class="card-container">
-          <!-- Card 1 -->
-          <div
-            class="card"
-            onclick="this.querySelector('a').click(); return true;"
-          >
-            <img src="./assets/image/USA-Premium.png" alt="USA Premium" />
-            <p>USA Premium</p>
-            <a href="./categories.html?catogeries_ID=1"></a>
+    <!-- SHOP BY CATEGORIES – HORIZONTAL DRAG CAROUSEL -->
+    <section id="categories" class="categories-carousel">
+      <h2 class="section-title">Shop by Categories</h2>
+      <div class="carousel-container">
+        <a
+          href="./categories.html?catogeries_ID=1"
+          class="category-card category-card--premium"
+        >
+          <div class="icon-wrapper">
+            <img src="assets/image/USA-Premium.png" alt="USA Premium" />
           </div>
-          <!-- Card 2 -->
-          <div
-            class="card"
-            onclick="this.querySelector('a').click(); return true;"
-          >
-            <img src="./assets/image/cardiac-care.png" alt="Cardiac Care" />
-            <p>Cardiac Care</p>
-            <a href="./categories.html?catogeries_ID=4"></a>
-          </div>
-          <!-- Card 3 -->
-          <div
-            class="card"
-            onclick="this.querySelector('a').click(); return true;"
-          >
+          <span>USA Premium</span>
+          <span class="badge">Premium</span>
+        </a>
+        <a href="./categories.html?catogeries_ID=2" class="category-card">
+          <div class="icon-wrapper">
             <img
-              src="./assets/image/general-health.png"
+              src="assets/image/general-health.png"
               alt="General Health Care"
             />
-            <p>General Health Care</p>
-            <a href="./categories.html?catogeries_ID=2"></a>
           </div>
-          <!-- Card 4 -->
-          <div
-            class="card"
-            onclick="this.querySelector('a').click(); return true;"
-          >
-            <img src="./assets/image/mens-health.png" alt="Men's Health" />
-            <p>Mens Health</p>
-            <a href="./categories.html?catogeries_ID=10"></a>
+          <span>General Health Care</span>
+        </a>
+        <a href="./categories.html?catogeries_ID=3" class="category-card">
+          <div class="icon-wrapper">
+            <img src="assets/image/pain-medication.png" alt="Pain Medication" />
           </div>
-          <!-- Card 5 -->
-          <div
-            class="card"
-            onclick="this.querySelector('a').click(); return true;"
-          >
-            <img src="./assets/image/mental-health.png" alt="Mental Health" />
-            <p>Mental Health</p>
-            <a href="./categories.html?catogeries_ID=5"></a>
+          <span>Pain Medication</span>
+        </a>
+        <a href="./categories.html?catogeries_ID=4" class="category-card">
+          <div class="icon-wrapper">
+            <img src="assets/image/cardiac-care.png" alt="Cardiac Care" />
           </div>
-          <!-- Card 6 -->
-          <div
-            class="card"
-            onclick="this.querySelector('a').click(); return true;"
-          >
-            <img
-              src="./assets/image/pain-medication.png"
-              alt="Pain Medication"
-            />
-            <p>Pain Medication</p>
-            <a href="./categories.html?catogeries_ID=3"></a>
+          <span>Cardiac Care</span>
+        </a>
+        <a href="./categories.html?catogeries_ID=5" class="category-card">
+          <div class="icon-wrapper">
+            <img src="assets/image/mental-health.png" alt="Mental Health" />
           </div>
-          <!-- Card 7 -->
-          <div
-            class="card"
-            onclick="this.querySelector('a').click(); return true;"
-          >
-            <img
-              src="./assets/image/sexual-wellness.png"
-              alt="Sexual Wellness"
-            />
-            <p>Sexual Wellness</p>
-            <a href="./categories.html?catogeries_ID=6"></a>
+          <span>Mental Health</span>
+        </a>
+        <a href="./categories.html?catogeries_ID=6" class="category-card">
+          <div class="icon-wrapper">
+            <img src="assets/image/sexual-wellness.png" alt="Sexual Wellness" />
           </div>
-          <!-- Card 8 -->
-          <div
-            class="card"
-            onclick="this.querySelector('a').click(); return true;"
-          >
-            <img src="./assets/image/skincare.png" alt="Skincare" />
-            <p>Skincare</p>
-            <a href="./categories.html?catogeries_ID=7"></a>
+          <span>Sexual Wellness</span>
+        </a>
+        <a href="./categories.html?catogeries_ID=7" class="category-card">
+          <div class="icon-wrapper">
+            <img src="assets/image/skincare.png" alt="Skincare" />
           </div>
-          <!-- Card 9 -->
-          <div
-            class="card"
-            onclick="this.querySelector('a').click(); return true;"
-          >
-            <img src="./assets/image/steroids.png" alt="Steroids" />
-            <p>Steroids</p>
-            <a href="./categories.html?catogeries_ID=8"></a>
+          <span>Skincare</span>
+        </a>
+        <a href="./categories.html?catogeries_ID=8" class="category-card">
+          <div class="icon-wrapper">
+            <img src="assets/image/steroids.png" alt="Steroids" />
           </div>
-          <!-- Card 10 -->
-          <div
-            class="card"
-            onclick="this.querySelector('a').click(); return true;"
-          >
-            <img src="./assets/image/women-health.png" alt="Womens Health" />
-            <p>Womens Health</p>
-            <a href="./categories.html?catogeries_ID=9"></a>
+          <span>Steroids</span>
+        </a>
+        <a href="./categories.html?catogeries_ID=9" class="category-card">
+          <div class="icon-wrapper">
+            <img src="assets/image/women-health.png" alt="Women's Health" />
           </div>
-        </div>
+          <span>Women's Health</span>
+        </a>
+        <a href="./categories.html?catogeries_ID=10" class="category-card">
+          <div class="icon-wrapper">
+            <img src="assets/image/mens-health.png" alt="Men's Health" />
+          </div>
+          <span>Men's Health</span>
+        </a>
       </div>
     </section>
 
-    <!-- New Arrivals -->
-    <section id="new-arrivals" class="product-section">
-      <div><h2>New Arrivals</h2></div>
-
-      <div class="product-grid" id="product-grids">
-        <div class="product-card">
-          <div class="right_side">
-            <div>
-              <img
-                src="./assets/image/Alprazolam-USA-to-USA-01.jpg"
-                alt="Product 1"
-              />
-            </div>
-            <div>
-              <p>Product Name 1</p>
-              <span>$25.99</span>
-              <a href="product_overview.html">Learn More</a>
-            </div>
-          </div>
-          <div class="left_side">
-            <button><a href="checkout.html">Buy</a></button>
-            <button><a href="cart.html">Add to Cart</a></button>
-          </div>
-        </div>
-
-        <div class="product-card">
-          <div class="right_side">
-            <div>
-              <img
-                src="./assets/image/Alprazolam-USA-to-USA-01.jpg"
-                alt="Product 1"
-              />
-            </div>
-            <div>
-              <p>Product Name 1</p>
-              <span>$25.99</span>
-              <a href="product_overview.html">Learn More</a>
-            </div>
-          </div>
-          <div class="left_side">
-            <button>Buy</button>
-            <button>Add to Cart</button>
-          </div>
-        </div>
-        <div class="product-card">
-          <div class="right_side">
-            <div>
-              <img
-                src="./assets/image/Alprazolam-USA-to-USA-01.jpg"
-                alt="Product 1"
-              />
-            </div>
-            <div>
-              <p>Product Name 1</p>
-              <span>$25.99</span>
-              <a href="product_overview.html">Learn More</a>
-            </div>
-          </div>
-          <div class="left_side">
-            <button>Buy</button>
-            <button>Add to Cart</button>
-          </div>
-        </div>
-        <div class="product-card">
-          <div class="right_side">
-            <div>
-              <img
-                src="./assets/image/Alprazolam-USA-to-USA-01.jpg"
-                alt="Product 1"
-              />
-            </div>
-            <div>
-              <p>Product Name 1</p>
-              <span>$25.99</span>
-              <a href="product_overview.html">Learn More</a>
-            </div>
-          </div>
-          <div class="left_side">
-            <button>Buy</button>
-            <button>Add to Cart</button>
-          </div>
-        </div>
-        <div class="product-card">
-          <div class="right_side">
-            <div>
-              <img
-                src="./assets/image/Alprazolam-USA-to-USA-01.jpg"
-                alt="Product 1"
-              />
-            </div>
-            <div>
-              <p>Product Name 1</p>
-              <span>$25.99</span>
-            </div>
-          </div>
-          <div class="left_side">
-            <button>Buy</button>
-            <button>Add to Cart</button>
-          </div>
-        </div>
-        <div class="product-card" id="product-cards">
-          <div class="right_side">
-            <div>
-              <img
-                src="./assets/image/Alprazolam-USA-to-USA-01.jpg"
-                alt="Product 1"
-              />
-            </div>
-            <div>
-              <p>Product Name 1</p>
-              <span>$25.99</span>
-            </div>
-          </div>
-          <div class="left_side">
-            <button>Buy</button>
-            <button>Add to Cart</button>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- <script>
-      async function loadSheetData() {
-          const sheetID = "1XVbrA6eUv85eOoJO6mziJ35LI8x2copV_ka7qil2ycU"; // Replace with your Sheet ID
-          const apiKey = "AIzaSyD7mumdGgofUc1DE_bgaYJtOKK4i421iA8"; // Replace with your Google API Key
-          
-          const range2 = "Sheet1!Y5:AF"; 
-          const range = "Sheet1!A5:V"; // Adjust based on your data range
-          const url2 = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range2}?key=${apiKey}`;
-          const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
-
-          // const category = document.getElementById('categories').value;
-          // console.log("this is the option chosen",category);
-          try {
-            const response2 = await fetch(url2);
-            const data2 = await response2.json();
-
-            const response = await fetch(url);
-            const data = await response.json();
-
-            if (!data.values || !data2.values) {
-              throw new Error("No data found in the specified range.");
-            }
-
-            const rows = data.values;
-            const row2 = data2.values;
-
-            const tableBody = document.getElementById("product-grids");
-            tableBody.innerHTML = ""; // Clear table
-
-            rows.forEach((row) => {
-              const productID = row[0]; 
-              let price=0;
-              let p=0;
-              row2.forEach((row2)=>{
-                if(row2[1] == row[0] && p == 0){
-                  price = row2[6];
-                  p=p+1;
-                }
-              });
-
-              
-
-              const rowHTML = `
-              <div class="product-card" id="product-cards" >
-          <div class="right_side">
-            <div>
-              <img
-                src="${row[15] || ""}"
-                alt="Product 1"
-              />
-            </div>
-            <div>
-              <p>${row[2] || ""}</p>
-              <span>${price}</span>
-            </div>
-          </div>
-          <div class="left_side">
-            <button><a href="./product_overview.html?product_ID=${productID}">Buy</a></button>
-            <button>Add to Cart</button>
-          </div>
-        </div>
-        `
-        ;
-
-              tableBody.innerHTML += rowHTML;
-            });
-          } catch (error) {
-            console.error("Error fetching data:", error);
-          }
-        }
-
-        loadSheetData();
-    </script> -->
     <script>
-      const sheetID = "1XVbrA6eUv85eOoJO6mziJ35LI8x2copV_ka7qil2ycU"; // Replace with your Sheet ID
-      const apiKey = "AIzaSyD7mumdGgofUc1DE_bgaYJtOKK4i421iA8"; // Replace with your API Key
+      // DRAG-TO-SCROLL FOR CATEGORIES CAROUSEL
+      const carousel = document.querySelector(".carousel-container");
+      let isDown = false,
+        startX,
+        scrollLeft;
+
+      carousel.addEventListener("mousedown", (e) => {
+        isDown = true;
+        carousel.classList.add("active");
+        startX = e.pageX - carousel.offsetLeft;
+        scrollLeft = carousel.scrollLeft;
+      });
+      carousel.addEventListener("mouseleave", () => {
+        isDown = false;
+        carousel.classList.remove("active");
+      });
+      carousel.addEventListener("mouseup", () => {
+        isDown = false;
+        carousel.classList.remove("active");
+      });
+      carousel.addEventListener("mousemove", (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - carousel.offsetLeft;
+        const walk = (x - startX) * 1; // scroll-fast multiplier (try 1)
+        carousel.scrollLeft = scrollLeft - walk;
+      });
+    </script>
+
+    <!-- NEW ARRIVALS SECTION -->
+    <!-- <section id="new-arrivals" class="product-section">
+      <h2 class="section-title">New Arrivals</h2>
+      <div class="product-grid" id="product-grids">
+        
+      </div>
+    </section> -->
+
+    <!-- TESTIMONIALS -->
+    <section class="testimonials">
+      <h2>What Our Customers Say</h2>
+      <div class="testimonials__grid">
+        <blockquote>
+          <p>"Fast delivery and genuine products—I trust MCLAND completely!"</p>
+          <footer>— Sarah K.</footer>
+        </blockquote>
+        <blockquote>
+          <p>"The customer support answered all my queries instantly."</p>
+          <footer>— James L.</footer>
+        </blockquote>
+        <blockquote>
+          <p>"Packaging was flawless and the medicines arrived on time."</p>
+          <footer>— Priya M.</footer>
+        </blockquote>
+      </div>
+    </section>
+
+    <!-- TRUST BADGES -->
+    <section class="trust-alt">
+      <div class="trust__item">
+        <img src="images.jpeg" alt="Secure Payment" />
+        <p>Secure Payment</p>
+      </div>
+      <div class="trust__item">
+        <img src="qa.png" alt="Quality Assured" />
+        <p>Quality Assured</p>
+      </div>
+      <div class="trust__item">
+        <img src="gol.jpg" alt="Data Privacy" />
+        <p>Data Privacy</p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-section resources">
+          <h3>Resources</h3>
+          <ul>
+            <li><a href="#">Shipping</a></li>
+            <li><a href="#">Returns & Refunds</a></li>
+            <li><a href="#">Payment Methods</a></li>
+            <li><a href="#">FAQs</a></li>
+          </ul>
+        </div>
+        <div class="footer-section legal">
+          <h3>Legal</h3>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">Terms & Conditions</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Cancellation Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-section support">
+          <h3>Support 24/7</h3>
+          <p><i class="fa fa-envelope"></i> support@mclandpharma.com</p>
+          <p><i class="fa fa-phone"></i> +1 315 666 5976</p>
+        </div>
+        <div class="footer-section disclaimer">
+          <h3>Disclaimer</h3>
+          <p>
+            The services on Mcland Pharma are available for millions of people
+            solely presented for informative, qualitative, quantitative, and
+            affordable medicinal purposes. Here we believe The Doctor's advice =
+            The Best Advice for medicinal needs by following protocol
+            accordingly by people suffering from different conditions.
+          </p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-left">
+          <p class="copyright">
+            &copy; 2024 Mcland Pharma. All rights reserved.
+          </p>
+          <p>© 2024 All rights reserved. Mcland Pharma</p>
+          <p>
+            Mcland Pharma has been working on a change towards healthcare and
+            improving health. We are on a mission Encouraging Healthcare –
+            Improving Health since 2013. We have covered the finest medicines
+            for the mission towards cure with a few simple steps at
+            budget-friendly prices.
+          </p>
+        </div>
+        <div class="footer-right">
+          <h3>Payment modes</h3>
+          <div class="payment-icons">
+            <img src="./assets/image/cash_app.png" alt="Cash App" />
+            <img src="./assets/image/zelle.png" alt="Zelle" />
+            <img src="./assets/image/venmo.png" alt="Venmo" />
+            <!-- <img src="./assets/image/apple_pay.png" alt="Apple Pay">
+          <img src="./assets/image/Gpay.png" alt="Google Pay"> -->
+            <img src="./assets/image/pay_pal.jpg" alt="Paypal" />
+            <!-- <img src="./assets/image/wire_transfer.png" alt="Wire Transfer"> -->
+            <img src="./assets/image/bitcoin.png" alt="Bitcoin" />
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Google Sheets API Integration for Products -->
+    <script>
+      const sheetID = "1XVbrA6eUv85eOoJO6mziJ35LI8x2copV_ka7qil2ycU"; // Your Sheet ID
+      const apiKey = "AIzaSyD7mumdGgofUc1DE_bgaYJtOKK4i421iA8"; // Your API Key
 
       const range2 = "Sheet1!AC5:AJ";
       const range = "Sheet1!A5:V";
-
+      buildProductSearch();
       const url2 = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range2}?key=${apiKey}`;
       const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
 
@@ -528,17 +430,17 @@
       function showSkeletonLoaders() {
         for (let i = 0; i < 6; i++) {
           const skeletonHTML = `
-      <div class="product-card skeleton">
-        <div class="right_side">
-          <div class="image-placeholder"></div>
-          <div class="text-placeholder"></div>
-        </div>
-        <div class="left_side">
-          <button class="button-placeholder"></button>
-          <button class="button-placeholder"></button>
-        </div>
-      </div>
-    `;
+          <div class="product-card skeleton">
+            <div class="right_side">
+              <div class="image-placeholder"></div>
+              <div class="text-placeholder"></div>
+            </div>
+            <div class="left_side">
+              <button class="button-placeholder"></button>
+              <button class="button-placeholder"></button>
+            </div>
+          </div>
+        `;
           tableBody.innerHTML += skeletonHTML;
         }
       }
@@ -592,210 +494,97 @@
           const price = priceMap[productID] || "Price not available";
 
           const rowHTML = `
-      <div class="product-card">
-        <div class="right_side">
-          <div>
-            <img
-              src="${row[15] || ""}"
-              alt="Product Image"
-            />
+          <div class="product-card">
+            <div class="right_side">
+              <div>
+                <img
+                  src="${row[15] || ""}"
+                  alt="Product Image"
+                />
+              </div>
+              <div>
+                <p>${row[2] || "No Description"}</p>
+                <span>${price}</span>
+              </div>
+            </div>
+            <div class="left_side">
+              <button><a href="./product_overview.html?product_ID=${productID}">Buy</a></button>
+              <button>Add to Cart</button>
+            </div>
           </div>
-          <div>
-            <p>${row[2] || "No Description"}</p>
-            <span>${price}</span>
-          </div>
-        </div>
-        <div class="left_side">
-          <button><a href="./product_overview.html?product_ID=${productID}">Buy</a></button>
-          <button>Add to Cart</button>
-        </div>
-      </div>
-    `;
+        `;
           batchHTML += rowHTML;
         });
 
         tableBody.innerHTML += batchHTML; // Append the batch to the DOM
       }
 
-      // Call fetchData
+      // Call fetchData to load products
       fetchData();
     </script>
-    <!-- Most Popular Products -->
-    <section id="popular-products" class="product-section">
-      <h2>Most Popular Products</h2>
-      <div class="product-grid">
-        <div class="product-card">
-          <img src="./assets/product4.png" alt="Product 4" />
-          <p>Product Name 4</p>
-          <span>$45.99</span>
-        </div>
-        <div class="product-card">
-          <img src="./assets/product5.png" alt="Product 5" />
-          <p>Product Name 5</p>
-          <span>$29.49</span>
-        </div>
-        <div class="product-card">
-          <img src="./assets/product6.png" alt="Product 6" />
-          <p>Product Name 6</p>
-          <span>$39.99</span>
-        </div>
-      </div>
-    </section>
 
-    <footer class="footer">
-      <div class="footer-content">
-        <div class="footer-section resources">
-          <h3>Resources</h3>
-          <ul>
-            <li><a href="#">Shipping</a></li>
-            <li><a href="#">Returns & Refunds</a></li>
-            <li><a href="#">Payment Methods</a></li>
-            <li><a href="#">FAQs</a></li>
-          </ul>
-        </div>
-        <div class="footer-section legal">
-          <h3>Legal</h3>
-          <ul>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Contact Us</a></li>
-            <li><a href="#">Terms & Conditions</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Cancellation Policy</a></li>
-          </ul>
-        </div>
-        <div class="footer-section support">
-          <h3>Support 24/7</h3>
-          <p><i class="fa fa-envelope"></i> support@mclandpharma.com</p>
-          <p><i class="fa fa-phone"></i> +1 315 666 5976</p>
-        </div>
-        <div class="footer-section disclaimer">
-          <h3>Disclaimer</h3>
-          <p>
-            The services on Mcland Pharma are available for millions of people
-            solely presented for informative, qualitative, quantitative, and
-            affordable medicinal purposes. Here we believe The Doctor’s advice =
-            The Best Advice for medicinal needs by following protocol
-            accordingly by people suffering from different conditions.
-          </p>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <div class="footer-left">
-          <p class="copyright">
-            &copy; 2024 Mcland Pharma. All rights reserved.
-          </p>
-          <p>© 2024 All rights reserved. Mcland Pharma</p>
-          <p>
-            Mcland Pharma has been working on a change towards healthcare and
-            improving health. We are on a mission Encouraging Healthcare –
-            Improving Health since 2013. We have covered the finest medicines
-            for the mission towards cure with a few simple steps at
-            budget-friendly prices.
-          </p>
-        </div>
-        <div class="footer-right">
-          <h3>Payment modes</h3>
-          <div class="payment-icons">
-            <img src="./assets/image/cash_app.png" alt="Cash App" />
-            <img src="./assets/image/zelle.png" alt="Zelle" />
-            <img src="./assets/image/venmo.png" alt="Venmo" />
-            <!-- <img src="./assets/image/apple_pay.png" alt="Apple Pay">
-          <img src="./assets/image/Gpay.png" alt="Google Pay"> -->
-            <img src="./assets/image/pay_pal.jpg" alt="Paypal" />
-            <!-- <img src="./assets/image/wire_transfer.png" alt="Wire Transfer"> -->
-            <img src="./assets/image/bitcoin.png" alt="Bitcoin" />
-          </div>
-        </div>
-      </div>
-    </footer>
-
+    <!-- Search Functionality -->
     <script>
-      // Auto-Slide Functionality
-      let currentSlideIndex = 0;
+      async function fetchProductDetails() {
+        try {
+          const [productDataResponse] = await Promise.all([
+            fetch(
+              `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/Sheet1!A5:V?key=${apiKey}`
+            ),
+          ]);
+          const productData = await productDataResponse.json();
+          if (!productData.values) {
+            throw new Error("No data found in the spreadsheet.");
+          }
+          console.log(productData);
 
-      function showSlide(index) {
-        const slides = document.querySelectorAll(".slide");
-        const dots = document.querySelectorAll(".dot");
-        if (index >= slides.length) currentSlideIndex = 0;
-        if (index < 0) currentSlideIndex = slides.length - 1;
-
-        slides.forEach((slide) => (slide.style.display = "none"));
-        dots.forEach((dot) => dot.classList.remove("active"));
-
-        slides[currentSlideIndex].style.display = "block";
-        dots[currentSlideIndex].classList.add("active");
+          buildProductSearch();
+        } catch (error) {
+          console.error("Error fetching product details:", error);
+          showError("Failed to load product details. Please try again later.");
+        }
       }
 
-      function changeSlide(n) {
-        showSlide((currentSlideIndex += n));
+      // Function to build the product search index
+      async function buildProductSearch() {
+        try {
+          const response = await fetch(`/products`);
+          const products = await response.json();
+          // console.log("prosuct is",products);
+          const searchList = document.getElementById("search_list");
+          searchList.innerHTML = "";
+          const fragment = document.createDocumentFragment();
+          products.forEach((product) => {
+            const option = document.createElement("option");
+            option.value = product.product_name || "Product Name";
+            option.textContent = product.product_name || "Product Name";
+            fragment.appendChild(option);
+          });
+          searchList.appendChild(fragment);
+
+          const searchButton = document.getElementById("search-button");
+          const searchInput = document.getElementById("search-input");
+          searchButton.addEventListener("click", () => {
+            const query = searchInput.value.trim();
+            const matchingProduct = products.find(
+              (product) => product.product_name === query
+            );
+            if (matchingProduct) {
+              window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
+            } else {
+              alert("No matching product found.");
+            }
+          });
+        } catch (error) {
+          console.error("eror is", error);
+        }
       }
 
-      function setCurrentSlide(n) {
-        currentSlideIndex = n - 1;
-        showSlide(currentSlideIndex);
-      }
-
-      function autoSlide() {
-        changeSlide(1);
-        setTimeout(autoSlide, 3000); // Auto-slide every 3 seconds
-      }
-
-      document.addEventListener("DOMContentLoaded", function () {
-        showSlide(currentSlideIndex);
-        autoSlide();
-      });
+      fetchProductDetails();
     </script>
 
+    <!-- Popup Script -->
     <script>
-      document.querySelectorAll(".navbar-bottom li").forEach((item) => {
-        item.addEventListener("click", function (e) {
-          const dropdown = this.querySelector(".dropdown");
-          if (dropdown) {
-            e.stopPropagation(); // Prevents clicks from propagating to other elements
-            dropdown.style.display =
-              dropdown.style.display === "block" ? "none" : "block";
-          }
-        });
-
-        item.addEventListener("mouseover", function () {
-          const dropdown = this.querySelector(".dropdown");
-          if (dropdown) {
-            dropdown.style.display = "block";
-          }
-        });
-
-        item.addEventListener("mouseout", function () {
-          const dropdown = this.querySelector(".dropdown");
-          if (dropdown) {
-            dropdown.style.display = "none";
-          }
-        });
-      });
-
-      // Close dropdowns when clicking outside
-      document.addEventListener("click", () => {
-        document.querySelectorAll(".dropdown").forEach((dropdown) => {
-          dropdown.style.display = "none";
-        });
-      });
-    </script>
-    <script>
-      // // Function to show the popup
-      // function showPopup() {
-      //   const popup = document.getElementById("popup");
-      //   popup.classList.add("visible");
-      // }
-
-      // // Function to close the popup
-      // function closePopup() {
-      //   const popup = document.getElementById("popup");
-      //   popup.classList.remove("visible");
-      // }
-
-      // // Automatically show the popup after 3 seconds (optional)
-      // window.onload = function () {
-      //   setTimeout(showPopup, 1000); // Popup will appear after 3 seconds
-      // };
       // Function to show the popup
       function showPopup() {
         const popup = document.getElementById("popup");
@@ -821,69 +610,24 @@
         if (!lastPopupTime || now - lastPopupTime > fifteenMinutes) {
           setTimeout(showPopup, 1000); // Popup will appear after 1 second
         }
+
+        // Initialize sidebar functionality
+        const hamburgerMenu = document.getElementById("hamburger-menu");
+        const sidebar = document.getElementById("sidebar");
+        const closeSidebar = document.getElementById("close-sidebar");
+
+        hamburgerMenu.addEventListener("click", function () {
+          sidebar.style.width = "250px";
+          sidebar.style.display = "block";
+        });
+
+        closeSidebar.addEventListener("click", function () {
+          sidebar.style.width = "0";
+          setTimeout(function () {
+            sidebar.style.display = "none";
+          }, 300);
+        });
       };
     </script>
-    <script>
-      async function fetchProductDetails() {
-        try {
-          const [productDataResponse] = await Promise.all([
-            fetch(
-              `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/Sheet1!A5:V?key=${apiKey}`
-            ),
-          ]);
-          const productData = await productDataResponse.json();
-          if (!productData.values) {
-            throw new Error("No data found in the spreadsheet.");
-          }
-          console.log(productData);
-
-          buildProductSearch(productData.values);
-          
-        } catch (error) {
-          console.error("Error fetching product details:", error);
-          showError("Failed to load product details. Please try again later.");
-        }
-      }
-
-      // Function to build the product search index
-      function buildProductSearch(products) {
-        const searchList = document.getElementById("search_list");
-        searchList.innerHTML = "";
-
-        // Create a document fragment for better performance
-        const fragment = document.createDocumentFragment();
-
-        // Build search options
-        products.forEach((product) => {
-          const option = document.createElement("option");
-          option.value = product[2] || "Product Name";
-          option.textContent = product[2] || "Product Name";
-          fragment.appendChild(option);
-        });
-
-        // Add all options at once
-        searchList.appendChild(fragment);
-
-        // Set up search functionality
-        const searchButton = document.getElementById("search-button");
-        const searchInput = document.getElementById("search-input");
-
-        searchButton.addEventListener("click", () => {
-          const query = searchInput.value.trim();
-          const matchingProduct = products.find(
-            (product) => product[2] === query
-          );
-
-          if (matchingProduct) {
-            window.location.href = `./product_overview.html?product_ID=${matchingProduct[0]}`;
-          } else {
-            alert("No matching product found.");
-          }
-        });
-      }
-      fetchProductDetails();
-    </script>
-    <script src="./assets/js/index.js"></script>
-    <!-- <script src="./assets/js/script.js"></script> -->
   </body>
 </html>

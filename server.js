@@ -266,7 +266,7 @@ app.get('/api/product', async (req, res) => {
       `SELECT * FROM product_variants WHERE product_id = $1`,
       [product_ID]
     );
-    console.log(prodRes.rows);
+    
     // 3) return both
     res.json({
       product:  prodRes.rows[0],
@@ -294,7 +294,9 @@ app.get("/products", async (req, res) => {
     }
 
     const result = await pool.query(query, params);
+    
     res.json(result.rows);
+
   } catch (error) {
     console.error("Error fetching products:", error);
     res.status(500).json({ error: "Internal server error" });
