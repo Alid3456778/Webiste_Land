@@ -244,6 +244,43 @@ app.post("/api/checkout", async (req, res) => {
   }
 });
 
+
+// Endpoint to get invoice data by order ID
+app.get('/api/invoice/:orderId', async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    // Fetch order details
+    const orderResult = await pool.query(
+      `SELECT o.order_id, o.order_date, o.total, u.first_name, u.last_name, 
+              u.email, u.phone, u.billing_address, u.billing_city, u.billing_state, 
+              u.billing_zip, u.shipping_address, u.shipping_city, u.shipping_state, 
+              u.shipping_zip 
+       FROM orders o
+       JOIN users u ON o.user_id = u.user_id
+       WHERE o.order_id = $1`,
+      [orderId]
+    );
+
+    const order = orderResult.rows[0];
+
+    // Fetch order items
+    const itemsResult = await pool.query(
+      `SELECT product_name, price 
+       FROM order_items 
+       WHERE order_id = $1`,
+      [orderId]
+    );
+
+    const items = itemsResult.rows;
+
+    res.json({ order, items });
+  } catch (err) {
+    console.error('Error fetching invoice data:', err);
+    res.status(500).json({ error: 'Failed to fetch invoice data' });
+  }
+});
+
 // assume you already have `const pool = new Pool({...})`
 
 // in server.js, after your other routes:

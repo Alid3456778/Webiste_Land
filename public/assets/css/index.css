@@ -34,6 +34,12 @@ body { font-family: var(--font); color: var(--gray-700); }
 .header__right { display:flex; align-items:center; gap:1rem; }
 
 /* ———————— Nav with Dropdowns ———————— */
+.cart-icon{
+  width: 25px;
+  height: 25px;
+  
+}
+
 
 .header__nav {
   display: flex;

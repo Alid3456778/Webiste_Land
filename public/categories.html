@@ -65,101 +65,109 @@
     </div>
 
     <section id="product-grid">
-       <script>
+      <script>
         document.addEventListener("DOMContentLoaded", () => {
-  // Fetch data based on category from the PostgreSQL database
-  async function loadProductData(categoryID) {
-    const loadingMessage = document.getElementById("loading-message");
-    if (loadingMessage) {
-      loadingMessage.innerText = "LOADING PRODUCTS...";
-    }
+          // Fetch data based on category from the PostgreSQL database
+          async function loadProductData(categoryID) {
+            const loadingMessage = document.getElementById("loading-message");
+            if (loadingMessage) {
+              loadingMessage.innerText = "LOADING PRODUCTS...";
+            }
 
-    const tableBody = document.getElementById("product-grid");
-    try {
-      const response = await fetch(`/products?categoryID=${categoryID}`);
-      const products = await response.json();
+            const tableBody = document.getElementById("product-grid");
+            try {
+              const response = await fetch(
+                `/products?categoryID=${categoryID}`
+              );
+              const products = await response.json();
 
-      const pricesResponse = await fetch("/product-prices");
-      const prices = await pricesResponse.json();
-      
-      if (products.length === 0) {
-        tableBody.innerHTML = `<p>No products found for the selected category.</p>`;
-        if (loadingMessage) {
-          loadingMessage.style.display = "none";
-        }
-        return;
-      }
+              const pricesResponse = await fetch("/product-prices");
+              const prices = await pricesResponse.json();
 
-      tableBody.innerHTML = ""; // Clear the previous data
-      displayBatch(products, prices, 0, products.length, tableBody);
-      if (loadingMessage) {
-        loadingMessage.style.display = "none";
-      }
-    } catch (error) {
-      console.error("Error loading product data:", error);
-      if (loadingMessage) {
-        loadingMessage.innerText = "Error loading products. Please try again.";
-      }
-    }
-  }
+              if (products.length === 0) {
+                tableBody.innerHTML = `<p>No products found for the selected category.</p>`;
+                if (loadingMessage) {
+                  loadingMessage.style.display = "none";
+                }
+                return;
+              }
 
-  // Display a batch of rows
-  function displayBatch(products, prices, start, end, tableBody) {
-    const batch = products.slice(start, end);
-   
-    batch.forEach((product) => {
-      const productID = product.id;
-      const priceObj = prices.find((price) => price.product_id === productID);
-      const price = priceObj ? price.price : "Price not available";
+              tableBody.innerHTML = ""; // Clear the previous data
+              displayBatch(products, prices, 0, products.length, tableBody);
+              if (loadingMessage) {
+                loadingMessage.style.display = "none";
+              }
+            } catch (error) {
+              console.error("Error loading product data:", error);
+              if (loadingMessage) {
+                loadingMessage.innerText =
+                  "Error loading products. Please try again.";
+              }
+            }
+          }
 
-      const rowHTML = `
-        <div class="product-card medicine-card ${product.category_id || "all"}" data-product-id="${productID}">
-          <img src="${product.primary_img || ""}" alt="Product Image" />
+          // Display a batch of rows
+          function displayBatch(products, prices, start, end, tableBody) {
+            const batch = products.slice(start, end);
+
+            batch.forEach((product) => {
+              const productID = product.id;
+              const priceObj = prices.find(
+                (price) => price.product_id === productID
+              );
+              const price = priceObj ? price.price : "Price not available";
+
+              const rowHTML = `
+        <div class="product-card medicine-card ${
+          product.category_id || "all"
+        }" data-product-id="${productID}">
+          <img src="${
+            product.primary_img || ""
+          }" alt="Product Image" loading="lazy"
+  onload="this.style.opacity='1'" />
           <div class="product-details">
             <h3>${product.product_name || "No Description"}</h3>
             <p id="pric">(${product.trade_names})</p>
             <div class="product-buttons">
               <button class="buy-btn">
-                <a href="./product_overview.html?product_ID=${product.product_id}">Buy</a>
+                <a href="./product_overview.html?product_ID=${
+                  product.product_id
+                }">Buy</a>
               </button>
             </div>
           </div>
         </div>
       `;
-      tableBody.innerHTML += rowHTML;
-    });
-  }
+              tableBody.innerHTML += rowHTML;
+            });
+          }
 
-  // Function to handle category filtering
-      // Function to handle category filtering
-      function filterCategory() {
-      const selectedCategory = document.getElementById("categories").value;
-      loadProductData(selectedCategory);
-    }
+          // Function to handle category filtering
+          // Function to handle category filtering
+          function filterCategory() {
+            const selectedCategory =
+              document.getElementById("categories").value;
+            loadProductData(selectedCategory);
+          }
 
-    // Load data on initial page load
-    const urlParams = new URLSearchParams(window.location.search);
-    const initialCategoryID = urlParams.get("catogeries_ID") || "all";
-    document.getElementById("categories").value = initialCategoryID;
-    loadProductData(initialCategoryID);
-});
-
-      </script> 
+          // Load data on initial page load
+          const urlParams = new URLSearchParams(window.location.search);
+          const initialCategoryID = urlParams.get("catogeries_ID") || "all";
+          document.getElementById("categories").value = initialCategoryID;
+          loadProductData(initialCategoryID);
+        });
+      </script>
       <script>
         // Fetch data based on category from URL
-        
-    
+
         // Display a batch of rows
-        
-    
+
         // Function to handle category filtering
-        
       </script>
-    
-     
+
       <div id="loading-message" class="loading-message">LOADING...</div>
     </section>
-    
+
     <!-- <script>
       // Define the addToCart function to send data to the backend
       async function addToCart(productId , quantity) {
@@ -238,8 +246,8 @@
             The services on Mcland Pharma are available for millions of people
             solely presented for informative, qualitative, quantitative, and
             affordable medicinal purposes. Here we believe The Doctor’s advice =
-            The Best Advice for medicinal needs by following protocol accordingly
-            by people suffering from different conditions.
+            The Best Advice for medicinal needs by following protocol
+            accordingly by people suffering from different conditions.
           </p>
         </div>
       </div>
@@ -251,8 +259,8 @@
           <p>© 2024 All rights reserved. Mcland Pharma</p>
           <p>
             Mcland Pharma has been working on a change towards healthcare and
-            improving health. We are on a mission Encouraging Healthcare – Improving
-            Health since 2013.
+            improving health. We are on a mission Encouraging Healthcare –
+            Improving Health since 2013.
           </p>
         </div>
         <div class="footer-right">

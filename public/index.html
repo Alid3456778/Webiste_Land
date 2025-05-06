@@ -332,7 +332,7 @@
     </section>
 
     <!-- TRUST BADGES -->
-    <section class="trust-alt">
+    <!-- <section class="trust-alt">
       <div class="trust__item">
         <img src="images.jpeg" alt="Secure Payment" />
         <p>Secure Payment</p>
@@ -345,7 +345,7 @@
         <img src="gol.jpg" alt="Data Privacy" />
         <p>Data Privacy</p>
       </div>
-    </section>
+    </section> -->
 
     <footer class="footer">
       <div class="footer-content">
@@ -413,162 +413,70 @@
         </div>
       </div>
     </footer>
-
-    <!-- Google Sheets API Integration for Products -->
-    <script>
-      const sheetID = "1XVbrA6eUv85eOoJO6mziJ35LI8x2copV_ka7qil2ycU"; // Your Sheet ID
-      const apiKey = "AIzaSyD7mumdGgofUc1DE_bgaYJtOKK4i421iA8"; // Your API Key
-
-      const range2 = "Sheet1!AC5:AJ";
-      const range = "Sheet1!A5:V";
-      buildProductSearch();
-      const url2 = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range2}?key=${apiKey}`;
-      const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
-
-      const tableBody = document.getElementById("product-grids");
-
-      function showSkeletonLoaders() {
-        for (let i = 0; i < 6; i++) {
-          const skeletonHTML = `
-          <div class="product-card skeleton">
-            <div class="right_side">
-              <div class="image-placeholder"></div>
-              <div class="text-placeholder"></div>
-            </div>
-            <div class="left_side">
-              <button class="button-placeholder"></button>
-              <button class="button-placeholder"></button>
-            </div>
-          </div>
-        `;
-          tableBody.innerHTML += skeletonHTML;
-        }
-      }
-
-      async function fetchData() {
-        showSkeletonLoaders(); // Display skeleton loaders
-
-        try {
-          // Fetch data in parallel
-          const [response, response2] = await Promise.all([
-            fetch(url),
-            fetch(url2),
-          ]);
-          const [data, data2] = await Promise.all([
-            response.json(),
-            response2.json(),
-          ]);
-
-          if (!data.values || !data2.values) {
-            throw new Error("No data found in the specified range.");
-          }
-
-          const rows = data.values;
-          const row2 = data2.values;
-
-          // Map row2 for faster lookup
-          const priceMap = row2.reduce((map, row) => {
-            map[row[1]] = row[6]; // Assuming row[1] is productID and row[6] is price
-            return map;
-          }, {});
-
-          // Remove skeleton loaders
-          tableBody.innerHTML = "";
-
-          // Batch rendering for better UI responsiveness
-          const BATCH_SIZE = 10;
-          for (let i = 0; i < rows.length; i += BATCH_SIZE) {
-            const batch = rows.slice(i, i + BATCH_SIZE);
-            renderBatch(batch, priceMap);
-            await new Promise((resolve) => setTimeout(resolve, 0)); // Yield to the UI thread
-          }
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      }
-
-      function renderBatch(batch, priceMap) {
-        let batchHTML = "";
-        batch.forEach((row) => {
-          const productID = row[0];
-          const price = priceMap[productID] || "Price not available";
-
-          const rowHTML = `
-          <div class="product-card">
-            <div class="right_side">
-              <div>
-                <img
-                  src="${row[15] || ""}"
-                  alt="Product Image"
-                />
-              </div>
-              <div>
-                <p>${row[2] || "No Description"}</p>
-                <span>${price}</span>
-              </div>
-            </div>
-            <div class="left_side">
-              <button><a href="./product_overview.html?product_ID=${productID}">Buy</a></button>
-              <button>Add to Cart</button>
-            </div>
-          </div>
-        `;
-          batchHTML += rowHTML;
-        });
-
-        tableBody.innerHTML += batchHTML; // Append the batch to the DOM
-      }
-
-      // Call fetchData to load products
-      fetchData();
-    </script>
-
     <!-- Search Functionality -->
     <script>
-      async function fetchProductDetails() {
-        try {
-          const [productDataResponse] = await Promise.all([
-            fetch(
-              `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/Sheet1!A5:V?key=${apiKey}`
-            ),
-          ]);
-          const productData = await productDataResponse.json();
-          if (!productData.values) {
-            throw new Error("No data found in the spreadsheet.");
-          }
-          console.log(productData);
-
-          buildProductSearch();
-        } catch (error) {
-          console.error("Error fetching product details:", error);
-          showError("Failed to load product details. Please try again later.");
-        }
-      }
 
       // Function to build the product search index
+      // async function buildProductSearch() {
+      //   try {
+      //     const response = await fetch(`/products`);
+      //     const products = await response.json();
+      //     // console.log("prosuct is",products);
+      //     const searchList = document.getElementById("search_list");
+      //     searchList.innerHTML = "";
+      //     const fragment = document.createDocumentFragment();
+      //     products.forEach((product) => {
+      //       const option = document.createElement("option");
+      //       option.value = product.product_name || "Product Name";
+      //       option.textContent = product.product_name || "Product Name";
+      //       fragment.appendChild(option);
+      //     });
+      //     searchList.appendChild(fragment);
+
+      //     const searchButton = document.getElementById("search-button");
+      //     const searchInput = document.getElementById("search-input");
+      //     searchButton.addEventListener("click", () => {
+      //       const query = searchInput.value.trim();
+      //       const matchingProduct = products.find(
+      //         (product) => product.product_name === query
+      //       );
+      //       if (matchingProduct) {
+      //         window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
+      //       } else {
+      //         alert("No matching product found.");
+      //       }
+      //     });
+      //   } catch (error) {
+      //     console.error("eror is", error);
+      //   }
+      // }
       async function buildProductSearch() {
         try {
           const response = await fetch(`/products`);
           const products = await response.json();
-          // console.log("prosuct is",products);
+          
           const searchList = document.getElementById("search_list");
           searchList.innerHTML = "";
           const fragment = document.createDocumentFragment();
+          
           products.forEach((product) => {
             const option = document.createElement("option");
             option.value = product.product_name || "Product Name";
             option.textContent = product.product_name || "Product Name";
             fragment.appendChild(option);
           });
+          
           searchList.appendChild(fragment);
-
+          
           const searchButton = document.getElementById("search-button");
           const searchInput = document.getElementById("search-input");
+          
           searchButton.addEventListener("click", () => {
             const query = searchInput.value.trim();
             const matchingProduct = products.find(
               (product) => product.product_name === query
             );
+            
             if (matchingProduct) {
               window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
             } else {
@@ -576,15 +484,14 @@
             }
           });
         } catch (error) {
-          console.error("eror is", error);
+          console.error("Error is", error);
         }
       }
-
-      fetchProductDetails();
+      buildProductSearch();
     </script>
 
     <!-- Popup Script -->
-    <script>
+    <!-- <script>
       // Function to show the popup
       function showPopup() {
         const popup = document.getElementById("popup");
@@ -628,6 +535,6 @@
           }, 300);
         });
       };
-    </script>
+    </script> -->
   </body>
 </html>

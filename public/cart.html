@@ -113,10 +113,6 @@
 
   <script>
     // Google Sheet configuration
-    const sheetID = "1XVbrA6eUv85eOoJO6mziJ35LI8x2copV_ka7qil2ycU";
-    const apiKey = "AIzaSyD7mumdGgofUc1DE_bgaYJtOKK4i421iA8";
-    const productSheetUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/Sheet1!A5:V?key=${apiKey}`;
-
     // Fetch cart items from backend and update the DOM
     async function loadCartItems() {
       try {
@@ -134,8 +130,9 @@
         }
 
         // Fetch product details from Google Sheet for name and image mapping
-        const productResponse = await fetch(productSheetUrl);
+        const productResponse = await fetch("/products");
         const productSheetData = await productResponse.json();
+        // console.log(productSheetData);
         if (!productSheetData.values) {
           throw new Error("Failed to fetch product data from sheet.");
         }
@@ -143,14 +140,17 @@
         // Build mappings: productID -> primary image and product name  
         // Assumption:
         // row[0] = productID, row[2] = product name, row[15] = primary image URL
-        const productImageMap = {};
-        const productNameMap = {};
-        productSheetData.values.forEach(row => {
-          productImageMap[row[0]] = row[15] || "./assets/image/placeholder.png";
-          productNameMap[row[0]] = row[2] || "Unnamed Product";
+        const productImageMap = [];
+        const productNameMap = [];
+        productSheetData.forEach(row => {
+          // productImageMap[] = row.primary_img || "./assets/image/placeholder.png";
+          // productNameMap[row[0]] = row.product_name || "Unnamed Product";
+          productNameMap.push(row.product_name || "Unnamed Product");
+          productImageMap.push(row.primary_img || "./assets/image/placeholder.png");
           // Debugging: Log the URL if needed
           // console.log(`Product ${row[0]}: Name ${productNameMap[row[0]]} - Image ${productImageMap[row[0]]}`);
         });
+        
 
         const cartContainer = document.getElementById("cart-items");
         cartContainer.innerHTML = ""; // Clear previous items
