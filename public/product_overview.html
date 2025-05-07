@@ -65,7 +65,120 @@
           <span data-value="5">★</span>
           <small class="rating__count">(24 reviews)</small>
         </div>
-  
+<!--   
+        <script>
+          const ratingContainer = document.getElementById("rating");
+          const stars = ratingContainer.querySelectorAll("span[data-value]");
+          let selectedRating = 0;
+        
+          stars.forEach((star) => {
+            const val = parseInt(star.getAttribute("data-value"));
+        
+            // Hover effect
+            star.addEventListener("mouseenter", () => {
+              highlightStars(val);
+            });
+        
+            // Remove hover on mouse leave
+            star.addEventListener("mouseleave", () => {
+              highlightStars(selectedRating);
+            });
+        
+            // Click to set rating
+            star.addEventListener("click", () => {
+              selectedRating = val;
+              highlightStars(selectedRating);
+              console.log("Selected Rating:", selectedRating); // You can send this to backend
+            });
+          });
+        
+          function highlightStars(rating) {
+            stars.forEach((star) => {
+              const val = parseInt(star.getAttribute("data-value"));
+              star.classList.toggle("selected", val <= rating);
+            });
+          }
+      </script> -->
+      <!-- <script>
+        const ratingContainer = document.getElementById("rating");
+        const stars = ratingContainer.querySelectorAll("span[data-value]");
+        let selectedRating = 0;
+      
+        stars.forEach((star) => {
+          const val = parseInt(star.getAttribute("data-value"));
+      
+          star.addEventListener("mouseenter", () => highlightStars(val));
+          star.addEventListener("mouseleave", () => highlightStars(selectedRating));
+          star.addEventListener("click", () => {
+            selectedRating = val;
+            highlightStars(selectedRating);
+            console.log("Selected Rating:", selectedRating);
+            sendRatingToBackend(selectedRating);
+          });
+        });
+      
+        function highlightStars(rating) {
+          stars.forEach((star) => {
+            const val = parseInt(star.getAttribute("data-value"));
+            star.classList.toggle("selected", val <= rating);
+          });
+        }
+      
+        function sendRatingToBackend(rating) {
+          fetch("http://localhost:3000/api/rating", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ rating: rating }),
+          })
+          .then(response => response.json())
+          .then(data => console.log("Server response:", data))
+          .catch(error => console.error("Error sending rating:", error));
+        }
+      </script> -->
+      <script>
+        const ratingContainer = document.getElementById("rating");
+        const stars = ratingContainer.querySelectorAll("span[data-value]");
+        let selectedRating = 0;
+      
+        // Replace with actual product ID from your page context
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get("product_ID");
+        // console.log("product_id",productId)
+      
+        stars.forEach((star) => {
+          const val = parseInt(star.getAttribute("data-value"));
+      
+          star.addEventListener("mouseenter", () => highlightStars(val));
+          star.addEventListener("mouseleave", () => highlightStars(selectedRating));
+          star.addEventListener("click", () => {
+            selectedRating = val;
+            highlightStars(selectedRating);
+            sendRatingToBackend(selectedRating, productId);
+          });
+        });
+      
+        function highlightStars(rating) {
+          stars.forEach((star) => {
+            const val = parseInt(star.getAttribute("data-value"));
+            star.classList.toggle("selected", val <= rating);
+          });
+        }
+      
+        function sendRatingToBackend(rating, productId) {
+          fetch("http://localhost:3000/api/rating", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ rating: rating, product_id: productId }),
+          })
+          .then(response => response.json())
+          .then(data => console.log("Server response:", data))
+          .catch(error => console.error("Error sending rating:", error));
+        }
+      </script>
+      
+
+        
+        
         <!-- Strength Selector -->
         <div class="selector">
           <label class="selector__label">MG</label>
@@ -78,7 +191,7 @@
         <div class="tabs-wrapper">
           <div class="tabs">
             <button class="tabs__btn tabs__btn--active" data-tab="desc">Description</button>
-            <button class="tabs__btn" data-tab="benefits">Benefits</button>
+            <button class="tabs__btn" data-tab="benefits">Symptoms</button>
             <button class="tabs__btn" data-tab="details">Product Details</button>
             <button class="tabs__btn" data-tab="usage">Usage</button>
             <button class="tabs__btn" data-tab="reviews">Reviews</button>
@@ -127,40 +240,131 @@
             </tbody>
           </table>
         </div>
-        <button class="btn btn--accent btn--custom" id="showButton">Custom Order</button>
-  
-        <!-- Custom Order Modal -->
-        <div class="overlay" id="overlay"></div>
-        <div id="toggleBox" class="custom-order-modal">
-          <h2>Select Custom MG and Quantity</h2>
-          <div class="selection-container">
-            <!-- MG Selection -->
-            <div class="select-group">
-              <label for="mg-select">Choose MG:</label>
-              <select id="mg-select">
-                <option value="1">1 MG</option>
-                <option value="2">2 MG</option>
-                <option value="3">3 MG</option>
-                <option value="4">4 MG</option>
-                <option value="5">5 MG</option>
-              </select>
-            </div>
-            <!-- Quantity Selection -->
-            <div class="select-group">
-              <label for="quantity-select">Choose Quantity:</label>
-              <input
-                type="text"
-                placeholder="Quantity"
-                class="quat-input"
-                id="quantity-select"
-              >
-            </div>
-          </div>
-          <!-- Submit Button -->
-          <div class="submit-container">
-            <button id="submit-selection">Submit</button>
-          </div>
-        </div>
+        <!-- Custom Order Button 
+<button class="btn btn--accent btn--custom" id="showButton">Custom Order</button>
+
+<!-- Overlay 
+<div class="overlay" id="overlay"></div>
+
+<!-- Custom Order Modal 
+<div id="toggleBox" class="custom-order-modal">
+  <h2>Select Custom MG and Quantity</h2>
+  <div class="selection-container">
+    <!-- MG Selection --
+    <div class="select-group">
+      <label for="mg-select">Choose MG:</label>
+      <select id="mg-select">
+        <option value="1">1 MG</option>
+        <option value="2">2 MG</option>
+        <option value="3">3 MG</option>
+        <option value="4">4 MG</option>
+        <option value="5">5 MG</option>
+      </select>
+    </div>
+
+    <!-- Quantity Selection --
+    <div class="select-group">
+      <label for="quantity-select">Choose Quantity:</label>
+      <input
+        type="text"
+        placeholder="Quantity"
+        class="quat-input"
+        id="quantity-select"
+      >
+    </div>
+  </div>
+
+  <!-- Submit Button --
+  <div class="submit-container">
+    <button id="submit-selection">Submit</button>
+  </div>
+</div>
+<script>
+  const showBtn = document.getElementById("showButton");
+  const modal = document.getElementById("toggleBox");
+  const overlay = document.getElementById("overlay");
+
+  // Show modal
+  showBtn.addEventListener("click", () => {
+    modal.classList.add("active");
+    overlay.classList.add("active");
+  });
+
+  // Hide modal when clicking outside
+  overlay.addEventListener("click", () => {
+    modal.classList.remove("active");
+    overlay.classList.remove("active");
+  });
+
+  // Optional: Close modal on ESC key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      modal.classList.remove("active");
+      overlay.classList.remove("active");
+    }
+  });
+</script> -->
+
+<!-- Custom Order Button -->
+<button class="btn btn--accent btn--custom" id="showButton">Custom Order</button>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay"></div>
+
+<!-- Custom Order Modal -->
+<div id="toggleBox" class="custom-order-modal">
+  <h2>Select Custom MG and Quantity</h2>
+  <div class="selection-container">
+    <!-- MG Selection -->
+    <div class="select-group">
+      <label for="mg-select">Choose MG:</label>
+      <select id="mg-select">
+        <option value="1">1 MG</option>
+        <option value="2">2 MG</option>
+        <option value="3">3 MG</option>
+        <option value="4">4 MG</option>
+        <option value="5">5 MG</option>
+      </select>
+    </div>
+
+    <!-- Quantity Selection -->
+    <div class="select-group">
+      <label for="quantity-select">Choose Quantity:</label>
+      <input type="number" placeholder="Quantity" class="quat-input" id="quantity-select" min="1">
+    </div>
+  </div>
+
+  <!-- Submit Button -->
+  <div class="submit-container">
+    <button id="submit-selection">Submit</button>
+  </div>
+</div>
+<script>
+  const showBtn = document.getElementById("showButton");
+const modal = document.getElementById("toggleBox");
+const overlay = document.getElementById("overlay");
+
+// Open modal
+showBtn.addEventListener("click", () => {
+  modal.classList.add("active");
+  overlay.classList.add("active");
+});
+
+// Close modal on outside click
+overlay.addEventListener("click", () => {
+  modal.classList.remove("active");
+  overlay.classList.remove("active");
+});
+
+// Close on Escape key
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    modal.classList.remove("active");
+    overlay.classList.remove("active");
+  }
+});
+
+</script>
   
         <!-- FAQ ACCORDION -->
         <div class="faq">
@@ -317,7 +521,7 @@
       // Update the UI with product details and variants
       function updateProductUI(product, variants) {
         name_dabba = product.product_name;
-        
+        // console.log(product);
         // Update product name
         document.getElementById("nameing_of_product").innerHTML = 
           `${product.product_name || "Product Name"} <span class="accent">Capsules</span>`;
@@ -336,9 +540,8 @@
         
         document.getElementById("benefits").innerHTML = `
           <ul class="tab-list">
-            <li>Trade Names: ${product.trade_names || "N/A"}</li>
-            <li>Manufactured By: ${product.manufactured_by || "N/A"}</li>
-            <li>Available in multiple strengths</li>
+            <li>Withdrawal Symptoms: ${product.withdrawal_symptoms|| "N/A"}</li>
+            <li>Warnings Precautions : ${product.warnings_precautions || "N/A"}</li>
           </ul>
         `;
         
@@ -360,53 +563,103 @@
           <p><strong>Recent Review:</strong> "This medication worked well for me!" - Recent Customer</p>
         `;
         
-        // Update detailed sections
-        document.getElementById("differ").innerHTML = `
-          <div class="rightside">
-            <div class="box">
-              <h3>Product Details</h3>
-              <ul>
-                <li><h4>Product Name</h4><p>${product.product_name || "Product Name"}</p></li>
-                <li><h4>Product Description</h4><p>${product.product_description || "Product Description"}</p></li>
-                <li><h4>Trade Names</h4><p>${product.trade_names || "Trade Name"}</p></li>
-                <li><h4>Ingredients</h4><p>${product.ingredients || "Product Ingredients"}</p></li>
-                <li><h4>Manufactured By</h4><p>${product.manufactured_by || "Product Manufacturer"}</p></li>
-                <li><h4>Drug Abuse</h4><p>${product.drug_abuse || "No information available"}</p></li>
-                <li><h4>Storage</h4><p>${product.storage || "No information available"}</p></li>
-              </ul>
-            </div>
-          </div>
-          <div class="leftside">
-            <div class="box">
-              <h3>Usage & Instructions</h3>
-              <ul>
-                <li><h4>Packaging Details</h4><p>${product.packaging_details || "No information available"}</p></li>
-                <li><h4>How to Use</h4><p>${product.how_to_use || "No information available"}</p></li>
-                <li><h4>Drug Interaction</h4><p>${product.drug_interaction || "No information available"}</p></li>
-                <li><h4>Side Effects</h4><p>${product.side_effects || "No information available"}</p></li>
-              </ul>
-            </div>
-          </div>
-        `;
+      //   // Update detailed sections
+      //   document.getElementById("differ").innerHTML = `
+      //     <div class="rightside">
+      //       <div class="box">
+      //         <h3>Product Details</h3>
+      //         <ul>
+      //           <li><h4>Product Name</h4><p>${product.product_name || "Product Name"}</p></li>
+      //           <li><h4>Product Description</h4><p>${product.product_description || "Product Description"}</p></li>
+      //           <li><h4>Trade Names</h4><p>${product.trade_names || "Trade Name"}</p></li>
+      //           <li><h4>Ingredients</h4><p>${product.ingredients || "Product Ingredients"}</p></li>
+      //           <li><h4>Manufactured By</h4><p>${product.manufactured_by || "Product Manufacturer"}</p></li>
+      //           <li><h4>Drug Abuse</h4><p>${product.drug_abuse || "No information available"}</p></li>
+      //           <li><h4>Storage</h4><p>${product.storage || "No information available"}</p></li>
+      //         </ul>
+      //       </div>
+      //     </div>
+      //     <div class="leftside">
+      //       <div class="box">
+      //         <h3>Usage & Instructions</h3>
+      //         <ul>
+      //           <li><h4>Packaging Details</h4><p>${product.packaging_details || "No information available"}</p></li>
+      //           <li><h4>How to Use</h4><p>${product.how_to_use || "No information available"}</p></li>
+      //           <li><h4>Drug Interaction</h4><p>${product.drug_interaction || "No information available"}</p></li>
+      //           <li><h4>Side Effects</h4><p>${product.side_effects || "No information available"}</p></li>
+      //         </ul>
+      //       </div>
+      //     </div>
+      //   `;
         
-        document.getElementById("three-box-section").innerHTML = `
-          <div class="box">
-            <h3>Product Details</h3>
-            <p>${product.packaging_details || "No information available"}</p>
-          </div>
-          <div class="box">
-            <h3>Withdrawal Symptoms</h3>
-            <p>${product.withdrawal_symptoms || "No information available"}</p>
-          </div>
-          <div class="box">
-            <h3>Safety Information:</h3>
-            <p>${product.warnings_precautions || "No information available"}</p>
-          </div>
-        `;
+      //   document.getElementById("three-box-section").innerHTML = `
+      //     <div class="box">
+      //       <h3>Product Details</h3>
+      //       <p>${product.packaging_details || "No information available"}</p>
+      //     </div>
+      //     <div class="box">
+      //       <h3>Withdrawal Symptoms</h3>
+      //       <p>${product.withdrawal_symptoms || "No information available"}</p>
+      //     </div>
+      //     <div class="box">
+      //       <h3>Safety Information:</h3>
+      //       <p>${product.warnings_precautions || "No information available"}</p>
+      //     </div>
+      //   `;
         
-        setupProductVariants(variants);
-      }
-      
+      //   setupProductVariants(variants);
+      // }
+      document.getElementById("differ").innerHTML = `
+  <div class="accordion-container">
+    ${generateAccordionItem("1. Product Details", `
+      <li><strong>Product Name:</strong> ${product.product_name || "N/A"}</li>
+      <li><strong>Description:</strong> ${product.product_description || "N/A"}</li>
+      <li><strong>Trade Names:</strong> ${product.trade_names || "N/A"}</li>
+      <li><strong>Ingredients:</strong> ${product.ingredients || "N/A"}</li>
+    `)}
+    ${generateAccordionItem("2. Manufactured By", `
+      <li>${product.manufactured_by || "No manufacturer info available"}</li>
+    `)}
+    ${generateAccordionItem("3. Drug Abuse", `
+      <li>${product.drug_abuse || "No drug abuse info available"}</li>
+    `)}
+    ${generateAccordionItem("4. Usage & Instructions", `
+      <li><strong>How to Use:</strong> ${product.how_to_use || "N/A"}</li>
+      <li><strong>Drug Interactions:</strong> ${product.drug_interaction || "N/A"}</li>
+      <li><strong>Storage:</strong> ${product.storage || "N/A"}</li>
+      <li><strong>Side Effects:</strong> ${product.side_effects || "N/A"}</li>
+      <li><strong>Withdrawal Symptoms:</strong> ${product.withdrawal_symptoms || "N/A"}</li>
+    `)}
+    ${generateAccordionItem("5. Packaging Details", `
+      <li>${product.packaging_details || "No packaging info available"}</li>
+    `)}
+    ${generateAccordionItem("6. Safety Information", `
+      <li>${product.warnings_precautions || "No safety info available"}</li>
+    `)}
+  </div>
+`;
+setupProductVariants(variants);
+
+function generateAccordionItem(title, content) {
+  return `
+    <div class="accordion-item">
+      <button class="accordion-header">${title}</button>
+      <div class="accordion-body">
+        <ul>${content}</ul>
+      </div>
+    </div>
+  `;
+}
+
+// Accordion toggle behavior
+document.addEventListener("click", function (e) {
+  if (e.target.classList.contains("accordion-header")) {
+    e.target.classList.toggle("active");
+    const body = e.target.nextElementSibling;
+    body.style.maxHeight = body.style.maxHeight ? null : body.scrollHeight + "px";
+  }
+});}
+
       // Set up variant buttons and table rows
       function setupProductVariants(variants) {
         const mgValues = [...new Set(variants.map((variant) => variant.unit_value))];
@@ -442,7 +695,7 @@
         const matchingVariants = variants.filter(
           (variant) => variant.unit_value === selectedMg
         );
-        
+        // console.log(variants);
         const fragment = document.createDocumentFragment();
         
         matchingVariants.forEach((variant) => {
