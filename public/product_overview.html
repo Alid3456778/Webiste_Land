@@ -528,7 +528,7 @@ document.addEventListener("keydown", (e) => {
         
         // Update carousel images
         document.getElementById("product_images_sinf").innerHTML = `
-          <img src="${product.primary_img || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
+          <img src="${product.image_url || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
           <img src="${product.primary_img || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
           <img src="${product.primary_img || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
         `;
@@ -563,52 +563,7 @@ document.addEventListener("keydown", (e) => {
           <p><strong>Recent Review:</strong> "This medication worked well for me!" - Recent Customer</p>
         `;
         
-      //   // Update detailed sections
-      //   document.getElementById("differ").innerHTML = `
-      //     <div class="rightside">
-      //       <div class="box">
-      //         <h3>Product Details</h3>
-      //         <ul>
-      //           <li><h4>Product Name</h4><p>${product.product_name || "Product Name"}</p></li>
-      //           <li><h4>Product Description</h4><p>${product.product_description || "Product Description"}</p></li>
-      //           <li><h4>Trade Names</h4><p>${product.trade_names || "Trade Name"}</p></li>
-      //           <li><h4>Ingredients</h4><p>${product.ingredients || "Product Ingredients"}</p></li>
-      //           <li><h4>Manufactured By</h4><p>${product.manufactured_by || "Product Manufacturer"}</p></li>
-      //           <li><h4>Drug Abuse</h4><p>${product.drug_abuse || "No information available"}</p></li>
-      //           <li><h4>Storage</h4><p>${product.storage || "No information available"}</p></li>
-      //         </ul>
-      //       </div>
-      //     </div>
-      //     <div class="leftside">
-      //       <div class="box">
-      //         <h3>Usage & Instructions</h3>
-      //         <ul>
-      //           <li><h4>Packaging Details</h4><p>${product.packaging_details || "No information available"}</p></li>
-      //           <li><h4>How to Use</h4><p>${product.how_to_use || "No information available"}</p></li>
-      //           <li><h4>Drug Interaction</h4><p>${product.drug_interaction || "No information available"}</p></li>
-      //           <li><h4>Side Effects</h4><p>${product.side_effects || "No information available"}</p></li>
-      //         </ul>
-      //       </div>
-      //     </div>
-      //   `;
-        
-      //   document.getElementById("three-box-section").innerHTML = `
-      //     <div class="box">
-      //       <h3>Product Details</h3>
-      //       <p>${product.packaging_details || "No information available"}</p>
-      //     </div>
-      //     <div class="box">
-      //       <h3>Withdrawal Symptoms</h3>
-      //       <p>${product.withdrawal_symptoms || "No information available"}</p>
-      //     </div>
-      //     <div class="box">
-      //       <h3>Safety Information:</h3>
-      //       <p>${product.warnings_precautions || "No information available"}</p>
-      //     </div>
-      //   `;
-        
-      //   setupProductVariants(variants);
-      // }
+      
       document.getElementById("differ").innerHTML = `
   <div class="accordion-container">
     ${generateAccordionItem("1. Product Details", `

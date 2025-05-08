@@ -122,7 +122,7 @@
           // Display a batch of rows
           function displayBatch(products, prices, start, end, tableBody) {
             const batch = products.slice(start, end);
-
+            // console.log(products);
             batch.forEach((product) => {
               const productID = product.id;
               const priceObj = prices.find(
@@ -135,7 +135,7 @@
           product.category_id || "all"
         }" data-product-id="${productID}">
           <img src="${
-            product.primary_img || ""
+            product.image_url || ""
           }" alt="Product Image" loading="lazy"
   onload="this.style.opacity='1'" />
           <div class="product-details">
