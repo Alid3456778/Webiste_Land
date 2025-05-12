@@ -146,7 +146,7 @@
           // productImageMap[] = row.primary_img || "./assets/image/placeholder.png";
           // productNameMap[row[0]] = row.product_name || "Unnamed Product";
           productNameMap.push(row.product_name || "Unnamed Product");
-          productImageMap.push(row.primary_img || "./assets/image/placeholder.png");
+          productImageMap.push(row.image_url || "./assets/image/placeholder.png");
           // Debugging: Log the URL if needed
           // console.log(`Product ${row[0]}: Name ${productNameMap[row[0]]} - Image ${productImageMap[row[0]]}`);
         });
@@ -165,10 +165,10 @@
       
           console.log("Price is ",price);
           subtotal = price + subtotal;
-
+          console.log("items",item);
           // Get product name and image from mapping
-          const productName = productNameMap[productID] || "Unnamed Product";
-          const productImg = productImageMap[productID];
+          const productName = item.name || "Unnamed Product";
+          const productImg = item.image_url;
 
           const cartItemDiv = document.createElement("div");
           cartItemDiv.classList.add("cart-item");
@@ -180,12 +180,8 @@
                 <button class="remove-btn" onclick="removeItem('${productID}')">Remove</button>
               </div>
               <div class="product-detail-2">
-                <p>${price}</span></p>
-                <div class="quantity-control">
-                  <button class="minus-btn" onclick="decreaseQuantity(this, '${productID}', ${price})">-</button>
-                  <input type="number" value="${quantity}" min="1" data-price="${price}">
-                  <button class="plus-btn" onclick="increaseQuantity(this, '${productID}', ${price})">+</button>
-                </div>
+                <p>Price : ${price}</span></p>
+                <p>Quantity : ${quantity}</p>
               </div>
             </div>
           `;
