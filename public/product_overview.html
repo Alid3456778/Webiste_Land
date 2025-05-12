@@ -521,7 +521,7 @@ document.addEventListener("keydown", (e) => {
       // Update the UI with product details and variants
       function updateProductUI(product, variants) {
         name_dabba = product.product_name;
-        // console.log(product);
+        console.log(product);
         // Update product name
         document.getElementById("nameing_of_product").innerHTML = 
           `${product.product_name || "Product Name"} <span class="accent">Capsules</span>`;
@@ -529,8 +529,12 @@ document.addEventListener("keydown", (e) => {
         // Update carousel images
         document.getElementById("product_images_sinf").innerHTML = `
           <img src="${product.image_url || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
-          <img src="${product.primary_img || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
-          <img src="${product.primary_img || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
+          <img src="${product.addtional_img1 || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
+          <img src="${product.addtional_img2 || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
+          <img src="${product.addtional_img3 || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
+          <img src="${product.addtional_img4 || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
+          <img src="${product.addtional_img5 || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
+          <img src="${product.addtional_img6 || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
         `;
         
         // Update tabs content
