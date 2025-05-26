@@ -188,3 +188,15 @@ margin-left: 10px;
 .customerAssistance{
 width: fit-content;
 }
+
+
+.hidden {
+  display: none;
+}
+
+#order-details {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+}

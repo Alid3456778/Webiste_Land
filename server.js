@@ -193,20 +193,21 @@ app.post("/api/checkout", async (req, res) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-
+    
     // 1) insert or find user
     const userRes = await client.query(
-      `INSERT INTO users (
-         first_name,last_name,email,phone,company,country,
-         street,apartment,city,state,zip_code
-       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
-       ON CONFLICT (email) DO UPDATE SET phone=EXCLUDED.phone
-       RETURNING user_id`,
-      [firstName, lastName, email, phone, companyName || null, country,
-       billingStreetAddress, apartment || null,
-       billingCity, billingState, billingZip]
-    );
-    const userId = userRes.rows[0].user_id;
+      `INSERT INTO customers (
+        first_name,last_name,email,phone,company_name,country,
+        street_address,apartment,city,state,zip_code
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+        ON CONFLICT (email) DO UPDATE SET phone=EXCLUDED.phone
+        RETURNING id`,
+        [firstName, lastName, email, phone, companyName || null, country,
+          billingStreetAddress, apartment || null,
+          billingCity, billingState, billingZip]
+        );
+        const userId = userRes.rows[0].id;
+        console.log(userId);
 
     // 2) insert order
     const orderRes = await client.query(
@@ -351,6 +352,49 @@ app.get("/product-prices", async (req, res) => {
   }
 });
 
+// Endpoint to fetch requests
+app.get('/api/requests', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM orders'); // Adjust query for your table schema
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Endpoint to delete a request
+app.delete('/api/requests/:id', (req, res) => {
+  const { id } = req.params;
+  const { order_id } = req.body;
+  console.log("id",id,"order id",order_id)
+  try {
+        // Delete related order_items first
+     pool.query('DELETE FROM orders WHERE order_id = $1', [orderId], (err, result) => {
+  if (err) {
+    console.error('Error deleting order:', err);
+    return res.status(500).json({ error: 'Error deleting order' });
+  }
+  res.status(200).json({ message: 'Order deleted successfully' });
+});
+res.json({ message: 'Request deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Endpoint to fetch order items by order_id
+app.get('/api/order-items/:order_id', async (req, res) => {
+  const { order_id } = req.params;
+  try {
+    const result = await pool.query(
+      'SELECT * FROM order_items WHERE order_id = $1', 
+      [order_id]
+    ); // Adjust query for your schema
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 
 // Static files
@@ -363,6 +407,10 @@ app.get('/product_overview', (req, res) => {
 
 app.get('/cart', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'cart.html'));
+});
+
+app.get('/employee', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'employee.html'));
 });
 
 // Start server

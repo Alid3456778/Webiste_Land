@@ -355,6 +355,117 @@
           </table>
         </div>
       </section>
+      <section id="order-details" class="card hidden">
+  <h2>Order Details</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Item Name</th>
+        <th>Quantity</th>
+        <th>MG</th>
+        <th>Price</th>
+      </tr>
+    </thead>
+    <tbody id="order-details-body">
+      <!-- Order items will be populated dynamically -->
+    </tbody>
+  </table>
+  <button id="close-details">Close</button>
+</section>
+
+
+       <script>
+        document.addEventListener('DOMContentLoaded', () => {
+  const tableBody = document.querySelector('#process-requests tbody');
+  const orderDetailsSection = document.getElementById('order-details');
+  const orderDetailsBody = document.getElementById('order-details-body');
+  const closeDetailsButton = document.getElementById('close-details');
+
+  // Function to fetch and populate data
+  const fetchRequests = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/requests');
+      const requests = await response.json();
+      console.log(requests);
+      // Clear existing rows
+      tableBody.innerHTML = '';
+
+      // Populate rows dynamically
+      requests.forEach((request) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${request.user_id}</td>
+          <td>${request.customer_name}</td>
+          <td>${request.total_amount}</td>
+          <td class="action">
+            <button onclick="viewOrderItems(${request.order_id})">View Items</button>
+            <button onclick="deleteRequest(${request.user_id} , ${request.order_id})">Delete</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    } catch (err) {
+      console.error('Error fetching requests:', err);
+    }
+  };
+
+  // Function to fetch and display order items
+  window.viewOrderItems = async (orderId) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/order-items/${orderId}`);
+      const orderItems = await response.json();
+
+      // Clear previous order details
+      orderDetailsBody.innerHTML = '';
+
+      // Populate order details
+      orderItems.forEach((item) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${item.name}</td>
+          <td>${item.quantity}</td>
+          <td>${item.mg}</td>
+          <td>${item.price}</td>
+        `;
+        orderDetailsBody.appendChild(row);
+      });
+
+      // Show the order details section
+      orderDetailsSection.classList.remove('hidden');
+    } catch (err) {
+      console.error('Error fetching order items:', err);
+    }
+  };
+
+  // Function to delete a request
+ window.deleteRequest = async (id, order_id) => {
+  try {
+    await fetch(`http://localhost:3000/api/requests/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ order_id }),
+    });
+    alert('Request deleted successfully');
+    fetchRequests(); // Refresh the table after deletion
+  } catch (err) {
+    console.error('Error deleting request:', err);
+  }
+};
+
+
+  // Close order details section
+  closeDetailsButton.addEventListener('click', () => {
+    orderDetailsSection.classList.add('hidden');
+  });
+
+  // Fetch data on page load
+  fetchRequests();
+});
+
+
+       </script>
 
       <!-- Customer Assistance Section -->
       <section id="customer-assistance" class="card">
