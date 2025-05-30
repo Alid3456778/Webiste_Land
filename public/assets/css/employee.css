@@ -52,6 +52,7 @@ nav a:hover {
     padding: 20px;
 }
 
+/* --- Card Base Styles --- */
 .card {
     background-color: var(--white);
     border: 1px solid var(--blue-green);
@@ -64,8 +65,11 @@ nav a:hover {
 .card h2 {
     margin-top: 0;
     color: var(--blue-sapphire);
+    text-align: center; /* Center the form title */
+    margin-bottom: 25px; /* Add some space below the title */
 }
 
+/* --- Table Styles --- */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -81,14 +85,18 @@ table th {
     background-color: var(--metallic-seaweed);
     color: var(--white);
 }
-.action{
+
+/* --- Action Buttons (e.g., in tables) --- */
+.action {
     display: flex;
     justify-content: space-around;
 }
-.action button{
+
+.action button {
     margin: 0px 10px 0px 10px;
 }
 
+/* --- General Button Styles --- */
 button {
     background-color: var(--forest-green);
     color: var(--white);
@@ -96,107 +104,225 @@ button {
     padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s ease; /* Smooth transition for hover */
 }
 
 button:hover {
     background-color: var(--india-green);
 }
 
-#manage-products{
+/* --- Specific Form Layouts (from your existing CSS) --- */
+#manage-products {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-#product-form{
-    display: flex;
-    flex-direction: row;
-    gap: 20px;
+/* This targets the main product form section */
+#product-form-section {
+    width: 100%; /* Make it take full width of its container */
+    max-width: 800px; /* Limit max width for better readability */
+    margin: 20px auto; /* Center the form on the page */
+    padding: 30px; /* More padding for a better look */
+    box-sizing: border-box; /* Include padding in width */
 }
 
-#product-form-section{
-    width: 25%;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+/* Style for the actual form within the section */
+#product-form {
+    display: grid; /* Use CSS Grid for a more robust form layout */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Creates flexible columns */
+    gap: 20px 30px; /* Gap between rows and columns */
 }
 
-#product-form-items{
+/* Make labels display properly */
+#product-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--blue-sapphire);
+}
+
+/* Apply consistent styling to all form inputs and textareas */
+#product-form input[type="number"],
+#product-form input[type="text"],
+#product-form textarea {
+    width: 100%; /* Take full width of its grid cell */
+    padding: 10px 12px;
+    margin-bottom: 0; /* Reset margin as grid handles spacing */
+    border: 1px solid var(--blue-green);
+    border-radius: 6px;
+    font-size: 1em;
+    color: var(--black);
+    box-sizing: border-box; /* Crucial for width calculation */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#product-form input[type="number"]:focus,
+#product-form input[type="text"]:focus,
+#product-form textarea:focus {
+    border-color: var(--blue-sapphire);
+    box-shadow: 0 0 0 3px rgba(18, 97, 128, 0.2); /* Light shadow on focus */
+    outline: none;
+}
+
+#product-form textarea {
+    resize: vertical; /* Allow vertical resizing */
+    min-height: 80px; /* Minimum height for text areas */
+}
+
+/* Span the submit button across all columns */
+#product-form button[type="submit"] {
+    grid-column: 1 / -1; /* Make the button span all available columns */
+    padding: 15px 20px;
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-top: 15px; /* Add some space above the button */
+    background-color: var(--american-green); /* Use a more appropriate button color */
+}
+
+#product-form button[type="submit"]:hover {
+    background-color: var(--forest-green);
+}
+
+
+/* Your existing CSS for other sections (if they exist in your HTML) */
+#product-form-items {
     width: 100%;
 }
 
-#variation-section{
-    width: 25%;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-#variation-items{
-    display: flex;
-    width: 100%;
-}
-
-#faq-section{
-    width: 25%;
+#variation-section,
+#faq-section {
+    width: 25%; /* This might need adjustment based on final HTML structure */
     display: flex;
     flex-direction: column;
     gap: 20px;
     margin-left: 10px;
 }
 
-#faq-items{
+#variation-items,
+#faq-items {
     display: flex;
     width: 100%;
 }
 
-#submit_btn{
+#submit_btn {
     width: 25%;
     display: flex;
     justify-content: flex-end;
     flex-direction: column;
 }
 
-#submit_btn button{
+#submit_btn button {
     width: 100%;
 }
 
-#existing-products-table{
-    overflow-x: auto; /* Enable horizontal scrolling */
-white-space: nowrap; /* Prevent content from wrapping */
-scrollbar-width: none; /* Hide scrollbar for Firefox */
--ms-overflow-style: none; /* Hide scrollbar for IE */
+#existing-products-table {
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
-
 label {
-font-size: 14px;
-color: #555;
+    font-size: 14px;
+    color: #555;
 }
 
 input, textarea, select, button {
-width: 100%;
-padding: 10px;
-margin-bottom: 15px;
-border: 1px solid #ccc;
-border-radius: 4px;
-font-size: 14px;
-}
-#variation-section{
-margin-left: 10px;
-}
-.customerAssistance{
-width: fit-content;
+    /* These global styles are largely overridden by more specific ones above,
+       but keep them for general consistency. */
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box; /* Added for consistency */
 }
 
+.customerAssistance {
+    width: fit-content;
+}
 
 .hidden {
-  display: none;
+    display: none;
 }
 
 #order-details {
-  margin-top: 20px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  background: #f9f9f9;
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background: #f9f9f9;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* Ensure modal is on top */
+}
+
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.close-btn {
+    float: right;
+    cursor: pointer;
+    font-size: 1.2em;
+}
+
+/* --- Media Queries for Responsiveness --- */
+@media (max-width: 768px) {
+    #product-form {
+        grid-template-columns: 1fr; /* Stack inputs on smaller screens */
+        gap: 15px;
+    }
+
+    #product-form-section {
+        padding: 20px;
+        margin: 15px auto;
+    }
+
+    .card h2 {
+        font-size: 1.8em;
+    }
+
+    /* Adjust button padding for smaller screens */
+    #product-form button[type="submit"] {
+        padding: 12px 15px;
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 480px) {
+    #product-form-section {
+        padding: 15px;
+        margin: 10px auto;
+    }
+
+    .card h2 {
+        font-size: 1.5em;
+    }
+
+    header {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    nav {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
 }

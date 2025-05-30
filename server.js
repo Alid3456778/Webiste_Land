@@ -316,6 +316,71 @@ app.get('/api/product', async (req, res) => {
   }
 });
 
+app.post('/api/set_products', async (req, res) => {
+  const {
+    category_id,
+    product_name,
+    product_description,
+    trade_names,
+    ingredients,
+    manufactured_by,
+    packaging_details,
+    how_to_use,
+    drug_interaction,
+    side_effects,
+    warnings_precautions,
+    withdrawal_symptoms,
+    drug_abuse,
+    storage,
+    primary_img,
+    additional_img1,
+    additional_img2,
+    additional_img3,
+    additional_img4,
+    additional_img5,
+    additional_img6,
+  } = req.body;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO products (
+    category_id, product_name, product_description, trade_names, ingredients, manufacturer, packaging,
+    usage_instructions, drug_interaction, side_effects,safety, withdrawal_symptoms, drug_abuse, storage,
+    image_url, addtional_img1, addtional_img2, addtional_img3, addtional_img4, addtional_img5, addtional_img6
+)VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21
+      ) RETURNING *`,
+      [
+        category_id,
+        product_name,
+        product_description,
+        trade_names,
+        ingredients,
+        manufactured_by,
+        packaging_details,
+        how_to_use,
+        drug_interaction,
+        side_effects,
+        warnings_precautions,
+        withdrawal_symptoms,
+        drug_abuse,
+        storage,
+        primary_img,
+        additional_img1,
+        additional_img2,
+        additional_img3,
+        additional_img4,
+        additional_img5,
+        additional_img6,
+      ]
+    );
+
+    res.json({ success: true, message: 'Product saved successfully!', product: result.rows[0] });
+  } catch (err) {
+    console.error('Error saving product:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 
 // API to fetch products based on category
@@ -363,24 +428,51 @@ app.get('/api/requests', async (req, res) => {
 });
 
 // Endpoint to delete a request
-app.delete('/api/requests/:id', (req, res) => {
-  const { id } = req.params;
-  const { order_id } = req.body;
-  console.log("id",id,"order id",order_id)
+// app.delete('/api/requests/:id', (req, res) => {
+//   const { id } = req.params;
+//   const { order_id } = req.body;
+//   console.log("id",id,"order id",order_id)
+//   try {
+//         // Delete related order_items first
+//      pool.query('DELETE FROM order_items WHERE order_id = $1', [order_id]);
+
+//     // Then delete the order
+//      pool.query('DELETE FROM orders WHERE user_id = $1 AND id = $2', [id, order_id]);
+// res.json({ message: 'Request deleted successfully' });
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
+// DELETE /api/requests/:orderId
+app.delete('/api/requests/:orderId', async (req, res) => {
+  const { orderId } = req.params;
+  const client = await pool.connect();
   try {
-        // Delete related order_items first
-     pool.query('DELETE FROM orders WHERE order_id = $1', [orderId], (err, result) => {
-  if (err) {
-    console.error('Error deleting order:', err);
-    return res.status(500).json({ error: 'Error deleting order' });
-  }
-  res.status(200).json({ message: 'Order deleted successfully' });
-});
-res.json({ message: 'Request deleted successfully' });
+    await client.query('BEGIN');
+
+    // 1) delete all items for that order
+    await client.query(
+      'DELETE FROM order_items WHERE order_id = $1',
+      [orderId]
+    );
+
+    // 2) delete the order itself
+    await client.query(
+      'DELETE FROM orders WHERE order_id = $1',
+      [orderId]
+    );
+
+    await client.query('COMMIT');
+    res.json({ success: true, message: 'Order and its items deleted.' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    await client.query('ROLLBACK');
+    console.error('Error deleting request:', err);
+    res.status(500).json({ success: false, error: err.message });
+  } finally {
+    client.release();
   }
 });
+
 
 // Endpoint to fetch order items by order_id
 app.get('/api/order-items/:order_id', async (req, res) => {
@@ -393,6 +485,25 @@ app.get('/api/order-items/:order_id', async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+
+// GET customer by ID
+app.get('/api/customers/:id', async (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+  try {
+    const result = await pool.query(
+      `SELECT * FROM customers WHERE id = $1`, [id]
+    );
+    if (!result.rows.length) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
