@@ -143,57 +143,164 @@
 
       <section id="existing-products" class="card">
         <h3>Existing Products</h3>
-        <div id="existing-products-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Category ID</th>
-                <th>Category Name</th>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Trade Names</th>
-                <th>Ingredients</th>
-                <th>Manufactured By</th>
-                <th>Packaging Details</th>
-                <th>How to Use</th>
-                <th>Drug Interaction</th>
-                <th>Side Effects</th>
-                <th>Warnings & Precautions</th>
-                <th>Withdrawal Symptoms</th>
-                <th>Drug Abuse</th>
-                <th>Storage</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Replace this static row with dynamic rows populated from the database -->
-              <tr>
-                <td>1</td>
-                <!-- Example Category ID -->
-                <td>Pain Medication</td>
-                <td>Paracetamol</td>
-                <td>Used to relieve pain and fever</td>
-                <td>Calpol, Panadol</td>
-                <td>Paracetamol 500mg</td>
-                <td>XYZ Pharma</td>
-                <td>Box of 10 strips</td>
-                <td>Take one pill every 6 hours</td>
-                <td>Avoid with alcohol or anticoagulants</td>
-                <td>Nausea, dizziness</td>
-                <td>Consult a doctor if pregnant</td>
-                <td>Rebound headaches</td>
-                <td>Risk of overdose with misuse</td>
-                <td>Store in a cool, dry place</td>
-                <td>
-                  <button>Edit</button>
-                  <button>Delete</button>
-                </td>
-              </tr>
-              <!-- Additional rows will be added dynamically for each product -->
-            </tbody>
-          </table>
-        </div>
+        <h1>Search Product by ID or Name</h1>
+  <form id="search-form">
+    <label for="product_id">Product ID:</label>
+    <input type="number" id="product_id" name="product_id" placeholder="Enter Product ID" />
+
+    <label for="product_name">Product Name:</label>
+    <input type="text" id="product_name_2" name="product_name_2" placeholder="Enter Product Name" />
+
+    <button type="submit">Search</button>
+  </form>
+
+  <div id="result" class="result" style="display: none;">
+    <h3>Product Details:</h3>
+    <p id="product-data">
+       <table class="product-table">
+    <thead>
+      <tr>
+        <th>Field</th>
+        <th>Details</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Product ID</td>
+        <td id="product-id"></td>
+      </tr>
+      <tr>
+        <td>Category ID</td>
+        <td id="category-id"></td>
+      </tr>
+      <tr>
+        <td>Product Name</td>
+        <td id="product-name"></td>
+      </tr>
+      <tr>
+        <td>Description</td>
+        <td id="product-description"></td>
+      </tr>
+      <tr>
+        <td>Trade Names</td>
+        <td id="trade-names"></td>
+      </tr>
+      <tr>
+        <td>Ingredients</td>
+        <td id="ingredients"></td>
+      </tr>
+      <tr>
+        <td>Manufacturer</td>
+        <td id="manufacturer"></td>
+      </tr>
+      <tr>
+        <td>Packaging</td>
+        <td id="packaging"></td>
+      </tr>
+      <tr>
+        <td>Usage Instructions</td>
+        <td id="usage-instructions"></td>
+      </tr>
+      <tr>
+        <td>Drug Interaction</td>
+        <td id="drug-interaction"></td>
+      </tr>
+      <tr>
+        <td>Side Effects</td>
+        <td id="side-effects"></td>
+      </tr>
+      <tr>
+        <td>Safety</td>
+        <td id="safety"></td>
+      </tr>
+      <tr>
+        <td>Withdrawal Symptoms</td>
+        <td id="withdrawal-symptoms"></td>
+      </tr>
+      <tr>
+        <td>Drug Abuse Potential</td>
+        <td id="drug-abuse"></td>
+      </tr>
+      <tr>
+        <td>Storage</td>
+        <td id="storage"></td>
+      </tr>
+      <tr>
+        <td>Image</td>
+        <td><img id="product-image" alt="Product Image"></td>
+      </tr>
+    </tbody>
+  </table>
+    </p>
+  </div>
       </section>
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+  const searchForm = document.getElementById('search-form');
+  const resultDiv = document.getElementById('result');
+  const productDataElement = document.getElementById('product-data');
+
+  searchForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    // Get user input
+    const productId = document.getElementById('product_id').value.trim();
+    const productName = document.getElementById('product_name_2').value.trim();
+
+    console.log(productName);
+    if (!productId && !productName) {
+      alert('Please enter either a Product ID or Product Name.');
+      return;
+    }
+
+    try {
+      // Send request to backend
+      const response = await fetch(`http://localhost:3000/api/products/search`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: productId, name: productName }),
+      });
+
+      const result = await response.json();
+      const productData = result;
+      
+
+
+      if (response.ok) {
+        productDataElement.textContent = JSON.stringify(result.data, null, 2);
+        resultDiv.style.display = 'block';
+        // Populate the table with JSON Data
+    document.getElementById('product-id').textContent = result.product_id;
+    document.getElementById('category-id').textContent = productData.category_id;
+    document.getElementById('product-name').textContent = productData.product_name;
+    document.getElementById('product-description').textContent = productData.product_description;
+    document.getElementById('trade-names').textContent = productData.trade_names;
+    document.getElementById('ingredients').textContent = productData.ingredients;
+    document.getElementById('manufacturer').textContent = productData.manufacturer;
+    document.getElementById('packaging').textContent = productData.packaging;
+    document.getElementById('usage-instructions').textContent = productData.usage_instructions;
+    document.getElementById('drug-interaction').textContent = productData.drug_interaction;
+    document.getElementById('side-effects').textContent = productData.side_effects;
+    document.getElementById('safety').textContent = productData.safety;
+    document.getElementById('withdrawal-symptoms').textContent = productData.withdrawal_symptoms;
+    document.getElementById('drug-abuse').textContent = productData.drug_abuse;
+    document.getElementById('storage').textContent = productData.storage;
+
+    // Display image if available
+    const imageUrl = productData.image_url;
+    if (imageUrl) {
+      document.getElementById('product-image').src = imageUrl;
+    }
+      } else {
+        throw new Error(result.error || 'Product not found.');
+      }
+    } catch (err) {
+      console.error('Error fetching product:', err);
+      alert('Error fetching product. Please try again.');
+    }
+  });
+});
+      </script>
 
       <!-- Process Requests Section -->
       <section id="process-requests" class="card">

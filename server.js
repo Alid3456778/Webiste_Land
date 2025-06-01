@@ -316,6 +316,39 @@ app.get('/api/product', async (req, res) => {
   }
 });
 
+app.post('/api/products/search', async (req, res) => {
+  const { id, name } = req.body;
+
+  console.log(name);
+  try {
+    if (!id && !name) {
+      return res.status(400).json({ error: 'Please provide either Product ID or Product Name.' });
+    }
+
+    let query;
+    let values;
+
+    if (id) {
+      query = 'SELECT * FROM products WHERE product_id = $1';
+      values = [id];
+    } else {
+      query = 'SELECT * FROM products WHERE LOWER(product_name) = LOWER($1)';
+      values = [name];
+    }
+
+    const result = await pool.query(query, values);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Product not found.' });
+    }
+
+    res.json({ data: result.rows[0] });
+  } catch (err) {
+    console.error('Error fetching product:', err);
+    res.status(500).json({ error: 'Failed to fetch product.' });
+  }
+});
+
 app.post('/api/set_products', async (req, res) => {
   const {
     category_id,
