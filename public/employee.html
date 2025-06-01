@@ -262,15 +262,18 @@
       });
 
       const result = await response.json();
-      const productData = result;
+      const productData = result.data;
       
 
 
       if (response.ok) {
-        productDataElement.textContent = JSON.stringify(result.data, null, 2);
+        // productDataElement.textContent = JSON.stringify(result.data, null, 2);
+        const rev = JSON.stringify(result.data, null, 2);
+
         resultDiv.style.display = 'block';
         // Populate the table with JSON Data
-    document.getElementById('product-id').textContent = result.product_id;
+        // console.log(result.data);
+    document.getElementById('product-id').textContent = productData.product_id;
     document.getElementById('category-id').textContent = productData.category_id;
     document.getElementById('product-name').textContent = productData.product_name;
     document.getElementById('product-description').textContent = productData.product_description;
@@ -286,13 +289,6 @@
     document.getElementById('drug-abuse').textContent = productData.drug_abuse;
     document.getElementById('storage').textContent = productData.storage;
 
-    // Display image if available
-    const imageUrl = productData.image_url;
-    if (imageUrl) {
-      document.getElementById('product-image').src = imageUrl;
-    }
-      } else {
-        throw new Error(result.error || 'Product not found.');
       }
     } catch (err) {
       console.error('Error fetching product:', err);
@@ -361,7 +357,7 @@
       try {
         const response = await fetch('http://localhost:3000/api/requests');
         const requests = await response.json();
-        console.log(requests);
+        // console.log(requests);
         tableBody.innerHTML = '';
 
         requests.forEach((request) => {
