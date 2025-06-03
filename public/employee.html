@@ -13,10 +13,7 @@
     <header>
       <h1>McLand Pharma - Employee Dashboard</h1>
       <nav>
-        <a href="#dashboard">Dashboard</a>
-        <a href="#manage-products">Manage Products</a>
-        <a href="#process-requests">Process Requests</a>
-        <a href="#customer-assistance">Customer Assistance</a>
+        <button id="logoutBtn">Logout</button>
       </nav>
     </header>
 
@@ -235,6 +232,29 @@
   </div>
       </section>
       <script>
+        //— 1) On load, check localStorage. If not logged in, redirect to login.html.
+    document.addEventListener('DOMContentLoaded', () => {
+      const isLoggedIn = localStorage.getItem('employeeLoggedIn');
+      if (isLoggedIn !== 'true') {
+        // Not logged in → force to login page:
+        window.location.href = 'employee-login.html';
+        return;
+      }
+
+   
+    });
+
+    //— 2) Logout button clears localStorage and redirects to login:
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('employeeLoggedIn');
+      localStorage.removeItem('employeeId');
+      window.location.href = 'employee-login.html';
+    });
+      </script>
+      <script>
+
+
+
         document.addEventListener('DOMContentLoaded', () => {
   const searchForm = document.getElementById('search-form');
   const resultDiv = document.getElementById('result');
