@@ -17,9 +17,9 @@ app.use(cookieParser());
 
 // PostgreSQL configuration
 const pool = new Pool({
-  user: "postmc",
+  user: "postgres",
   host: "localhost",
-  database: "mcdata",
+  database: "postgres",
   password: "postsql",
   port: 5432,
 });
