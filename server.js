@@ -300,7 +300,7 @@ app.get("/api/product", async (req, res) => {
   try {
     // 1) fetch the main product row
     const prodRes = await pool.query(
-      `SELECT * FROM products WHERE product_id = $1`,
+      "SELECT * FROM products WHERE product_id = $1",
       [product_ID]
     );
     if (!prodRes.rows.length)
@@ -308,7 +308,7 @@ app.get("/api/product", async (req, res) => {
 
     // 2) fetch its variants
     const varRes = await pool.query(
-      `SELECT * FROM product_variants WHERE product_id = $1`,
+      "SELECT * FROM product_variants WHERE product_id = $1",
       [product_ID]
     );
 
@@ -516,7 +516,7 @@ app.get("/api/customers/:id", async (req, res) => {
   const { id } = req.params;
   console.log(id);
   try {
-    const result = await pool.query(`SELECT * FROM customers WHERE id = $1`, [
+    const result = await pool.query("SELECT * FROM customers WHERE id = $1", [
       id,
     ]);
     if (!result.rows.length) {
