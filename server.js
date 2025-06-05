@@ -7,6 +7,7 @@ const { Pool } = require("pg");
 const path = require("path");
 const bcrypt = require("bcrypt"); // For password hashing comparison
 const jwt = require("jsonwebtoken"); // For generating authentication tokens
+require("dotenv").config();
 // const { use } = require("react");
 
 const app = express();
@@ -17,11 +18,8 @@ app.use(cookieParser());
 
 // PostgreSQL configuration
 const pool = new Pool({
-  user: "postgres",
-  host: "localhost",
-  database: "datamc",
-  password: "postsql",
-  port: 5432,
+  connectionString: process.env.DATABASE_URL, // Use connection string from the environment
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,   
 });
 
 // Middleware to assign session cookie
