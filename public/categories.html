@@ -25,57 +25,37 @@
               class="search__input"
               id="search-input"
               list="search_list"
-            >
+            />
             <datalist id="search_list">
               <!-- This will be populated dynamically -->
             </datalist>
             <button class="btn btn--search" id="search-button">
               <!-- Inline SVG magnifier for crispness -->
-              <svg xmlns="http://www.w3.org/2000/svg" class="search__icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                <path d="M10 2a8 8 0 015.292 13.708l4.5 4.5a1 1 0 01-1.415 1.414l-4.5-4.5A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"/>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="search__icon"
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+                fill="currentColor"
+              >
+                <path
+                  d="M10 2a8 8 0 015.292 13.708l4.5 4.5a1 1 0 01-1.415 1.414l-4.5-4.5A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"
+                />
               </svg>
             </button>
           </div>
           <a href="cart">
             <button class="btn btn--icon">
-              <img src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" alt="Cart">
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
+                alt="Cart"
+              />
             </button>
           </a>
         </div>
-
       </div>
-      
     </header>
-
-
-
-    <!-- Filter and Search Section -->
-    <!-- <div class="filter-search">
-      <div class="search-bar">
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="Search for medicines..."
-        />
-        <button onclick="searchMedicines()">Search</button>
-      </div>
-      <div class="filter-options">
-        <label for="categories">Filter by Category:</label>
-        <select id="categories" onchange="filterCategory()">
-          <option value="all">All Categories</option>
-          <option value="1">USA Premium</option>
-          <option value="2">General Health Care</option>
-          <option value="3">Pain Medication</option>
-          <option value="4">Cardiac Care</option>
-          <option value="5">Mental Health</option>
-          <option value="6">Sexual Wellness</option>
-          <option value="7">Skincare</option>
-          <option value="8">Steroids</option>
-          <option value="9">Women's Health</option>
-          <option value="10">Men's Health</option>
-        </select>
-      </div>
-    </div>   -->
 
     <section id="product-grid">
       <script>
@@ -137,7 +117,7 @@
           <img src="${
             product.image_url || ""
           }" alt="Product Image" loading="lazy"
-  onload="this.style.opacity='1'" />
+            onload="this.style.opacity='1'" />
           <div class="product-details">
             <h3>${product.product_name || "No Description"}</h3>
             <p id="pric">(${product.trade_names})</p>
@@ -173,42 +153,42 @@
       <script>
         buildProductSearch();
         async function buildProductSearch() {
-        try {
-          const response = await fetch(`/products`);
-          const products = await response.json();
-          
-          const searchList = document.getElementById("search_list");
-          searchList.innerHTML = "";
-          const fragment = document.createDocumentFragment();
-          
-          products.forEach((product) => {
-            const option = document.createElement("option");
-            option.value = product.product_name || "Product Name";
-            option.textContent = product.product_name || "Product Name";
-            fragment.appendChild(option);
-          });
-          
-          searchList.appendChild(fragment);
-          
-          const searchButton = document.getElementById("search-button");
-          const searchInput = document.getElementById("search-input");
-          
-          searchButton.addEventListener("click", () => {
-            const query = searchInput.value.trim();
-            const matchingProduct = products.find(
-              (product) => product.product_name === query
-            );
-            
-            if (matchingProduct) {
-              window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
-            } else {
-              alert("No matching product found.");
-            }
-          });
-        } catch (error) {
-          console.error("Error is", error);
+          try {
+            const response = await fetch(`/products`);
+            const products = await response.json();
+
+            const searchList = document.getElementById("search_list");
+            searchList.innerHTML = "";
+            const fragment = document.createDocumentFragment();
+
+            products.forEach((product) => {
+              const option = document.createElement("option");
+              option.value = product.product_name || "Product Name";
+              option.textContent = product.product_name || "Product Name";
+              fragment.appendChild(option);
+            });
+
+            searchList.appendChild(fragment);
+
+            const searchButton = document.getElementById("search-button");
+            const searchInput = document.getElementById("search-input");
+
+            searchButton.addEventListener("click", () => {
+              const query = searchInput.value.trim();
+              const matchingProduct = products.find(
+                (product) => product.product_name === query
+              );
+
+              if (matchingProduct) {
+                window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
+              } else {
+                alert("No matching product found.");
+              }
+            });
+          } catch (error) {
+            console.error("Error is", error);
+          }
         }
-      }
       </script>
 
       <div id="loading-message" class="loading-message">LOADING...</div>
