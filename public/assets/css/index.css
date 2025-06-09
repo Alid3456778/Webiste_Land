@@ -123,11 +123,13 @@ body { font-family: var(--font); color: var(--gray-700); }
 .btn--search:hover { transform:scale(1.05); }
 
 /* HERO ALT */
-.hero-alt {
+.hero-alt {   
+  
   position:relative; text-align:center; color:#fff;
   margin-top:1rem;
 }
 .hero-alt__bg {
+  height: 100vh;
   position:relative; overflow:hidden; border-radius:1rem;
 }
 .hero-alt__bg img {
