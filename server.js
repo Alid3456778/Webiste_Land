@@ -336,7 +336,7 @@ app.post("/api/products/search", async (req, res) => {
     let values;
 
     if (id) {
-      query = "SELECT * FROM products WHERE product_id = $1";
+      query = "SELECT * FROM products WHERE product_id = $1  ";
       values = [id];
     } else {
       query = "SELECT * FROM products WHERE LOWER(product_name) = LOWER($1)";
@@ -433,9 +433,9 @@ app.get("/products", async (req, res) => {
     let query;
     let params = [];
     if (categoryID === "all") {
-      query = "SELECT * FROM products";
+      query = "SELECT * FROM products ORDER BY product_id ASC";
     } else {
-      query = "SELECT * FROM products WHERE category_id = $1";
+      query = "SELECT * FROM products WHERE category_id = $1 ORDER BY product_id ASC";
       params = [categoryID];
     }
 
