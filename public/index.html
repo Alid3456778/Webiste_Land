@@ -23,7 +23,9 @@
           <button class="nav__btn" data-menu="medicine">Medicine ▾</button>
           <ul class="dropdown-menu" id="menu-medicine">
             <li>
-              <a href="./categories.html?catogeries_ID=4" class="dropdown__link">Cardiac Care</a>
+              <a href="./categories.html?catogeries_ID=4" class="dropdown__link"
+                >Cardiac Care</a
+              >
             </li>
             <li>
               <a href="/categories.html?catogeries_ID=2" class="dropdown__link"
@@ -41,21 +43,35 @@
           <button class="nav__btn" data-menu="wellness">Wellness ▾</button>
           <ul class="dropdown-menu" id="menu-wellness">
             <li>
-              <a href="./categories.html?catogeries_ID=5" class="dropdown__link">Mental Health</a>
+              <a href="./categories.html?catogeries_ID=5" class="dropdown__link"
+                >Mental Health</a
+              >
             </li>
             <li>
               <a href="./categories.html?catogeries_ID=6" class="dropdown__link"
                 >Sexual Wellness</a
               >
             </li>
-            <li><a href="./categories.html?catogeries_ID=7" class="dropdown__link">Skincare</a></li>
+            <li>
+              <a href="./categories.html?catogeries_ID=7" class="dropdown__link"
+                >Skincare</a
+              >
+            </li>
           </ul>
         </div>
         <div class="nav__item">
           <button class="nav__btn" data-menu="beauty">Beauty ▾</button>
           <ul class="dropdown-menu" id="menu-beauty">
-            <li><a href="./categories.html?catogeries_ID=7" class="dropdown__link">Skin Care</a></li>
-            <li><a href="./categories.html?catogeries_ID=8" class="dropdown__link">Steriods</a></li>
+            <li>
+              <a href="./categories.html?catogeries_ID=7" class="dropdown__link"
+                >Skin Care</a
+              >
+            </li>
+            <li>
+              <a href="./categories.html?catogeries_ID=8" class="dropdown__link"
+                >Steriods</a
+              >
+            </li>
           </ul>
         </div>
       </nav>
@@ -124,10 +140,14 @@
           </button>
         </div>
         <a href="cart">
-        <button class="btn btn--icon">
-          <img src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" alt="Cart" class="cart-icon" />
-        </button>
-      </a>
+          <button class="btn btn--icon">
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
+              alt="Cart"
+              class="cart-icon"
+            />
+          </button>
+        </a>
       </div>
     </header>
 
@@ -148,16 +168,18 @@
     <!-- HERO -->
     <section class="hero-alt">
       <div class="hero-alt__bg">
-        <img
-          src=""
-          
-        />
+        <img src="" />
         <div class="hero-alt__overlay"></div>
       </div>
       <div class="hero-alt__content">
         <h1>Your Trusted Online Pharmacy</h1>
         <p>Premium medicines, genuine quality, delivered fast & secure.</p>
-        <a href="#categories" class="btn btn--cta">Shop Now</a>
+        <a
+          href="https://wa.me/19898022372"
+          target="_blank"
+          class="btn btn--cta"
+          >Contact Us</a
+        >
       </div>
     </section>
 
@@ -414,7 +436,6 @@
     </footer>
     <!-- Search Functionality -->
     <script>
-
       // Function to build the product search index
       // async function buildProductSearch() {
       //   try {
@@ -453,29 +474,29 @@
         try {
           const response = await fetch(`/products`);
           const products = await response.json();
-          
+
           const searchList = document.getElementById("search_list");
           searchList.innerHTML = "";
           const fragment = document.createDocumentFragment();
-          
+
           products.forEach((product) => {
             const option = document.createElement("option");
             option.value = product.product_name || "Product Name";
             option.textContent = product.product_name || "Product Name";
             fragment.appendChild(option);
           });
-          
+
           searchList.appendChild(fragment);
-          
+
           const searchButton = document.getElementById("search-button");
           const searchInput = document.getElementById("search-input");
-          
+
           searchButton.addEventListener("click", () => {
             const query = searchInput.value.trim();
             const matchingProduct = products.find(
               (product) => product.product_name === query
             );
-            
+
             if (matchingProduct) {
               window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
             } else {
