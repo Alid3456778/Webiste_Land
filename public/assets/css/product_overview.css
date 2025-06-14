@@ -40,6 +40,10 @@ body {
   align-items: center;
   gap: 0.5rem;
 }
+.header__brand img{
+  width: 50px;
+  height: auto;
+}
 
 .logo {
   width: auto;

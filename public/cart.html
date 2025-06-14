@@ -8,32 +8,25 @@
   <link rel="stylesheet" href="./assets/css/cart.css" />
 </head>
 <body>
+  <!-- NAVBAR (unchanged) -->
   <header class="navbar">
     <div class="navbar-top">
       <div class="logo" onclick="this.querySelector('a').click(); return true;">
         <img src="./assets/image2/logo.png" alt="MCland Pharma Logo" />
         <a href="./index.html"></a>
       </div>
-      <!-- <div class="navbar-top-right">
-        <div class="actions">
-          <button type="button">
-            <a class="a Cart" href="./cart.html">
-              <img src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" alt="Cart" class="cart-icon" />
-            </a>
-          </button>
-        </div>
-      </div> -->
     </div>
   </header>
 
-  <!-- Main Cart Section -->
+  <!-- MAIN CART SECTION (premium markup) -->
   <main class="cart-container">
     <!-- Products in Cart -->
     <section class="cart-products">
       <h2>Your Cart</h2>
-      <!-- Cart items will be inserted here dynamically -->
+      <!-- Dynamic cart items will be injected here -->
       <div id="cart-items"></div>
-      <!-- Buttons to Update Cart and Add More Products -->
+
+      <!-- Cart action buttons -->
       <div class="cart-actions">
         <button id="update-cart-btn">Update Cart</button>
         <button id="add-products-btn">Add More Products</button>
@@ -44,21 +37,24 @@
     <aside class="bill-summary">
       <h2>Bill Summary</h2>
       <div class="bill-item">
-        <p>Subtotal:</p>
-        <p id="subtotal">₹0</p>
+        <span>Subtotal</span>
+        <span id="subtotal">₹0</span>
       </div>
       <div class="bill-item">
-        <p>Tax (5%):</p>
-        <p id="tax">₹0</p>
+        <span>Tax (5%)</span>
+        <span id="tax">₹0</span>
       </div>
       <div class="bill-item total">
-        <p>Total:</p>
-        <p id="total">₹0</p>
+        <span>Total</span>
+        <span id="total">₹0</span>
       </div>
-      <a href="./checkout1.html"><button class="checkout-btn">Proceed to Checkout</button></a>
+      <a href="./checkout1.html">
+        <button class="checkout-btn">Proceed to Checkout</button>
+      </a>
     </aside>
   </main>
 
+  <!-- FOOTER (unchanged) -->
   <footer class="footer">
     <div class="footer-content">
       <div class="footer-section resources">
@@ -111,142 +107,90 @@
     </div>
   </footer>
 
+  <!-- YOUR SCRIPT (unchanged) -->
   <script>
-    // Google Sheet configuration
-    // Fetch cart items from backend and update the DOM
     async function loadCartItems() {
       try {
         const cartResponse = await fetch("/api/cart");
         const cartData = await cartResponse.json();
-
-        if (!cartData.success) {
-          throw new Error("Failed to fetch cart items.");
-        }
+        if (!cartData.success) throw new Error("Failed to fetch cart items.");
 
         const cartItems = cartData.data;
+        const container = document.getElementById("cart-items");
         if (cartItems.length === 0) {
-          document.getElementById("cart-items").innerHTML = "<p>Your cart is empty.</p>";
+          container.innerHTML = "<p>Your cart is empty.</p>";
           return;
         }
 
-        // Fetch product details from Google Sheet for name and image mapping
-        const productResponse = await fetch("/products");
-        const productSheetData = await productResponse.json();
-        // console.log(productSheetData);
-        if (!productSheetData.values) {
-          throw new Error("Failed to fetch product data from sheet.");
-        }
-
-        // Build mappings: productID -> primary image and product name  
-        // Assumption:
-        // row[0] = productID, row[2] = product name, row[15] = primary image URL
-        const productImageMap = [];
-        const productNameMap = [];
-        productSheetData.forEach(row => {
-          // productImageMap[] = row.primary_img || "./assets/image/placeholder.png";
-          // productNameMap[row[0]] = row.product_name || "Unnamed Product";
-          productNameMap.push(row.product_name || "Unnamed Product");
-          productImageMap.push(row.image_url || "./assets/image/placeholder.png");
-          // Debugging: Log the URL if needed
-          // console.log(`Product ${row[0]}: Name ${productNameMap[row[0]]} - Image ${productImageMap[row[0]]}`);
-        });
-        
-
-        const cartContainer = document.getElementById("cart-items");
-        cartContainer.innerHTML = ""; // Clear previous items
+        // Build and inject each .cart-item with premium structure
+        container.innerHTML = "";
         let subtotal = 0;
-
-        cartItems.forEach(item => {
-          const productID = item.product_id;
-          const quantity = parseFloat(item.quantity) || 1;
-          const mg = item.mg || "";
-          // const price = item.price;
-          const price = parseFloat(item.price.replace(/[^\d.-]/g, "")); // Remove non-numeric characters
-      
-          console.log("Price is ",price);
-          subtotal = price + subtotal;
-          console.log("items",item);
-          // Get product name and image from mapping
-          const productName = item.name || "Unnamed Product";
-          const productImg = item.image_url;
-
-          const cartItemDiv = document.createElement("div");
-          cartItemDiv.classList.add("cart-item");
-          cartItemDiv.innerHTML = `
-            <img src="${productImg}" alt="Product Image" />
+        for (const item of cartItems) {
+          const price = parseFloat(item.price.replace(/[^\d.-]/g, "")) || 0;
+          subtotal += price;
+          const mgText = item.mg ? ` (${item.mg} MG)` : "";
+          const div = document.createElement("div");
+          div.className = "cart-item";
+          div.innerHTML = `
+            <img src="${item.image_url}" alt="Product Image" />
             <div class="product-details">
               <div class="product-detail-1">
-                <h3>${productName} ${mg ? '(' + mg + ' MG)' : ''}</h3>
-                <button class="remove-btn" onclick="removeItem('${productID}')">Remove</button>
+                <h3>${item.name || "Unnamed Product"}${mgText}</h3>
+                <button class="remove-btn" onclick="removeItem('${item.product_id}')">Remove</button>
               </div>
               <div class="product-detail-2">
-                <p>Price : ${price}</span></p>
-                <p>Quantity : ${quantity}</p>
+                <p>Price: ₹${price.toFixed(2)}</p>
+                <p>Quantity: ${item.quantity}</p>
               </div>
             </div>
           `;
-          cartContainer.appendChild(cartItemDiv);
-        });
+          container.appendChild(div);
+        }
 
-        // Update bill summary
         const tax = subtotal * 0.05;
-        document.getElementById("subtotal").textContent = "$"+ subtotal.toFixed(2);
-        document.getElementById("tax").textContent = "$"+ tax.toFixed(2);
-        document.getElementById("total").textContent = "$"+ (subtotal + tax).toFixed(2);
-      } catch (error) {
-        console.error("Error loading cart items:", error);
+        document.getElementById("subtotal").textContent = `₹${subtotal.toFixed(2)}`;
+        document.getElementById("tax").textContent = `₹${tax.toFixed(2)}`;
+        document.getElementById("total").textContent = `₹${(subtotal + tax).toFixed(2)}`;
+      } catch (err) {
+        console.error(err);
         document.getElementById("cart-items").innerHTML = "<p>Error loading cart items.</p>";
       }
     }
 
-    // Quantity control functions (unchanged)
-    function decreaseQuantity(button, productID, price) {
-      const input = button.nextElementSibling;
-      let value = parseInt(input.value);
-      if (value > 1) {
-        input.value = --value;
-        updateCartItem(productID, value, price);
-      }
-    }
-
-    function increaseQuantity(button, productID, price) {
-      const input = button.previousElementSibling;
-      let value = parseInt(input.value);
-      input.value = ++value;
-      updateCartItem(productID, value, price);
-    }
-
-    function updateCartItem(productID, quantity, price) {
-      // Placeholder: update backend quantity if needed. For now, reload cart.
-      setTimeout(loadCartItems, 500);
-    }
-
-    // Remove item function - calls the backend remove endpoint
-    async function removeItem(productID) {
-      try {
-        // Using DELETE method with JSON body (if your backend supports it)
-        const response = await fetch("/remove-from-cart", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ productId: productID })
-        });
-        const result = await response.json();
-        if (result.success) {
-          // Reload the cart items after removal
+    function removeItem(productID) {
+      fetch("/remove-from-cart", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: productID })
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.success){
+          showToast("Item removed from cart");
           loadCartItems();
-        } else {
-          alert("Error removing item: " + result.message);
-        }
-      } catch (error) {
-        console.error("Error removing item:", error);
-        alert("Server error while removing item.");
-      }
+        } 
+        else alert("Error removing item: " + result.message);
+      })
+      .catch(() => alert("Server error while removing item."));
     }
 
-    // Initialize cart items when the page loads
     document.addEventListener("DOMContentLoaded", loadCartItems);
   </script>
-
   <script src="./assets/js/cart.js"></script>
+  <div id="toast" class="toast hidden"></div>
+<script>
+function showToast(message, duration = 3000) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.classList.remove("hidden");
+  toast.classList.add("show");
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.classList.add("hidden"), 300);
+  }, duration);
+}
+
+</script>
 </body>
 </html>

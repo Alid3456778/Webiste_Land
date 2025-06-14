@@ -11,8 +11,7 @@
     <!-- HEADER -->
     <header class="header">
       <div class="header__brand">
-        <img src="assets/image2/logo.png" alt="MCLAND Logo" class="logo">
-        <span class="brand-name">MCLAND</span>
+        <a href="/"><img src="assets/image2/logo.png" alt="MCLAND Logo" class="logo" /></a>
       </div>
       <div class="header__search-cart">
         <div class="search">
@@ -22,42 +21,96 @@
             class="search__input"
             id="search-input"
             list="search_list"
-          >
+          />
           <datalist id="search_list">
             <!-- This will be populated dynamically -->
           </datalist>
           <button class="btn btn--search" id="search-button">
             <!-- Inline SVG magnifier for crispness -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="search__icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-              <path d="M10 2a8 8 0 015.292 13.708l4.5 4.5a1 1 0 01-1.415 1.414l-4.5-4.5A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"/>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="search__icon"
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              fill="currentColor"
+            >
+              <path
+                d="M10 2a8 8 0 015.292 13.708l4.5 4.5a1 1 0 01-1.415 1.414l-4.5-4.5A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"
+              />
             </svg>
           </button>
         </div>
         <a href="cart">
           <button class="btn btn--icon">
-            <img src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" alt="Cart">
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
+              alt="Cart"
+            />
           </button>
         </a>
       </div>
     </header>
-  
+
     <!-- MAIN PRODUCT SECTION -->
     <main class="product-section">
       <!-- IMAGE CAROUSEL -->
-      <div class="carousel">
-        <button id="prevSlide" class="carousel__nav carousel__nav--left">&#10094;</button>
-        <div class="carousel__slide" id="product_images_sinf">
-          <!-- Images will be loaded dynamically -->
+      <div>
+        <div class="carousel">
+          <button id="prevSlide" class="carousel__nav carousel__nav--left">
+            &#10094;
+          </button>
+          <div class="carousel__slide" id="product_images_sinf">
+            <!-- Images will be loaded dynamically -->
+          </div>
+          <button id="nextSlide" class="carousel__nav carousel__nav--right">
+            &#10095;
+          </button>
         </div>
-        <button id="nextSlide" class="carousel__nav carousel__nav--right">&#10095;</button>
+
+        <div class="tabs-wrapper">
+          <div class="tabs">
+            <button class="tabs__btn tabs__btn--active" data-tab="desc">
+              Description
+            </button>
+            <button class="tabs__btn" data-tab="benefits">Symptoms</button>
+            <button class="tabs__btn" data-tab="details">
+              Product Details
+            </button>
+            <button class="tabs__btn" data-tab="usage">Usage</button>
+            <button class="tabs__btn" data-tab="reviews">Reviews</button>
+          </div>
+          <div class="tabs__content">
+            <div id="desc" class="tab">
+              <p>Loading product description...</p>
+            </div>
+            <div id="benefits" class="tab hidden">
+              <ul class="tab-list">
+                <li>Loading benefits...</li>
+              </ul>
+            </div>
+            <div id="details" class="tab hidden">
+              <p>Loading product details...</p>
+            </div>
+            <div id="usage" class="tab hidden">
+              <ol class="tab-list">
+                <li>Loading usage information...</li>
+              </ol>
+            </div>
+            <div id="reviews" class="tab hidden">
+              <p>Loading reviews...</p>
+            </div>
+          </div>
+        </div>
       </div>
-  
+
       <!-- PRODUCT DETAILS & DYNAMIC CONTENT -->
       <div class="product-info">
         <h1 class="product-info__title" id="nameing_of_product">
-          Loading... <!-- This will be replaced dynamically -->
+          Loading...
+          <!-- This will be replaced dynamically -->
         </h1>
-  
+
         <!-- STAR RATING -->
         <div id="rating" class="rating">
           <span data-value="1">★</span><span data-value="2">★</span>
@@ -65,120 +118,50 @@
           <span data-value="5">★</span>
           <small class="rating__count">(24 reviews)</small>
         </div>
-<!--   
+
         <script>
           const ratingContainer = document.getElementById("rating");
           const stars = ratingContainer.querySelectorAll("span[data-value]");
           let selectedRating = 0;
-        
+
+          // Replace with actual product ID from your page context
+          const urlParams = new URLSearchParams(window.location.search);
+          const productId = urlParams.get("product_ID");
+          // console.log("product_id",productId)
+
           stars.forEach((star) => {
             const val = parseInt(star.getAttribute("data-value"));
-        
-            // Hover effect
-            star.addEventListener("mouseenter", () => {
-              highlightStars(val);
-            });
-        
-            // Remove hover on mouse leave
-            star.addEventListener("mouseleave", () => {
-              highlightStars(selectedRating);
-            });
-        
-            // Click to set rating
+
+            star.addEventListener("mouseenter", () => highlightStars(val));
+            star.addEventListener("mouseleave", () =>
+              highlightStars(selectedRating)
+            );
             star.addEventListener("click", () => {
               selectedRating = val;
               highlightStars(selectedRating);
-              console.log("Selected Rating:", selectedRating); // You can send this to backend
+              sendRatingToBackend(selectedRating, productId);
             });
           });
-        
+
           function highlightStars(rating) {
             stars.forEach((star) => {
               const val = parseInt(star.getAttribute("data-value"));
               star.classList.toggle("selected", val <= rating);
             });
           }
-      </script> -->
-      <!-- <script>
-        const ratingContainer = document.getElementById("rating");
-        const stars = ratingContainer.querySelectorAll("span[data-value]");
-        let selectedRating = 0;
-      
-        stars.forEach((star) => {
-          const val = parseInt(star.getAttribute("data-value"));
-      
-          star.addEventListener("mouseenter", () => highlightStars(val));
-          star.addEventListener("mouseleave", () => highlightStars(selectedRating));
-          star.addEventListener("click", () => {
-            selectedRating = val;
-            highlightStars(selectedRating);
-            console.log("Selected Rating:", selectedRating);
-            sendRatingToBackend(selectedRating);
-          });
-        });
-      
-        function highlightStars(rating) {
-          stars.forEach((star) => {
-            const val = parseInt(star.getAttribute("data-value"));
-            star.classList.toggle("selected", val <= rating);
-          });
-        }
-      
-        function sendRatingToBackend(rating) {
-          fetch("http://localhost:3000/api/rating", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ rating: rating }),
-          })
-          .then(response => response.json())
-          .then(data => console.log("Server response:", data))
-          .catch(error => console.error("Error sending rating:", error));
-        }
-      </script> -->
-      <script>
-        const ratingContainer = document.getElementById("rating");
-        const stars = ratingContainer.querySelectorAll("span[data-value]");
-        let selectedRating = 0;
-      
-        // Replace with actual product ID from your page context
-        const urlParams = new URLSearchParams(window.location.search);
-        const productId = urlParams.get("product_ID");
-        // console.log("product_id",productId)
-      
-        stars.forEach((star) => {
-          const val = parseInt(star.getAttribute("data-value"));
-      
-          star.addEventListener("mouseenter", () => highlightStars(val));
-          star.addEventListener("mouseleave", () => highlightStars(selectedRating));
-          star.addEventListener("click", () => {
-            selectedRating = val;
-            highlightStars(selectedRating);
-            sendRatingToBackend(selectedRating, productId);
-          });
-        });
-      
-        function highlightStars(rating) {
-          stars.forEach((star) => {
-            const val = parseInt(star.getAttribute("data-value"));
-            star.classList.toggle("selected", val <= rating);
-          });
-        }
-      
-        function sendRatingToBackend(rating, productId) {
-          fetch("http://localhost:3000/api/rating", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ rating: rating, product_id: productId }),
-          })
-          .then(response => response.json())
-          .then(data => console.log("Server response:", data))
-          .catch(error => console.error("Error sending rating:", error));
-        }
-      </script>
-      
 
-        
-        
+          function sendRatingToBackend(rating, productId) {
+            fetch("api/rating", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ rating: rating, product_id: productId }),
+            })
+              .then((response) => response.json())
+              .then((data) => console.log("Server response:", data))
+              .catch((error) => console.error("Error sending rating:", error));
+          }
+        </script>
+
         <!-- Strength Selector -->
         <div class="selector">
           <label class="selector__label">MG</label>
@@ -186,9 +169,9 @@
             <!-- MG buttons will be generated dynamically -->
           </div>
         </div>
-  
+
         <!-- TABS -->
-        <div class="tabs-wrapper">
+        <!-- <div class="tabs-wrapper">
           <div class="tabs">
             <button class="tabs__btn tabs__btn--active" data-tab="desc">Description</button>
             <button class="tabs__btn" data-tab="benefits">Symptoms</button>
@@ -217,12 +200,12 @@
               <p>Loading reviews...</p>
             </div>
           </div>
-        </div>
-  
+        </div> -->
+
         <h2 class="product-info__subtitle">
           Select The Strength & Quantity <span>💊</span>
         </h2>
-  
+
         <!-- TABLE -->
         <div class="table-wrapper">
           <table class="product-table">
@@ -240,88 +223,95 @@
             </tbody>
           </table>
         </div>
-        
 
+        <!-- Custom Order Modal -->
+        <div id="toggleBox" class="custom-order-modal">
+          <h2>Select Custom MG and Quantity</h2>
+          <div class="selection-container">
+            <!-- MG Selection -->
+            <div class="select-group">
+              <label for="mg-select">Choose MG:</label>
+              <select id="mg-select">
+                <option value="1">1 MG</option>
+                <option value="2">2 MG</option>
+                <option value="3">3 MG</option>
+                <option value="4">4 MG</option>
+                <option value="5">5 MG</option>
+              </select>
+            </div>
 
-<!-- Custom Order Modal -->
-<div id="toggleBox" class="custom-order-modal">
-  <h2>Select Custom MG and Quantity</h2>
-  <div class="selection-container">
-    <!-- MG Selection -->
-    <div class="select-group">
-      <label for="mg-select">Choose MG:</label>
-      <select id="mg-select">
-        <option value="1">1 MG</option>
-        <option value="2">2 MG</option>
-        <option value="3">3 MG</option>
-        <option value="4">4 MG</option>
-        <option value="5">5 MG</option>
-      </select>
-    </div>
+            <!-- Quantity Selection -->
+            <div class="select-group">
+              <label for="quantity-select">Choose Quantity:</label>
+              <input
+                type="number"
+                placeholder="Quantity"
+                class="quat-input"
+                id="quantity-select"
+                min="1"
+              />
+            </div>
+          </div>
 
-    <!-- Quantity Selection -->
-    <div class="select-group">
-      <label for="quantity-select">Choose Quantity:</label>
-      <input type="number" placeholder="Quantity" class="quat-input" id="quantity-select" min="1">
-    </div>
-  </div>
+          <!-- Submit Button -->
+          <div class="submit-container">
+            <button id="submit-selection">Submit</button>
+          </div>
+        </div>
+        <script>
+          const showBtn = document.getElementById("showButton");
+          const modal = document.getElementById("toggleBox");
+          const overlay = document.getElementById("overlay");
 
-  <!-- Submit Button -->
-  <div class="submit-container">
-    <button id="submit-selection">Submit</button>
-  </div>
-</div>
-<script>
-  const showBtn = document.getElementById("showButton");
-const modal = document.getElementById("toggleBox");
-const overlay = document.getElementById("overlay");
+          // Open modal
+          showBtn.addEventListener("click", () => {
+            modal.classList.add("active");
+            overlay.classList.add("active");
+          });
 
-// Open modal
-showBtn.addEventListener("click", () => {
-  modal.classList.add("active");
-  overlay.classList.add("active");
-});
+          // Close modal on outside click
+          overlay.addEventListener("click", () => {
+            modal.classList.remove("active");
+            overlay.classList.remove("active");
+          });
 
-// Close modal on outside click
-overlay.addEventListener("click", () => {
-  modal.classList.remove("active");
-  overlay.classList.remove("active");
-});
+          // Close on Escape key
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+              modal.classList.remove("active");
+              overlay.classList.remove("active");
+            }
+          });
+        </script>
 
-// Close on Escape key
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    modal.classList.remove("active");
-    overlay.classList.remove("active");
-  }
-});
-
-</script>
-  
         <!-- FAQ ACCORDION -->
         <div class="faq">
           <h3>FAQs</h3>
           <div class="faq__item">
             <button class="faq__q">How quickly does it work?</button>
-            <div class="faq__a hidden">Most patients feel relief within 15–20 minutes after ingestion.</div>
+            <div class="faq__a hidden">
+              Most patients feel relief within 15–20 minutes after ingestion.
+            </div>
           </div>
           <div class="faq__item">
             <button class="faq__q">Any common side effects?</button>
-            <div class="faq__a hidden">May include drowsiness, dizziness, or headache.</div>
+            <div class="faq__a hidden">
+              May include drowsiness, dizziness, or headache.
+            </div>
           </div>
         </div>
       </div>
     </main>
-  
+
     <!-- Details Sections -->
     <section class="differ" id="differ">
       <!-- Will be filled dynamically -->
     </section>
-    
+
     <section class="three-box-section" id="three-box-section">
       <!-- Will be filled dynamically -->
     </section>
-  
+
     <!-- Footer -->
     <footer class="footer">
       <div class="footer-content">
@@ -377,68 +367,69 @@ document.addEventListener("keydown", (e) => {
         </div>
       </div>
     </footer>
-    
+
     <script>
-      let name_dabba = '';
+      let name_dabba = "";
       let imgg = "";
       // Fetch product details from API based on the product_ID in the URL
       async function fetchProductDetails() {
         // Show loading indicators
         document.getElementById("nameing_of_product").innerHTML = "Loading...";
-        document.getElementById("differ").innerHTML = '<div class="loading-spinner"></div>';
-        document.getElementById("three-box-section").innerHTML = '<div class="loading-spinner"></div>';
-        
+        document.getElementById("differ").innerHTML =
+          '<div class="loading-spinner"></div>';
+        document.getElementById("three-box-section").innerHTML =
+          '<div class="loading-spinner"></div>';
+
         // Get product_ID from URL (expected format: /product?product_ID=5)
         const urlParams = new URLSearchParams(window.location.search);
         const productID = urlParams.get("product_ID");
-        
+
         if (!productID) {
           showError("Product ID not found in URL");
           return;
         }
-        
+
         try {
           // Fetch product details and variants from the API
           const resp = await fetch(`/api/product?product_ID=${productID}`);
           const { product, variants } = await resp.json();
-          
+
           buildProductSearch();
           updateProductUI(product, variants);
-          
         } catch (error) {
           console.error("Error fetching product details:", error);
           showError("Failed to load product details. Please try again later.");
         }
       }
-      
+
       // Build search options for the datalist
       async function buildProductSearch() {
         try {
           const response = await fetch(`/products`);
           const products = await response.json();
-          
+
           const searchList = document.getElementById("search_list");
           searchList.innerHTML = "";
           const fragment = document.createDocumentFragment();
-          
+
           products.forEach((product) => {
             const option = document.createElement("option");
             option.value = product.product_name || "Product Name";
             option.textContent = product.product_name || "Product Name";
             fragment.appendChild(option);
           });
-          
+
           searchList.appendChild(fragment);
-          
+
           const searchButton = document.getElementById("search-button");
           const searchInput = document.getElementById("search-input");
-          
+
           searchButton.addEventListener("click", () => {
             const query = searchInput.value.trim();
             const matchingProduct = products.find(
               (product) => product.product_name === query
             );
-            
+
             if (matchingProduct) {
               window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
             } else {
@@ -449,91 +440,142 @@ document.addEventListener("keydown", (e) => {
           console.error("Error is", error);
         }
       }
-      
+
       // Update the UI with product details and variants
       function updateProductUI(product, variants) {
         name_dabba = product.product_name;
         imgg = product.image_url;
         console.log(product);
         // Update product name
-        document.getElementById("nameing_of_product").innerHTML = 
-          `${product.product_name || "Product Name"} <span class="accent">Capsules</span>`;
-        
+        document.getElementById("nameing_of_product").innerHTML = `${
+          product.product_name || "Product Name"
+        } <span class="accent">Capsules</span>`;
+
         // Update carousel images
         document.getElementById("product_images_sinf").innerHTML = `
-          <img src="${product.image_url || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
-          <img src="${product.addtional_img1 || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
-          <img src="${product.addtional_img2 || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
-          <img src="${product.addtional_img3 || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
-          <img src="${product.addtional_img4 || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
-          <img src="${product.addtional_img5 || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
-          <img src="${product.addtional_img6 || "./assets/image/placeholder.png"}" alt="${product.product_name}" loading="lazy" />
+          <img src="${
+            product.image_url || "./assets/image/placeholder.png"
+          }" alt="${product.product_name}" loading="lazy" />
+          <img src="${
+            product.addtional_img1 || "./assets/image/placeholder.png"
+          }" alt="${product.product_name}" loading="lazy" />
+          <img src="${
+            product.addtional_img2 || "./assets/image/placeholder.png"
+          }" alt="${product.product_name}" loading="lazy" />
+          <img src="${
+            product.addtional_img3 || "./assets/image/placeholder.png"
+          }" alt="${product.product_name}" loading="lazy" />
+          <img src="${
+            product.addtional_img4 || "./assets/image/placeholder.png"
+          }" alt="${product.product_name}" loading="lazy" />
+          <img src="${
+            product.addtional_img5 || "./assets/image/placeholder.png"
+          }" alt="${product.product_name}" loading="lazy" />
+          <img src="${
+            product.addtional_img6 || "./assets/image/placeholder.png"
+          }" alt="${product.product_name}" loading="lazy" />
         `;
-        
+
         // Update tabs content
         document.getElementById("desc").innerHTML = `
           <p>${product.product_description || "No description available."}</p>
         `;
-        
+
         document.getElementById("benefits").innerHTML = `
           <ul class="tab-list">
-            <li>Withdrawal Symptoms: ${product.withdrawal_symptoms|| "N/A"}</li>
-            <li>Warnings Precautions : ${product.warnings_precautions || "N/A"}</li>
+            <li>Withdrawal Symptoms: ${
+              product.withdrawal_symptoms || "N/A"
+            }</li>
+            <li>Warnings Precautions : ${
+              product.warnings_precautions || "N/A"
+            }</li>
           </ul>
         `;
-        
+
         document.getElementById("details").innerHTML = `
           <p>Ingredients: ${product.ingredients || "Not specified"}</p>
-          <p>Packaging Details: ${product.packaging_details || "Not specified"}</p>
+          <p>Packaging Details: ${
+            product.packaging_details || "Not specified"
+          }</p>
         `;
-        
+
         document.getElementById("usage").innerHTML = `
           <ol class="tab-list">
-            <li>${product.how_to_use || "Use as directed by your physician."}</li>
-            <li>Storage: ${product.storage || "Store in a cool, dry place."}</li>
-            <li>Drug Interaction: ${product.drug_interaction || "Consult your doctor about possible drug interactions."}</li>
+            <li>${
+              product.how_to_use || "Use as directed by your physician."
+            }</li>
+            <li>Storage: ${
+              product.storage || "Store in a cool, dry place."
+            }</li>
+            <li>Drug Interaction: ${
+              product.drug_interaction ||
+              "Consult your doctor about possible drug interactions."
+            }</li>
           </ol>
         `;
-        
+
         document.getElementById("reviews").innerHTML = `
           <p><strong>Average Rating:</strong> 4.5/5 stars</p>
           <p><strong>Recent Review:</strong> "This medication worked well for me!" - Recent Customer</p>
         `;
-        
-      
-      document.getElementById("differ").innerHTML = `
+
+        document.getElementById("differ").innerHTML = `
   <div class="accordion-container">
-    ${generateAccordionItem("1. Product Details", `
+    ${generateAccordionItem(
+      "1. Product Details",
+      `
       <li><strong>Product Name:</strong> ${product.product_name || "N/A"}</li>
-      <li><strong>Description:</strong> ${product.product_description || "N/A"}</li>
+      <li><strong>Description:</strong> ${
+        product.product_description || "N/A"
+      }</li>
       <li><strong>Trade Names:</strong> ${product.trade_names || "N/A"}</li>
       <li><strong>Ingredients:</strong> ${product.ingredients || "N/A"}</li>
-    `)}
-    ${generateAccordionItem("2. Manufactured By", `
+    `
+    )}
+    ${generateAccordionItem(
+      "2. Manufactured By",
+      `
       <li>${product.manufactured_by || "No manufacturer info available"}</li>
-    `)}
-    ${generateAccordionItem("3. Drug Abuse", `
+    `
+    )}
+    ${generateAccordionItem(
+      "3. Drug Abuse",
+      `
       <li>${product.drug_abuse || "No drug abuse info available"}</li>
-    `)}
-    ${generateAccordionItem("4. Usage & Instructions", `
+    `
+    )}
+    ${generateAccordionItem(
+      "4. Usage & Instructions",
+      `
       <li><strong>How to Use:</strong> ${product.how_to_use || "N/A"}</li>
-      <li><strong>Drug Interactions:</strong> ${product.drug_interaction || "N/A"}</li>
+      <li><strong>Drug Interactions:</strong> ${
+        product.drug_interaction || "N/A"
+      }</li>
       <li><strong>Storage:</strong> ${product.storage || "N/A"}</li>
       <li><strong>Side Effects:</strong> ${product.side_effects || "N/A"}</li>
-      <li><strong>Withdrawal Symptoms:</strong> ${product.withdrawal_symptoms || "N/A"}</li>
-    `)}
-    ${generateAccordionItem("5. Packaging Details", `
+      <li><strong>Withdrawal Symptoms:</strong> ${
+        product.withdrawal_symptoms || "N/A"
+      }</li>
+    `
+    )}
+    ${generateAccordionItem(
+      "5. Packaging Details",
+      `
       <li>${product.packaging_details || "No packaging info available"}</li>
-    `)}
-    ${generateAccordionItem("6. Safety Information", `
+    `
+    )}
+    ${generateAccordionItem(
+      "6. Safety Information",
+      `
       <li>${product.warnings_precautions || "No safety info available"}</li>
-    `)}
+    `
+    )}
   </div>
 `;
-setupProductVariants(variants);
+        setupProductVariants(variants);
 
-function generateAccordionItem(title, content) {
-  return `
+        function generateAccordionItem(title, content) {
+          return `
     <div class="accordion-item">
       <button class="accordion-header">${title}</button>
       <div class="accordion-body">
@@ -541,60 +583,67 @@ function generateAccordionItem(title, content) {
       </div>
     </div>
   `;
-}
+        }
 
-// Accordion toggle behavior
-document.addEventListener("click", function (e) {
-  if (e.target.classList.contains("accordion-header")) {
-    e.target.classList.toggle("active");
-    const body = e.target.nextElementSibling;
-    body.style.maxHeight = body.style.maxHeight ? null : body.scrollHeight + "px";
-  }
-});}
+        // Accordion toggle behavior
+        document.addEventListener("click", function (e) {
+          if (e.target.classList.contains("accordion-header")) {
+            e.target.classList.toggle("active");
+            const body = e.target.nextElementSibling;
+            body.style.maxHeight = body.style.maxHeight
+              ? null
+              : body.scrollHeight + "px";
+          }
+        });
+      }
 
       // Set up variant buttons and table rows
       function setupProductVariants(variants) {
-        const mgValues = [...new Set(variants.map((variant) => variant.unit_value))];
+        const mgValues = [
+          ...new Set(variants.map((variant) => variant.unit_value)),
+        ];
         const buttonContainer = document.getElementById("button-container");
         buttonContainer.innerHTML = "";
-        
+
         mgValues.forEach((mg, index) => {
           const button = document.createElement("button");
           button.className = "btn btn--toggle";
           if (index === 0) button.classList.add("btn--active");
           button.textContent = mg;
           button.setAttribute("data-mg", mg);
-          
+
           button.addEventListener("click", () => {
-            document.querySelectorAll(".btn--toggle").forEach((btn) => btn.classList.remove("btn--active"));
+            document
+              .querySelectorAll(".btn--toggle")
+              .forEach((btn) => btn.classList.remove("btn--active"));
             button.classList.add("btn--active");
             displayVariantOptions(variants, mg);
           });
-          
+
           buttonContainer.appendChild(button);
-          
+
           if (index === 0) {
             displayVariantOptions(variants, mg);
           }
         });
       }
-      
+
       // Display variant options in the table
       function displayVariantOptions(variants, selectedMg) {
         const tableBody = document.getElementById("popil");
         tableBody.innerHTML = "";
-        
+
         const matchingVariants = variants.filter(
           (variant) => variant.unit_value === selectedMg
         );
         // console.log(variants);
         const fragment = document.createDocumentFragment();
-        
+
         matchingVariants.forEach((variant) => {
-          console.log("varietns are ",variant);
+          console.log("varietns are ", variant);
           const tr = document.createElement("tr");
           tr.setAttribute("data-mg", variant.unit_value);
-          
+
           tr.innerHTML = `
             <td>${variant.unit_value} ${variant.unit_type}</td>
             <td>${variant.qty}</td>
@@ -611,32 +660,34 @@ document.addEventListener("click", function (e) {
               </button>
             </td>
           `;
-          
+
           fragment.appendChild(tr);
         });
-        
+
         tableBody.appendChild(fragment);
         setupAddToCartButtons();
       }
-      
+
       // Set up "Add To Cart" buttons
       function setupAddToCartButtons() {
         document.querySelectorAll(".btn--add").forEach((button) => {
-          button.addEventListener("click", function() {
+          button.addEventListener("click", function () {
             const variantId = this.getAttribute("data-variant-id");
             const quantity = this.getAttribute("data-quantity") || 1;
             const mg = this.getAttribute("data-mg") || "default_mg_value";
-            const price = this.getAttribute("data-price").replace(/[^0-9,.]/g, '') || "default_price";
+            const price =
+              this.getAttribute("data-price").replace(/[^0-9,.]/g, "") ||
+              "default_price";
             const immg = imgg;
             const name = name_dabba;
-            
-            addToCart(variantId, quantity, mg, price, name,immg);
+
+            addToCart(variantId, quantity, mg, price, name, immg);
           });
         });
       }
-      
+
       // Send a POST request to add the item to cart
-      function addToCart(variantId, quantity, mg, price, name,immg) {
+      function addToCart(variantId, quantity, mg, price, name, immg) {
         fetch("/add-to-cart", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -646,23 +697,23 @@ document.addEventListener("click", function (e) {
             mg: mg,
             price: price,
             name: name,
-            image_url:immg
+            image_url: immg,
           }),
         })
-        .then((response) => response.json())
-        .then((result) => {
-          if (result.success) {
-            alert("Item added to cart!");
-          } else {
-            alert("Error: " + result.message);
-          }
-        })
-        .catch((error) => {
-          console.error("Error adding to cart:", error);
-          alert("Server error, please try again later.");
-        });
+          .then((response) => response.json())
+          .then((result) => {
+            if (result.success) {
+              alert("Item added to cart!");
+            } else {
+              alert("Error: " + result.message);
+            }
+          })
+          .catch((error) => {
+            console.error("Error adding to cart:", error);
+            alert("Server error, please try again later.");
+          });
       }
-      
+
       // Display error messages in designated areas
       function showError(message) {
         const errorElements = [
@@ -671,141 +722,150 @@ document.addEventListener("click", function (e) {
           document.getElementById("three-box-section"),
           document.getElementById("product_images_sinf"),
         ];
-        
+
         errorElements.forEach((element) => {
           if (element) {
             element.innerHTML = `<div class="error-message">${message}</div>`;
           }
         });
       }
-      
+
       // Tabs functionality
       function setupTabs() {
-        const tabButtons = document.querySelectorAll('.tabs__btn');
-        
-        tabButtons.forEach(button => {
-          button.addEventListener('click', () => {
+        const tabButtons = document.querySelectorAll(".tabs__btn");
+
+        tabButtons.forEach((button) => {
+          button.addEventListener("click", () => {
             // Remove active class from all buttons and tabs
-            document.querySelectorAll('.tabs__btn').forEach(btn => {
-              btn.classList.remove('tabs__btn--active');
+            document.querySelectorAll(".tabs__btn").forEach((btn) => {
+              btn.classList.remove("tabs__btn--active");
             });
-            
-            document.querySelectorAll('.tab').forEach(tab => {
-              tab.classList.add('hidden');
+
+            document.querySelectorAll(".tab").forEach((tab) => {
+              tab.classList.add("hidden");
             });
-            
+
             // Add active class to clicked button
-            button.classList.add('tabs__btn--active');
-            
+            button.classList.add("tabs__btn--active");
+
             // Show corresponding tab
-            const tabId = button.getAttribute('data-tab');
-            document.getElementById(tabId).classList.remove('hidden');
+            const tabId = button.getAttribute("data-tab");
+            document.getElementById(tabId).classList.remove("hidden");
           });
         });
       }
-      
+
       // FAQ accordion functionality
       function setupFaqAccordion() {
-        const faqQuestions = document.querySelectorAll('.faq__q');
-        
-        faqQuestions.forEach(question => {
-          question.addEventListener('click', () => {
+        const faqQuestions = document.querySelectorAll(".faq__q");
+
+        faqQuestions.forEach((question) => {
+          question.addEventListener("click", () => {
             const answer = question.nextElementSibling;
-            answer.classList.toggle('hidden');
+            answer.classList.toggle("hidden");
           });
         });
       }
-      
+
       // Image carousel functionality
       function setupCarousel() {
-        const carousel = document.querySelector('.carousel__slide');
-        const prevButton = document.getElementById('prevSlide');
-        const nextButton = document.getElementById('nextSlide');
+        const carousel = document.querySelector(".carousel__slide");
+        const prevButton = document.getElementById("prevSlide");
+        const nextButton = document.getElementById("nextSlide");
         let currentSlide = 0;
-        
+
         function showSlide(index) {
-          const slides = carousel.querySelectorAll('img');
+          const slides = carousel.querySelectorAll("img");
           if (slides.length === 0) return;
-          
+
           // Hide all slides
-          slides.forEach(slide => {
-            slide.style.display = 'none';
+          slides.forEach((slide) => {
+            slide.style.display = "none";
           });
-          
+
           // Show the current slide
-          slides[index].style.display = 'block';
+          slides[index].style.display = "block";
         }
-        
+
         // Initialize carousel
         function initCarousel() {
-          const slides = carousel.querySelectorAll('img');
+          const slides = carousel.querySelectorAll("img");
           if (slides.length === 0) return;
-          
+
           showSlide(currentSlide);
-          
-          prevButton.addEventListener('click', () => {
+
+          prevButton.addEventListener("click", () => {
             currentSlide = (currentSlide - 1 + slides.length) % slides.length;
             showSlide(currentSlide);
           });
-          
-          nextButton.addEventListener('click', () => {
+
+          nextButton.addEventListener("click", () => {
             currentSlide = (currentSlide + 1) % slides.length;
             showSlide(currentSlide);
           });
         }
-        
+
         // Run after images are loaded
         const observer = new MutationObserver((mutations) => {
           mutations.forEach((mutation) => {
-            if (mutation.type === 'childList' && carousel.querySelectorAll('img').length > 0) {
+            if (
+              mutation.type === "childList" &&
+              carousel.querySelectorAll("img").length > 0
+            ) {
               initCarousel();
               observer.disconnect();
             }
           });
         });
-        
+
         observer.observe(carousel, { childList: true });
       }
-      
+
       // Custom order modal functionality
       function setupCustomOrderModal() {
-        const showButton = document.getElementById('showButton');
-        const modal = document.getElementById('toggleBox');
-        const overlay = document.getElementById('overlay');
-        const submitButton = document.getElementById('submit-selection');
-        
-        showButton.addEventListener('click', () => {
-          modal.style.display = 'block';
-          overlay.style.display = 'block';
+        const showButton = document.getElementById("showButton");
+        const modal = document.getElementById("toggleBox");
+        const overlay = document.getElementById("overlay");
+        const submitButton = document.getElementById("submit-selection");
+
+        showButton.addEventListener("click", () => {
+          modal.style.display = "block";
+          overlay.style.display = "block";
         });
-        
-        overlay.addEventListener('click', () => {
-          modal.style.display = 'none';
-          overlay.style.display = 'none';
+
+        overlay.addEventListener("click", () => {
+          modal.style.display = "none";
+          overlay.style.display = "none";
         });
-        
-        submitButton.addEventListener('click', () => {
-          const mgSelect = document.getElementById('mg-select');
-          const quantityInput = document.getElementById('quantity-select');
-          
+
+        submitButton.addEventListener("click", () => {
+          const mgSelect = document.getElementById("mg-select");
+          const quantityInput = document.getElementById("quantity-select");
+
           const selectedMg = mgSelect.value;
           const selectedQuantity = quantityInput.value;
-          
-          if (!selectedQuantity || isNaN(selectedQuantity) || selectedQuantity <= 0) {
-            alert('Please enter a valid quantity');
+
+          if (
+            !selectedQuantity ||
+            isNaN(selectedQuantity) ||
+            selectedQuantity <= 0
+          ) {
+            alert("Please enter a valid quantity");
             return;
           }
-          
+
           // Handle custom order processing here
-          alert(`Custom order placed: ${selectedMg}MG, Quantity: ${selectedQuantity}`);
-          
-          modal.style.display = 'none';
-          overlay.style.display = 'none';
+          alert(
+            `Custom order placed: ${selectedMg}MG, Quantity: ${selectedQuantity}`
+          );
+
+          modal.style.display = "none";
+          overlay.style.display = "none";
         });
       }
-      
+
       // Initialize everything when the DOM is loaded
-      document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener("DOMContentLoaded", function () {
         fetchProductDetails();
         setupTabs();
         setupFaqAccordion();
