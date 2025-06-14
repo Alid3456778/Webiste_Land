@@ -9,8 +9,9 @@
     <style></style>
   </head>
   <body>
+   
     <header class="navbar">
-      <div class="navbar-top">
+      <div class="navbar-top" id="navbar">
         <div
           class="logo"
           onclick="this.querySelector('a').click(); return true;"
@@ -46,30 +47,30 @@
     <main class="checkout-container">
       <h1>Billing Details</h1>
       <!-- <progress id="checkout-form" max="100" value="70">70%</progress> -->
-      <div class="checkout-card">
+      <div class="checkout-card" class="input-group"> 
         <form id="checkout-form" class="checkout-form">
           <!-- Billing Details -->
-          <div class="form-group">
+          <div class="form-group input-group">
             <label for="first-name">First Name <span>*</span></label>
             <input type="text" id="first-name" name="firstName" required />
           </div>
-          <div class="form-group">
+          <div class="form-group input-group">
             <label for="last-name">Last Name <span>*</span></label>
             <input type="text" id="last-name" name="lastName" required />
           </div>
-          <div class="form-group">
+          <div class="form-group input-group">
             <label for="phone">Phone <span>*</span></label>
             <input type="tel" id="phone" name="phone" required />
           </div>
-          <div class="form-group">
+          <div class="form-group input-group">
             <label for="email">Email Address <span>*</span></label>
             <input type="email" id="email" name="email" required />
           </div>
-          <div class="form-group">
+          <div class="form-group input-group">
             <label for="company-name">Company Name (optional)</label>
             <input type="text" id="company-name" />
           </div>
-          <div class="form-group">
+          <div class="form-group input-group">
             <label for="country">Country / Region <span>*</span></label>
             <select id="country" required>
               <option value="United States">United States (US)</option>
@@ -77,35 +78,36 @@
               <option value="Canada">Canada</option>
             </select>
           </div>
-          <div class="form-group">
+          <div class="form-group input-group">
             <label for="street-address">Street Address <span>*</span></label>
             <input
               type="text"
               id="street-address"
               name="billingStreetAddress"
-              placeholder="House number and street name"
+              placeholder=""
               required
             />
           </div>
-          <div class="form-group">
+          <div class="form-group input-group">
             <label for="apartment"
               >Apartment, suite, unit, etc. (optional)</label
             >
             <input type="text" id="apartment" />
           </div>
-          <div class="form-group">
+          <div class="form-group input-group">
             <label for="city">Town / City <span>*</span></label>
             <input type="text" id="city" name="billingCity" required />
           </div>
-          <div class="form-group">
+          <div class="form-group input-group">
             <label for="state">State <span>*</span></label>
             <select id="state" name="billingState" required>
+              <option value="Texas">Texas</option>
               <option value="California">California</option>
               <option value="New York">New York</option>
-              <option value="Texas">Texas</option>
+              
             </select>
           </div>
-          <div class="form-group">
+          <div class="form-group input-group">
             <label for="zip-code">ZIP Code <span>*</span></label>
             <input type="text" id="zip-code" name="billingZip" required />
           </div>
@@ -119,7 +121,7 @@
             <h2>Shipping Address</h2>
             <div class="form-group">
               <label for="ship-street-address"
-                >Street Address <span>*</span></label
+                > <span>*</span></label
               >
               <input
                 type="text"
@@ -372,7 +374,62 @@ document.getElementById("place-order-btn").addEventListener("click", async () =>
 
   
     </script>
+     <script>
+      // checkout.js
+document.getElementById("different-address").addEventListener("change", function () {
+  const shippingForm = document.getElementById("shipping-address-form");
+  shippingForm.style.display = this.checked ? "block" : "none";
+});
+
+// Sample dummy cart data
+const sampleCartItems = [
+  { product: "Paracetamol 500mg", subtotal: 100 },
+  { product: "Cough Syrup", subtotal: 150 }
+];
+
+function populateCart(cartItems) {
+  const cartBody = document.getElementById("cart-items");
+  const totalCostEl = document.getElementById("total-cost");
+
+  let total = 0;
+  cartItems.forEach(item => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${item.product}</td>
+      <td>$${item.subtotal.toFixed(2)}</td>
+    `;
+    cartBody.appendChild(row);
+    total += item.subtotal;
+  });
+
+  // Add shipping cost
+  const shipping = 50;
+  total += shipping;
+
+  totalCostEl.textContent = `$${total.toFixed(2)}`;
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  populateCart(sampleCartItems);
+});
+
+    </script>
 
     <script src="./assets/js/checkout1.js"></script>
-  </body>
+  
+  <!-- Place this at the end, just before </body> -->
+<script>
+  let lastScrollY = window.scrollY;
+  const navbar = document.getElementById('navbar');
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > lastScrollY && window.scrollY > 50) {
+      navbar.classList.add('hidden');
+    } else {
+      navbar.classList.remove('hidden');
+    }
+    lastScrollY = window.scrollY;
+  });
+</script>
+</body>
 </html>
