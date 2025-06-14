@@ -38,15 +38,15 @@
       <h2>Bill Summary</h2>
       <div class="bill-item">
         <span>Subtotal</span>
-        <span id="subtotal">₹0</span>
+        <span id="subtotal">$0</span>
       </div>
       <div class="bill-item">
         <span>Tax (5%)</span>
-        <span id="tax">₹0</span>
+        <span id="tax">$0</span>
       </div>
       <div class="bill-item total">
         <span>Total</span>
-        <span id="total">₹0</span>
+        <span id="total">$0</span>
       </div>
       <a href="./checkout1.html">
         <button class="checkout-btn">Proceed to Checkout</button>
@@ -148,9 +148,9 @@
         }
 
         const tax = subtotal * 0.05;
-        document.getElementById("subtotal").textContent = `₹${subtotal.toFixed(2)}`;
-        document.getElementById("tax").textContent = `₹${tax.toFixed(2)}`;
-        document.getElementById("total").textContent = `₹${(subtotal + tax).toFixed(2)}`;
+        document.getElementById("subtotal").textContent = `$${subtotal.toFixed(2)}`;
+        document.getElementById("tax").textContent = `$${tax.toFixed(2)}`;
+        document.getElementById("total").textContent = `$${(subtotal + tax).toFixed(2)}`;
       } catch (err) {
         console.error(err);
         document.getElementById("cart-items").innerHTML = "<p>Error loading cart items.</p>";

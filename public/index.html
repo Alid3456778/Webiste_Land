@@ -149,20 +149,6 @@
       </div>
     </header>
 
-    <!-- Sidebar
-    <div id="sidebar" class="sidebar">
-      <button id="close-sidebar" class="close-btn">✖</button>
-      <div class="sidebar-content">
-        <h2>Menu</h2>
-        <ul>
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Products</a></li>
-          <li><a href="#">About Us</a></li>
-          <li><a href="#">Contact</a></li>
-        </ul>
-      </div>
-    </div> -->
-
     <!-- HERO -->
     <section class="hero-alt">
       <div class="hero-alt__bg">
@@ -180,25 +166,6 @@
         >
       </div>
     </section>
-
-    <!-- pop up -->
-    <!-- <div id="popup" class="popup-overlay">
-      <div class="popup-content">
-        <img
-          src="./assets/image2/Gemini_Generated_Image_s3achms3achms3ac.jpg"
-          alt=""
-        />
-        <span class="close-btn" onclick="closePopup()">&times;</span>
-        <h2 class="headd">Special Offer!</h2>
-        <p>
-          Flat 25% off + up to 10% cash-in-wallet +
-          <strong>free shipping</strong>
-        </p>
-        <span>Code: <strong>NMSNEW</strong></span>
-        <br />
-        <button class="btn" onclick="closePopup()">Claim Offer</button>
-      </div>
-    </div> -->
 
     <!-- FEATURES -->
     <section class="features">
@@ -323,14 +290,6 @@
       });
     </script>
 
-    <!-- NEW ARRIVALS SECTION -->
-    <!-- <section id="new-arrivals" class="product-section">
-      <h2 class="section-title">New Arrivals</h2>
-      <div class="product-grid" id="product-grids">
-        
-      </div>
-    </section> -->
-
     <!-- TESTIMONIALS -->
     <section class="testimonials">
       <h2>What Our Customers Say</h2>
@@ -350,21 +309,6 @@
       </div>
     </section>
 
-    <!-- TRUST BADGES -->
-    <!-- <section class="trust-alt">
-      <div class="trust__item">
-        <img src="images.jpeg" alt="Secure Payment" />
-        <p>Secure Payment</p>
-      </div>
-      <div class="trust__item">
-        <img src="qa.png" alt="Quality Assured" />
-        <p>Quality Assured</p>
-      </div>
-      <div class="trust__item">
-        <img src="gol.jpg" alt="Data Privacy" />
-        <p>Data Privacy</p>
-      </div>
-    </section> -->
 
     <footer class="footer">
       <div class="footer-content">
@@ -508,51 +452,5 @@
       buildProductSearch();
     </script>
 
-    <!-- Popup Script -->
-    <!-- <script>
-      // Function to show the popup
-      function showPopup() {
-        const popup = document.getElementById("popup");
-        popup.classList.add("visible");
-
-        // Store the current timestamp as the last shown time
-        localStorage.setItem("lastPopupTime", Date.now());
-      }
-
-      // Function to close the popup
-      function closePopup() {
-        const popup = document.getElementById("popup");
-        popup.classList.remove("visible");
-      }
-
-      // Automatically show the popup if 15 minutes have passed
-      window.onload = function () {
-        const lastPopupTime = localStorage.getItem("lastPopupTime");
-        const now = Date.now();
-        const fifteenMinutes = 15 * 60 * 1000; // 15 minutes in milliseconds
-
-        // Show popup if it has never been shown or 15 minutes have passed
-        if (!lastPopupTime || now - lastPopupTime > fifteenMinutes) {
-          setTimeout(showPopup, 1000); // Popup will appear after 1 second
-        }
-
-        // Initialize sidebar functionality
-        const hamburgerMenu = document.getElementById("hamburger-menu");
-        const sidebar = document.getElementById("sidebar");
-        const closeSidebar = document.getElementById("close-sidebar");
-
-        hamburgerMenu.addEventListener("click", function () {
-          sidebar.style.width = "250px";
-          sidebar.style.display = "block";
-        });
-
-        closeSidebar.addEventListener("click", function () {
-          sidebar.style.width = "0";
-          setTimeout(function () {
-            sidebar.style.display = "none";
-          }, 300);
-        });
-      };
-    </script> -->
   </body>
 </html>
