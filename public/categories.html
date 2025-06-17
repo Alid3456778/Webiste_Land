@@ -105,11 +105,7 @@
             // console.log(products);
             batch.forEach((product) => {
               const productID = product.id;
-              const priceObj = prices.find(
-                (price) => price.product_id === productID
-              );
-              const price = priceObj ? price.price : "Price not available";
-
+               
               const rowHTML = `
         <div class="product-card medicine-card ${
           product.category_id || "all"
@@ -120,7 +116,9 @@
             onload="this.style.opacity='1'" />
           <div class="product-details">
             <h3>${product.product_name || "No Description"}</h3>
-            <p id="pric">(${product.trade_names})</p>
+            <p id="pric">${product.trade_names 
+      ? product.trade_names.split(',')[0].trim() 
+      : ''}</p>
             <p>(4-5 Day's Delivery)</p>
             <div class="product-buttons">
              
