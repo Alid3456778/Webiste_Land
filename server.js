@@ -433,9 +433,9 @@ app.get("/products", async (req, res) => {
     let query;
     let params = [];
     if (categoryID === "all") {
-      query = "SELECT * FROM products ORDER BY product_id ASC";
+      query = "SELECT * FROM products ORDER BY product_name";
     } else {
-      query = "SELECT * FROM products WHERE category_id = $1 ORDER BY product_id ASC";
+      query = "SELECT * FROM products WHERE category_id = $1 ORDER BY product_name";
       params = [categoryID];
     }
 
