@@ -52,6 +52,7 @@ body {
 }
 .logo {
   height: 2rem;
+  cursor: pointer;
 }
 .brand-name {
   font-weight: 600;
