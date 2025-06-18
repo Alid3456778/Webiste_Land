@@ -321,6 +321,39 @@ app.get("/api/product", async (req, res) => {
   }
 });
 
+// Update product endpoint
+app.put('/api/products/update/:id', async (req, res) => {
+  const { id } = req.params; // Product ID from URL
+  const updates = req.body; // Updated fields from request body
+
+  try {
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ error: 'No fields to update.' });
+    }
+
+    // Build dynamic SQL query
+    const fields = Object.keys(updates);
+    const values = Object.values(updates);
+    const setClause = fields.map((field, index) => `${field} = $${index + 1}`).join(', ');
+
+    const query = `UPDATE products SET ${setClause} WHERE product_id = $${fields.length + 1}`;
+    values.push(id);
+
+    // Execute query
+    const result = await pool.query(query, values);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Product not found or no changes made.' });
+    }
+
+    res.json({ message: 'Product updated successfully.' });
+  } catch (err) {
+    console.error('Error updating product:', err);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+
 app.post("/api/products/search", async (req, res) => {
   const { id, name } = req.body;
 

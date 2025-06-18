@@ -6,9 +6,8 @@
     <title>Employee Dashboard - McLand Pharma</title>
     <style></style>
     <link rel="stylesheet" href="./assets/css/employee.css" />
-    
- 
   </head>
+
   <body>
     <header>
       <h1>McLand Pharma - Employee Dashboard</h1>
@@ -16,6 +15,24 @@
         <button id="logoutBtn">Logout</button>
       </nav>
     </header>
+    <script>
+      //— 1) On load, check localStorage. If not logged in, redirect to login.html.
+      document.addEventListener("DOMContentLoaded", () => {
+        const isLoggedIn = localStorage.getItem("employeeLoggedIn");
+        if (isLoggedIn !== "true") {
+          // Not logged in → force to login page:
+          window.location.href = "employee-login.html";
+          return;
+        }
+      });
+
+      //— 2) Logout button clears localStorage and redirects to login:
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        localStorage.removeItem("employeeLoggedIn");
+        localStorage.removeItem("employeeId");
+        window.location.href = "employee-login.html";
+      });
+    </script>
 
     <div class="container">
       <!-- Dashboard Section -->
@@ -31,358 +48,579 @@
         </ul>
       </section>
 
-  <section id="product-form-section" class="card">
-  <h2>Add New Product</h2>
-  <form id="product-form" id="product-form-items">
-    <label for="category_id">Category ID (integer):</label>
-    <input type="number" id="category_id" name="category_id" required />
+      <section id="product-form-section" class="card">
+        <h2>Add New Product</h2>
+        <form id="product-form" id="product-form-items">
+          <label for="category_id">Category ID (integer):</label>
+          <input type="number" id="category_id" name="category_id" required />
 
-    <label for="product_name">Product Name:</label>
-    <input type="text" id="product_name" name="product_name" required />
+          <label for="product_name">Product Name:</label>
+          <input type="text" id="product_name" name="product_name" required />
 
-    <label for="product_description">Product Description:</label>
-    <textarea id="product_description" name="product_description" rows="3" required></textarea>
+          <label for="product_description">Product Description:</label>
+          <textarea
+            id="product_description"
+            name="product_description"
+            rows="3"
+            required
+          ></textarea>
 
-    <label for="trade_names">Trade Names:</label>
-    <input type="text" id="trade_names" name="trade_names" required />
+          <label for="trade_names">Trade Names:</label>
+          <input type="text" id="trade_names" name="trade_names" required />
 
-    <label for="ingredients">Ingredients:</label>
-    <textarea id="ingredients" name="ingredients" rows="3" required></textarea>
+          <label for="ingredients">Ingredients:</label>
+          <textarea
+            id="ingredients"
+            name="ingredients"
+            rows="3"
+            required
+          ></textarea>
 
-    <label for="manufactured_by">Manufactured By:</label>
-    <input type="text" id="manufactured_by" name="manufactured_by" required />
+          <label for="manufactured_by">Manufactured By:</label>
+          <input
+            type="text"
+            id="manufactured_by"
+            name="manufactured_by"
+            required
+          />
 
-    <label for="packaging_details">Packaging Details:</label>
-    <textarea id="packaging_details" name="packaging_details" rows="3" required></textarea>
+          <label for="packaging_details">Packaging Details:</label>
+          <textarea
+            id="packaging_details"
+            name="packaging_details"
+            rows="3"
+            required
+          ></textarea>
 
-    <label for="how_to_use">How To Use:</label>
-    <textarea id="how_to_use" name="how_to_use" rows="3" required></textarea>
+          <label for="how_to_use">How To Use:</label>
+          <textarea
+            id="how_to_use"
+            name="how_to_use"
+            rows="3"
+            required
+          ></textarea>
 
-    <label for="drug_interaction">Drug Interaction:</label>
-    <textarea id="drug_interaction" name="drug_interaction" rows="3" required></textarea>
+          <label for="drug_interaction">Drug Interaction:</label>
+          <textarea
+            id="drug_interaction"
+            name="drug_interaction"
+            rows="3"
+            required
+          ></textarea>
 
-    <label for="side_effects">Side Effects:</label>
-    <textarea id="side_effects" name="side_effects" rows="3" required></textarea>
+          <label for="side_effects">Side Effects:</label>
+          <textarea
+            id="side_effects"
+            name="side_effects"
+            rows="3"
+            required
+          ></textarea>
 
-    <label for="warnings_precautions">Warnings/Precautions:</label>
-    <textarea id="warnings_precautions" name="warnings_precautions" rows="3" required></textarea>
+          <label for="warnings_precautions">Warnings/Precautions:</label>
+          <textarea
+            id="warnings_precautions"
+            name="warnings_precautions"
+            rows="3"
+            required
+          ></textarea>
 
-    <label for="withdrawal_symptoms">Withdrawal Symptoms:</label>
-    <textarea id="withdrawal_symptoms" name="withdrawal_symptoms" rows="3" required></textarea>
+          <label for="withdrawal_symptoms">Withdrawal Symptoms:</label>
+          <textarea
+            id="withdrawal_symptoms"
+            name="withdrawal_symptoms"
+            rows="3"
+            required
+          ></textarea>
 
-    <label for="drug_abuse">Drug Abuse:</label>
-    <textarea id="drug_abuse" name="drug_abuse" rows="3" required></textarea>
+          <label for="drug_abuse">Drug Abuse:</label>
+          <textarea
+            id="drug_abuse"
+            name="drug_abuse"
+            rows="3"
+            required
+          ></textarea>
 
-    <label for="storage">Storage:</label>
-    <textarea id="storage" name="storage" rows="3" required></textarea>
+          <label for="storages">Storage:</label>
+          <textarea id="storages" name="storage" rows="3" required></textarea>
 
-    <label for="primary_img">Primary Image URL:</label>
-    <input type="text" id="primary_img" name="primary_img" required />
+          <label for="primary_img">Primary Image URL:</label>
+          <input type="text" id="primary_img" name="primary_img" required />
 
-    <label for="additional_img1">Additional Image 1 URL:</label>
-    <input type="text" id="additional_img1" name="additional_img1" />
+          <label for="additional_img1">Additional Image 1 URL:</label>
+          <input type="text" id="additional_img1" name="additional_img1" />
 
-    <label for="additional_img2">Additional Image 2 URL:</label>
-    <input type="text" id="additional_img2" name="additional_img2" />
+          <label for="additional_img2">Additional Image 2 URL:</label>
+          <input type="text" id="additional_img2" name="additional_img2" />
 
-    <label for="additional_img3">Additional Image 3 URL:</label>
-    <input type="text" id="additional_img3" name="additional_img3" />
+          <label for="additional_img3">Additional Image 3 URL:</label>
+          <input type="text" id="additional_img3" name="additional_img3" />
 
-    <label for="additional_img4">Additional Image 4 URL:</label>
-    <input type="text" id="additional_img4" name="additional_img4" />
+          <label for="additional_img4">Additional Image 4 URL:</label>
+          <input type="text" id="additional_img4" name="additional_img4" />
 
-    <label for="additional_img5">Additional Image 5 URL:</label>
-    <input type="text" id="additional_img5" name="additional_img5" />
+          <label for="additional_img5">Additional Image 5 URL:</label>
+          <input type="text" id="additional_img5" name="additional_img5" />
 
-    <label for="additional_img6">Additional Image 6 URL:</label>
-    <input type="text" id="additional_img6" name="additional_img6" />
+          <label for="additional_img6">Additional Image 6 URL:</label>
+          <input type="text" id="additional_img6" name="additional_img6" />
 
-    <button type="submit">Submit</button>
-  </form>
-</section>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-  const productForm = document.getElementById('product-form');
+          <button type="submit">Submit</button>
+        </form>
+      </section>
+      <script>
+        document.addEventListener("DOMContentLoaded", () => {
+          const productForm = document.getElementById("product-form");
 
-  productForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
+          productForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
 
-    try {
-      // Collect form data
-      const formData = new FormData(productForm);
-      const formObject = Object.fromEntries(formData.entries());
+            try {
+              // Collect form data
+              const formData = new FormData(productForm);
+              const formObject = Object.fromEntries(formData.entries());
 
-      console.log('Submitting form data:', formObject);
+              console.log("Submitting form data:", formObject);
 
-      // Send POST request to backend
-      const response = await fetch(`/api/set_products`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formObject),
-      });
+              // Send POST request to backend
+              const response = await fetch(`/api/set_products`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formObject),
+              });
 
-      const result = await response.json();
-      if (response.ok) {
-        alert(result.message || 'Product added successfully!');
-        productForm.reset();
-      } else {
-        throw new Error(result.error || 'Failed to add product.');
-      }
-    } catch (err) {
-      console.error('Error submitting form:', err);
-      alert('Error saving product. Check console for details.');
-    }
-  });
-});
-</script>
-
-
+              const result = await response.json();
+              if (response.ok) {
+                alert(result.message || "Product added successfully!");
+                productForm.reset();
+              } else {
+                throw new Error(result.error || "Failed to add product.");
+              }
+            } catch (err) {
+              console.error("Error submitting form:", err);
+              alert("Error saving product. Check console for details.");
+            }
+          });
+        });
+      </script>
 
       <section id="existing-products" class="card">
         <h3>Existing Products</h3>
         <h1>Search Product by ID or Name</h1>
-  <form id="search-form">
-    <label for="product_id">Product ID:</label>
-    <input type="number" id="product_id" name="product_id" placeholder="Enter Product ID" />
+        <form id="search-form">
+          <label for="product_id">Product ID:</label>
+          <input
+            type="number"
+            id="product_id"
+            name="product_id"
+            placeholder="Enter Product ID"
+          />
 
-    <label for="product_name">Product Name:</label>
-    <input type="text" id="product_name_2" name="product_name_2" placeholder="Enter Product Name" />
+          <label for="product_name">Product Name:</label>
+          <input
+            type="text"
+            id="product_name_2"
+            name="product_name_2"
+            placeholder="Enter Product Name"
+          />
 
-    <button type="submit">Search</button>
-  </form>
+          <button type="submit">Search</button>
+        </form>
 
-  <div id="result" class="result" style="display: none;">
-    <h3>Product Details:</h3>
-    <p id="product-data">
-       <table class="product-table">
-    <thead>
-      <tr>
-        <th>Field</th>
-        <th>Details</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Product ID</td>
-        <td id="product-id"></td>
-      </tr>
-      <tr>
-        <td>Category ID</td>
-        <td id="category-id"></td>
-      </tr>
-      <tr>
-        <td>Product Name</td>
-        <td id="product-name"></td>
-      </tr>
-      <tr>
-        <td>Description</td>
-        <td id="product-description"></td>
-      </tr>
-      <tr>
-        <td>Trade Names</td>
-        <td id="trade-names"></td>
-      </tr>
-      <tr>
-        <td>Ingredients</td>
-        <td id="ingredients"></td>
-      </tr>
-      <tr>
-        <td>Manufacturer</td>
-        <td id="manufacturer"></td>
-      </tr>
-      <tr>
-        <td>Packaging</td>
-        <td id="packaging"></td>
-      </tr>
-      <tr>
-        <td>Usage Instructions</td>
-        <td id="usage-instructions"></td>
-      </tr>
-      <tr>
-        <td>Drug Interaction</td>
-        <td id="drug-interaction"></td>
-      </tr>
-      <tr>
-        <td>Side Effects</td>
-        <td id="side-effects"></td>
-      </tr>
-      <tr>
-        <td>Safety</td>
-        <td id="safety"></td>
-      </tr>
-      <tr>
-        <td>Withdrawal Symptoms</td>
-        <td id="withdrawal-symptoms"></td>
-      </tr>
-      <tr>
-        <td>Drug Abuse Potential</td>
-        <td id="drug-abuse"></td>
-      </tr>
-      <tr>
-        <td>Storage</td>
-        <td id="storage"></td>
-      </tr>
-      <tr>
-        <td>Image</td>
-        <td><img id="product-image" alt="Product Image"></td>
-      </tr>
-    </tbody>
-  </table>
-    </p>
-  </div>
+        <div id="result" class="result" style="display: none">
+          <h3>Product Details:</h3>
+          <p id="product-data"></p>
+          <table class="product-table">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Product ID</td>
+                <td id="product-id"></td>
+              </tr>
+              <tr>
+                <td>Category ID</td>
+                <td id="category-id"></td>
+              </tr>
+              <tr>
+                <td>Product Name</td>
+                <td id="product-name"></td>
+              </tr>
+              <tr>
+                <td>Description</td>
+                <td id="product-description"></td>
+              </tr>
+              <tr>
+                <td>Trade Names</td>
+                <td id="trade-names"></td>
+              </tr>
+              <tr>
+                <td>Ingredients</td>
+                <td id="ingreds"></td>
+              </tr>
+              <tr>
+                <td>Manufacturer</td>
+                <td id="manufacturer"></td>
+              </tr>
+              <tr>
+                <td>Packaging</td>
+                <td id="packaging"></td>
+              </tr>
+              <tr>
+                <td>Usage Instructions</td>
+                <td id="usage-instructions"></td>
+              </tr>
+              <tr>
+                <td>Drug Interaction</td>
+                <td id="drug-interaction"></td>
+              </tr>
+              <tr>
+                <td>Side Effects</td>
+                <td id="side-effects"></td>
+              </tr>
+              <tr>
+                <td>Safety</td>
+                <td id="safety"></td>
+              </tr>
+              <tr>
+                <td>Withdrawal Symptoms</td>
+                <td id="withdrawal-symptoms"></td>
+              </tr>
+              <tr>
+                <td>Drug Abuse Potential</td>
+                <td id="drug-abuse"></td>
+              </tr>
+              <tr>
+                <td>Storage</td>
+                <td id="storage"></td>
+              </tr>
+              <tr>
+                <td>Primary Image</td>
+                <td id="image_url"></td>
+              </tr>
+              <tr>
+                <td>Additional Image 1</td>
+                <td id="addtional-img1"></td>
+              </tr>
+              <tr>
+                <td>Additional Image 2</td>
+                <td id="addtional-img2"></td>
+              </tr>
+              <tr>
+                <td>Additional Image 3</td>
+                <td id="addtional-img3"></td>
+              </tr>
+              <tr>
+                <td>Additional Image 4</td>
+                <td id="addtional-img4"></td>
+              </tr>
+              <tr>
+                <td>Additional Image 5</td>
+                <td id="addtional-img5"></td>
+              </tr>
+              <tr>
+                <td>Additional Image 6</td>
+                <td id="addtional-img6"></td>
+              </tr>
+              <tr>
+                <td>Stock</td>
+                <td id="stocks"></td>
+              </tr>
+            </tbody>
+          </table>
+          <button id="edit-button">Edit</button>
+        </div>
+
+        <div id="edit-section" style="display: none">
+          <form id="edit-form">
+            <div id="editable-fields">
+              <!-- Editable fields will be dynamically generated -->
+            </div>
+            <button type="submit">Submit Changes</button>
+          </form>
+        </div>
       </section>
-      <script>
-        //— 1) On load, check localStorage. If not logged in, redirect to login.html.
-    document.addEventListener('DOMContentLoaded', () => {
-      const isLoggedIn = localStorage.getItem('employeeLoggedIn');
-      if (isLoggedIn !== 'true') {
-        // Not logged in → force to login page:
-        window.location.href = 'employee-login.html';
-        return;
-      }
 
-   
+      <script>
+        document.addEventListener("DOMContentLoaded", () => {
+          const searchForm = document.getElementById("search-form");
+          const resultDiv = document.getElementById("result");
+          const editSection = document.getElementById("edit-section");
+          const editForm = document.getElementById("edit-form");
+          const editableFieldsDiv = document.getElementById("editable-fields");
+
+          searchForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const productId = document
+              .getElementById("product_id")
+              .value.trim();
+            const productName = document
+              .getElementById("product_name_2")
+              .value.trim();
+
+            if (!productId && !productName) {
+              alert("Please enter either a Product ID or Product Name.");
+              return;
+            }
+
+            try {
+              const response = await fetch(`/api/products/search`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: productId, name: productName }),
+              });
+
+              if (!response.ok) {
+                throw new Error("Failed to fetch product data.");
+              }
+
+              const result = await response.json();
+              const productData = result.data;
+              console.log(productData);
+              // Populate text fields
+              document.getElementById("product-id").textContent =
+                productData.product_id || "N/A";
+              document.getElementById("category-id").textContent =
+                productData.category_id || "N/A";
+              document.getElementById("product-name").textContent =
+                productData.product_name || "N/A";
+              document.getElementById("product-description").textContent =
+                productData.product_description || "N/A";
+              document.getElementById("trade-names").textContent =
+                productData.trade_names || "N/A";
+              document.getElementById("ingreds").textContent =
+                productData.ingredients || "N/A";
+              document.getElementById("manufacturer").textContent =
+                productData.manufacturer || "N/A";
+              document.getElementById("packaging").textContent =
+                productData.packaging || "N/A";
+              document.getElementById("usage-instructions").textContent =
+                productData.usage_instructions || "N/A";
+              document.getElementById("drug-interaction").textContent =
+                productData.drug_interaction || "N/A";
+              document.getElementById("side-effects").textContent =
+                productData.side_effects || "N/A";
+              document.getElementById("safety").textContent =
+                productData.safety || "N/A";
+              document.getElementById("withdrawal-symptoms").textContent =
+                productData.withdrawal_symptoms || "N/A";
+              document.getElementById("drug-abuse").textContent =
+                productData.drug_abuse || "N/A";
+              document.getElementById("storage").textContent =
+                productData.storage || "N/A";
+              document.getElementById("image_url").textContent =
+                productData.image_url || "N/A";
+              document.getElementById("addtional-img1").textContent =
+                productData.addtional_img1;
+              document.getElementById("addtional-img2").textContent =
+                productData.addtional_img2;
+              document.getElementById("addtional-img3").textContent =
+                productData.addtional_img3;
+              document.getElementById("addtional-img4").textContent =
+                productData.addtional_img4;
+              document.getElementById("addtional-img5").textContent =
+                productData.addtional_img5;
+              document.getElementById("addtional-img6").textContent =
+                productData.addtional_img6;
+              document.getElementById("stocks").textContent =
+                productData.stocks;
+
+              resultDiv.style.display = "block";
+            } catch (err) {
+              console.error("Error fetching product:", err);
+              alert("Error fetching product. Please try again.");
+            }
+          });
+
+          document.getElementById("edit-button").addEventListener("click", () => {
+    editableFieldsDiv.innerHTML = ""; // Clear previous editable fields
+            const fields = [
+                "category-id",
+                "product-name",
+                "product-description",
+                "trade-names",
+                "ingreds",
+                "manufacturer",
+                "packaging",
+                "usage-instructions",
+                "drug-interaction",
+                "side-effects",
+                "safety",
+                "withdrawal-symptoms",
+                "drug-abuse",
+                "storage",
+                "image_url", // ID for the image
+                "addtional-img1",
+                "addtional-img2",
+                "addtional-img3",
+                "addtional-img4",
+                "addtional-img5",
+                "addtional-img6",
+                "stocks",
+              ];
+
+    fields.forEach((field) => {
+      const label = document.createElement("label");
+      label.textContent = field.replace("-", " ").toUpperCase();
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.id = `edit-${field}`;
+      const originalField = document.getElementById(field);
+      input.value = originalField ? originalField.textContent : "";
+
+      editableFieldsDiv.appendChild(label);
+      editableFieldsDiv.appendChild(input);
     });
 
-    //— 2) Logout button clears localStorage and redirects to login:
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      localStorage.removeItem('employeeLoggedIn');
-      localStorage.removeItem('employeeId');
-      window.location.href = 'employee-login.html';
-    });
-      </script>
-      <script>
+    editSection.style.display = "block";
+  });
 
-
-
-        document.addEventListener('DOMContentLoaded', () => {
-  const searchForm = document.getElementById('search-form');
-  const resultDiv = document.getElementById('result');
-  const productDataElement = document.getElementById('product-data');
-
-  searchForm.addEventListener('submit', async (event) => {
+  // Edit Form Submission Handler
+  editForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    // Get user input
-    const productId = document.getElementById('product_id').value.trim();
-    const productName = document.getElementById('product_name_2').value.trim();
+    const productId = document.getElementById("product-id").textContent;
+    const updates = {};
 
-    console.log(productName);
-    if (!productId && !productName) {
-      alert('Please enter either a Product ID or Product Name.');
-      return;
-    }
+    const fields = [
+                "category-id",
+                "product-name",
+                "product-description",
+                "trade-names",
+                "ingreds",
+                "manufacturer",
+                "packaging",
+                "usage-instructions",
+                "drug-interaction",
+                "side-effects",
+                "safety",
+                "withdrawal-symptoms",
+                "drug-abuse",
+                "storage",
+                "storage",
+                "image_url", // ID for the image
+                "addtional-img1",
+                "addtional-img2",
+                "addtional-img3",
+                "addtional-img4",
+                "addtional-img5",
+                "addtional-img6",
+                "stocks",
+              ];
+
+    fields.forEach((field) => {
+      const inputElement = document.getElementById(`edit-${field}`);
+      if (inputElement) {
+        const newValue = inputElement.value;
+        const originalValue =
+          document.getElementById(field)?.textContent || "";
+
+        if (newValue !== originalValue) {
+          updates[field.replace("-", "_")] = newValue;
+        }
+      } else {
+        console.warn(`Editable field "edit-${field}" not found.`);
+      }
+    });
 
     try {
-      // Send request to backend
-      const response = await fetch(`/api/products/search`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: productId, name: productName }),
+      const response = await fetch(`/api/products/update/${productId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
       });
 
-      const result = await response.json();
-      const productData = result.data;
-      
-
-
-      if (response.ok) {
-        // productDataElement.textContent = JSON.stringify(result.data, null, 2);
-        const rev = JSON.stringify(result.data, null, 2);
-
-        resultDiv.style.display = 'block';
-        // Populate the table with JSON Data
-        // console.log(result.data);
-    document.getElementById('product-id').textContent = productData.product_id;
-    document.getElementById('category-id').textContent = productData.category_id;
-    document.getElementById('product-name').textContent = productData.product_name;
-    document.getElementById('product-description').textContent = productData.product_description;
-    document.getElementById('trade-names').textContent = productData.trade_names;
-    document.getElementById('ingredients').textContent = productData.ingredients;
-    document.getElementById('manufacturer').textContent = productData.manufacturer;
-    document.getElementById('packaging').textContent = productData.packaging;
-    document.getElementById('usage-instructions').textContent = productData.usage_instructions;
-    document.getElementById('drug-interaction').textContent = productData.drug_interaction;
-    document.getElementById('side-effects').textContent = productData.side_effects;
-    document.getElementById('safety').textContent = productData.safety;
-    document.getElementById('withdrawal-symptoms').textContent = productData.withdrawal_symptoms;
-    document.getElementById('drug-abuse').textContent = productData.drug_abuse;
-    document.getElementById('storage').textContent = productData.storage;
-
+      if (!response.ok) {
+        throw new Error("Failed to update product data.");
       }
+
+      alert("Product updated successfully!");
+      resultDiv.style.display = "none";
+      editSection.style.display = "none";
     } catch (err) {
-      console.error('Error fetching product:', err);
-      alert('Error fetching product. Please try again.');
+      console.error("Error updating product:", err);
+      alert("Error updating product. Please try again.");
     }
   });
-});
+        });
       </script>
 
       <!-- Process Requests Section -->
       <section id="process-requests" class="card">
-  <h2>Process Requests</h2>
-  <div id="existing-products-table">
-    <table>
-      <thead>
-        <tr>
-          <th>Order No.</th>
-          <th>Cost</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Rows will be dynamically populated -->
-      </tbody>
-    </table>
-  </div>
-</section>
+        <h2>Process Requests</h2>
+        <div id="existing-products-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Order No.</th>
+                <th>Cost</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Rows will be dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-<section id="order-details" class="card hidden">
-  <h2>Order Details</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Item Name</th>
-        <th>Quantity</th>
-        <th>MG</th>
-        <th>Price</th>
-      </tr>
-    </thead>
-    <tbody id="order-details-body">
-      <!-- Order items will be populated dynamically -->
-    </tbody>
-  </table>
-  <button id="close-details">Close</button>
-</section>
+      <section id="order-details" class="card hidden">
+        <h2>Order Details</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Item Name</th>
+              <th>Quantity</th>
+              <th>MG</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody id="order-details-body">
+            <!-- Order items will be populated dynamically -->
+          </tbody>
+        </table>
+        <button id="close-details">Close</button>
+      </section>
 
-<section id="customer-details" class="card hidden">
-  <h2>Customer Details</h2>
-  <div id="customer-details-body">
-    <!-- Customer details will be dynamically populated -->
-  </div>
-  <button id="close-customer-details">Close</button>
-</section>
+      <section id="customer-details" class="card hidden">
+        <h2>Customer Details</h2>
+        <div id="customer-details-body">
+          <!-- Customer details will be dynamically populated -->
+        </div>
+        <button id="close-customer-details">Close</button>
+      </section>
 
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const tableBody = document.querySelector('#process-requests tbody');
-    const orderDetailsSection = document.getElementById('order-details');
-    const orderDetailsBody = document.getElementById('order-details-body');
-    const customerDetailsSection = document.getElementById('customer-details');
-    const customerDetailsBody = document.getElementById('customer-details-body');
-    const closeDetailsButton = document.getElementById('close-details');
-    const closeCustomerDetailsButton = document.getElementById('close-customer-details');
+      <script>
+        document.addEventListener("DOMContentLoaded", () => {
+          const tableBody = document.querySelector("#process-requests tbody");
+          const orderDetailsSection = document.getElementById("order-details");
+          const orderDetailsBody =
+            document.getElementById("order-details-body");
+          const customerDetailsSection =
+            document.getElementById("customer-details");
+          const customerDetailsBody = document.getElementById(
+            "customer-details-body"
+          );
+          const closeDetailsButton = document.getElementById("close-details");
+          const closeCustomerDetailsButton = document.getElementById(
+            "close-customer-details"
+          );
 
-    const fetchRequests = async () => {
-      try {
-        const response = await fetch(`/api/requests`);
-        const requests = await response.json();
-        // console.log(requests);
-        tableBody.innerHTML = '';
+          const fetchRequests = async () => {
+            try {
+              const response = await fetch(`/api/requests`);
+              const requests = await response.json();
+              // console.log(requests);
+              tableBody.innerHTML = "";
 
-        requests.forEach((request) => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
+              requests.forEach((request) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
             <td>${request.user_id}</td>
             <td>${request.total_amount}</td>
             <td class="action">
@@ -391,84 +629,82 @@
               <button onclick="deleteRequest(${request.order_id})">Delete</button>
             </td>
           `;
-          tableBody.appendChild(row);
-        });
-      } catch (err) {
-        console.error('Error fetching requests:', err);
-      }
-    };
+                tableBody.appendChild(row);
+              });
+            } catch (err) {
+              console.error("Error fetching requests:", err);
+            }
+          };
 
-    window.viewOrderItems = async (orderId) => {
-      try {
-        const response = await fetch(`/api/order-items/${orderId}`);
-        const orderItems = await response.json();
-        orderDetailsBody.innerHTML = '';
+          window.viewOrderItems = async (orderId) => {
+            try {
+              const response = await fetch(`/api/order-items/${orderId}`);
+              const orderItems = await response.json();
+              orderDetailsBody.innerHTML = "";
 
-        orderItems.forEach((item) => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
+              orderItems.forEach((item) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
             <td>${item.name}</td>
             <td>${item.quantity}</td>
             <td>${item.mg}</td>
             <td>${item.price}</td>
           `;
-          orderDetailsBody.appendChild(row);
-        });
+                orderDetailsBody.appendChild(row);
+              });
 
-        orderDetailsSection.classList.remove('hidden');
-      } catch (err) {
-        console.error('Error fetching order items:', err);
-      }
-    };
+              orderDetailsSection.classList.remove("hidden");
+            } catch (err) {
+              console.error("Error fetching order items:", err);
+            }
+          };
 
-    window.viewCustomerDetails = async (id) => {
-      try {
-        console.log(id);
-        const response = await fetch(`/api/customers/${id}`);
-        const customer = await response.json();
+          window.viewCustomerDetails = async (id) => {
+            try {
+              console.log(id);
+              const response = await fetch(`/api/customers/${id}`);
+              const customer = await response.json();
 
-        customerDetailsBody.innerHTML = `
+              customerDetailsBody.innerHTML = `
           <p><strong>Name:</strong> ${customer.first_name} ${customer.last_name}</p>
           <p><strong>Email:</strong> ${customer.email}</p>
           <p><strong>Phone:</strong> ${customer.phone}</p>
           <p><strong>Address:</strong> ${customer.address}</p>
         `;
 
-        customerDetailsSection.classList.remove('hidden');
-      } catch (err) {
-        console.error('Error fetching customer details:', err);
-      }
-    };
+              customerDetailsSection.classList.remove("hidden");
+            } catch (err) {
+              console.error("Error fetching customer details:", err);
+            }
+          };
 
-    window.deleteRequest = async (orderId) => {
-  if (!confirm('Are you sure you want to delete this order?')) return;
-  try {
-    const res = await fetch(`/api/requests/${orderId}`, {
-      method: 'DELETE',
-    });
-    const json = await res.json();
-    if (!json.success) throw new Error(json.error || 'Delete failed');
-    alert(json.message);
-    fetchRequests(); // refresh the table
-  } catch (err) {
-    console.error('Error deleting request:', err);
-    alert('Could not delete order: ' + err.message);
-  }
-};
+          window.deleteRequest = async (orderId) => {
+            if (!confirm("Are you sure you want to delete this order?")) return;
+            try {
+              const res = await fetch(`/api/requests/${orderId}`, {
+                method: "DELETE",
+              });
+              const json = await res.json();
+              if (!json.success) throw new Error(json.error || "Delete failed");
+              alert(json.message);
+              fetchRequests(); // refresh the table
+            } catch (err) {
+              console.error("Error deleting request:", err);
+              alert("Could not delete order: " + err.message);
+            }
+          };
 
+          closeDetailsButton.addEventListener("click", () => {
+            orderDetailsSection.classList.add("hidden");
+          });
 
-    closeDetailsButton.addEventListener('click', () => {
-      orderDetailsSection.classList.add('hidden');
-    });
+          closeCustomerDetailsButton.addEventListener("click", () => {
+            customerDetailsSection.classList.add("hidden");
+          });
 
-    closeCustomerDetailsButton.addEventListener('click', () => {
-      customerDetailsSection.classList.add('hidden');
-    });
-
-    fetchRequests();
-  });
-</script>
-
+          fetchRequests();
+        });
+      </script>
 
       <!-- Customer Assistance Section -->
       <section id="customer-assistance" class="card">

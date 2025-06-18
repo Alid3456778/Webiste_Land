@@ -284,3 +284,17 @@ a {
   box-shadow: 0 8px 18px rgba(21, 158, 148, 0.4);
   transform: translateY(-2px);
 }
+
+
+.stock-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+}
+
+.stock-overlay img {
+  width: 50px; /* Adjust size as needed */
+  height: 50px;
+  opacity: 0.8; /* Slight transparency */
+}

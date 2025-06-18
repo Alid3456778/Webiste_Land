@@ -48,7 +48,7 @@
           <a href="cart">
             <button class="btn btn--icon">
               <img
-                src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
+               src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
                 alt="Cart"
               />
             </button>
@@ -101,40 +101,48 @@
 
           // Display a batch of rows
           function displayBatch(products, prices, start, end, tableBody) {
-            const batch = products.slice(start, end);
-            // console.log(products);
-            batch.forEach((product) => {
-              const productID = product.id;
-               
-              const rowHTML = `
-        <div class="product-card medicine-card ${
-          product.category_id || "all"
-        }" data-product-id="${productID}">
-          <img src="${
-            product.image_url || ""
-          }" alt="Product Image" loading="lazy"
-            onload="this.style.opacity='1'" />
-          <div class="product-details">
-            <h3>${product.product_name || "No Description"}</h3>
-            <p id="pric">${product.trade_names 
-      ? product.trade_names.split(',')[0].trim() 
-      : ''}</p>
-            <p>(4-5 Day's Delivery)</p>
-            <div class="product-buttons">
-             
-                <a href="./product_overview.html?product_ID=${
-                  product.product_id
-                }"> 
-                <button class="buy-btn"> Buy Now </button>
-                </a>
-              
-            </div>
+  const batch = products.slice(start, end);
+  batch.forEach((product) => {
+    const productID = product.id;
+
+    // Conditional rendering for the stock status
+    const stockOverlay = product.stocks === 0 
+      ? `<div class="stock-overlay">
+         
+           <img  src="./assets/image2/out-of-stock.png" alt="Out of Stock" />
+         </div>` 
+      : "";
+
+    const rowHTML = `
+      <div class="product-card medicine-card ${
+        product.category_id || "all"
+      }" data-product-id="${productID}">
+        ${stockOverlay}
+        <img src="${
+          product.image_url || ""
+        }" alt="Product Image" loading="lazy"
+          onload="this.style.opacity='1'" />
+        <div class="product-details">
+          <h3>${product.product_name || "No Description"}</h3>
+          <p id="pric">${
+            product.trade_names 
+              ? product.trade_names.split(",")[0].trim() 
+              : ""
+          }</p>
+          <p style="font-weight: bold;">(4-5 Day's Delivery)</p>
+          <div class="product-buttons">
+            <a href="./product_overview.html?product_ID=${
+              product.product_id
+            }"> 
+              <button class="buy-btn"> Buy Now </button>
+            </a>
           </div>
         </div>
-      `;
-              tableBody.innerHTML += rowHTML;
-            });
-          }
+      </div>
+    `;
+    tableBody.innerHTML += rowHTML;
+  });
+}
 
           // Function to handle category filtering
           // Function to handle category filtering
