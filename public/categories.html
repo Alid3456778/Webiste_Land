@@ -203,52 +203,6 @@
       <div id="loading-message" class="loading-message">LOADING...</div>
     </section>
 
-    <!-- <script>
-      // Define the addToCart function to send data to the backend
-      async function addToCart(productId , quantity) {
-     
-        try {
-          const response = await fetch("/add-to-cart", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ productId, quantity }),
-          });
-          const result = await response.json();
-          if (result.success) {
-            alert("Product added to cart!");
-          } else {
-            alert("Error: " + result.message);
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          alert("Server error, please try again later.");
-        }
-      }
-    
-      // Use event delegation so that dynamically loaded buttons work
-      document.getElementById("product-grid").addEventListener("click", (e) => {
-        // Check if the clicked element is the "Add to Cart" button or within it
-        if (
-          e.target.classList.contains("cart-btn") ||
-          e.target.closest(".cart-btn")
-        ) {
-          e.preventDefault();
-          const productCard = e.target.closest(".product-card");
-          const productId = productCard ? productCard.getAttribute("data-product-id") : null;
-          let quan = document.getElementById('pric').textContent;
-          const quantity = quan.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '');
-          console.log("Quantity is ",quantity);
-          if (productId) {
-            addToCart(productId , quantity);
-          } else {
-            console.error("No product ID found");
-          }
-        }
-      });
-    </script> -->
-
     <footer class="footer">
       <div class="footer-content">
         <div class="footer-section resources">
@@ -310,8 +264,5 @@
         </div>
       </div>
     </footer>
-
-    <!-- If you have any external script files, adjust the path accordingly -->
-    <script src="./assets/js/categories.js"></script>
   </body>
 </html>
