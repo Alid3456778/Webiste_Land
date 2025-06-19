@@ -47,69 +47,76 @@
     <main class="checkout-container">
       <h1>Billing Details</h1>
       <!-- <progress id="checkout-form" max="100" value="70">70%</progress> -->
-      <div class="checkout-card" class="input-group"> 
+      <div class="checkout-card" class="input-group form-group"> 
         <form id="checkout-form" class="checkout-form">
           <!-- Billing Details -->
           <div class="form-group input-group">
+            <input type="text" id="first-name" name="firstName" placeholder=" " required />
             <label for="first-name">First Name <span>*</span></label>
-            <input type="text" id="first-name" name="firstName" required />
           </div>
           <div class="form-group input-group">
+            <input type="text" id="last-name" name="lastName"  placeholder=" "required />
             <label for="last-name">Last Name <span>*</span></label>
-            <input type="text" id="last-name" name="lastName" required />
           </div>
           <div class="form-group input-group">
+
+            <input type="tel" id="phone" name="phone"  placeholder=" "required />
             <label for="phone">Phone <span>*</span></label>
-            <input type="tel" id="phone" name="phone" required />
           </div>
           <div class="form-group input-group">
+           
+            <input type="email" id="email" name="email"  placeholder=" "required />
             <label for="email">Email Address <span>*</span></label>
-            <input type="email" id="email" name="email" required />
           </div>
           <div class="form-group input-group">
+            
+            <input type="text" id="company-name"  placeholder=" "/>
             <label for="company-name">Company Name (optional)</label>
-            <input type="text" id="company-name" />
           </div>
-          <div class="form-group input-group">
-            <label for="country">Country / Region <span>*</span></label>
-            <select id="country" required>
+          <!-- <div class="form-group input-group">
+            
+            <select id="country"  placeholder=" "required>
+              <label for="country">Country / Region <span>*</span></label>
               <option value="United States">United States (US)</option>
               <option value="India">India</option>
               <option value="Canada">Canada</option>
             </select>
-          </div>
+          </div> -->
           <div class="form-group input-group">
-            <label for="street-address">Street Address <span>*</span></label>
+            
             <input
               type="text"
               id="street-address"
               name="billingStreetAddress"
-              placeholder=""
+              placeholder=" "
               required
             />
+            <label for="street-address">Street Address <span>*</span></label>
           </div>
           <div class="form-group input-group">
+            
+            <input type="text" id="apartment" placeholder=" "required/>
             <label for="apartment"
               >Apartment, suite, unit, etc. (optional)</label
             >
-            <input type="text" id="apartment" />
           </div>
+         <div class=" input-group">
+  <select id="state" name="billingState" required>
+    <option value="" disabled selected hidden></option>
+    <option value="Texas">Texas</option>
+    <option value="California">California</option>
+    <option value="New York">New York</option>
+  </select>
+  <label for="state">State <span>*</span></label>
+</div>
+
+          
+          
+          
           <div class="form-group input-group">
-            <label for="city">Town / City <span>*</span></label>
-            <input type="text" id="city" name="billingCity" required />
-          </div>
-          <div class="form-group input-group">
-            <label for="state">State <span>*</span></label>
-            <select id="state" name="billingState" required>
-              <option value="Texas">Texas</option>
-              <option value="California">California</option>
-              <option value="New York">New York</option>
-              
-            </select>
-          </div>
-          <div class="form-group input-group">
+           
+            <input type="text" id="zip-code" name="billingZip" placeholder=" "required />
             <label for="zip-code">ZIP Code <span>*</span></label>
-            <input type="text" id="zip-code" name="billingZip" required />
           </div>
           <!-- Shipping Address Checkbox -->
           <div class="form-group-shipping">

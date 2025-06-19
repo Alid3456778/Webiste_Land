@@ -48,7 +48,7 @@
           <a href="cart">
             <button class="btn btn--icon">
               <img
-               src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
+                src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
                 alt="Cart"
               />
             </button>
@@ -101,48 +101,43 @@
 
           // Display a batch of rows
           function displayBatch(products, prices, start, end, tableBody) {
-  const batch = products.slice(start, end);
-  batch.forEach((product) => {
-    const productID = product.id;
+            const batch = products.slice(start, end);
+            batch.forEach((product) => {
+              const productID = product.id;
 
-    // Conditional rendering for the stock status
-    const stockOverlay = product.stocks === 0 
-      ? `<div class="stock-overlay">
+              // Conditional rendering for the stock status
+              const stockOverlay =
+                product.stocks === 0
+                  ? `<div class="stock-overlay">
          
            <img  src="./assets/image2/out-of-stock.png" alt="Out of Stock" />
-         </div>` 
-      : "";
+         </div>`
+                  : "";
 
-    const rowHTML = `
+              const rowHTML = `
       <div class="product-card medicine-card ${
         product.category_id || "all"
       }" data-product-id="${productID}">
         ${stockOverlay}
-        <img src="${
-          product.image_url || ""
-        }" alt="Product Image" loading="lazy"
+        <img src="${product.image_url || ""}" alt="Product Image" loading="lazy"
           onload="this.style.opacity='1'" />
         <div class="product-details">
           <h3>${product.product_name || "No Description"}</h3>
           <p id="pric">${
-            product.trade_names 
-              ? product.trade_names.split(",")[0].trim() 
-              : ""
+            product.trade_names ? product.trade_names.split(",")[0].trim() : ""
           }</p>
           <p style="font-weight: bold;">(4-5 Day's Delivery)</p>
           <div class="product-buttons">
-            <a href="./product_overview.html?product_ID=${
-              product.product_id
-            }"> 
+            <a href="./product_overview.html?product_ID=${product.product_id}"> 
               <button class="buy-btn"> Buy Now </button>
             </a>
           </div>
         </div>
       </div>
     `;
-    tableBody.innerHTML += rowHTML;
-  });
-}
+              tableBody.innerHTML += rowHTML;
+            });
+          }
 
           // Function to handle category filtering
           // Function to handle category filtering
@@ -160,7 +155,40 @@
         });
       </script>
       <script>
-        buildProductSearch();
+        // Function to build the product search index
+        // async function buildProductSearch() {
+        //   try {
+        //     const response = await fetch(`/products`);
+        //     const products = await response.json();
+        //     // console.log("prosuct is",products);
+        //     const searchList = document.getElementById("search_list");
+        //     searchList.innerHTML = "";
+        //     const fragment = document.createDocumentFragment();
+        //     products.forEach((product) => {
+        //       const option = document.createElement("option");
+        //       option.value = product.product_name || "Product Name";
+        //       option.textContent = product.product_name || "Product Name";
+        //       fragment.appendChild(option);
+        //     });
+        //     searchList.appendChild(fragment);
+
+        //     const searchButton = document.getElementById("search-button");
+        //     const searchInput = document.getElementById("search-input");
+        //     searchButton.addEventListener("click", () => {
+        //       const query = searchInput.value.trim();
+        //       const matchingProduct = products.find(
+        //         (product) => product.product_name === query
+        //       );
+        //       if (matchingProduct) {
+        //         window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
+        //       } else {
+        //         alert("No matching product found.");
+        //       }
+        //     });
+        //   } catch (error) {
+        //     console.error("eror is", error);
+        //   }
+        // }
         async function buildProductSearch() {
           try {
             const response = await fetch(`/products`);
@@ -182,7 +210,8 @@
             const searchButton = document.getElementById("search-button");
             const searchInput = document.getElementById("search-input");
 
-            searchButton.addEventListener("click", () => {
+            // Function to handle product search
+            const handleSearch = () => {
               const query = searchInput.value.trim();
               const matchingProduct = products.find(
                 (product) => product.product_name === query
@@ -193,11 +222,24 @@
               } else {
                 alert("No matching product found.");
               }
+            };
+
+            // Trigger search on button click
+            searchButton.addEventListener("click", handleSearch);
+
+            // Trigger search on Enter key press in the input field
+            searchInput.addEventListener("keydown", (event) => {
+              if (event.key === "Enter") {
+                event.preventDefault(); // Prevent default form submission
+                handleSearch();
+              }
             });
           } catch (error) {
             console.error("Error is", error);
           }
         }
+
+        buildProductSearch();
       </script>
 
       <div id="loading-message" class="loading-message">LOADING...</div>

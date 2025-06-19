@@ -12,9 +12,7 @@
     <!-- HEADER -->
     <header class="header">
       <div class="header__left">
-       
         <img src="assets/image2/logo.png" alt="MCLAND Logo" class="logo" />
-        
       </div>
       <nav class="header__nav">
         <div class="nav__item">
@@ -158,10 +156,7 @@
       <div class="hero-alt__content">
         <h1>Your Trusted Online Pharmacy</h1>
         <p>Premium medicines, genuine quality, delivered fast & secure.</p>
-        <a
-          href="https://t.me/MCLAND1"
-  target="_blank"
-          class="btn btn--cta"
+        <a href="https://t.me/MCLAND1" target="_blank" class="btn btn--cta"
           >Contact Us</a
         >
       </div>
@@ -309,7 +304,6 @@
       </div>
     </section>
 
-
     <footer class="footer">
       <div class="footer-content">
         <div class="footer-section resources">
@@ -433,7 +427,8 @@
           const searchButton = document.getElementById("search-button");
           const searchInput = document.getElementById("search-input");
 
-          searchButton.addEventListener("click", () => {
+          // Function to handle product search
+          const handleSearch = () => {
             const query = searchInput.value.trim();
             const matchingProduct = products.find(
               (product) => product.product_name === query
@@ -444,13 +439,24 @@
             } else {
               alert("No matching product found.");
             }
+          };
+
+          // Trigger search on button click
+          searchButton.addEventListener("click", handleSearch);
+
+          // Trigger search on Enter key press in the input field
+          searchInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+              event.prevxentDefault(); // Prevent default form submission
+              handleSearch();
+            }
           });
         } catch (error) {
           console.error("Error is", error);
         }
       }
+
       buildProductSearch();
     </script>
-
   </body>
 </html>

@@ -223,8 +223,7 @@ body {
   width: 100%;
 }
 
-.input-group input,
-.input-group select {
+.input-group input {
   width: 100%;
   padding: 14px 12px 14px 12px;
   font-size: 16px;
@@ -236,7 +235,7 @@ body {
 }
 
 .input-group input:focus,
-.input-group select:focus {
+.input-group input:not(:placeholder-shown) {
   border-color: #007bff;
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
 }
@@ -251,11 +250,31 @@ body {
   pointer-events: none;
   background: white;
   padding: 0 4px;
-  transition: 0.2s ease-in-out;
+  transition: all 0.25s ease-in-out;
 }
 
 .input-group input:focus ~ label,
-.input-group input:not(:placeholder-shown) ~ label,
+.input-group input:not(:placeholder-shown) ~ label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #007bff;
+}
+.input-group select {
+  appearance: none;
+  width: 100%;
+  padding: 14px 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: transparent;
+  color: #000;
+  outline: none;
+  position: relative;
+  z-index: 1;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
 .input-group select:focus ~ label,
 .input-group select:valid ~ label {
   top: -8px;
@@ -263,6 +282,8 @@ body {
   font-size: 12px;
   color: #007bff;
 }
+.input-group select:not([value=""]) ~ label
+
 
 /* Optional: checkbox and shipping toggle */
 .form-group-shipping {

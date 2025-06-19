@@ -422,7 +422,7 @@ app.post("/api/set_products", async (req, res) => {
     image_url, addtional_img1, addtional_img2, addtional_img3, addtional_img4, addtional_img5, addtional_img6
 )VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21
-      ) RETURNING *`,
+      )`,
       [
         category_id,
         product_name,
