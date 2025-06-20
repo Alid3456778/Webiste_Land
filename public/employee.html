@@ -361,7 +361,7 @@
             const productName = document
               .getElementById("product_name_2")
               .value.trim();
-            console.log("Product name is ",productName);
+            console.log("Product name is ", productName);
             if (!productId && !productName) {
               alert("Please enter either a Product ID or Product Name.");
               return;
@@ -436,117 +436,122 @@
             }
           });
 
-          document.getElementById("edit-button").addEventListener("click", () => {
-    editableFieldsDiv.innerHTML = ""; // Clear previous editable fields
+          document
+            .getElementById("edit-button")
+            .addEventListener("click", () => {
+              editableFieldsDiv.innerHTML = ""; // Clear previous editable fields
+              const fields = [
+                "category-id",
+                "product-name",
+                "product-description",
+                "trade-names",
+                "ingreds",
+                "manufacturer",
+                "packaging",
+                "usage-instructions",
+                "drug-interaction",
+                "side-effects",
+                "safety",
+                "withdrawal-symptoms",
+                "drug-abuse",
+                "storage",
+                "image_url", // ID for the image
+                "addtional-img1",
+                "addtional-img2",
+                "addtional-img3",
+                "addtional-img4",
+                "addtional-img5",
+                "addtional-img6",
+                "stocks",
+              ];
+
+              fields.forEach((field) => {
+                const label = document.createElement("label");
+                label.textContent = field.replace("-", " ").toUpperCase();
+
+                const input = document.createElement("input");
+                input.type = "text";
+                input.id = `edit-${field}`;
+                const originalField = document.getElementById(field);
+                input.value = originalField ? originalField.textContent : "";
+
+                editableFieldsDiv.appendChild(label);
+                editableFieldsDiv.appendChild(input);
+              });
+
+              editSection.style.display = "block";
+            });
+
+          // Edit Form Submission Handler
+          editForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const productId = document.getElementById("product-id").textContent;
+            const updates = {};
+
             const fields = [
-                "category-id",
-                "product-name",
-                "product-description",
-                "trade-names",
-                "ingreds",
-                "manufacturer",
-                "packaging",
-                "usage-instructions",
-                "drug-interaction",
-                "side-effects",
-                "safety",
-                "withdrawal-symptoms",
-                "drug-abuse",
-                "storage",
-                "image_url", // ID for the image
-                "addtional-img1",
-                "addtional-img2",
-                "addtional-img3",
-                "addtional-img4",
-                "addtional-img5",
-                "addtional-img6",
-                "stocks",
-              ];
+              "category-id",
+              "product-name",
+              "product-description",
+              "trade-names",
+              "ingreds",
+              "manufacturer",
+              "packaging",
+              "usage-instructions",
+              "drug-interaction",
+              "side-effects",
+              "safety",
+              "withdrawal-symptoms",
+              "drug-abuse",
+              "storage",
+              "storage",
+              "image_url", // ID for the image
+              "addtional-img1",
+              "addtional-img2",
+              "addtional-img3",
+              "addtional-img4",
+              "addtional-img5",
+              "addtional-img6",
+              "stocks",
+            ];
 
-    fields.forEach((field) => {
-      const label = document.createElement("label");
-      label.textContent = field.replace("-", " ").toUpperCase();
+            fields.forEach((field) => {
+              const inputElement = document.getElementById(`edit-${field}`);
+              if (inputElement) {
+                const newValue = inputElement.value;
+                const originalValue =
+                  document.getElementById(field)?.textContent || "";
 
-      const input = document.createElement("input");
-      input.type = "text";
-      input.id = `edit-${field}`;
-      const originalField = document.getElementById(field);
-      input.value = originalField ? originalField.textContent : "";
+                if (newValue !== originalValue) {
+                  updates[field.replace("-", "_")] = newValue;
+                }
+              } else {
+                console.warn(`Editable field "edit-${field}" not found.`);
+              }
+            });
 
-      editableFieldsDiv.appendChild(label);
-      editableFieldsDiv.appendChild(input);
-    });
+            try {
+              const response = await fetch(
+                `/api/products/update/${productId}`,
+                {
+                  method: "PUT",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(updates),
+                }
+              );
 
-    editSection.style.display = "block";
-  });
+              if (!response.ok) {
+                throw new Error("Failed to update product data.");
+              }
 
-  // Edit Form Submission Handler
-  editForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const productId = document.getElementById("product-id").textContent;
-    const updates = {};
-
-    const fields = [
-                "category-id",
-                "product-name",
-                "product-description",
-                "trade-names",
-                "ingreds",
-                "manufacturer",
-                "packaging",
-                "usage-instructions",
-                "drug-interaction",
-                "side-effects",
-                "safety",
-                "withdrawal-symptoms",
-                "drug-abuse",
-                "storage",
-                "storage",
-                "image_url", // ID for the image
-                "addtional-img1",
-                "addtional-img2",
-                "addtional-img3",
-                "addtional-img4",
-                "addtional-img5",
-                "addtional-img6",
-                "stocks",
-              ];
-
-    fields.forEach((field) => {
-      const inputElement = document.getElementById(`edit-${field}`);
-      if (inputElement) {
-        const newValue = inputElement.value;
-        const originalValue =
-          document.getElementById(field)?.textContent || "";
-
-        if (newValue !== originalValue) {
-          updates[field.replace("-", "_")] = newValue;
-        }
-      } else {
-        console.warn(`Editable field "edit-${field}" not found.`);
-      }
-    });
-
-    try {
-      const response = await fetch(`/api/products/update/${productId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updates),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update product data.");
-      }
-
-      alert("Product updated successfully!");
-      resultDiv.style.display = "none";
-      editSection.style.display = "none";
-    } catch (err) {
-      console.error("Error updating product:", err);
-      alert("Error updating product. Please try again.");
-    }
-  });
+              alert("Product updated successfully!");
+              resultDiv.style.display = "none";
+              editSection.style.display = "none";
+            } catch (err) {
+              console.error("Error updating product:", err);
+              alert("Error updating product. Please try again.");
+            }
+          });
         });
       </script>
 
@@ -703,6 +708,213 @@
           });
 
           fetchRequests();
+        });
+      </script>
+      <section id="manage-prices">
+        <h2>Manage Product Pricing</h2>
+
+        <div class="lookup">
+          <label
+            >Product ID:
+            <input type="number" id="lookup-product-id" min="1" />
+          </label>
+          <button id="btn-load-variants">Load Variants</button>
+        </div>
+
+        <table
+          id="variants-table"
+          border="1"
+          style="margin-top: 1em; display: none"
+        >
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Unit Type</th>
+              <th>Unit Value</th>
+              <th>QTY</th>
+              <th>Price / Pill</th>
+              <th>Price / Box</th>
+              <th>Delivery Time</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="variants-body">
+            <td>
+              <button class="update-btn">Update</button>
+              <button class="delete-btn">Delete</button>
+            </td>
+          </tbody>
+        </table>
+
+        <button id="btn-add-new" style="display: none; margin-top: 1em">
+          + Add New Variant
+        </button>
+      </section>
+
+      <script>
+        document.addEventListener("DOMContentLoaded", () => {
+          const lookupInput = document.getElementById("lookup-product-id");
+          const loadBtn = document.getElementById("btn-load-variants");
+          const table = document.getElementById("variants-table");
+          const tbody = table.querySelector("tbody");
+          const addBtn = document.getElementById("btn-add-new");
+
+          // helper to create an <input> cell
+          function makeCell(value, field) {
+            const td = document.createElement("td");
+            const inp = document.createElement("input");
+            inp.value = value || "";
+            inp.dataset.field = field;
+            td.appendChild(inp);
+            return td;
+          }
+
+          // render a variant row
+          function renderRow(variant) {
+            const tr = document.createElement("tr");
+            tr.dataset.id = variant.variation_id;
+
+            // ID readonly
+            const idTd = document.createElement("td");
+            idTd.textContent = variant.variation_id;
+            tr.appendChild(idTd);
+
+            tr.appendChild(makeCell(variant.unit_type, "unit_type"));
+            tr.appendChild(makeCell(variant.unit_value, "unit_value"));
+            tr.appendChild(makeCell(variant.qty, "qty"));
+            tr.appendChild(makeCell(variant.price_per_pill, "price_per_pill"));
+            tr.appendChild(makeCell(variant.price_per_box, "price_per_box"));
+            tr.appendChild(makeCell(variant.delivery_time, "delivery_time"));
+
+            // actions
+            const actTd = document.createElement("td");
+            const saveBtn = document.createElement("button");
+            const delBtn = document.createElement("button");
+            saveBtn.textContent = "Save";
+            delBtn.textContent = "Delete";
+
+            saveBtn.addEventListener("click", () => updateVariant(tr));
+            delBtn.addEventListener("click", () => {
+              if (!confirm(`Really delete this variation? ${tr.dataset.id}`))
+                return;
+              deleteVariant(tr.dataset.id)
+                .then(() => {
+                  tr.remove();
+                  alert("Variation deleted");
+                })
+                .catch((err) => {
+                  console.error(err);
+                  alert("Delete failed");
+                });
+            });
+            actTd.appendChild(saveBtn);
+            actTd.appendChild(delBtn);
+            tr.appendChild(actTd);
+
+            return tr;
+          }
+
+          // fetch & show
+          loadBtn.addEventListener("click", async () => {
+            const pid = lookupInput.value.trim();
+            if (!pid) return alert("enter product id");
+            const resp = await fetch(`/api/variants/${pid}`);
+            const variants = await resp.json();
+            tbody.innerHTML = "";
+            variants.forEach((v) => tbody.appendChild(renderRow(v)));
+            table.style.display = "";
+            addBtn.style.display = "";
+          });
+
+          async function deleteVariant(variationId) {
+            const res = await fetch(`/api/variants/${variationId}`, {
+              method: "DELETE",
+            });
+            if (!res.ok) {
+              const { error } = await res.json();
+              throw new Error(error || res.statusText);
+            }
+          }
+
+          // update one
+          async function updateVariant(row) {
+            const id = row.dataset.id;
+            if (!/^\d+$/.test(id)) {
+              return alert(
+                "Cannot update — no valid variation ID yet. Use Create."
+              );
+            }
+            const payload = {};
+            row.querySelectorAll("input").forEach((inp) => {
+              payload[inp.dataset.field] = inp.value;
+            });
+            try {
+              const res = await fetch(`/api/variants/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+              if (!res.ok) throw new Error(res.statusText);
+              alert("Updated");
+            } catch (err) {
+              console.error("updateVariant error", err);
+              alert("Update failed: " + err.message);
+            }
+          }
+
+          // add new row UI
+          addBtn.addEventListener("click", () => {
+  const pid = lookupInput.value.trim();
+  const empty = {
+    variation_id: "",
+    unit_type: "",
+    unit_value: "",
+    qty: "",
+    price_per_pill: "",
+    price_per_box: "",
+    delivery_time: "",
+  };
+  const newRow = renderRow(empty);
+
+  // Create a separate "Create" button
+  const createBtn = document.createElement("button");
+  createBtn.textContent = "Create";
+  createBtn.id = "create-btn";
+
+  // Add event listener for the "Create" button
+  createBtn.addEventListener("click", () => createVariant(newRow, pid));
+
+  // Append the new "Create" button to the action cell
+  const actionCell = newRow.querySelector("td:last-child");
+  actionCell.appendChild(createBtn);
+
+  // Append the new row to the table body
+  tbody.appendChild(newRow);
+});
+
+          // POST new
+          async function createVariant(row, pid) {
+            // build payload
+            const payload = { product_id: +pid };
+            row.querySelectorAll("input").forEach((inp) => {
+              payload[inp.dataset.field] = inp.value;
+            });
+            try {
+              const res = await fetch(`/api/variants`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+              if (!res.ok) throw new Error(res.statusText);
+              const created = await res.json();
+              // render a fresh row with a real numeric ID
+              tbody.replaceChild(renderRow(created), row);
+              alert("Created");
+            } catch (err) {
+              console.error("createVariant error", err);
+              alert("Create failed: " + err.message);
+            }
+          }
         });
       </script>
 

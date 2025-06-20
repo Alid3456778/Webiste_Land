@@ -321,6 +321,61 @@ app.get("/api/product", async (req, res) => {
   }
 });
 
+// GET all variants for a product
+app.get('/api/variants/:productId', async (req, res) => {
+  const { productId } = req.params;
+  const { rows } = await pool.query(
+    `SELECT * FROM product_variants WHERE product_id = $1 ORDER BY variation_id`,
+    [productId]
+  );
+  res.json(rows);
+});
+
+// PUT update one variant
+app.put('/api/variants/:id', async (req, res) => {
+  const { id } = req.params;
+  const { unit_type, unit_value, qty, price_per_pill, price_per_box, delivery_time } = req.body;
+  await pool.query(
+    `UPDATE product_variants
+     SET unit_type=$1, unit_value=$2, qty=$3, price_per_pill=$4, price_per_box=$5, delivery_time=$6
+     WHERE variation_id=$7`,
+    [unit_type, unit_value, qty, price_per_pill, price_per_box, delivery_time, id]
+  );
+  res.json({ success: true });
+});
+
+// POST a brand‑new variant
+app.post('/api/variants', async (req, res) => {
+  const { product_id, unit_type, unit_value, qty, price_per_pill, price_per_box, delivery_time } = req.body;
+  const { rows } = await pool.query(
+    `INSERT INTO product_variants
+      (product_id, unit_type, unit_value, qty, price_per_pill, price_per_box, delivery_time)
+     VALUES ($1,$2,$3,$4,$5,$6,$7)
+     RETURNING *`,
+    [product_id, unit_type, unit_value, qty, price_per_pill, price_per_box, delivery_time]
+  );
+  res.json(rows[0]);
+});
+
+// DELETE a single variation by its variation_id
+app.delete('/api/variants/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      'DELETE FROM product_variants WHERE variation_id = $1',
+      [id]
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Variation not found' });
+    }
+    res.json({ message: 'Variation deleted' });
+  } catch (err) {
+    console.error('Error deleting variation:', err);
+    res.status(500).json({ error: 'Failed to delete variation' });
+  }
+});
+
+
 // Update product endpoint
 app.put('/api/products/update/:id', async (req, res) => {
   const { id } = req.params; // Product ID from URL
@@ -352,6 +407,8 @@ app.put('/api/products/update/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal server error.' });
   }
 });
+
+
 
 
 app.post("/api/products/search", async (req, res) => {
