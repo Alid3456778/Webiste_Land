@@ -516,7 +516,7 @@ app.post("/api/set_products", async (req, res) => {
   }
 });
 
-app.delete("/api/products/delete/:id", async (req, res) => {
+app.delete("api/products/delete/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
