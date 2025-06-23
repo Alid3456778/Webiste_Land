@@ -623,38 +623,42 @@
 
       // Set up variant buttons and table rows
       function setupProductVariants(variants) {
-        const mgValues = [
-          ...new Set(variants.map((variant) => variant.unit_value , variants.unit_type)),
-        ];
-        const buttonContainer = document.getElementById("button-container");
-        buttonContainer.innerHTML = "";
+  const uniqueVariants = [
+    ...new Set(variants.map((variant) => `${variant.unit_value} ${variant.unit_type}`)),
+  ];
+  const buttonContainer = document.getElementById("button-container");
+  buttonContainer.innerHTML = "";
 
-        mgValues.forEach((mg,index) => {
-          const button = document.createElement("button");
-          console.log(mg);
-          button.className = "btn btn--toggle";
-          if (index === 0) button.classList.add("btn--active");
-          button.textContent = mg;
-          button.setAttribute("data-mg", mg);
+  uniqueVariants.forEach((variant, index) => {
+    const button = document.createElement("button");
+    console.log(variant);
+    button.className = "btn btn--toggle";
+    if (index === 0) button.classList.add("btn--active");
+    button.textContent = variant;
+    button.setAttribute("data-variant", variant);
 
-          button.addEventListener("click", () => {
-            document
-              .querySelectorAll(".btn--toggle")
-              .forEach((btn) => btn.classList.remove("btn--active"));
-            button.classList.add("btn--active");
-            displayVariantOptions(variants, mg);
-          });
+    button.addEventListener("click", () => {
+      document
+        .querySelectorAll(".btn--toggle")
+        .forEach((btn) => btn.classList.remove("btn--active"));
+      button.classList.add("btn--active");
 
-          buttonContainer.appendChild(button);
+      const [unitValue, unitType] = variant.split(" ");
+      displayVariantOptions(variants, unitValue, unitType);
+    });
 
-          if (index === 0) {
-            displayVariantOptions(variants, mg);
-          }
-        });
-      }
+    buttonContainer.appendChild(button);
+
+    if (index === 0) {
+      const [unitValue, unitType] = variant.split(" ");
+      displayVariantOptions(variants, unitValue, unitType);
+    }
+  });
+}
+
 
       // Display variant options in the table
-      function displayVariantOptions(variants, selectedMg) {
+      function displayVariantOptions(variants, selectedMg, unitType) {
         const tableBody = document.getElementById("popil");
         tableBody.innerHTML = "";
 
