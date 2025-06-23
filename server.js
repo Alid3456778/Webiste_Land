@@ -516,12 +516,17 @@ app.post("/api/set_products", async (req, res) => {
   }
 });
 
-app.delete("api/products/delete/:id", async (req, res) => {
+app.delete("/api/products/delete/:id", async (req, res) => {
   const { id } = req.params;
+  console.log("Received ID for deletion:", id); // Debug log
+
+  if (isNaN(id)) {
+    return res.status(400).json({ success: false, message: "Invalid Product ID" });
+  }
 
   try {
-    // Replace with your database query logic
-    const result = await db.query("DELETE FROM products WHERE product_id = $1", [id]);
+    const result = await pool.query("DELETE FROM products WHERE product_id = $1", [id]);
+    console.log("Query Result:", result); // Debug log
 
     if (result.rowCount === 0) {
       return res.status(404).json({ success: false, message: "Product not found" });

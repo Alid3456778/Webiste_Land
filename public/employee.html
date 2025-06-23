@@ -332,7 +332,12 @@
             </tbody>
           </table>
           <button id="edit-button">Edit</button>
-           <button id="delete-button" style="background-color: red; color: white;">Delete</button>
+          <button
+            id="delete-button"
+            style="background-color: red; color: white"
+          >
+            Delete
+          </button>
         </div>
 
         <div id="edit-section" style="display: none">
@@ -555,35 +560,43 @@
           });
         });
 
-        document.getElementById("delete-button").addEventListener("click", async () => {
-  const productId = document.getElementById("product-id").textContent;
+        document
+          .getElementById("delete-button")
+          .addEventListener("click", async () => {
+            const productId = document.getElementById("product-id").textContent;
 
-  if (!productId) {
-    alert("No product ID found. Please search for a product first.");
-    return;
-  }
+            if (!productId) {
+              alert("No product ID found. Please search for a product first.");
+              return;
+            }
 
-  if (!confirm(`Are you sure you want to delete the product with ID: ${productId}?`)) {
-    return; // User canceled the delete operation
-  }
+            if (
+              !confirm(
+                `Are you sure you want to delete the product with ID: ${productId}?`
+              )
+            ) {
+              return; // User canceled the delete operation
+            }
 
-  try {
-    const response = await fetch(`api/products/delete/${productId}`, {
-      method: "DELETE",
-    });
+            try {
+              const response = await fetch(`/api/products/delete/${productId}`, {
+                method: "DELETE",
+              });
+              const responseData = await response.json();
+              console.log("Response Data:", responseData);
 
-    if (!response.ok) {
-      throw new Error("Failed to delete product data.");
-    }
+              if (!response.ok) {
+                throw new Error("Failed to delete product data.");
+              }
 
-    alert("Product deleted successfully!");
-    // Hide the result section after deletion
-    document.getElementById("result").style.display = "none";
-  } catch (err) {
-    console.error("Error deleting product:", err);
-    alert("Error deleting product. Please try again.");
-  }
-});
+              alert("Product deleted successfully!");
+              // Hide the result section after deletion
+              document.getElementById("result").style.display = "none";
+            } catch (err) {
+              console.error("Error deleting product:", err);
+              alert("Error deleting product. Please try again.");
+            }
+          });
       </script>
 
       <!-- Process Requests Section -->
