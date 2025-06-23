@@ -323,59 +323,74 @@
 
 // checkout1.js
 document.getElementById("place-order-btn").addEventListener("click", async () => {
-  // collect billing details
-  const orderData = {
-    firstName:            document.getElementById("first-name").value,
-    lastName:             document.getElementById("last-name").value,
-    phone:                document.getElementById("phone").value,
-    email:                document.getElementById("email").value,
-    companyName:          document.getElementById("company-name").value,
-    country:              document.getElementById("country").value,
-    billingStreetAddress: document.getElementById("street-address").value,
-    apartment:            document.getElementById("apartment").value,
-    billingCity:          document.getElementById("city").value,
-    billingState:         document.getElementById("state").value,
-    billingZip:           document.getElementById("zip-code").value
-  };
+  try {
+    // Collect billing details with null checks
+    const getValue = (id) => {
+      const element = document.getElementById(id);
+      if (!element) {
+        console.error(`Element with ID "${id}" not found.`);
+        throw new Error(`Missing required field: ${id}`);
+      }
+      return element.value;
+    };
 
-  // fetch cart items from the backend for this session
-  const cartRes = await fetch("/api/cart");
-  const cartJson = await cartRes.json();
-  if (!cartJson.success) {
-    return alert("Could not fetch cart items");
-  }
-  const cartItems = cartJson.data.map(item => ({
-    product_id: item.product_id,
-    name:       item.name,
-    mg:         item.mg,
-    quantity:   parseInt(item.quantity, 10),
-    price:      parseFloat(item.price)
-  }));
+    const orderData = {
+      firstName: getValue("first-name"),
+      lastName: getValue("last-name"),
+      phone: getValue("phone"),
+      email: getValue("email"),
+      companyName: document.getElementById("company-name")?.value || "",
+      billingStreetAddress: getValue("street-address"),
+      apartment: getValue("apartment"),
+      billingState: getValue("state"),
+      billingZip: getValue("zip-code"),
+    };
 
-  // compute totals
-  const shippingCost = 50.0;
-  const subtotal = cartItems.reduce((sum, it) => sum + it.price , 0);
-  const totalCost = subtotal + shippingCost;
+    // Fetch cart items
+    const cartRes = await fetch("/api/cart");
+    const cartJson = await cartRes.json();
+    if (!cartJson.success) {
+      alert("Could not fetch cart items");
+      return;
+    }
 
-  // send everything to /api/checkout
-  const res = await fetch("/api/checkout", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      ...orderData,
-      cartItems,
-      shippingCost,
-      totalCost
-    })
-  });
-  const result = await res.json();
-  if (result.success) {
-    // alert("Order placed! ID: " + result.orderId);
-    // window.location.href = `/invoice1.html?orderId=${result.orderId}`;
-  } else {
-    alert("Error placing order");
+    const cartItems = cartJson.data.map((item) => ({
+      product_id: item.product_id,
+      name: item.name,
+      mg: item.mg,
+      quantity: parseInt(item.quantity, 10),
+      price: parseFloat(item.price),
+    }));
+
+    // Compute totals
+    const shippingCost = 50.0;
+    const subtotal = cartItems.reduce((sum, it) => sum + it.price, 0);
+    const totalCost = subtotal + shippingCost;
+
+    // Send everything to /api/checkout
+    const res = await fetch("/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...orderData,
+        cartItems,
+        shippingCost,
+        totalCost,
+      }),
+    });
+    const result = await res.json();
+    if (result.success) {
+      alert("Order placed! ID: " + result.orderId);
+      window.location.href = `/invoice1.html?orderId=${result.orderId}`;
+    } else {
+      alert("Error placing order");
+    }
+  } catch (error) {
+    console.error("Error placing order:", error);
+    alert(`Error: ${error.message}`);
   }
 });
+
 
 
 

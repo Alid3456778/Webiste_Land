@@ -40,10 +40,7 @@
         <span>Subtotal</span>
         <span id="subtotal">$0</span>
       </div>
-      <div class="bill-item">
-        <span>Tax (5%)</span>
-        <span id="tax">$0</span>
-      </div>
+      
       <div class="bill-item total">
         <span>Total</span>
         <span id="total">$0</span>
@@ -147,10 +144,10 @@
           container.appendChild(div);
         }
 
-        const tax = subtotal * 0.05;
+        
         document.getElementById("subtotal").textContent = `$${subtotal.toFixed(2)}`;
-        document.getElementById("tax").textContent = `$${tax.toFixed(2)}`;
-        document.getElementById("total").textContent = `$${(subtotal + tax).toFixed(2)}`;
+        
+        document.getElementById("total").textContent = `$${(subtotal).toFixed(2)}`;
       } catch (err) {
         console.error(err);
         document.getElementById("cart-items").innerHTML = "<p>Error loading cart items.</p>";

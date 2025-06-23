@@ -258,7 +258,7 @@
             <button id="submit-selection">Submit</button>
           </div>
         </div>
-        <script>
+        <!-- <script>
           const showBtn = document.getElementById("showButton");
           const modal = document.getElementById("toggleBox");
           const overlay = document.getElementById("overlay");
@@ -282,7 +282,7 @@
               overlay.classList.remove("active");
             }
           });
-        </script>
+        </script> -->
 
         <!-- FAQ ACCORDION -->
         <div class="faq">
@@ -424,7 +424,8 @@
           const searchButton = document.getElementById("search-button");
           const searchInput = document.getElementById("search-input");
 
-          searchButton.addEventListener("click", () => {
+
+           const handleSearch = () => {
             const query = searchInput.value.trim();
             const matchingProduct = products.find(
               (product) => product.product_name === query
@@ -435,7 +436,30 @@
             } else {
               alert("No matching product found.");
             }
+          };
+
+          // Trigger search on button click
+          searchButton.addEventListener("click", handleSearch);
+
+          // Trigger search on Enter key press in the input field
+          searchInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+              handleSearch();
+            }
           });
+
+          // searchButton.addEventListener("click", () => {
+          //   const query = searchInput.value.trim();
+          //   const matchingProduct = products.find(
+          //     (product) => product.product_name === query
+          //   );
+
+          //   if (matchingProduct) {
+          //     window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
+          //   } else {
+          //     alert("No matching product found.");
+          //   }
+          // });
         } catch (error) {
           console.error("Error is", error);
         }
@@ -822,47 +846,47 @@
       }
 
       // Custom order modal functionality
-      function setupCustomOrderModal() {
-        const showButton = document.getElementById("showButton");
-        const modal = document.getElementById("toggleBox");
-        const overlay = document.getElementById("overlay");
-        const submitButton = document.getElementById("submit-selection");
+      // function setupCustomOrderModal() {
+      //   const showButton = document.getElementById("showButton");
+      //   const modal = document.getElementById("toggleBox");
+      //   const overlay = document.getElementById("overlay");
+      //   const submitButton = document.getElementById("submit-selection");
 
-        showButton.addEventListener("click", () => {
-          modal.style.display = "block";
-          overlay.style.display = "block";
-        });
+      //   showButton.addEventListener("click", () => {
+      //     modal.style.display = "block";
+      //     overlay.style.display = "block";
+      //   });
 
-        overlay.addEventListener("click", () => {
-          modal.style.display = "none";
-          overlay.style.display = "none";
-        });
+      //   overlay.addEventListener("click", () => {
+      //     modal.style.display = "none";
+      //     overlay.style.display = "none";
+      //   });
 
-        submitButton.addEventListener("click", () => {
-          const mgSelect = document.getElementById("mg-select");
-          const quantityInput = document.getElementById("quantity-select");
+      //   submitButton.addEventListener("click", () => {
+      //     const mgSelect = document.getElementById("mg-select");
+      //     const quantityInput = document.getElementById("quantity-select");
 
-          const selectedMg = mgSelect.value;
-          const selectedQuantity = quantityInput.value;
+      //     const selectedMg = mgSelect.value;
+      //     const selectedQuantity = quantityInput.value;
 
-          if (
-            !selectedQuantity ||
-            isNaN(selectedQuantity) ||
-            selectedQuantity <= 0
-          ) {
-            alert("Please enter a valid quantity");
-            return;
-          }
+      //     if (
+      //       !selectedQuantity ||
+      //       isNaN(selectedQuantity) ||
+      //       selectedQuantity <= 0
+      //     ) {
+      //       alert("Please enter a valid quantity");
+      //       return;
+      //     }
 
-          // Handle custom order processing here
-          alert(
-            `Custom order placed: ${selectedMg}MG, Quantity: ${selectedQuantity}`
-          );
+      //     // Handle custom order processing here
+      //     alert(
+      //       `Custom order placed: ${selectedMg}MG, Quantity: ${selectedQuantity}`
+      //     );
 
-          modal.style.display = "none";
-          overlay.style.display = "none";
-        });
-      }
+      //     modal.style.display = "none";
+      //     overlay.style.display = "none";
+      //   });
+      // }
 
       // Initialize everything when the DOM is loaded
       document.addEventListener("DOMContentLoaded", function () {
@@ -870,7 +894,7 @@
         setupTabs();
         setupFaqAccordion();
         setupCarousel();
-        setupCustomOrderModal();
+        // setupCustomOrderModal();
       });
     </script>
   </body>

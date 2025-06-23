@@ -332,6 +332,7 @@
             </tbody>
           </table>
           <button id="edit-button">Edit</button>
+           <button id="delete-button" style="background-color: red; color: white;">Delete</button>
         </div>
 
         <div id="edit-section" style="display: none">
@@ -553,6 +554,36 @@
             }
           });
         });
+
+        document.getElementById("delete-button").addEventListener("click", async () => {
+  const productId = document.getElementById("product-id").textContent;
+
+  if (!productId) {
+    alert("No product ID found. Please search for a product first.");
+    return;
+  }
+
+  if (!confirm(`Are you sure you want to delete the product with ID: ${productId}?`)) {
+    return; // User canceled the delete operation
+  }
+
+  try {
+    const response = await fetch(`/api/products/delete/${productId}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete product data.");
+    }
+
+    alert("Product deleted successfully!");
+    // Hide the result section after deletion
+    document.getElementById("result").style.display = "none";
+  } catch (err) {
+    console.error("Error deleting product:", err);
+    alert("Error deleting product. Please try again.");
+  }
+});
       </script>
 
       <!-- Process Requests Section -->
@@ -864,33 +895,35 @@
 
           // add new row UI
           addBtn.addEventListener("click", () => {
-  const pid = lookupInput.value.trim();
-  const empty = {
-    variation_id: "",
-    unit_type: "",
-    unit_value: "",
-    qty: "",
-    price_per_pill: "",
-    price_per_box: "",
-    delivery_time: "",
-  };
-  const newRow = renderRow(empty);
+            const pid = lookupInput.value.trim();
+            const empty = {
+              variation_id: "",
+              unit_type: "",
+              unit_value: "",
+              qty: "",
+              price_per_pill: "",
+              price_per_box: "",
+              delivery_time: "",
+            };
+            const newRow = renderRow(empty);
 
-  // Create a separate "Create" button
-  const createBtn = document.createElement("button");
-  createBtn.textContent = "Create";
-  createBtn.id = "create-btn";
+            // Create a separate "Create" button
+            const createBtn = document.createElement("button");
+            createBtn.textContent = "Create";
+            createBtn.id = "create-btn";
 
-  // Add event listener for the "Create" button
-  createBtn.addEventListener("click", () => createVariant(newRow, pid));
+            // Add event listener for the "Create" button
+            createBtn.addEventListener("click", () =>
+              createVariant(newRow, pid)
+            );
 
-  // Append the new "Create" button to the action cell
-  const actionCell = newRow.querySelector("td:last-child");
-  actionCell.appendChild(createBtn);
+            // Append the new "Create" button to the action cell
+            const actionCell = newRow.querySelector("td:last-child");
+            actionCell.appendChild(createBtn);
 
-  // Append the new row to the table body
-  tbody.appendChild(newRow);
-});
+            // Append the new row to the table body
+            tbody.appendChild(newRow);
+          });
 
           // POST new
           async function createVariant(row, pid) {

@@ -516,6 +516,24 @@ app.post("/api/set_products", async (req, res) => {
   }
 });
 
+app.delete("/api/products/delete/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Replace with your database query logic
+    const result = await db.query("DELETE FROM products WHERE product_id = $1", [id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    res.json({ success: true, message: "Product deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting product:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
 // API to fetch products based on category
 app.get("/products", async (req, res) => {
   const categoryID = req.query.categoryID || "all";
