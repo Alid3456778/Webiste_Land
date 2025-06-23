@@ -624,13 +624,14 @@
       // Set up variant buttons and table rows
       function setupProductVariants(variants) {
         const mgValues = [
-          ...new Set(variants.map((variant) => variant.unit_value)),
+          ...new Set(variants.map((variant) => variant.unit_value , variants.unit_type)),
         ];
         const buttonContainer = document.getElementById("button-container");
         buttonContainer.innerHTML = "";
 
-        mgValues.forEach((mg, index) => {
+        mgValues.forEach((mg,index) => {
           const button = document.createElement("button");
+          console.log(mg);
           button.className = "btn btn--toggle";
           if (index === 0) button.classList.add("btn--active");
           button.textContent = mg;

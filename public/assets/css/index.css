@@ -206,7 +206,6 @@ body {
 .hero-alt__bg img {
   width: 100%;
   display: block;
-  filter: brightness(0.75);
 }
 .hero-alt__overlay {
   position: absolute;
