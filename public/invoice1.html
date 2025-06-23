@@ -92,8 +92,9 @@
     document.getElementById('billing-info').innerHTML = `
       <strong>Name:</strong> ${order.firstName} ${order.lastName}<br>
       <strong>Address:</strong> ${order.billingStreetAddress}, ${order.apartment}<br>
-      <strong>City:</strong>${order.billingState} ${order.billingZip}<br>
-      <strong>Phone:</strong> ${order.phone}
+      <strong>City:</strong>${order.city}${order.billingState} ${order.billingZip}<br>
+      <strong>Phone:</strong> ${order.phone}<br>
+      <strong>Country:</strong> ${order.country}
     `;
 
     // Shipping info

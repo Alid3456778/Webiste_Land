@@ -9,7 +9,6 @@
     <style></style>
   </head>
   <body>
-   
     <header class="navbar">
       <div class="navbar-top" id="navbar">
         <div
@@ -47,43 +46,30 @@
     <main class="checkout-container">
       <h1>Billing Details</h1>
       <!-- <progress id="checkout-form" max="100" value="70">70%</progress> -->
-      <div class="checkout-card" class="input-group form-group"> 
+      <div class="checkout-card" class="input-group form-group">
         <form id="checkout-form" class="checkout-form">
           <!-- Billing Details -->
           <div class="form-group input-group">
-            <input type="text" id="first-name" name="firstName" placeholder=" " required />
+            <input
+              type="text"
+              id="first-name"
+              name="firstName"
+              placeholder=" "
+              required
+            />
             <label for="first-name">First Name <span>*</span></label>
           </div>
           <div class="form-group input-group">
-            <input type="text" id="last-name" name="lastName"  placeholder=" "required />
+            <input
+              type="text"
+              id="last-name"
+              name="lastName"
+              placeholder=" "
+              required
+            />
             <label for="last-name">Last Name <span>*</span></label>
           </div>
           <div class="form-group input-group">
-
-            <input type="tel" id="phone" name="phone"  placeholder=" "required />
-            <label for="phone">Phone <span>*</span></label>
-          </div>
-          <div class="form-group input-group">
-           
-            <input type="email" id="email" name="email"  placeholder=" "required />
-            <label for="email">Email Address <span>*</span></label>
-          </div>
-          <div class="form-group input-group">
-            
-            <input type="text" id="company-name"  placeholder=" "/>
-            <label for="company-name">Company Name (optional)</label>
-          </div>
-          <!-- <div class="form-group input-group">
-            
-            <select id="country"  placeholder=" "required>
-              <label for="country">Country / Region <span>*</span></label>
-              <option value="United States">United States (US)</option>
-              <option value="India">India</option>
-              <option value="Canada">Canada</option>
-            </select>
-          </div> -->
-          <div class="form-group input-group">
-            
             <input
               type="text"
               id="street-address"
@@ -93,31 +79,62 @@
             />
             <label for="street-address">Street Address <span>*</span></label>
           </div>
-          <div class="form-group input-group">
-            
-            <input type="text" id="apartment" placeholder=" "required/>
-            <label for="apartment"
-              >Apartment, suite, unit, etc. (optional)</label
-            >
+          <div class="form-group">
+            <label for="ship-city">City <span>*</span></label>
+            <input type="text" id="ship-city" name="shipCity" />
+                      
           </div>
-         <div class=" input-group">
-  <select id="state" name="billingState" required>
-    <option value="" disabled selected hidden></option>
-    <option value="Texas">Texas</option>
-    <option value="California">California</option>
-    <option value="New York">New York</option>
-  </select>
-  <label for="state">State <span>*</span></label>
-</div>
-
-          
-          
-          
+          <div class="input-group">
+            <select id="state" name="billingState" required>
+              <option value="" disabled selected hidden></option>
+              <option value="Texas">Texas</option>
+              <option value="California">California</option>
+              <option value="New York">New York</option>
+            </select>
+            <label for="state">State <span>*</span></label>
+          </div>
           <div class="form-group input-group">
-           
-            <input type="text" id="zip-code" name="billingZip" placeholder=" "required />
+            <input
+              type="text"
+              id="zip-code"
+              name="billingZip"
+              placeholder=" "
+              required
+            />
             <label for="zip-code">ZIP Code <span>*</span></label>
           </div>
+          <div class="form-group input-group">
+            <select id="country" placeholder=" " required>
+              <!-- <option value="United States"> </option> -->
+              <option value="United States">United States (US)</option>
+              <!-- <option value="India">India</option> -->
+              <option value="Canada">Canada</option>
+            </select>
+            <label for="country">Country / Region <span>*</span></label>
+          </div>
+          <div class="form-group input-group">
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              placeholder=" "
+              required
+            />
+            <label for="phone">Phone <span>*</span></label>
+          </div>
+
+          <div class="form-group input-group">
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder=" "
+              required
+            />
+            <label for="email">Email Address <span>*</span></label>
+          </div>
+
+
           <!-- Shipping Address Checkbox -->
           <div class="form-group-shipping">
             <input type="checkbox" id="different-address" />
@@ -127,9 +144,7 @@
           <div id="shipping-address-form" style="display: none">
             <h2>Shipping Address</h2>
             <div class="form-group">
-              <label for="ship-street-address"
-                > <span>*</span></label
-              >
+              <label for="ship-street-address"> <span>*</span></label>
               <input
                 type="text"
                 id="ship-street-address"
@@ -149,32 +164,32 @@
 
         <!-- Order Summary -->
         <section class="order-summary">
-          
-
           <h2>Your Order</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Product</th>
-        <th>Subtotal</th>
-      </tr>
-    </thead>
-    <tbody id="cart-items">
-      <!-- Cart items will be dynamically injected here -->
-    </tbody>
-    <tfoot>
-      <tr>
-        <td>Shipping</td>
-        <td id="shipping-cost">$50.00</td>
-      </tr>
-      <tr>
-        <td>Total</td>
-        <td id="total-cost">$0.00</td>
-      </tr>
-    </tfoot>
-  </table>
-  <!-- Place Order Button -->
-  <button id="place-order-btn" class="place-order-btn">Place Order</button>               
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Subtotal</th>
+              </tr>
+            </thead>
+            <tbody id="cart-items">
+              <!-- Cart items will be dynamically injected here -->
+            </tbody>
+            <tfoot>
+              <tr>
+                <td>Shipping</td>
+                <td id="shipping-cost">$50.00</td>
+              </tr>
+              <tr>
+                <td>Total</td>
+                <td id="total-cost">$0.00</td>
+              </tr>
+            </tfoot>
+          </table>
+          <!-- Place Order Button -->
+          <button id="place-order-btn" class="place-order-btn">
+            Place Order
+          </button>
         </section>
       </div>
     </main>
@@ -279,179 +294,179 @@
         });
       });
 
+      document.addEventListener("DOMContentLoaded", async () => {
+        const cartItemsElement = document.getElementById("cart-items");
+        const totalCostElement = document.getElementById("total-cost");
+        const shippingCost = 50.0; // Flat shipping cost
 
-      document.addEventListener('DOMContentLoaded', async () => {
-  const cartItemsElement = document.getElementById('cart-items');
-  const totalCostElement = document.getElementById('total-cost');
-  const shippingCost = 50.0; // Flat shipping cost
+        try {
+          const response = await fetch("/api/cart");
+          const result = await response.json();
 
-  try {
-    const response = await fetch('/api/cart');
-    const result = await response.json();
+          if (result.success) {
+            const cartItems = result.data;
+            let total = 0;
 
-    if (result.success) {
-      const cartItems = result.data;
-      let total = 0;
+            // Clear the cart items element
+            cartItemsElement.innerHTML = "";
 
-      // Clear the cart items element
-      cartItemsElement.innerHTML = '';
+            // Populate the cart items
+            cartItems.forEach((item) => {
+              console.log(parseFloat(item.price));
+              const subtotal = parseFloat(item.price);
+              total += subtotal;
 
-      // Populate the cart items
-      cartItems.forEach(item => {
-        console.log(parseFloat(item.price));
-        const subtotal = parseFloat(item.price);
-        total += subtotal;
-        
-        const row = `
+              const row = `
           <tr>
-            <td>${item.name} ${item.mg || ''}mg x ${item.quantity}</td>
+            <td>${item.name} ${item.mg || ""}mg x ${item.quantity}</td>
             <td>$${item.price}</td>
           </tr>
         `;
-        cartItemsElement.innerHTML += row;
+              cartItemsElement.innerHTML += row;
+            });
+
+            // Update the total cost
+            totalCostElement.textContent = `$${(total + shippingCost).toFixed(
+              2
+            )}`;
+          } else {
+            console.error("Failed to fetch cart items:", result.message);
+          }
+        } catch (error) {
+          console.error("Error fetching cart items:", error);
+        }
       });
 
-      // Update the total cost
-      totalCostElement.textContent = `$${(total + shippingCost).toFixed(2)}`;
-    } else {
-      console.error('Failed to fetch cart items:', result.message);
-    }
-  } catch (error) {
-    console.error('Error fetching cart items:', error);
-  }
-});
+      // checkout1.js
+      document
+        .getElementById("place-order-btn")
+        .addEventListener("click", async () => {
+          try {
+            // Collect billing details with null checks
+            const getValue = (id) => {
+              const element = document.getElementById(id);
+              if (!element) {
+                console.error(`Element with ID "${id}" not found.`);
+                throw new Error(`Missing required field: ${id}`);
+              }
+              return element.value;
+            };
 
-// checkout1.js
-document.getElementById("place-order-btn").addEventListener("click", async () => {
-  try {
-    // Collect billing details with null checks
-    const getValue = (id) => {
-      const element = document.getElementById(id);
-      if (!element) {
-        console.error(`Element with ID "${id}" not found.`);
-        throw new Error(`Missing required field: ${id}`);
-      }
-      return element.value;
-    };
+            const orderData = {
+              firstName: getValue("first-name"),
+              lastName: getValue("last-name"),
+              city: getValue("ship-city"),
+              country: getValue("country"),
+              phone: getValue("phone"),
+              email: getValue("email"),
+              companyName: document.getElementById("company-name")?.value || "",
+              billingStreetAddress: getValue("street-address"),
+              billingState: getValue("state"),
+              billingZip: getValue("zip-code"),
+            };
 
-    const orderData = {
-      firstName: getValue("first-name"),
-      lastName: getValue("last-name"),
-      phone: getValue("phone"),
-      email: getValue("email"),
-      companyName: document.getElementById("company-name")?.value || "",
-      billingStreetAddress: getValue("street-address"),
-      apartment: getValue("apartment"),
-      billingState: getValue("state"),
-      billingZip: getValue("zip-code"),
-    };
+            // Fetch cart items
+            const cartRes = await fetch("/api/cart");
+            const cartJson = await cartRes.json();
+            if (!cartJson.success) {
+              alert("Could not fetch cart items");
+              return;
+            }
 
-    // Fetch cart items
-    const cartRes = await fetch("/api/cart");
-    const cartJson = await cartRes.json();
-    if (!cartJson.success) {
-      alert("Could not fetch cart items");
-      return;
-    }
+            const cartItems = cartJson.data.map((item) => ({
+              product_id: item.product_id,
+              name: item.name,
+              mg: item.mg,
+              quantity: parseInt(item.quantity, 10),
+              price: parseFloat(item.price),
+            }));
 
-    const cartItems = cartJson.data.map((item) => ({
-      product_id: item.product_id,
-      name: item.name,
-      mg: item.mg,
-      quantity: parseInt(item.quantity, 10),
-      price: parseFloat(item.price),
-    }));
+            // Compute totals
+            const shippingCost = 50.0;
+            const subtotal = cartItems.reduce((sum, it) => sum + it.price, 0);
+            const totalCost = subtotal + shippingCost;
 
-    // Compute totals
-    const shippingCost = 50.0;
-    const subtotal = cartItems.reduce((sum, it) => sum + it.price, 0);
-    const totalCost = subtotal + shippingCost;
-
-    // Send everything to /api/checkout
-    const res = await fetch("/api/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...orderData,
-        cartItems,
-        shippingCost,
-        totalCost,
-      }),
-    });
-    const result = await res.json();
-    if (result.success) {
-      alert("Order placed! ID: " + result.orderId);
-      window.location.href = `/invoice1.html?orderId=${result.orderId}`;
-    } else {
-      alert("Error placing order");
-    }
-  } catch (error) {
-    console.error("Error placing order:", error);
-    alert(`Error: ${error.message}`);
-  }
-});
-
-
-
-
-  
+            // Send everything to /api/checkout
+            const res = await fetch("/api/checkout", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                ...orderData,
+                cartItems,
+                shippingCost,
+                totalCost,
+              }),
+            });
+            const result = await res.json();
+            if (result.success) {
+              alert("Order placed! ID: " + result.orderId);
+              window.location.href = `/invoice1.html?orderId=${result.orderId}`;
+            } else {
+              alert("Error placing order");
+            }
+          } catch (error) {
+            console.error("Error placing order:", error);
+            alert(`Error: ${error.message}`);
+          }
+        });
     </script>
-     <script>
+    <script>
       // checkout.js
-document.getElementById("different-address").addEventListener("change", function () {
-  const shippingForm = document.getElementById("shipping-address-form");
-  shippingForm.style.display = this.checked ? "block" : "none";
-});
+      document
+        .getElementById("different-address")
+        .addEventListener("change", function () {
+          const shippingForm = document.getElementById("shipping-address-form");
+          shippingForm.style.display = this.checked ? "block" : "none";
+        });
 
-// Sample dummy cart data
-const sampleCartItems = [
-  { product: "Paracetamol 500mg", subtotal: 100 },
-  { product: "Cough Syrup", subtotal: 150 }
-];
+      // Sample dummy cart data
+      const sampleCartItems = [
+        { product: "Paracetamol 500mg", subtotal: 100 },
+        { product: "Cough Syrup", subtotal: 150 },
+      ];
 
-function populateCart(cartItems) {
-  const cartBody = document.getElementById("cart-items");
-  const totalCostEl = document.getElementById("total-cost");
+      function populateCart(cartItems) {
+        const cartBody = document.getElementById("cart-items");
+        const totalCostEl = document.getElementById("total-cost");
 
-  let total = 0;
-  cartItems.forEach(item => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
+        let total = 0;
+        cartItems.forEach((item) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
       <td>${item.product}</td>
       <td>$${item.subtotal.toFixed(2)}</td>
     `;
-    cartBody.appendChild(row);
-    total += item.subtotal;
-  });
+          cartBody.appendChild(row);
+          total += item.subtotal;
+        });
 
-  // Add shipping cost
-  const shipping = 50;
-  total += shipping;
+        // Add shipping cost
+        const shipping = 50;
+        total += shipping;
 
-  totalCostEl.textContent = `$${total.toFixed(2)}`;
-}
+        totalCostEl.textContent = `$${total.toFixed(2)}`;
+      }
 
-window.addEventListener("DOMContentLoaded", () => {
-  populateCart(sampleCartItems);
-});
-
+      window.addEventListener("DOMContentLoaded", () => {
+        populateCart(sampleCartItems);
+      });
     </script>
 
     <script src="./assets/js/checkout1.js"></script>
-  
-  <!-- Place this at the end, just before </body> -->
-<script>
-  let lastScrollY = window.scrollY;
-  const navbar = document.getElementById('navbar');
 
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > lastScrollY && window.scrollY > 50) {
-      navbar.classList.add('hidden');
-    } else {
-      navbar.classList.remove('hidden');
-    }
-    lastScrollY = window.scrollY;
-  });
-</script>
-</body>
+    <!-- Place this at the end, just before </body> -->
+    <script>
+      let lastScrollY = window.scrollY;
+      const navbar = document.getElementById("navbar");
+
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > lastScrollY && window.scrollY > 50) {
+          navbar.classList.add("hidden");
+        } else {
+          navbar.classList.remove("hidden");
+        }
+        lastScrollY = window.scrollY;
+      });
+    </script>
+  </body>
 </html>
