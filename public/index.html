@@ -150,16 +150,15 @@
     <!-- HERO -->
     <section class="hero-alt">
       <div class="hero-alt__bg">
-        
+        <img src="assets/image2/WhatsApp Image 2025-06-19 at 13.30.48_27ad08b7.jpg" />
         <div class="hero-alt__overlay"></div>
       </div>
       <div class="hero-alt__content">
-        <!-- <h1>Your Trusted Online Pharmacy</h1>
-        <p>Premium medicines, genuine quality, delivered fast & secure.</p> -->
         <a href="https://t.me/MCLAND1" target="_blank" class="btn btn--cta"
           >Contact Us</a
         >
       </div>
+          
     </section>
 
     <!-- FEATURES -->
@@ -447,7 +446,6 @@
           // Trigger search on Enter key press in the input field
           searchInput.addEventListener("keydown", (event) => {
             if (event.key === "Enter") {
-             
               handleSearch();
             }
           });
@@ -459,33 +457,33 @@
       buildProductSearch();
     </script>
     <script>
-  const searchInput = document.getElementById("search-input");
-  const searchButton = document.getElementById("search-button");
-  const products = document.querySelectorAll(".product");
+      const searchInput = document.getElementById("search-input");
+      const searchButton = document.getElementById("search-button");
+      const products = document.querySelectorAll(".product");
 
-  function filterProducts() {
-    const query = searchInput.value.trim().toLowerCase();
+      function filterProducts() {
+        const query = searchInput.value.trim().toLowerCase();
 
-    products.forEach(product => {
-      const productName = product.dataset.name.toLowerCase();
-      if (productName.includes(query)) {
-        product.style.display = "block";
-      } else {
-        product.style.display = "none";
+        products.forEach((product) => {
+          const productName = product.dataset.name.toLowerCase();
+          if (productName.includes(query)) {
+            product.style.display = "block";
+          } else {
+            product.style.display = "none";
+          }
+        });
       }
-    });
-  }
 
-  // Filter when Enter is pressed
-  searchInput.addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      filterProducts();
-    }
-  });
+      // Filter when Enter is pressed
+      searchInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          filterProducts();
+        }
+      });
 
-  // Filter when search button is clicked
-  searchButton.addEventListener("click", filterProducts);
-</script>
+      // Filter when search button is clicked
+      searchButton.addEventListener("click", filterProducts);
+    </script>
   </body>
 </html>

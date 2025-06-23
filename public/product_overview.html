@@ -211,7 +211,7 @@
           <table class="product-table">
             <thead>
               <tr>
-                <th id="unit_Type">MG</th>
+                <!-- <th id="unit_Type">MG</th> -->
                 <th>QTY</th>
                 <th>Description</th>
                 <th>Price</th>
@@ -669,7 +669,7 @@
           tr.setAttribute("data-mg", variant.unit_value);
 
           tr.innerHTML = `
-            <td>${variant.unit_value} ${variant.unit_type}</td>
+            
             <td>${variant.qty}</td>
             <td>${variant.price_per_pill || "$0.00 per pill"}</td>
             <td>${variant.price_per_box || "$0.00"}</td>

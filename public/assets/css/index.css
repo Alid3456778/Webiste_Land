@@ -202,22 +202,12 @@ body {
   position: relative;
   overflow: hidden;
   border-radius: 1rem;
-
-  background-image: url('../image2/WhatsApp\ Image\ 2025-06-19\ at\ 13.30.48_27ad08b7.jpg');
-  background-size: contain;         /* full image visible */
-  background-repeat: no-repeat;
-  background-position: center;
-  background-color: #ffffff;           /* fills any space around image */
 }
-
 .hero-alt__bg img {
   width: 100%;
-  height: 100%;           /* Add this */
-  object-fit: contain;      /* Add this */
   display: block;
   filter: brightness(0.75);
 }
-
 .hero-alt__overlay {
   position: absolute;
   inset: 0;
