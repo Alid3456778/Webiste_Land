@@ -126,7 +126,7 @@
           <p id="pric">${
             product.trade_names ? product.trade_names.split(",")[0].trim() : ""
           }</p>
-          <p style="font-weight: bold;">(4-5 Day's Delivery)</p>
+          ${product.category_id == 1 ? `<p style="font-weight: bold;">(4-5 Day's Delivery)</p>` : `<p style="font-weight: bold;">(It will take Time)</p>`}
           <div class="product-buttons">
             <a href="./product_overview.html?product_ID=${product.product_id}"> 
               <button class="buy-btn"> Buy Now </button>
@@ -155,40 +155,6 @@
         });
       </script>
       <script>
-        // Function to build the product search index
-        // async function buildProductSearch() {
-        //   try {
-        //     const response = await fetch(`/products`);
-        //     const products = await response.json();
-        //     // console.log("prosuct is",products);
-        //     const searchList = document.getElementById("search_list");
-        //     searchList.innerHTML = "";
-        //     const fragment = document.createDocumentFragment();
-        //     products.forEach((product) => {
-        //       const option = document.createElement("option");
-        //       option.value = product.product_name || "Product Name";
-        //       option.textContent = product.product_name || "Product Name";
-        //       fragment.appendChild(option);
-        //     });
-        //     searchList.appendChild(fragment);
-
-        //     const searchButton = document.getElementById("search-button");
-        //     const searchInput = document.getElementById("search-input");
-        //     searchButton.addEventListener("click", () => {
-        //       const query = searchInput.value.trim();
-        //       const matchingProduct = products.find(
-        //         (product) => product.product_name === query
-        //       );
-        //       if (matchingProduct) {
-        //         window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
-        //       } else {
-        //         alert("No matching product found.");
-        //       }
-        //     });
-        //   } catch (error) {
-        //     console.error("eror is", error);
-        //   }
-        // }
         async function buildProductSearch() {
           try {
             const response = await fetch(`/products`);
