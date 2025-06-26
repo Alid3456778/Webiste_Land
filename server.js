@@ -37,22 +37,17 @@ app.use((req, res, next) => {
 
 // DELETE endpoint to remove an item from the cart
 app.delete("/remove-from-cart", async (req, res) => {
-  const sessionId = req.cookies.sessionId;
-  const { productId } = req.body;
-  if (!sessionId || !productId) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Missing productId or session" });
-  }
+  const { id } = req.body;
+
   try {
-    await pool.query(
-      "DELETE FROM carts WHERE session_id = $1 AND product_id = $2",
-      [sessionId, productId]
-    );
-    res.json({ success: true, message: "Item removed from cart" });
-  } catch (error) {
-    console.error("Error removing cart item:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    const result = await pool.query("DELETE FROM carts WHERE id = $1", [id]);
+    if (result.rowCount === 0) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+    res.json({ success: true, message: "Product removed successfully" });
+  } catch (err) {
+    console.error("Error removing product from cart:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
 

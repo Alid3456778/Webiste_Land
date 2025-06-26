@@ -107,69 +107,67 @@
   <!-- YOUR SCRIPT (unchanged) -->
   <script>
     async function loadCartItems() {
-      try {
-        const cartResponse = await fetch("/api/cart");
-        const cartData = await cartResponse.json();
-        if (!cartData.success) throw new Error("Failed to fetch cart items.");
+  try {
+    const cartResponse = await fetch("/api/cart");
+    const cartData = await cartResponse.json();
+    if (!cartData.success) throw new Error("Failed to fetch cart items.");
 
-        const cartItems = cartData.data;
-        const container = document.getElementById("cart-items");
-        if (cartItems.length === 0) {
-          container.innerHTML = "<p>Your cart is empty.</p>";
-          return;
-        }
-
-        // Build and inject each .cart-item with premium structure
-        container.innerHTML = "";
-        let subtotal = 0;
-        for (const item of cartItems) {
-          const price = parseFloat(item.price.replace(/[^\d.-]/g, "")) || 0;
-          subtotal += price;
-          const mgText = item.mg ? ` (${item.mg} MG)` : "";
-          const div = document.createElement("div");
-          div.className = "cart-item";
-          div.innerHTML = `
-            <img src="${item.image_url}" alt="Product Image" />
-            <div class="product-details">
-              <div class="product-detail-1">
-                <h3>${item.name || "Unnamed Product"}${mgText}</h3>
-                <button class="remove-btn" onclick="removeItem('${item.product_id}')">Remove</button>
-              </div>
-              <div class="product-detail-2">
-                <p>Price: ₹${price.toFixed(2)}</p>
-                <p>Quantity: ${item.quantity}</p>
-              </div>
-            </div>
-          `;
-          container.appendChild(div);
-        }
-
-        
-        document.getElementById("subtotal").textContent = `$${subtotal.toFixed(2)}`;
-        
-        document.getElementById("total").textContent = `$${(subtotal).toFixed(2)}`;
-      } catch (err) {
-        console.error(err);
-        document.getElementById("cart-items").innerHTML = "<p>Error loading cart items.</p>";
-      }
+    const cartItems = cartData.data;
+    const container = document.getElementById("cart-items");
+    if (cartItems.length === 0) {
+      container.innerHTML = "<p>Your cart is empty.</p>";
+      return;
     }
 
-    function removeItem(productID) {
-      fetch("/remove-from-cart", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: productID })
-      })
-      .then(res => res.json())
-      .then(result => {
-        if (result.success){
-          showToast("Item removed from cart");
-          loadCartItems();
-        } 
-        else alert("Error removing item: " + result.message);
-      })
-      .catch(() => alert("Server error while removing item."));
+    container.innerHTML = "";
+    let subtotal = 0;
+    for (const item of cartItems) {
+      const price = parseFloat(item.price.replace(/[^\d.-]/g, "")) || 0;
+      subtotal += price;
+      const mgText = item.mg ? ` (${item.mg} MG)` : "";
+      const div = document.createElement("div");
+      div.className = "cart-item";
+      div.innerHTML = `
+        <img src="${item.image_url}" alt="Product Image" />
+        <div class="product-details">
+          <div class="product-detail-1">
+            <h3>${item.name || "Unnamed Product"}${mgText}</h3>
+            <button class="remove-btn" onclick="removeItem('${item.id}')">Remove</button>
+          </div>
+          <div class="product-detail-2">
+            <p>Price: ₹${price.toFixed(2)}</p>
+            <p>Quantity: ${item.quantity}</p>
+          </div>
+        </div>
+      `;
+      container.appendChild(div);
     }
+
+    document.getElementById("subtotal").textContent = `$${subtotal.toFixed(2)}`;
+    document.getElementById("total").textContent = `$${subtotal.toFixed(2)}`;
+  } catch (err) {
+    console.error(err);
+    document.getElementById("cart-items").innerHTML = "<p>Error loading cart items.</p>";
+  }
+}
+
+    function removeItem(id) {
+  fetch("/remove-from-cart", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id: id }) // Use unique product_id
+  })
+  .then(res => res.json())
+  .then(result => {
+    if (result.success) {
+      showToast("Item removed from cart");
+      loadCartItems(); // Reload cart to update UI
+    } else {
+      alert("Error removing item: " + result.message);
+    }
+  })
+  .catch(() => alert("Server error while removing item."));
+}
 
     document.addEventListener("DOMContentLoaded", loadCartItems);
   </script>
