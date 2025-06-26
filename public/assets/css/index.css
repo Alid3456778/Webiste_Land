@@ -263,8 +263,9 @@ body {
   text-align: center;
 }
 .features__item img {
-  width: 48px;
+  width: 100px;
   margin-bottom: 1rem;
+  
 }
 .features__item h4 {
   font-size: 1.125rem;
