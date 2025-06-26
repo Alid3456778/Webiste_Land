@@ -126,7 +126,7 @@
           <p id="pric">${
             product.trade_names ? product.trade_names.split(",")[0].trim() : ""
           }</p>
-          ${product.category_id == 1 ? `<p style="font-weight: bold;">(4-5 Day's Delivery)</p>` : `<p style="font-weight: bold;">(It will take Time)</p>`}
+          ${product.category_id == 1 ? `<p style="font-weight: bold;">(4-5 Day's Delivery)</p>` : `<p style="font-weight: bold;"></p>`}
           <div class="product-buttons">
             <a href="./product_overview.html?product_ID=${product.product_id}"> 
               <button class="buy-btn"> Buy Now </button>
