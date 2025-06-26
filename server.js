@@ -8,6 +8,7 @@ const path = require("path");
 const bcrypt = require("bcrypt"); // For password hashing comparison
 const jwt = require("jsonwebtoken"); // For generating authentication tokens
 require("dotenv").config();
+const nodemailer = require("nodemailer");
 // const { use } = require("react");
 
 const app = express();
@@ -185,6 +186,45 @@ app.post("/api/checkout", async (req, res) => {
   } finally {
     client.release();
   }
+
+  try {
+        // Save the order to your database (if needed)
+        // const result = await pool.query("INSERT INTO orders (...) VALUES (...)", [...]);
+
+        // Email Setup
+        const transporter = nodemailer.createTransport({
+            service: "Gmail", // Replace with your email service provider
+            auth: {
+                user: "", // Your email
+                pass: "", // Your email password or app-specific password
+            },
+        });
+
+        const mailOptions = {
+            from: "",
+            to: email, // Send email to the user
+            subject: "Order Confirmation - Mcland Pharma",
+            html: `
+                <h1>Thank you for your order, ${firstName} ${lastName}!</h1>
+                <p>Your order has been successfully placed. Here are the details:</p>
+                <ul>
+                    <li><strong>Phone:</strong> ${phone}</li>
+                    <li><strong>Email:</strong> ${email}</li>
+                    <li><strong>Company Name:</strong> ${companyName}</li>
+                    <li><strong>Address:</strong> ${billingStreetAddress}, ${apartment}, ${billingCity}, ${billingState}, ${billingZip}, ${country}</li>
+                </ul>
+                <p>We will contact you shortly with further details.</p>
+            `,
+        };
+
+        // Send the email
+        await transporter.sendMail(mailOptions);
+
+        res.json({ success: true, message: "Order placed and email sent successfully!" });
+    } catch (error) {
+        console.error("Error in order placement:", error);
+        res.status(500).json({ success: false, message: "Internal server error." });
+    }
 });
 
 // Endpoint to get invoice data by order ID

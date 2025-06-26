@@ -9,9 +9,11 @@
     "express": "^4.21.2",
     "express-session": "^1.18.1",
     "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^7.0.3",
     "path": "^0.12.7",
     "pdfkit": "^0.17.0",
     "pg": "^8.14.1",
+    "twilio": "^5.7.1",
     "uuid": "^11.1.0"
   }
 }
