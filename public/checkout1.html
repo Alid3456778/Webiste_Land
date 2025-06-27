@@ -6,9 +6,101 @@
     <title>Checkout | Mcland Pharma</title>
     <link rel="stylesheet" href="./assets/css/navbar_footer.css" />
     <link rel="stylesheet" href="./assets/css/checkout.css" />
-    <style></style>
+    <style>
+      .modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 30px;
+  width: 400px;
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content h2 {
+  margin-bottom: 10px;
+  color: #222;
+}
+
+.modal-content p {
+  margin: 10px 0;
+  color: #555;
+}
+
+.modal-content button {
+  margin: 10px 5px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.modal-content button:first-of-type {
+  background-color: #FF6B5E;
+  color: #fff;
+}
+
+.modal-content button:last-of-type {
+  background-color: transparent;
+  color: #FF6B5E;
+  border: 1px solid #FF6B5E;
+}
+
+.modal-img {
+  width: 100px;
+  margin-bottom: 20px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+    </style>
   </head>
   <body>
+    <!-- Confirmation Modal -->
+<div id="confirmationModal" class="modal">
+  <div class="modal-content">
+    <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="Success" class="modal-img" />
+    <h2>Thank you for your purchase!</h2>
+    <p>Your order number is <strong>#54871648754</strong></p>
+    <p>You’ll get an email confirmation for your order details</p>
+    <button  id="place-order-btn">View order</button>
+    <button onclick="goHome()">Go to home</button>
+  </div>
+</div>
+<script>
+  function openConfirmationPopup() {
+    document.getElementById("confirmationModal").style.display = "flex";
+  }
+
+  function trackOrder() {
+    window.location.href = "/track-order"; // Customize this link
+  }
+
+  function goHome() {
+    window.location.href = "/"; // Go back to homepage
+  }
+
+  // Optional: Close on outside click
+  window.onclick = function (event) {
+    const modal = document.getElementById("confirmationModal");
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
+  }
+</script>
+
     <header class="navbar">
       <div class="navbar-top" id="navbar">
         <div
@@ -69,6 +161,7 @@
             />
             <label for="last-name">Last Name <span>*</span></label>
           </div>
+
           <div class="form-group input-group">
             <input
               type="text"
@@ -79,10 +172,15 @@
             />
             <label for="street-address">Street Address <span>*</span></label>
           </div>
-          <div class="form-group">
+          <div class="form-group input-group">
+            <input
+              type="text"
+              id="ship-city"
+              name="shipCity"
+              placeholder=" "
+              required
+            />
             <label for="ship-city">City <span>*</span></label>
-            <input type="text" id="ship-city" name="shipCity" />
-                      
           </div>
           <div class="input-group">
             <select id="state" name="billingState" required>
@@ -134,7 +232,6 @@
             <label for="email">Email Address <span>*</span></label>
           </div>
 
-
           <!-- Shipping Address Checkbox -->
           <div class="form-group-shipping">
             <input type="checkbox" id="different-address" />
@@ -151,9 +248,11 @@
                 name="shipStreetAddress"
               />
             </div>
-            <div class="form-group">
-              <label for="ship-city">City <span>*</span></label>
-              <input type="text" id="ship-city" name="shipCity" />
+            <div>
+              <div class="form-group">
+                <label for="ship-city"> <span>*</span></label>
+                <input type="text" id="ship-city" name="shipCity" />
+              </div>
             </div>
             <div class="form-group">
               <label for="ship-zip">ZIP Code <span>*</span></label>
@@ -187,7 +286,7 @@
             </tfoot>
           </table>
           <!-- Place Order Button -->
-          <button id="place-order-btn" class="place-order-btn">
+          <button id="place-order-btn" onclick="openConfirmationPopup()" class="place-order-btn">
             Place Order
           </button>
         </section>
@@ -355,16 +454,17 @@
             const orderData = {
               firstName: getValue("first-name"),
               lastName: getValue("last-name"),
-              city: getValue("ship-city"),
               country: getValue("country"),
               phone: getValue("phone"),
               email: getValue("email"),
+              billingCity: getValue("ship-city"),
               companyName: document.getElementById("company-name")?.value || "",
               billingStreetAddress: getValue("street-address"),
               billingState: getValue("state"),
               billingZip: getValue("zip-code"),
             };
 
+            console.log("order data",orderData);
             // Fetch cart items
             const cartRes = await fetch("/api/cart");
             const cartJson = await cartRes.json();
@@ -382,6 +482,7 @@
             }));
 
             // Compute totals
+
             const shippingCost = 50.0;
             const subtotal = cartItems.reduce((sum, it) => sum + it.price, 0);
             const totalCost = subtotal + shippingCost;
@@ -399,7 +500,8 @@
             });
             const result = await res.json();
             if (result.success) {
-              alert("Order placed! ID: " + result.orderId);
+              //yaha per notification code
+              // alert("Order placed! ID: " + result.orderId);
               window.location.href = `/invoice1.html?orderId=${result.orderId}`;
             } else {
               alert("Error placing order");

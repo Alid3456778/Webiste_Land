@@ -84,6 +84,22 @@ app.post("/add-to-cart", async (req, res) => {
   }
 });
 
+app.get("/api/cart/count", async (req, res) => {
+  try {
+    const userId = req.cookies.sessionId; // Assume the user ID is available in the request
+    const result = await pool.query(
+      "SELECT COUNT(*) AS count FROM carts WHERE session_id = $1",
+      [userId]
+    );
+    const count = result.rows[0].count;
+
+    res.json({ success: true, count });
+  } catch (err) {
+    console.error("Error fetching cart count:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
 // GET: Fetch cart items
 app.get("/api/cart", async (req, res) => {
   const sessionId = req.cookies.sessionId;
@@ -122,6 +138,7 @@ app.post("/api/checkout", async (req, res) => {
     shippingCost,
     totalCost,
   } = req.body;
+  console.log("data ",req.body);
 
   const client = await pool.connect();
   try {
@@ -178,7 +195,7 @@ app.post("/api/checkout", async (req, res) => {
     }
 
     await client.query("COMMIT");
-    res.json({ success: true, orderId });
+    //res.json({ success: true, orderId });
   } catch (e) {
     await client.query("ROLLBACK");
     console.error("Checkout error:", e);
@@ -188,21 +205,20 @@ app.post("/api/checkout", async (req, res) => {
   }
 
   try {
-        // Save the order to your database (if needed)
-        // const result = await pool.query("INSERT INTO orders (...) VALUES (...)", [...]);
-
-        // Email Setup
+        // Email Setup for Zoho Mail
         const transporter = nodemailer.createTransport({
-            service: "Gmail", // Replace with your email service provider
-            auth: {
-                user: "", // Your email
-                pass: "", // Your email password or app-specific password
-            },
+          host: 'smtp.zoho.in',
+          port: 465,
+          secure: true,
+          auth: {
+            user: 'orderconfirmation@mclandpharma.com',
+            pass: 'YFc3HfTpMu5S',
+          },
         });
 
         const mailOptions = {
-            from: "",
-            to: email, // Send email to the user
+            from: '"Mcland Pharma" <orderconfirmation@mclandpharma.com>', // Sender's name and email
+            to: email, // Recipient's email
             subject: "Order Confirmation - Mcland Pharma",
             html: `
                 <h1>Thank you for your order, ${firstName} ${lastName}!</h1>
@@ -220,7 +236,7 @@ app.post("/api/checkout", async (req, res) => {
         // Send the email
         await transporter.sendMail(mailOptions);
 
-        res.json({ success: true, message: "Order placed and email sent successfully!" });
+         res.json({ success: true, message: "Order placed and email sent successfully!"});
     } catch (error) {
         console.error("Error in order placement:", error);
         res.status(500).json({ success: false, message: "Internal server error." });
