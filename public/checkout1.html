@@ -8,98 +8,111 @@
     <link rel="stylesheet" href="./assets/css/checkout.css" />
     <style>
       .modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  justify-content: center;
-  align-items: center;
-}
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+      }
 
-.modal-content {
-  background: #fff;
-  border-radius: 12px;
-  padding: 30px;
-  width: 400px;
-  text-align: center;
-  animation: fadeIn 0.3s ease;
-}
+      .modal-content {
+        background: #fff;
+        border-radius: 12px;
+        padding: 30px;
+        width: 400px;
+        text-align: center;
+        animation: fadeIn 0.3s ease;
+      }
 
-.modal-content h2 {
-  margin-bottom: 10px;
-  color: #222;
-}
+      .modal-content h2 {
+        margin-bottom: 10px;
+        color: #222;
+      }
 
-.modal-content p {
-  margin: 10px 0;
-  color: #555;
-}
+      .modal-content p {
+        margin: 10px 0;
+        color: #555;
+      }
 
-.modal-content button {
-  margin: 10px 5px;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
+      .modal-content button {
+        margin: 10px 5px;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+      }
 
-.modal-content button:first-of-type {
-  background-color: #FF6B5E;
-  color: #fff;
-}
+      .modal-content button:first-of-type {
+        background-color: #ff6b5e;
+        color: #fff;
+      }
 
-.modal-content button:last-of-type {
-  background-color: transparent;
-  color: #FF6B5E;
-  border: 1px solid #FF6B5E;
-}
+      .modal-content button:last-of-type {
+        background-color: transparent;
+        color: #ff6b5e;
+        border: 1px solid #ff6b5e;
+      }
 
-.modal-img {
-  width: 100px;
-  margin-bottom: 20px;
-}
+      .modal-img {
+        width: 100px;
+        margin-bottom: 20px;
+      }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
     </style>
   </head>
   <body>
     <!-- Confirmation Modal -->
-<div id="confirmationModal" class="modal">
-  <div class="modal-content">
-    <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="Success" class="modal-img" />
-    <h2>Thank you for your purchase!</h2>
-    <p>Your order number is <strong>#54871648754</strong></p>
-    <p>You’ll get an email confirmation for your order details</p>
-    <button  id="place-order-btn">View order</button>
-    <button onclick="goHome()">Go to home</button>
-  </div>
-</div>
-<script>
-  function openConfirmationPopup() {
-    document.getElementById("confirmationModal").style.display = "flex";
-  }
+    <div id="confirmationModal" class="modal">
+      <div class="modal-content">
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/190/190411.png"
+          alt="Success"
+          class="modal-img"
+        />
+        <h2>Thank you for your purchase!</h2>
+        <p>Your order number is <strong>#54871648754</strong></p>
+        <p>You’ll get an email confirmation for your order details</p>
+        <button id="place-order-btn">View order</button>
+        <button onclick="goHome()">Go to home</button>
+          
+      </div>
+    </div>
+    <script>
+      function openConfirmationPopup() {
+        document.getElementById("confirmationModal").style.display = "flex";
+      }
 
-  function trackOrder() {
-    window.location.href = "/track-order"; // Customize this link
-  }
+      function trackOrder() {
+        window.location.href = "/track-order"; // Customize this link
+      }
 
-  function goHome() {
-    window.location.href = "/"; // Go back to homepage
-  }
+      function goHome() {
+        window.location.href = "/"; // Go back to homepage
+      }
 
-  // Optional: Close on outside click
-  window.onclick = function (event) {
-    const modal = document.getElementById("confirmationModal");
-    if (event.target === modal) {
-      modal.style.display = "none";
-    }
-  }
-</script>
+      // Optional: Close on outside click
+      window.onclick = function (event) {
+        const modal = document.getElementById("confirmationModal");
+        if (event.target === modal) {
+          modal.style.display = "none";
+        }
+      };
+    </script>
 
     <header class="navbar">
       <div class="navbar-top" id="navbar">
@@ -277,7 +290,7 @@
             <tfoot>
               <tr>
                 <td>Shipping</td>
-                <td id="shipping-cost">$50.00</td>
+                <td id="shipping-cost">$0.00</td>
               </tr>
               <tr>
                 <td>Total</td>
@@ -286,7 +299,11 @@
             </tfoot>
           </table>
           <!-- Place Order Button -->
-          <button id="place-order-btn" onclick="openConfirmationPopup()" class="place-order-btn">
+          <button
+            id="place-order-btn"
+            onclick="openConfirmationPopup()"
+            class="place-order-btn"
+          >
             Place Order
           </button>
         </section>
@@ -393,10 +410,40 @@
         });
       });
 
+      // Function to calculate shipping cost based on total price and product IDs
+      function calculateShippingCost(total, cartItems) {
+        // Separate items into free shipping and chargeable shipping categories
+        let chargeableTotal = 0;
+
+        cartItems.forEach((item) => {
+          const productId = parseInt(item.product_id, 10);
+          const price = parseFloat(item.price);
+
+          if (productId > 24) {
+            // Add price to chargeable total if product ID is greater than 24
+            chargeableTotal += price;
+          }
+        });
+
+        // Calculate shipping cost based on chargeable total price
+        if (chargeableTotal > 300) {
+          return 0; // Free shipping for chargeable items above $300
+        } else if (chargeableTotal >= 101) {
+          return 10; // $10 for chargeable items between $101 and $300
+        } else if (chargeableTotal >= 51) {
+          return 15; // $15 for chargeable items between $51 and $100
+        } else if (chargeableTotal >= 1) {
+          return 20; // $20 for chargeable items between $1 and $50
+        }
+
+        return 0; // Default to free shipping for invalid amounts
+      }
+
+      // Populate cart items and calculate totals
       document.addEventListener("DOMContentLoaded", async () => {
         const cartItemsElement = document.getElementById("cart-items");
         const totalCostElement = document.getElementById("total-cost");
-        const shippingCost = 50.0; // Flat shipping cost
+        const shippingCostElement = document.getElementById("shipping-cost");
 
         try {
           const response = await fetch("/api/cart");
@@ -411,18 +458,22 @@
 
             // Populate the cart items
             cartItems.forEach((item) => {
-              console.log(parseFloat(item.price));
-              const subtotal = parseFloat(item.price);
+              const subtotal = parseFloat(item.price); // Use price directly
               total += subtotal;
 
               const row = `
           <tr>
-            <td>${item.name} ${item.mg || ""}mg x ${item.quantity}</td>
+            <td>${item.name} ${item.mg || ""}mg</td>
             <td>$${item.price}</td>
           </tr>
         `;
               cartItemsElement.innerHTML += row;
             });
+
+            // Calculate shipping cost
+            console.log(total);
+            const shippingCost = calculateShippingCost(total, cartItems);
+            shippingCostElement.textContent = `$${shippingCost.toFixed(2)}`;
 
             // Update the total cost
             totalCostElement.textContent = `$${(total + shippingCost).toFixed(
@@ -436,12 +487,11 @@
         }
       });
 
-      // checkout1.js
+      // Checkout functionality
       document
         .getElementById("place-order-btn")
         .addEventListener("click", async () => {
           try {
-            // Collect billing details with null checks
             const getValue = (id) => {
               const element = document.getElementById(id);
               if (!element) {
@@ -464,8 +514,8 @@
               billingZip: getValue("zip-code"),
             };
 
-            console.log("order data",orderData);
-            // Fetch cart items
+            console.log("order data", orderData);
+
             const cartRes = await fetch("/api/cart");
             const cartJson = await cartRes.json();
             if (!cartJson.success) {
@@ -481,13 +531,10 @@
               price: parseFloat(item.price),
             }));
 
-            // Compute totals
-
-            const shippingCost = 50.0;
             const subtotal = cartItems.reduce((sum, it) => sum + it.price, 0);
+            const shippingCost = calculateShippingCost(subtotal, cartItems);
             const totalCost = subtotal + shippingCost;
 
-            // Send everything to /api/checkout
             const res = await fetch("/api/checkout", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -499,10 +546,9 @@
               }),
             });
             const result = await res.json();
+
             if (result.success) {
-              //yaha per notification code
-              // alert("Order placed! ID: " + result.orderId);
-              window.location.href = `/invoice1.html?orderId=${result.orderId}`;
+              // window.location.href = `/invoice1.html?orderId=${result.orderId}`;
             } else {
               alert("Error placing order");
             }
@@ -511,47 +557,8 @@
             alert(`Error: ${error.message}`);
           }
         });
-    </script>
-    <script>
-      // checkout.js
-      document
-        .getElementById("different-address")
-        .addEventListener("change", function () {
-          const shippingForm = document.getElementById("shipping-address-form");
-          shippingForm.style.display = this.checked ? "block" : "none";
-        });
 
-      // Sample dummy cart data
-      const sampleCartItems = [
-        { product: "Paracetamol 500mg", subtotal: 100 },
-        { product: "Cough Syrup", subtotal: 150 },
-      ];
-
-      function populateCart(cartItems) {
-        const cartBody = document.getElementById("cart-items");
-        const totalCostEl = document.getElementById("total-cost");
-
-        let total = 0;
-        cartItems.forEach((item) => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-      <td>${item.product}</td>
-      <td>$${item.subtotal.toFixed(2)}</td>
-    `;
-          cartBody.appendChild(row);
-          total += item.subtotal;
-        });
-
-        // Add shipping cost
-        const shipping = 50;
-        total += shipping;
-
-        totalCostEl.textContent = `$${total.toFixed(2)}`;
-      }
-
-      window.addEventListener("DOMContentLoaded", () => {
-        populateCart(sampleCartItems);
-      });
+        
     </script>
 
     <script src="./assets/js/checkout1.js"></script>

@@ -176,18 +176,18 @@ body {
 .btn--search:hover {
   transform: scale(1.05);
 }
-.btn--icon{
-    width: 28px;
+.btn--icon {
+  width: 28px;
   height: 28px;
   cursor: pointer;
   transition: transform 0.2s ease;
- 
+
   background-color: white;
-    border: none;
+  border: none;
 }
 
 .btn--icon:hover {
-  transform: scale(1.1);
+  transform: scale(1.1);
 }
 
 /* HERO ALT */
@@ -202,7 +202,7 @@ body {
   position: relative;
   overflow: hidden;
   border-radius: 1rem;
-  padding-left:20px;
+  padding-left: 20px;
   padding-right: 20px;
 }
 .hero-alt__bg img {
@@ -214,7 +214,6 @@ body {
 .hero-alt__overlay {
   position: absolute;
   inset: 0;
-
 }
 .hero-alt__content {
   position: absolute;
@@ -236,7 +235,6 @@ body {
   margin-bottom: 1.5rem;
 }
 
-
 .btn--cta {
   display: inline-block;
   background: var(--accent);
@@ -246,7 +244,6 @@ body {
   font-weight: 600;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: background 0.2s, transform 0.2s;
- 
 }
 .btn--cta:hover {
   background: darken(var(--accent), 10%);
@@ -265,7 +262,6 @@ body {
 .features__item img {
   width: 100px;
   margin-bottom: 1rem;
-  
 }
 .features__item h4 {
   font-size: 1.125rem;
@@ -524,4 +520,20 @@ body {
 .trust__item p {
   font-weight: 500;
   color: var(--gray-600);
+}
+
+.cart-count {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: bold;
+  display: none; /* Hide initially */
+}
+#cart-a-section{
+  position: relative;
 }

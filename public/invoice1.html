@@ -92,10 +92,11 @@
     document.getElementById('billing-info').innerHTML = `
       <strong>Name:</strong> ${order.firstName} ${order.lastName}<br>
       <strong>Address:</strong> ${order.billingStreetAddress}, ${order.apartment}<br>
-      <strong>City:</strong>${order.city}${order.billingState} ${order.billingZip}<br>
+      <strong>City:</strong>${order.city} ${order.billingZip}<br>
+      <strong>State:</strong> ${order.billingState}<br>
       <strong>Phone:</strong> ${order.phone}<br>
       <strong>Country:</strong> ${order.country}<br>
-      <strong>Country:</strong> ${order.country}<br>
+      
     `;
 
     // Shipping info
@@ -106,7 +107,7 @@
     // Product summary
     const tbody = document.querySelector('#product-summary tbody');
     order.products.forEach(p => {
-      const row = `<tr><td>${p.name}</td></tr>`;
+      const row = `<tr><td>Product Name :${p.name} <br> Price :${p.price}</td></tr>`;
       tbody.insertAdjacentHTML('beforeend', row);
     });
 
