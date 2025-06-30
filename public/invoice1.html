@@ -3,58 +3,65 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Invoice | Mcland Pharma</title>
-  <link rel="stylesheet" href="assets/css/invoice.css">
+  <link rel="stylesheet" href="./assets/css/invoice.css">
+  <title>Invoice</title>
 </head>
 <body>
-  <header class="navbar">
-    <div class="navbar-top">
-      <div class="logo" onclick="this.querySelector('a').click();">
-        <img src="assets/image2/logo.png" alt="MCland Pharma Logo" />
-        <a href="./index.html"></a>
+  <div class="invoice-container" id="invoice">
+    <button class="download-btn" id="download-btn">Download PDF</button>
+
+    <header>
+      <h1>McLandpharma</h1>
+      <p>Tagline for company</p>
+    </header>
+
+    <div class="section-title">Order Confirmation</div>
+
+    <div class="customer-details">
+      <div>
+        <p><strong>First Name:</strong> <span id="firstName"></span></p>
+        <p><strong>Address:</strong> <span id="address"></span></p>
+        <p><strong>State:</strong> <span id="state"></span></p>
+        <p><strong>Country:</strong> <span id="country"></span></p>
+        <p><strong>Phone:</strong> <span id="phone"></span></p>
+      </div>
+      <div>
+        <p><strong>Last Name:</strong> <span id="lastName"></span></p>
+        <p><strong>City:</strong> <span id="city"></span></p>
+        <p><strong>ZIP:</strong> <span id="zip"></span>
+        <p><strong>Email:</strong> <span id="email"></span></p>
+       
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Unit Price</th>
+          <th>Shipping</th>
+        </tr>
+      </thead>
+      <tbody id="productRows">
+        <!-- Inject product rows here via JS -->
+      </tbody>
+    </table>
+
+    <div class="totals">
+      <div>
+        <p>Subtotal: <span id="subtotal">$0.00</span></p>
+        <p>Total: <span id="total">₹0.00</span></p>
       </div>
     </div>
-  </header>
 
-  <div class="pdf-content">
-    <main id="invoice" class="invoice-container">
-      <div class="invoice-header">
-        <h1>McLand Pharma</h1>
-        <p>Invoice</p>
-        <p><strong>Order Number:</strong> <span id="order-number"></span></p>
-        <p><strong>Date:</strong> <span id="order-date"></span></p>
-      </div>
-    
-      <div class="order-info">
-        <h3>Billing Information</h3>
-        <p id="billing-info"></p>
-    
-        <h3>Shipping Information</h3>
-        <p id="shipping-info"></p>
-      </div>
-    
-      <div class="product-table">
-        <h3>Order Summary</h3>
-        <table id="product-summary">
-          <thead>
-            <tr><th>Product</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    
-      <div class="total-section">
-        <p><strong>Total:</strong><span id="order-total"></span></p>
-        <p><strong>Email:</strong><span id="order-email"></span></p>
-      </div>
-    </main>
+    <footer>
+      Thank you for your business!
+    </footer>
   </div>
-  <button id="download-btn">Download PDF</button>
-  
-  <!-- html2pdf.js -->
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script>
-    // Mock order details (in production, set localStorage.orderDetails in checkout flow)
     const order = JSON.parse(localStorage.getItem('orderDetails')) || {
       orderNumber: '1234',
       orderDate: new Date().toISOString(),
@@ -72,80 +79,71 @@
       shipCity: '',
       shipZip: '',
       products: [
-        { name: 'Paracetamol 500mg', price: '50.00' },
-        { name: 'Vitamin C Tablets', price: '100.00' }
+        { name: 'Paracetamol 500mg', price: 50, quantity: 1 },
+        { name: 'Vitamin C Tablets', price: 100, quantity: 2 }
       ],
-      total: '150.00',
+      total: '250.00',
       email: 'john.doe@example.com'
     };
 
     console.log(order);
-
-    // Populate invoice fields
-    document.getElementById('order-number').textContent = order.orderNumber;
-    document.getElementById('order-date').textContent =
-      new Date(order.orderDate).toLocaleDateString();
-    document.getElementById('order-total').textContent = order.total;
-    document.getElementById('order-email').textContent = order.email;
-
-    // Billing info
-    document.getElementById('billing-info').innerHTML = `
-      <strong>Name:</strong> ${order.firstName} ${order.lastName}<br>
-      <strong>Address:</strong> ${order.billingStreetAddress}, ${order.apartment}<br>
-      <strong>City:</strong>${order.city} ${order.billingZip}<br>
-      <strong>State:</strong> ${order.billingState}<br>
-      <strong>Phone:</strong> ${order.phone}<br>
-      <strong>Country:</strong> ${order.country}<br>
-      
-    `;
-
-    // Shipping info
-    document.getElementById('shipping-info').textContent = order.differentAddress
-      ? `${order.shipStreetAddress}, ${order.shipCity}, ${order.country}, ${order.shipZip}`
-      : 'Same as billing address';
-
-    // Product summary
-    const tbody = document.querySelector('#product-summary tbody');
+    // Fill in customer details
+    document.getElementById('firstName').textContent = order.firstName;
+    document.getElementById('lastName').textContent = order.lastName;
+    document.getElementById('phone').textContent = order.phone;
+    document.getElementById('email').textContent = order.email;
+    document.getElementById('address').textContent = `${order.billingStreetAddress}, ${order.apartment}`;
+    document.getElementById('city').textContent = order.city;
+    document.getElementById('state').textContent = order.billingState;
+    document.getElementById('zip').textContent = order.billingZip;
+    document.getElementById('country').textContent = order.country;
+    const shipping = order.shippingCost;
+    // Product table
+    let subtotal = 0;
+    const tbody = document.getElementById('productRows');
     order.products.forEach(p => {
-      const row = `<tr><td>Product Name :${p.name} <br> Price :${p.price}</td></tr>`;
-      tbody.insertAdjacentHTML('beforeend', row);
+      console.log(p);
+      const qty = p.quantity || 1;
+      const price =parseFloat(p.price.replace(/[^0-9,.]/g, ""));
+      const total = price;
+      subtotal += total;
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${p.name}</td>
+        <td>${qty}</td>
+        <td>$${p.price}</td>
+        ${p.category_id == 1 ? `<td>Free</td>` : `<td>$${shipping}</td>` }
+    
+      `;
+      tbody.appendChild(row);
     });
+    const tot = subtotal+parseFloat(shipping.replace(/[^0-9,.]/g, ""));
+    document.getElementById('subtotal').textContent = `$${subtotal}`;
+    document.getElementById('total').textContent = `$${tot}`;
 
-    // Download PDF function with improved approach
-    document.getElementById('download-btn').addEventListener('click', function() {
-      // Get the PDF content
-      const element = document.querySelector('.pdf-content');
-      
-      // Define PDF options for better rendering
+    // PDF Download
+    document.getElementById('download-btn').addEventListener('click', function () {
+      const element = document.getElementById("invoice");
       const opt = {
-        margin: [0, 0, 0, 0],
+        margin: 0,
         filename: `Invoice-${order.orderNumber}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-          scale: 2, // Higher scale for better quality
+        html2canvas: {
+          scale: 2,
           useCORS: true,
-          logging: false,
           letterRendering: true,
-          allowTaint: true,
           scrollX: 0,
           scrollY: 0
         },
-        jsPDF: { 
-          unit: 'mm', 
-          format: 'a4', 
+        jsPDF: {
+          unit: 'mm',
+          format: 'a4',
           orientation: 'portrait',
           compress: true
         }
       };
-      
-      // Use a promise-based approach for better error handling
-      html2pdf().from(element).set(opt).toPdf().get('pdf').then(function(pdf) {
-        // Success callback
-        pdf.save(`Invoice-${order.orderNumber}.pdf`);
-      }).catch(function(error) {
-        console.error('PDF generation failed:', error);
-        alert('Failed to generate PDF. Please try again.');
-      });
+
+      html2pdf().from(element).set(opt).save();
     });
   </script>
 </body>

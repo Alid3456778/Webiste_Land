@@ -159,11 +159,11 @@ body {
 }
 
 #add-products-btn {
-  background-color: #17a2b8;
+  background-color: #01655D;
   color: white;
 }
 #add-products-btn:hover {
-  background-color: #138496;
+  background-color: #01655D;
 }
 
 /* Bill Summary */
@@ -200,7 +200,7 @@ body {
   width: 100%;
   padding: 15px;
   font-size: 17px;
-  background-color: #28a745;
+  background-color: #01655D;
   color: white;
   border: none;
   border-radius: 12px;
@@ -210,7 +210,7 @@ body {
 }
 
 .checkout-btn:hover {
-  background-color: #218838;
+  background-color: #01655D;
 }
 
 /* Responsive */

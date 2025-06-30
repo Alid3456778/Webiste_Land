@@ -7,72 +7,7 @@
     <link rel="stylesheet" href="./assets/css/navbar_footer.css" />
     <link rel="stylesheet" href="./assets/css/checkout.css" />
     <style>
-      .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        justify-content: center;
-        align-items: center;
-      }
-
-      .modal-content {
-        background: #fff;
-        border-radius: 12px;
-        padding: 30px;
-        width: 400px;
-        text-align: center;
-        animation: fadeIn 0.3s ease;
-      }
-
-      .modal-content h2 {
-        margin-bottom: 10px;
-        color: #222;
-      }
-
-      .modal-content p {
-        margin: 10px 0;
-        color: #555;
-      }
-
-      .modal-content button {
-        margin: 10px 5px;
-        padding: 10px 15px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-      }
-
-      .modal-content button:first-of-type {
-        background-color: #ff6b5e;
-        color: #fff;
-      }
-
-      .modal-content button:last-of-type {
-        background-color: transparent;
-        color: #ff6b5e;
-        border: 1px solid #ff6b5e;
-      }
-
-      .modal-img {
-        width: 100px;
-        margin-bottom: 20px;
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(-20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
+     
     </style>
   </head>
   <body>
@@ -416,10 +351,10 @@
         let chargeableTotal = 0;
 
         cartItems.forEach((item) => {
-          const productId = parseInt(item.product_id, 10);
+          const productId = parseInt(item.category_id, 10);
           const price = parseFloat(item.price);
-
-          if (productId > 24) {
+          console.log("Category ",productId);
+          if (productId > 1) {
             // Add price to chargeable total if product ID is greater than 24
             chargeableTotal += price;
           }
@@ -428,11 +363,11 @@
         // Calculate shipping cost based on chargeable total price
         if (chargeableTotal > 300) {
           return 0; // Free shipping for chargeable items above $300
-        } else if (chargeableTotal >= 101) {
+        } else if (chargeableTotal >= 101 && chargeableTotal <= 300) {
           return 10; // $10 for chargeable items between $101 and $300
-        } else if (chargeableTotal >= 51) {
+        } else if (chargeableTotal >= 51 && chargeableTotal <= 100) {
           return 15; // $15 for chargeable items between $51 and $100
-        } else if (chargeableTotal >= 1) {
+        } else if (chargeableTotal >= 1 && chargeableTotal <= 50 ) {
           return 20; // $20 for chargeable items between $1 and $50
         }
 
@@ -471,7 +406,7 @@
             });
 
             // Calculate shipping cost
-            console.log(total);
+            console.log(cartItems);
             const shippingCost = calculateShippingCost(total, cartItems);
             shippingCostElement.textContent = `$${shippingCost.toFixed(2)}`;
 
@@ -530,7 +465,7 @@
               quantity: parseInt(item.quantity, 10),
               price: parseFloat(item.price),
             }));
-
+            console.log(cartItems);
             const subtotal = cartItems.reduce((sum, it) => sum + it.price, 0);
             const shippingCost = calculateShippingCost(subtotal, cartItems);
             const totalCost = subtotal + shippingCost;

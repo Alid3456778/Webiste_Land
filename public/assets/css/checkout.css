@@ -137,13 +137,13 @@ body {
   top: -0.6rem;
   left: 0.6rem;
   font-size: 0.75rem;
-  color: #4a90e2;
+  color:#01655D;
 }
 
 .form-group input:focus,
 .form-group select:focus {
-  border-color: #4a90e2;
-  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  border-color: #01655D;
+ 
 }
 
 .form-group-shipping {
@@ -189,7 +189,7 @@ body {
   font-size: 1rem;
   font-weight: 600;
   color: white;
-  background: linear-gradient(135deg, #4a90e2, #357abd);
+  background: linear-gradient(135deg,#028C7E);
   border: none;
   border-radius: 12px;
   cursor: pointer;
@@ -197,7 +197,7 @@ body {
 }
 
 .place-order-btn:hover {
-  background: linear-gradient(135deg, #357abd, #2e6bc2);
+  background: linear-gradient(135deg,#01655D);
 }
 
 @media (max-width: 768px) {
@@ -236,8 +236,8 @@ body {
 
 .input-group input:focus,
 .input-group input:not(:placeholder-shown) {
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+  border-color:#028C7E;
+ 
 }
 
 .input-group label {
@@ -258,7 +258,7 @@ body {
   top: -8px;
   left: 8px;
   font-size: 12px;
-  color: #007bff;
+  color: #028C7E;
 }
 .input-group select {
   appearance: none;
@@ -280,7 +280,7 @@ body {
   top: -8px;
   left: 8px;
   font-size: 12px;
-  color: #007bff;
+  color: #01655D;
 }
 .input-group select:not([value=""]) ~ label
 
@@ -293,3 +293,70 @@ body {
   gap: 8px;
   font-size: 16px;
 }
+/* pop up */
+ .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        background: #fff;
+        border-radius: 12px;
+        padding: 30px;
+        width: 400px;
+        text-align: center;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .modal-content h2 {
+        margin-bottom: 10px;
+        color: #222;
+      }
+
+      .modal-content p {
+        margin: 10px 0;
+        color: #555;
+      }
+
+      .modal-content button {
+        margin: 10px 5px;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .modal-content button:first-of-type {
+        background-color: #01655D;
+        color: #fff;
+      }
+
+      .modal-content button:last-of-type {
+        background-color: transparent;
+        color: #01655D;
+        border: 1px solid #01655D;
+      }
+
+      .modal-img {
+        width: 100px;
+        margin-bottom: 20px;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }

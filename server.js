@@ -55,7 +55,7 @@ app.delete("/remove-from-cart", async (req, res) => {
 // POST: Add item to cart
 app.post("/add-to-cart", async (req, res) => {
   const sessionId = req.cookies.sessionId;
-  const { productId, name, quantity, mg, price, image_url } = req.body;
+  const { productId,categoryId, name, quantity, mg, price, image_url } = req.body;
   console.log(name);
   if (!productId) {
     return res
@@ -66,7 +66,7 @@ app.post("/add-to-cart", async (req, res) => {
 
   try {
     await pool.query(
-      "INSERT INTO carts (session_id, product_id, name, quantity, mg, price, image_url) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+      "INSERT INTO carts (session_id, product_id, name, quantity, mg, price, image_url,category_id) VALUES ($1, $2, $3, $4, $5, $6, $7,$8)",
       [
         sessionId,
         productId,
@@ -75,6 +75,7 @@ app.post("/add-to-cart", async (req, res) => {
         mg || null,
         price || null,
         image_url || null,
+        categoryId,
       ]
     );
     res.json({ success: true, message: "Product added to cart" });
