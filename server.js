@@ -20,7 +20,10 @@ app.use(cookieParser());
 // PostgreSQL configuration
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL, // Use connection string from the environment
-  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,   
+  ssl:
+    process.env.NODE_ENV === "production"
+      ? { rejectUnauthorized: false }
+      : false,
 });
 
 // Middleware to assign session cookie
@@ -43,7 +46,9 @@ app.delete("/remove-from-cart", async (req, res) => {
   try {
     const result = await pool.query("DELETE FROM carts WHERE id = $1", [id]);
     if (result.rowCount === 0) {
-      return res.status(404).json({ success: false, message: "Product not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
     }
     res.json({ success: true, message: "Product removed successfully" });
   } catch (err) {
@@ -55,7 +60,8 @@ app.delete("/remove-from-cart", async (req, res) => {
 // POST: Add item to cart
 app.post("/add-to-cart", async (req, res) => {
   const sessionId = req.cookies.sessionId;
-  const { productId,categoryId, name, quantity, mg, price, image_url } = req.body;
+  const { productId, categoryId, name, quantity, mg, price, image_url } =
+    req.body;
   console.log(name);
   if (!productId) {
     return res
@@ -139,7 +145,7 @@ app.post("/api/checkout", async (req, res) => {
     shippingCost,
     totalCost,
   } = req.body;
-  console.log("data ",req.body);
+  console.log("data ", req.body);
 
   const client = await pool.connect();
   try {
@@ -206,22 +212,22 @@ app.post("/api/checkout", async (req, res) => {
   }
 
   try {
-        // Email Setup for Zoho Mail
-        const transporter = nodemailer.createTransport({
-          host: 'smtp.zoho.in',
-          port: 465,
-          secure: true,
-          auth: {
-            user: 'orderconfirmation@mclandpharma.com',
-            pass: 'YFc3HfTpMu5S',
-          },
-        });
+    // Email Setup for Zoho Mail
+    const transporter = nodemailer.createTransport({
+      host: "smtp.zoho.in",
+      port: 465,
+      secure: true,
+      auth: {
+        user: "orderconfirmation@mclandpharma.com",
+        pass: "YFc3HfTpMu5S",
+      },
+    });
 
-        const mailOptions = {
-            from: '"Mcland Pharma" <orderconfirmation@mclandpharma.com>', // Sender's name and email
-            to: email, // Recipient's email
-            subject: "Order Confirmation - Mcland Pharma",
-            html: `
+    const mailOptions = {
+      from: '"Mcland Pharma" <orderconfirmation@mclandpharma.com>', // Sender's name and email
+      to: email, // Recipient's email
+      subject: "Order Confirmation - Mcland Pharma",
+      html: `
                 <h1>Thank you for your order, ${firstName} ${lastName}!</h1>
                 <p>Your order has been successfully placed. Here are the details:</p>
                 <ul>
@@ -232,16 +238,19 @@ app.post("/api/checkout", async (req, res) => {
                 </ul>
                 <p>We will contact you shortly with further details.</p>
             `,
-        };
+    };
 
-        // Send the email
-        await transporter.sendMail(mailOptions);
+    // Send the email
+    await transporter.sendMail(mailOptions);
 
-         res.json({ success: true, message: "Order placed and email sent successfully!"});
-    } catch (error) {
-        console.error("Error in order placement:", error);
-        res.status(500).json({ success: false, message: "Internal server error." });
-    }
+    res.json({
+      success: true,
+      message: "Order placed and email sent successfully!",
+    });
+  } catch (error) {
+    console.error("Error in order placement:", error);
+    res.status(500).json({ success: false, message: "Internal server error." });
+  }
 });
 
 // Endpoint to get invoice data by order ID
@@ -280,26 +289,32 @@ app.get("/api/invoice/:orderId", async (req, res) => {
   }
 });
 
-const JWT_SECRET = "3db7f92394dfb627bdbe12fbfc34f63b2f9c2296da88c4c3dfbf9eb48b8a5e29a81f1df435ad8abfe3dc9a4edcd45f71d8fb5e38d6c93ed2f5f8451b5b9e2565";
+const JWT_SECRET =
+  "3db7f92394dfb627bdbe12fbfc34f63b2f9c2296da88c4c3dfbf9eb48b8a5e29a81f1df435ad8abfe3dc9a4edcd45f71d8fb5e38d6c93ed2f5f8451b5b9e2565";
 
-app.post('/api/login', async (req, res) => {
+app.post("/api/login", async (req, res) => {
   const { username, password } = req.body;
-  
+
   // Input validation
   if (!username || !password) {
-    return res.status(400).json({ error: 'Username and password are required' });
+    return res
+      .status(400)
+      .json({ error: "Username and password are required" });
   }
-  
+
   try {
     // Check if the user exists in the database
-    const result = await pool.query('SELECT * FROM employee_login WHERE username = $1', [username]);
-    
+    const result = await pool.query(
+      "SELECT * FROM employee_login WHERE username = $1",
+      [username]
+    );
+
     // Debug logging - log the actual rows data
     // console.log('Query result rows:', result.rows);
     // console.log('Number of rows found:', result.rows.length);
-    
+
     if (result.rows.length === 0) {
-      return res.status(401).json({ error: 'Invalid username or password' });
+      return res.status(401).json({ error: "Invalid username or password" });
     }
 
     const user = result.rows[0];
@@ -308,37 +323,34 @@ app.post('/api/login', async (req, res) => {
     // Compare the password with the hashed password in the database
     // const isPasswordValid = await bcrypt.compare(password, user.password);
     // console.log('Password validation result:', isPasswordValid);
-    let isPasswordValid ;
-    if(password === user.password){
-       isPasswordValid = true;
-      
-    }
-    else{
-       isPasswordValid = false;
+    let isPasswordValid;
+    if (password === user.password) {
+      isPasswordValid = true;
+    } else {
+      isPasswordValid = false;
     }
     if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Invalid username or password' });
+      return res.status(401).json({ error: "Invalid username or password" });
     }
 
     // Create a JWT token
     const token = jwt.sign(
-      { id: user.id, username: user.username }, 
-      JWT_SECRET, 
-      { expiresIn: '1h' }
+      { id: user.id, username: user.username },
+      JWT_SECRET,
+      { expiresIn: "1h" }
     );
 
     // Return the token to the client
-    res.json({ 
+    res.json({
       token,
       user: {
         id: user.id,
-        username: user.username
-      }
+        username: user.username,
+      },
     });
-    
   } catch (err) {
-    console.error('Error during login:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error during login:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -374,7 +386,7 @@ app.get("/api/product", async (req, res) => {
 });
 
 // GET all variants for a product
-app.get('/api/variants/:productId', async (req, res) => {
+app.get("/api/variants/:productId", async (req, res) => {
   const { productId } = req.params;
   const { rows } = await pool.query(
     `SELECT * FROM product_variants WHERE product_id = $1 ORDER BY variation_id`,
@@ -384,84 +396,117 @@ app.get('/api/variants/:productId', async (req, res) => {
 });
 
 // PUT update one variant
-app.put('/api/variants/:id', async (req, res) => {
+app.put("/api/variants/:id", async (req, res) => {
   const { id } = req.params;
-  const { unit_type, unit_value, qty, price_per_pill, price_per_box, delivery_time } = req.body;
+  const {
+    unit_type,
+    unit_value,
+    qty,
+    price_per_pill,
+    price_per_box,
+    delivery_time,
+  } = req.body;
   await pool.query(
     `UPDATE product_variants
      SET unit_type=$1, unit_value=$2, qty=$3, price_per_pill=$4, price_per_box=$5, delivery_time=$6
      WHERE variation_id=$7`,
-    [unit_type, unit_value, qty, price_per_pill, price_per_box, delivery_time, id]
+    [
+      unit_type,
+      unit_value,
+      qty,
+      price_per_pill,
+      price_per_box,
+      delivery_time,
+      id,
+    ]
   );
   res.json({ success: true });
 });
 
 // POST a brand‑new variant
-app.post('/api/variants', async (req, res) => {
-  const { product_id, unit_type, unit_value, qty, price_per_pill, price_per_box, delivery_time } = req.body;
+app.post("/api/variants", async (req, res) => {
+  const {
+    product_id,
+    unit_type,
+    unit_value,
+    qty,
+    price_per_pill,
+    price_per_box,
+    delivery_time,
+  } = req.body;
   const { rows } = await pool.query(
     `INSERT INTO product_variants
       (product_id, unit_type, unit_value, qty, price_per_pill, price_per_box, delivery_time)
      VALUES ($1,$2,$3,$4,$5,$6,$7)
      RETURNING *`,
-    [product_id, unit_type, unit_value, qty, price_per_pill, price_per_box, delivery_time]
+    [
+      product_id,
+      unit_type,
+      unit_value,
+      qty,
+      price_per_pill,
+      price_per_box,
+      delivery_time,
+    ]
   );
   res.json(rows[0]);
 });
 
 // DELETE a single variation by its variation_id
-app.delete('/api/variants/:id', async (req, res) => {
+app.delete("/api/variants/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const result = await pool.query(
-      'DELETE FROM product_variants WHERE variation_id = $1',
+      "DELETE FROM product_variants WHERE variation_id = $1",
       [id]
     );
     if (result.rowCount === 0) {
-      return res.status(404).json({ error: 'Variation not found' });
+      return res.status(404).json({ error: "Variation not found" });
     }
-    res.json({ message: 'Variation deleted' });
+    res.json({ message: "Variation deleted" });
   } catch (err) {
-    console.error('Error deleting variation:', err);
-    res.status(500).json({ error: 'Failed to delete variation' });
+    console.error("Error deleting variation:", err);
+    res.status(500).json({ error: "Failed to delete variation" });
   }
 });
 
-
 // Update product endpoint
-app.put('/api/products/update/:id', async (req, res) => {
+app.put("/api/products/update/:id", async (req, res) => {
   const { id } = req.params; // Product ID from URL
   const updates = req.body; // Updated fields from request body
 
   try {
     if (Object.keys(updates).length === 0) {
-      return res.status(400).json({ error: 'No fields to update.' });
+      return res.status(400).json({ error: "No fields to update." });
     }
 
     // Build dynamic SQL query
     const fields = Object.keys(updates);
     const values = Object.values(updates);
-    const setClause = fields.map((field, index) => `${field} = $${index + 1}`).join(', ');
+    const setClause = fields
+      .map((field, index) => `${field} = $${index + 1}`)
+      .join(", ");
 
-    const query = `UPDATE products SET ${setClause} WHERE product_id = $${fields.length + 1}`;
+    const query = `UPDATE products SET ${setClause} WHERE product_id = $${
+      fields.length + 1
+    }`;
     values.push(id);
 
     // Execute query
     const result = await pool.query(query, values);
 
     if (result.rowCount === 0) {
-      return res.status(404).json({ error: 'Product not found or no changes made.' });
+      return res
+        .status(404)
+        .json({ error: "Product not found or no changes made." });
     }
 
-    res.json({ message: 'Product updated successfully.' });
+    res.json({ message: "Product updated successfully." });
   } catch (err) {
-    console.error('Error updating product:', err);
-    res.status(500).json({ error: 'Internal server error.' });
+    console.error("Error updating product:", err);
+    res.status(500).json({ error: "Internal server error." });
   }
 });
-
-
-
 
 app.post("/api/products/search", async (req, res) => {
   const { id, name } = req.body;
@@ -573,15 +618,22 @@ app.delete("/api/products/delete/:id", async (req, res) => {
   console.log("Received ID for deletion:", id); // Debug log
 
   if (isNaN(id)) {
-    return res.status(400).json({ success: false, message: "Invalid Product ID" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid Product ID" });
   }
 
   try {
-    const result = await pool.query("DELETE FROM products WHERE product_id = $1", [id]);
+    const result = await pool.query(
+      "DELETE FROM products WHERE product_id = $1",
+      [id]
+    );
     console.log("Query Result:", result); // Debug log
 
     if (result.rowCount === 0) {
-      return res.status(404).json({ success: false, message: "Product not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
     }
 
     res.json({ success: true, message: "Product deleted successfully" });
@@ -600,7 +652,8 @@ app.get("/products", async (req, res) => {
     if (categoryID === "all") {
       query = "SELECT * FROM products ORDER BY product_name";
     } else {
-      query = "SELECT * FROM products WHERE category_id = $1 ORDER BY product_name";
+      query =
+        "SELECT * FROM products WHERE category_id = $1 ORDER BY product_name";
       params = [categoryID];
     }
 
