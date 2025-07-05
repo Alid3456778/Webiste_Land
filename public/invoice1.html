@@ -110,7 +110,7 @@
       const row = document.createElement('tr');
       row.innerHTML = `
         <td>${p.name}</td>
-        <td>${qty}</td>
+        <td>${p.qty}</td>
         <td>$${p.price}</td>
         ${p.category_id == 1 ? `<td>Free</td>` : `<td>$${shipping}</td>` }
     
