@@ -145,3 +145,65 @@ footer:before {
   background: linear-gradient(to right, transparent, rgb(2, 140, 126), transparent);
   margin: 30px 0 15px;
 }
+
+@media screen and (max-width: 768px) {
+  body {
+    padding: 15px;
+  }
+
+  .invoice-container {
+    padding: 20px;
+  }
+
+  .download-btn {
+    position: static;
+    display: block;
+    width: 100%;
+    margin-bottom: 1rem;
+    font-size: 16px;
+  }
+
+  .customer-details {
+    flex-direction: column;
+  }
+
+  .customer-details div {
+    width: 100%;
+    font-size: 14px;
+  }
+
+  table {
+    font-size: 13px;
+  }
+
+  table th,
+  table td {
+    padding: 10px;
+  }
+
+  .totals {
+    justify-content: flex-start;
+  }
+
+  .totals div {
+    width: 100%;
+    font-size: 14px;
+  }
+
+  .totals p {
+    padding: 8px 0;
+  }
+
+  header h1 {
+    font-size: 28px;
+  }
+
+  .section-title {
+    font-size: 24px;
+    padding: 10px;
+  }
+
+  footer {
+    font-size: 13px;
+  }
+}

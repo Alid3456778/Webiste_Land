@@ -6,6 +6,7 @@
     <title>Categories | Mcland Pharma</title>
     <link rel="stylesheet" href="./assets/css/navbar_footer.css" />
     <link rel="stylesheet" href="./assets/css/categories.css" />
+    <style></style>
   </head>
   <body>
     <header class="navbar">
@@ -17,23 +18,20 @@
           <img src="./assets/image2/logo.png" alt="MCland Pharma Logo" />
           <a href="./index.html"></a>
         </div>
-        <div class="header__search-cart">
+        <div class="header__search-cart header__right">
           <div class="search">
             <input
               type="text"
-              placeholder="Search products…"
+              placeholder="Search products..."
               class="search__input"
               id="search-input"
-              list="search_list"
+              autocomplete="off"
             />
-            <datalist id="search_list">
-              <!-- This will be populated dynamically -->
-            </datalist>
+            <ul id="suggestions" class="search-suggestions"></ul>
+
             <button class="btn btn--search" id="search-button">
-              <!-- Inline SVG magnifier for crispness -->
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="search__icon"
                 viewBox="0 0 24 24"
                 width="20"
                 height="20"
@@ -45,33 +43,34 @@
               </svg>
             </button>
           </div>
+
           <a href="cart" id="cart-a-section">
-          <button class="btn btn--icon">
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
-              alt="Cart"
-              class="cart-icon"
-            />
-          </button>
-          <span id="cart-count" class="cart-count">0</span>
-        </a>
+            <button class="btn btn--icon">
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
+                alt="Cart"
+                class="cart-icon"
+              />
+            </button>
+            <span id="cart-count" class="cart-count">0</span>
+          </a>
         </div>
       </div>
     </header>
+
     <script>
       document.addEventListener("DOMContentLoaded", async () => {
         const cartCountSpan = document.getElementById("cart-count");
 
         try {
-          // Fetch the cart count for the logged-in user
-          const response = await fetch("/api/cart/count"); // Adjust endpoint as needed
+          const response = await fetch("/api/cart/count");
           const result = await response.json();
 
           if (result.success) {
-            const cartCount = result.count; // Get the count from the response
+            const cartCount = result.count;
             if (cartCount > 0) {
-              cartCountSpan.textContent = cartCount; // Update badge content
-              cartCountSpan.style.display = "inline-block"; // Show badge
+              cartCountSpan.textContent = cartCount;
+              cartCountSpan.style.display = "inline-block";
             }
           } else {
             console.error("Failed to fetch cart count:", result.message);
@@ -83,158 +82,247 @@
     </script>
 
     <section id="product-grid">
-      <script>
-        document.addEventListener("DOMContentLoaded", () => {
-          // Fetch data based on category from the PostgreSQL database
-          async function loadProductData(categoryID) {
-            const loadingMessage = document.getElementById("loading-message");
-            if (loadingMessage) {
-              loadingMessage.innerText = "LOADING PRODUCTS...";
-            }
+      <div id="loading-message" class="loading-message">LOADING...</div>
+    </section>
 
-            const tableBody = document.getElementById("product-grid");
-            try {
-              const response = await fetch(
-                `/products?categoryID=${categoryID}`
-              );
-              const products = await response.json();
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        async function loadProductData(categoryID) {
+          const loadingMessage = document.getElementById("loading-message");
+          if (loadingMessage) {
+            loadingMessage.innerText = "LOADING PRODUCTS...";
+          }
 
-              const pricesResponse = await fetch("/product-prices");
-              const prices = await pricesResponse.json();
+          const tableBody = document.getElementById("product-grid");
+          try {
+            const response = await fetch(`/products?categoryID=${categoryID}`);
+            const products = await response.json();
 
-              if (products.length === 0) {
-                tableBody.innerHTML = `<p>No products found for the selected category.</p>`;
-                if (loadingMessage) {
-                  loadingMessage.style.display = "none";
-                }
-                return;
-              }
+            const pricesResponse = await fetch("/product-prices");
+            const prices = await pricesResponse.json();
 
-              tableBody.innerHTML = ""; // Clear the previous data
-              displayBatch(products, prices, 0, products.length, tableBody);
+            if (products.length === 0) {
+              tableBody.innerHTML = `<p>No products found for the selected category.</p>`;
               if (loadingMessage) {
                 loadingMessage.style.display = "none";
               }
-            } catch (error) {
-              console.error("Error loading product data:", error);
-              if (loadingMessage) {
-                loadingMessage.innerText =
-                  "Error loading products. Please try again.";
-              }
+              return;
             }
-          }
 
-          // Display a batch of rows
-          function displayBatch(products, prices, start, end, tableBody) {
-            const batch = products.slice(start, end);
-            batch.forEach((product) => {
-              const productID = product.id;
-
-              // Conditional rendering for the stock status
-              const stockOverlay =
-                product.stocks === 0
-                  ? `<div class="stock-overlay">
-         
-           <img  src="./assets/image2/out-of-stock.png" alt="Out of Stock" />
-         </div>`
-                  : "";
-
-              const rowHTML = `
-      <div class="product-card medicine-card ${
-        product.category_id || "all"
-      }" data-product-id="${productID}">
-        ${stockOverlay}
-        <img src="${product.image_url || ""}" alt="Product Image" loading="lazy"
-          onload="this.style.opacity='1'" />
-        <div class="product-details">
-          <h3>${product.product_name || "No Description"}</h3>
-          <p id="pric">${
-            product.trade_names ? product.trade_names.split(",")[0].trim() : ""
-          }</p>
-          ${product.category_id == 1 ? `<p style="font-weight: bold;">(4-5 Day's Delivery)</p>` : `<p style="font-weight: bold;"></p>`}
-          <div class="product-buttons">
-            <a href="./product_overview.html?product_ID=${product.product_id}"> 
-              <button class="buy-btn"> Buy Now </button>
-            </a>
-          </div>
-        </div>
-      </div>
-    `;
-              tableBody.innerHTML += rowHTML;
-            });
-          }
-
-          // Function to handle category filtering
-          // Function to handle category filtering
-          function filterCategory() {
-            const selectedCategory =
-              document.getElementById("categories").value;
-            loadProductData(selectedCategory);
-          }
-
-          // Load data on initial page load
-          const urlParams = new URLSearchParams(window.location.search);
-          const initialCategoryID = urlParams.get("catogeries_ID") || "all";
-          // document.getElementById("categories").value = initialCategoryID;
-          loadProductData(initialCategoryID);
-        });
-      </script>
-      <script>
-        async function buildProductSearch() {
-          try {
-            const response = await fetch(`/products`);
-            const products = await response.json();
-
-            const searchList = document.getElementById("search_list");
-            searchList.innerHTML = "";
-            const fragment = document.createDocumentFragment();
-
-            products.forEach((product) => {
-              const option = document.createElement("option");
-              option.value = product.product_name || "Product Name";
-              option.textContent = product.product_name || "Product Name";
-              fragment.appendChild(option);
-            });
-
-            searchList.appendChild(fragment);
-
-            const searchButton = document.getElementById("search-button");
-            const searchInput = document.getElementById("search-input");
-
-            // Function to handle product search
-            const handleSearch = () => {
-              const query = searchInput.value.trim();
-              const matchingProduct = products.find(
-                (product) => product.product_name === query
-              );
-
-              if (matchingProduct) {
-                window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
-              } else {
-                alert("No matching product found.");
-              }
-            };
-
-            // Trigger search on button click
-            searchButton.addEventListener("click", handleSearch);
-
-            // Trigger search on Enter key press in the input field
-            searchInput.addEventListener("keydown", (event) => {
-              if (event.key === "Enter") {
-                event.preventDefault(); // Prevent default form submission
-                handleSearch();
-              }
-            });
+            tableBody.innerHTML = "";
+            displayBatch(products, prices, 0, products.length, tableBody);
+            if (loadingMessage) {
+              loadingMessage.style.display = "none";
+            }
           } catch (error) {
-            console.error("Error is", error);
+            console.error("Error loading product data:", error);
+            if (loadingMessage) {
+              loadingMessage.innerText =
+                "Error loading products. Please try again.";
+            }
           }
         }
 
-        buildProductSearch();
-      </script>
+        function displayBatch(products, prices, start, end, tableBody) {
+          const batch = products.slice(start, end);
+          batch.forEach((product) => {
+            const productID = product.id;
 
-      <div id="loading-message" class="loading-message">LOADING...</div>
-    </section>
+            const stockOverlay =
+              product.stocks === 0
+                ? `<div class="stock-overlay">
+                     <img src="./assets/image2/out-of-stock.png" alt="Out of Stock" />
+                   </div>`
+                : "";
+
+            const rowHTML = `
+              <div class="product-card medicine-card ${
+                product.category_id || "all"
+              }" data-product-id="${productID}">
+                ${stockOverlay}
+                <img src="${
+                  product.image_url || ""
+                }" alt="Product Image" loading="lazy"
+                  onload="this.style.opacity='1'" />
+                <div class="product-details">
+                  <h3>${product.product_name || "No Description"}</h3>
+                  <p id="pric">${
+                    product.trade_names
+                      ? product.trade_names.split(",")[0].trim()
+                      : ""
+                  }</p>
+                  ${
+                    product.category_id == 1
+                      ? `<p style="font-weight: bold;">(4-5 Day's Delivery)</p>`
+                      : `<p style="font-weight: bold;"></p>`
+                  }
+                  <div class="product-buttons">
+                    <a href="./product_overview.html?product_ID=${
+                      product.product_id
+                    }"> 
+                      <button class="buy-btn"> Buy Now </button>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            `;
+            tableBody.innerHTML += rowHTML;
+          });
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialCategoryID = urlParams.get("catogeries_ID") || "all";
+        loadProductData(initialCategoryID);
+      });
+    </script>
+
+    <!-- <script>
+      async function buildProductSearch() {
+        try {
+          const response = await fetch(`/products`);
+          const products = await response.json();
+
+          const searchList = document.getElementById("search_list");
+          searchList.innerHTML = "";
+          const fragment = document.createDocumentFragment();
+
+          products.forEach((product) => {
+            const option = document.createElement("option");
+            option.value = product.product_name || "Product Name";
+            option.textContent = product.product_name || "Product Name";
+            fragment.appendChild(option);
+          });
+
+          searchList.appendChild(fragment);
+
+          const searchButton = document.getElementById("search-button");
+          const searchInput = document.getElementById("search-input");
+
+          const handleSearch = () => {
+            const query = searchInput.value.trim();
+            const matchingProduct = products.find(
+              (product) => product.product_name === query
+            );
+
+            if (matchingProduct) {
+              window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
+            } else {
+              alert("No matching product found.");
+            }
+          };
+
+          searchButton.addEventListener("click", handleSearch);
+
+          searchInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              handleSearch();
+            }
+          });
+        } catch (error) {
+          console.error("Error is", error);
+        }
+      }
+
+      buildProductSearch();
+    </script> -->
+<script>
+  async function buildProductSearch() {
+    try {
+      const response = await fetch(`/products`);
+      const products = await response.json();
+
+      const searchInput = document.getElementById("search-input");
+      const searchButton = document.getElementById("search-button");
+      const suggestionBox = document.getElementById("suggestions");
+
+      // Real-time suggestions
+      searchInput.addEventListener("input", () => {
+        const query = searchInput.value.trim().toLowerCase();
+        suggestionBox.innerHTML = "";
+
+        if (!query) {
+          suggestionBox.style.display = "none";
+          return;
+        }
+
+        const matches = products.filter((product) =>
+          product.product_name.toLowerCase().includes(query)
+        );
+
+        if (matches.length > 0) {
+          matches.slice(0, 5).forEach((product) => {
+            const li = document.createElement("li");
+            li.textContent = product.product_name;
+            li.onclick = () => {
+              searchInput.value = product.product_name;
+              suggestionBox.style.display = "none";
+              handleSearch();
+            };
+            suggestionBox.appendChild(li);
+          });
+          suggestionBox.style.display = "block";
+        } else {
+          suggestionBox.style.display = "none";
+        }
+      });
+
+      // Hide suggestions when clicking outside
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".search")) {
+          suggestionBox.style.display = "none";
+        }
+      });
+
+      // Search and redirect if exact match found
+      function handleSearch() {
+        const query = searchInput.value.trim();
+        const matchingProduct = products.find(
+          (product) => product.product_name === query
+        );
+
+        if (matchingProduct) {
+          window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
+        } else {
+          alert("No matching product found.");
+        }
+      }
+
+      // Button click or Enter = search
+      searchButton.addEventListener("click", handleSearch);
+      searchInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          handleSearch();
+        }
+      });
+
+      // Filtering product cards (if present on page)
+      const productCards = document.querySelectorAll(".product");
+      function filterProducts() {
+        const query = searchInput.value.trim().toLowerCase();
+
+        productCards.forEach((product) => {
+          const productName = product.dataset.name.toLowerCase();
+          product.style.display = productName.includes(query) ? "block" : "none";
+        });
+      }
+
+      searchInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          filterProducts();
+        }
+      });
+
+      searchButton.addEventListener("click", filterProducts);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  }
+
+  buildProductSearch();
+</script>
 
     <footer class="footer">
       <div class="footer-content">
@@ -267,7 +355,7 @@
           <p>
             The services on Mcland Pharma are available for millions of people
             solely presented for informative, qualitative, quantitative, and
-            affordable medicinal purposes. Here we believe The Doctor’s advice =
+            affordable medicinal purposes. Here we believe The Doctor's advice =
             The Best Advice for medicinal needs by following protocol
             accordingly by people suffering from different conditions.
           </p>

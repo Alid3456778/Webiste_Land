@@ -360,3 +360,44 @@ body {
           transform: translateY(0);
         }
       }
+
+@media screen and (max-width: 768px) {
+  .checkout-card {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-form {
+    grid-template-columns: 1fr !important; /* Force single column layout */
+  }
+
+  .form-group,
+  .form-group.full-width,
+  .form-group-shipping,
+  .input-group {
+    grid-column: span 1 !important;
+    width: 100%;
+  }
+
+  .input-group input,
+  .input-group select {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  .place-order-btn {
+    width: 100%;
+    font-size: 16px;
+    padding: 14px;
+    border-radius: 10px;
+  }
+
+  .order-summary {
+    padding: 1rem;
+  }
+
+  .order-summary table th,
+  .order-summary table td {
+    font-size: 14px;
+    padding: 0.75rem 0.5rem;
+  }
+}
