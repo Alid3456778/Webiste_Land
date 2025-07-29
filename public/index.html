@@ -164,7 +164,9 @@
       id="search-input"
       autocomplete="off"
     />
-    <ul id="suggestions" class="search-suggestions"></ul>
+    <ul id="suggestions" class="search-suggestions">
+      
+    </ul>
 
     <button class="btn btn--search" id="search-button">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
@@ -458,126 +460,11 @@
     </footer>
     <!-- Search Functionality -->
     <script>
-      // Function to build the product search index
-      // async function buildProductSearch() {
-      //   try {
-      //     const response = await fetch(`/products`);
-      //     const products = await response.json();
-      //     // console.log("prosuct is",products);
-      //     const searchList = document.getElementById("search_list");
-      //     searchList.innerHTML = "";
-      //     const fragment = document.createDocumentFragment();
-      //     products.forEach((product) => {
-      //       const option = document.createElement("option");
-      //       option.value = product.product_name || "Product Name";
-      //       option.textContent = product.product_name || "Product Name";
-      //       fragment.appendChild(option);
-      //     });
-      //     searchList.appendChild(fragment);
-
-      //     const searchButton = document.getElementById("search-button");
-      //     const searchInput = document.getElementById("search-input");
-      //     searchButton.addEventListener("click", () => {
-      //       const query = searchInput.value.trim();
-      //       const matchingProduct = products.find(
-      //         (product) => product.product_name === query
-      //       );
-      //       if (matchingProduct) {
-      //         window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
-      //       } else {
-      //         alert("No matching product found.");
-      //       }
-      //     });
-      //   } catch (error) {
-      //     console.error("eror is", error);
-      //   }
-      // }
-    //   async function buildProductSearch() {
-    //     try {
-    //       const response = await fetch(`/products`);
-    //       const products = await response.json();
-
-    //       const searchList = document.getElementById("search_list");
-    //       searchList.innerHTML = "";
-    //       const fragment = document.createDocumentFragment();
-
-    //       products.forEach((product) => {
-    //         const option = document.createElement("option");
-    //         option.value = product.product_name || "Product Name";
-    //         option.textContent = product.product_name || "Product Name";
-    //         fragment.appendChild(option);
-    //       });
-
-    //       searchList.appendChild(fragment);
-
-    //       const searchButton = document.getElementById("search-button");
-    //       const searchInput = document.getElementById("search-input");
-
-    //       // Function to handle product search
-    //       const handleSearch = () => {
-    //         const query = searchInput.value.trim();
-    //         const matchingProduct = products.find(
-    //           (product) => product.product_name === query
-    //         );
-
-    //         if (matchingProduct) {
-    //           window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
-    //         } else {
-    //           alert("No matching product found.");
-    //         }
-    //       };
-
-    //       // Trigger search on button click
-    //       searchButton.addEventListener("click", handleSearch);
-
-    //       // Trigger search on Enter key press in the input field
-    //       searchInput.addEventListener("keydown", (event) => {
-    //         if (event.key === "Enter") {
-    //           handleSearch();
-    //         }
-    //       });
-    //     } catch (error) {
-    //       console.error("Error is", error);
-    //     }
-    //   }
-
-    //   buildProductSearch();
-    // </script>
-    // <script>
-    //   const searchInput = document.getElementById("search-input");
-    //   const searchButton = document.getElementById("search-button");
-    //   const products = document.querySelectorAll(".product");
-
-    //   function filterProducts() {
-    //     const query = searchInput.value.trim().toLowerCase();
-
-    //     products.forEach((product) => {
-    //       const productName = product.dataset.name.toLowerCase();
-    //       if (productName.includes(query)) {
-    //         product.style.display = "block";
-    //       } else {
-    //         product.style.display = "none";
-    //       }
-    //     });
-    //   }
-
-    //   // Filter when Enter is pressed
-    //   searchInput.addEventListener("keydown", function (event) {
-    //     if (event.key === "Enter") {
-    //       event.preventDefault();
-    //       filterProducts();
-    //     }
-    //   });
-
-    //   // Filter when search button is clicked
-    //   searchButton.addEventListener("click", filterProducts);
-    // </script>
-    <script>
   async function buildProductSearch() {
     try {
       const response = await fetch(`/products`);
       const products = await response.json();
-
+      console.log(products);
       const searchInput = document.getElementById("search-input");
       const searchButton = document.getElementById("search-button");
       const suggestionBox = document.getElementById("suggestions");
@@ -591,23 +478,39 @@
           suggestionBox.style.display = "none";
           return;
         }
+        
 
         const matches = products.filter((product) =>
-          product.product_name.toLowerCase().includes(query)
+          product.product_name.toLowerCase().includes(query)          
         );
 
         if (matches.length > 0) {
           matches.slice(0, 5).forEach((product) => {
             const li = document.createElement("li");
+            const img = document.createElement("img");
+            img.src = product.image_url || "assets/image/default.png"; // Fallback image
+            img.alt = product.product_name;
+            img.className = "suggestion-image";
+            img.style.width = "50px"; // Set a fixed width for images
+            img.style.height = "50px"; // Set a fixed height for images
+            img.style.objectFit = "cover"; // Ensure images fit well
+            img.style.marginRight = "10px"; // Add some space between image and text
+            img.style.borderRadius = "5px"; // Optional: round the corners of the image
+            img.style.display = "inline-block"; // Ensure image is inline with text
+            li.appendChild(img);
+           
             li.textContent = product.product_name;
+
             li.onclick = () => {
               searchInput.value = product.product_name;
               suggestionBox.style.display = "none";
               handleSearch();
             };
             suggestionBox.appendChild(li);
+            
           });
           suggestionBox.style.display = "block";
+
         } else {
           suggestionBox.style.display = "none";
         }

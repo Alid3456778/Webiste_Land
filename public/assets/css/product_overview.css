@@ -190,7 +190,7 @@ body {
 .carousel__slide {
   font-size: 1rem;
   color: var(--color-gray-600);
-  width: 200px;
+  width: auto;
 }
 
 img{

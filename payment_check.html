@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Stripe Test</title>
+    <script src="https://js.stripe.com/v3/"></script>
+  </head>
+  <body>
+    <h2>Stripe Test Payment</h2>
+    <div id="card-element" style="border:1px solid #ccc; padding:10px; width:300px;"></div>
+    <button id="payBtn">Pay $1</button>
+
+    <script>
+      const stripe = Stripe("pk_test_51Rq7ypA9umcU0sQscWbkoRyfPHyLZckLkvR68pJF25eOy0xNDUQJDMes0AW0J90JYSA9ZUzrepa9V3b6JUs476u300gzodW42Y_");
+      const elements = stripe.elements();
+      const card = elements.create("card");
+      card.mount("#card-element");
+
+      let clientSecret;
+
+      async function createPaymentIntent() {
+        const res = await fetch("http://localhost:3000/create-payment-intent", {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({ amount: 100 }) // $1 in cents
+        });
+        const data = await res.json();
+        clientSecret = data.clientSecret;
+      }
+
+      document.getElementById("payBtn").addEventListener("click", async () => {
+        if (!clientSecret) await createPaymentIntent();
+
+        const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+          payment_method: { card: card }
+        });
+
+        if (error) {
+          alert("❌ Payment Failed: " + error.message);
+        } else if (paymentIntent.status === "succeeded") {
+          alert("✅ Payment Successful!");
+        }
+      });
+
+      createPaymentIntent();
+    </script>
+  </body>
+</html>

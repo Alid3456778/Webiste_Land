@@ -4,11 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Checkout | Mcland Pharma</title>
+    <script src="https://js.stripe.com/v3/"></script>
     <link rel="stylesheet" href="./assets/css/navbar_footer.css" />
     <link rel="stylesheet" href="./assets/css/checkout.css" />
-    <style>
-     
-    </style>
+    <style></style>
   </head>
   <body>
     <!-- Confirmation Modal -->
@@ -243,6 +242,11 @@
           </button>
         </section>
       </div>
+      <div class="form-group">
+        <label>Card Details</label>
+        <div id="card-element"></div>
+      </div>
+      <button id="pay-now-btn" class="place-order-btn">Pay Now</button>
     </main>
 
     <footer class="footer">
@@ -353,7 +357,7 @@
         cartItems.forEach((item) => {
           const productId = parseInt(item.category_id, 10);
           const price = parseFloat(item.price);
-          console.log("Category ",productId);
+          console.log("Category ", productId);
           if (productId > 1) {
             // Add price to chargeable total if product ID is greater than 24
             chargeableTotal += price;
@@ -367,7 +371,7 @@
           return 10; // $10 for chargeable items between $101 and $300
         } else if (chargeableTotal >= 51 && chargeableTotal <= 100) {
           return 15; // $15 for chargeable items between $51 and $100
-        } else if (chargeableTotal >= 1 && chargeableTotal <= 50 ) {
+        } else if (chargeableTotal >= 1 && chargeableTotal <= 50) {
           return 20; // $20 for chargeable items between $1 and $50
         }
 
@@ -492,8 +496,6 @@
             alert(`Error: ${error.message}`);
           }
         });
-
-        
     </script>
 
     <script src="./assets/js/checkout1.js"></script>
@@ -511,6 +513,64 @@
         }
         lastScrollY = window.scrollY;
       });
+    </script>
+
+    <script>
+      const stripe = Stripe(
+        "pk_test_51Rq7yxAQdTZkHhGheNNYrWyIYRGYTW5Z4MwSQhsI4wb0Rz4mzndxlPFbrVwENUBgJb76iDIouyBqThgJgxQIBPNN00VEYj7lor"
+      ); // Replace with your key
+      const elements = stripe.elements();
+      const card = elements.create("card");
+      card.mount("#card-element");
+
+      document
+        .getElementById("pay-now-btn")
+        .addEventListener("click", async () => {
+          try {
+            // ✅ Get total cost from your cart
+            const totalCost =
+              parseFloat(
+                document.getElementById("total-cost").innerText.replace("$", "")
+              ) * 100; // Convert to cents
+
+            // ✅ Create Payment Intent on server
+            const res = await fetch("/create-payment-intent", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ amount: totalCost }),
+            });
+            const { clientSecret } = await res.json();
+            console.log("Client secret received:", clientSecret);
+
+            // ✅ Confirm Card Payment
+            const { paymentIntent, error } = await stripe.confirmCardPayment(
+              clientSecret,
+              {
+                payment_method: {
+                  card: card,
+                  billing_details: {
+                    name:
+                      document.getElementById("first-name").value +
+                      " " +
+                      document.getElementById("last-name").value,
+                    email: document.getElementById("email").value,
+                  },
+                },
+              }
+            );
+
+            if (error) {
+              alert(error.message);
+            } else if (paymentIntent.status === "succeeded") {
+              alert("Payment Successful!");
+              openConfirmationPopup();
+              // ✅ Call your checkout API to save order
+            }
+          } catch (err) {
+            console.error(err);
+            alert("Payment failed!");
+          }
+        });
     </script>
   </body>
 </html>
