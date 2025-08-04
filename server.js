@@ -11,7 +11,6 @@ require("dotenv").config();
 const nodemailer = require("nodemailer");
 
 const Stripe = require('stripe');
-const stripe = Stripe('sk_test_51Rq7yxAQdTZkHhGhMHyIrTwuTenHh7xU8XI42vPfJMPnWgEmq59sKNQjqjGgT8XUuTjGG5Hupa1NNvk6bV5nERrV00XHEhiKF3'); // Replace with your key
 // const { use } = require("react");
 
 const app = express();
