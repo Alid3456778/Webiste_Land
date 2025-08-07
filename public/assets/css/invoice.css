@@ -207,3 +207,21 @@ footer:before {
     font-size: 13px;
   }
 }
+
+.debug-info {
+      background: #f0f0f0;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      display: none; /* Hidden by default, show for debugging */
+    }
+    
+    .error-message {
+      background: #ffebee;
+      color: #d32f2f;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 10px 0;
+    }

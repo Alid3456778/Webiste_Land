@@ -401,3 +401,97 @@ body {
     padding: 0.75rem 0.5rem;
   }
 }
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.payment-options img {
+  width: 100px;
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+.scanner-content img {
+  width: 200px;
+  margin-bottom: 20px;
+}
+
+.scanner-buttons button {
+  margin: 0 10px;
+  padding: 10px 20px;
+}
+
+/* Modal container */
+.modal1 {
+  display: none; /* hidden by default */
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modal content */
+.modal-content1 {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Payment buttons container */
+.modal-content1 button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin: 10px;
+  transition: transform 0.2s ease;
+}
+
+.modal-content1 button:hover {
+  transform: scale(1.1);
+}
+
+/* QR container */
+#qr-container {
+  margin-top: 20px;
+}
+
+/* Payment options horizontal */
+.modal-content1 > button {
+  display: inline-block;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 600px) {
+  .modal-content1 {
+    width: 95%;
+    padding: 15px;
+  }
+
+  .modal-content1 button img {
+    max-width: 80px;
+  }
+}

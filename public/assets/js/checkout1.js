@@ -1,7 +1,8 @@
 const placeOrderBtn = document.getElementById("place-order-btn");
 
-placeOrderBtn.addEventListener("click", async (e) => {
-  e.preventDefault();
+// Extract your logic into a named function
+async function handlePlaceOrder(e) {
+  e?.preventDefault();
 
   try {
     const response = await fetch("/api/cart");
@@ -12,9 +13,9 @@ placeOrderBtn.addEventListener("click", async (e) => {
       return;
     }
 
-    console.log("crats data ",cartData);
+    console.log("crats data ", cartData);
     let subtotal = 0;
-    
+
     // Calculate subtotal
     cartData.data.forEach((item) => {
       subtotal += parseFloat(item.price);
@@ -29,6 +30,7 @@ placeOrderBtn.addEventListener("click", async (e) => {
 
     // Calculate shipping cost
     const shippingCost = calculateShippingCost(subtotal, cartData.data);
+
     // Prepare order details
     const orderDetails = {
       orderNumber: Math.floor(Math.random() * 1000000),
@@ -52,20 +54,26 @@ placeOrderBtn.addEventListener("click", async (e) => {
         name: `${item.name} ${item.mg} x ${item.quantity}`,
         qty: `${item.quantity}`,
         price: `${parseFloat(item.price).toFixed(2)}`,
-        category_id:`${item.category_id}`,
+        category_id: `${item.category_id}`,
       })),
       shippingCost: `${shippingCost}`,
       total: `$${(subtotal + shippingCost).toFixed(2)}`,
     };
 
-    // Save order details to localStorage and redirect
+    // Save order details to localStorage
     localStorage.setItem("orderDetails", JSON.stringify(orderDetails));
-    window.location.href = "./invoice1.html"; // Redirect to invoice
+
+    // Redirect to invoice page
+    // window.location.href = "./invoice1.html";
   } catch (error) {
     console.error("Error loading cart:", error);
     alert("Error displaying order summary.");
   }
-});
+}
+
+// Attach the function to the button
+placeOrderBtn.addEventListener("click", handlePlaceOrder);
+
 
 // Calculate shipping cost function
 function calculateShippingCost(total, cartItems) {
