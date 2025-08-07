@@ -10,7 +10,7 @@ const jwt = require("jsonwebtoken"); // For generating authentication tokens
 require("dotenv").config();
 const nodemailer = require("nodemailer");
 
-const Stripe = require('stripe');
+
 // const { use } = require("react");
 
 const app = express();
@@ -748,22 +748,7 @@ app.get("/api/customers/:id", async (req, res) => {
 });
 
 
-app.post("/create-payment-intent", async (req, res) => {
-  try {
-    const { amount } = req.body;
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      currency: "usd",
-      automatic_payment_methods: { enabled: true },
-    });
-    // console.log("Amount sent to Stripe:", amount);
-    console.log("Created PaymentIntent:", paymentIntent.id);
-    res.json({ clientSecret: paymentIntent.client_secret });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
+
 
 
 // Static files
