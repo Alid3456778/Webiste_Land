@@ -11,8 +11,6 @@ require("dotenv").config();
 const nodemailer = require("nodemailer");
 
 
-// const { use } = require("react");
-
 const app = express();
 
 // Middleware
