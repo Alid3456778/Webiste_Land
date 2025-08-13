@@ -166,7 +166,7 @@
         <h2>Select Payment Method</h2>
         <button onclick="selectPayment('Zelle')"><img src="./assets/image/zelle.png" alt="" style="max-width: 100px"></button>
         <button onclick="selectPayment('Bitcoin')"><img src="./assets/image/bitcoin.png" alt="" style="max-width: 100px"></button>
-        <button onclick="selectPayment('Bitcoin')"><img src="./assets/image/venmo.png" alt="" style="max-width: 100px"></button>
+        <button onclick="selectPayment('Venmo')"><img src="./assets/image/venmo.png" alt="" style="max-width: 100px"></button>
         <div id="qr-container" style="margin-top: 20px; display: none">
           <img id="qr-code" src="" alt="QR Code" style="max-width: 200px" />
           <br />
@@ -189,11 +189,11 @@
         container.style.display = "block";
 
         if (method === "Zelle") {
-          qr.src = "./assets/image/venom.jpg";
+          qr.src = "./assets/image/";
         } else if (method === "Bitcoin") {
           qr.src = "./assets/images/qr-bitcoin.png";
-        } else if (method === "Stripe") {
-          qr.src = "./assets/images/qr-stripe.png";
+        } else if (method === "Venmo") {
+          qr.src = "./assets/image/venom.jpg";
         }
       }
 
@@ -294,7 +294,7 @@
             <div class="error" id="last-name-error"></div>
           </div>
 
-          <div class="form-group input-group">
+          <!-- <div class="form-group input-group">
             <input
               type="text"
               id="company-name"
@@ -302,7 +302,7 @@
               placeholder=" "
             />
             <label for="company-name">Company Name (Optional)</label>
-          </div>
+          </div> -->
 
           <div class="form-group input-group">
             <input
@@ -318,7 +318,7 @@
             <div class="error" id="street-address-error"></div>
           </div>
 
-          <div class="form-group input-group">
+          <!-- <div class="form-group input-group">
             <input
               type="text"
               id="apartment"
@@ -326,7 +326,7 @@
               placeholder=" "
             />
             <label for="apartment">Apartment, suite, etc. (Optional)</label>
-          </div>
+          </div> -->
 
           <div class="form-group input-group">
             <input type="text" id="city" name="city" placeholder=" " required />

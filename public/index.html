@@ -111,25 +111,17 @@
         });
       </script>
 
-      <!-- <div class="header__right">
+      <div class="header__right">
         <div class="search">
           <input
             type="text"
             placeholder="Search products..."
             class="search__input"
             id="search-input"
-            list="search_list"
+            autocomplete="off"
           />
           <ul id="suggestions" class="search-suggestions"></ul>
 
-          <datalist id="search_list">
-            <option value="anazol">anazol</option>
-            <option value="Armandilo">Armandilo</option>
-            <option value="Pain Killer">Pain Killer</option>
-            <option value="Medistic">Medtistic</option>
-          </datalist>
-
-          
           <button class="btn btn--search" id="search-button">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -144,6 +136,7 @@
             </svg>
           </button>
         </div>
+
         <a href="cart" id="cart-a-section">
           <button class="btn btn--icon">
             <img
@@ -154,42 +147,10 @@
           </button>
           <span id="cart-count" class="cart-count">0</span>
         </a>
-      </div> -->
-      <div class="header__right">
-  <div class="search">
-    <input
-      type="text"
-      placeholder="Search products..."
-      class="search__input"
-      id="search-input"
-      autocomplete="off"
-    />
-    <ul id="suggestions" class="search-suggestions">
-      
-    </ul>
-
-    <button class="btn btn--search" id="search-button">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-        <path
-          d="M10 2a8 8 0 015.292 13.708l4.5 4.5a1 1 0 01-1.415 1.414l-4.5-4.5A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"
-        />
-      </svg>
-    </button>
-  </div>
-
-  <a href="cart" id="cart-a-section">
-    <button class="btn btn--icon">
-      <img src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" alt="Cart" class="cart-icon" />
-    </button>
-    <span id="cart-count" class="cart-count">0</span>
-  </a>
-</div>
+      </div>
 
       <!-- Hamburger only visible on mobile -->
     </header>
-    <script>
-      
-    </script>
 
     <script>
       const hamburger = document.getElementById("hamburger-toggle");
@@ -225,9 +186,9 @@
     </script>
 
     <!-- HERO -->
-    <section class="hero-alt">
+    <!-- <section class="hero-alt">
       <div class="hero-alt__bg">
-        <img
+         <img
           src="assets/image2/WhatsApp Image 2025-06-19 at 13.30.48_27ad08b7.jpg"
         />
         <div class="hero-alt__overlay">
@@ -240,12 +201,253 @@
                 >Contact Us</a
               >
             </div>
-          </div>
+          </div> 
         </div>
       </div>
 
           
+    </section> -->
+    <!-- Updated HERO section for your index.html -->
+    <section class="hero-alt">
+      <div class="hero-alt__bg">
+        <!-- Hero Title and Subtitle -->
+        <div class="hero-content">
+          <h1 class="hero-title">Find Your Medicine</h1>
+        </div>
+
+        <!-- Large Hero Search Bar -->
+        <div class="hero-search">
+          <div class="hero-search-container">
+            <input
+              type="text"
+              placeholder="Search for medicines, health products..."
+              id="hero-search-input"
+              autocomplete="off"
+            />
+            <button class="hero-search-btn" id="hero-search-button">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                fill="currentColor"
+              >
+                <path
+                  d="M10 2a8 8 0 015.292 13.708l4.5 4.5a1 1 0 01-1.415 1.414l-4.5-4.5A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"
+                />
+              </svg>
+            </button>
+          </div>
+          <ul id="hero-suggestions" class="search-suggestions"></ul>
+        </div>
+
+        <!-- Contact Button -->
+        <!-- <div class="hero-contact">
+      <a href="https://t.me/MCLAND1" target="_blank" class="btn btn--cta">Contact Us</a>
+    </div> -->
+      </div>
     </section>
+
+    <script>
+      // Initialize hero search functionality
+      document.addEventListener("DOMContentLoaded", function () {
+        // Initialize search for hero section
+        initHeroSearch();
+      });
+
+      function initHeroSearch() {
+        fetch("/products")
+          .then((res) => res.json())
+          .then((products) => {
+            const heroSearchInput =
+              document.getElementById("hero-search-input");
+            const heroSearchButton =
+              document.getElementById("hero-search-button");
+            const heroSuggestionBox =
+              document.getElementById("hero-suggestions");
+
+            // Real-time suggestions for hero search
+            heroSearchInput.addEventListener("input", () => {
+              const query = heroSearchInput.value.trim().toLowerCase();
+              heroSuggestionBox.innerHTML = "";
+
+              if (!query) {
+                heroSuggestionBox.style.display = "none";
+                return;
+              }
+
+              const matches = products.filter((product) =>
+                product.product_name.toLowerCase().includes(query)
+              );
+
+              if (matches.length > 0) {
+                matches.forEach((product) => {
+                  const li = document.createElement("li");
+
+                  const img = document.createElement("img");
+                  img.src = product.image_url || "assets/image/default.png";
+                  img.alt = product.product_name;
+
+                  const span = document.createElement("span");
+                  span.textContent = product.product_name;
+
+                  li.appendChild(img);
+                  li.appendChild(span);
+
+                  li.onclick = () => {
+                    window.location.href = `product_overview.html?product_ID=${product.product_id}`;
+                  };
+
+                  heroSuggestionBox.appendChild(li);
+                });
+                heroSuggestionBox.style.display = "block";
+              } else {
+                heroSuggestionBox.style.display = "none";
+              }
+            });
+
+            // Hide suggestions when clicking outside
+            document.addEventListener("click", (e) => {
+              if (!e.target.closest(".hero-search")) {
+                heroSuggestionBox.style.display = "none";
+              }
+            });
+
+            // Handle search
+            function handleHeroSearch() {
+              const query = heroSearchInput.value.trim();
+              const matchingProduct = products.find(
+                (product) =>
+                  product.product_name.toLowerCase() === query.toLowerCase()
+              );
+
+              if (matchingProduct) {
+                window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
+              } else if (query) {
+                // If no exact match, redirect to search results or show message
+                alert("No exact matching product found.");
+              }
+            }
+
+            // Button click and Enter key handling
+            heroSearchButton.addEventListener("click", handleHeroSearch);
+            heroSearchInput.addEventListener("keydown", (event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                handleHeroSearch();
+              }
+            });
+          })
+          .catch((error) => {
+            console.error("Error fetching products for hero search:", error);
+          });
+      }
+
+      // Updated JavaScript to position suggestions correctly
+      function initHeroSearch() {
+        fetch("/products")
+          .then((res) => res.json())
+          .then((products) => {
+            const heroSearchInput =
+              document.getElementById("hero-search-input");
+            const heroSearchButton =
+              document.getElementById("hero-search-button");
+            const heroSuggestionBox =
+              document.getElementById("hero-suggestions");
+
+            // Real-time suggestions for hero search
+            heroSearchInput.addEventListener("input", () => {
+              const query = heroSearchInput.value.trim().toLowerCase();
+              heroSuggestionBox.innerHTML = "";
+
+              if (!query) {
+                heroSuggestionBox.style.display = "none";
+                return;
+              }
+
+              const matches = products.filter((product) =>
+                product.product_name.toLowerCase().includes(query)
+              );
+
+              if (matches.length > 0) {
+                // Position the suggestions dropdown below the search bar
+                const heroSearchContainer = document.querySelector(
+                  ".hero-search-container"
+                );
+                const rect = heroSearchContainer.getBoundingClientRect();
+                const scrollTop =
+                  window.pageYOffset || document.documentElement.scrollTop;
+
+                // Set position dynamically
+                heroSuggestionBox.style.top =
+                  rect.bottom + scrollTop + 10 + "px";
+
+                matches.forEach((product) => {
+                  const li = document.createElement("li");
+
+                  const img = document.createElement("img");
+                  img.src = product.image_url || "assets/image/default.png";
+                  img.alt = product.product_name;
+
+                  const span = document.createElement("span");
+                  span.textContent = product.product_name;
+
+                  li.appendChild(img);
+                  li.appendChild(span);
+
+                  li.onclick = () => {
+                    window.location.href = `product_overview.html?product_ID=${product.product_id}`;
+                  };
+
+                  heroSuggestionBox.appendChild(li);
+                });
+                heroSuggestionBox.style.display = "block";
+              } else {
+                heroSuggestionBox.style.display = "none";
+              }
+            });
+
+            // Hide suggestions when clicking outside
+            document.addEventListener("click", (e) => {
+              if (!e.target.closest(".hero-search")) {
+                heroSuggestionBox.style.display = "none";
+              }
+            });
+
+            // Handle search
+            function handleHeroSearch() {
+              const query = heroSearchInput.value.trim();
+              const matchingProduct = products.find(
+                (product) =>
+                  product.product_name.toLowerCase() === query.toLowerCase()
+              );
+
+              if (matchingProduct) {
+                window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
+              } else if (query) {
+                alert("No exact matching product found.");
+              }
+            }
+
+            // Button click and Enter key handling
+            heroSearchButton.addEventListener("click", handleHeroSearch);
+            heroSearchInput.addEventListener("keydown", (event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                handleHeroSearch();
+              }
+            });
+          })
+          .catch((error) => {
+            console.error("Error fetching products for hero search:", error);
+          });
+      }
+
+      // Initialize when DOM is loaded
+      document.addEventListener("DOMContentLoaded", function () {
+        initHeroSearch();
+      });
+    </script>
 
     <!-- FEATURES -->
     <section class="features">
@@ -460,118 +662,239 @@
     </footer>
     <!-- Search Functionality -->
     <script>
-  async function buildProductSearch() {
-    try {
-      const response = await fetch(`/products`);
-      const products = await response.json();
-      console.log(products);
-      const searchInput = document.getElementById("search-input");
-      const searchButton = document.getElementById("search-button");
-      const suggestionBox = document.getElementById("suggestions");
+      async function buildProductSearch() {
+        try {
+          const response = await fetch(`/products`);
+          const products = await response.json();
+          console.log(products);
+          const searchInput = document.getElementById("search-input");
+          const searchButton = document.getElementById("search-button");
+          const suggestionBox = document.getElementById("suggestions");
 
-      // Real-time suggestions
-      searchInput.addEventListener("input", () => {
-        const query = searchInput.value.trim().toLowerCase();
-        suggestionBox.innerHTML = "";
+          // Real-time suggestions
+          // searchInput.addEventListener("input", () => {
+          //   const query = searchInput.value.trim().toLowerCase();
+          //   suggestionBox.innerHTML = "";
 
-        if (!query) {
-          suggestionBox.style.display = "none";
-          return;
-        }
-        
+          //   if (!query) {
+          //     suggestionBox.style.display = "none";
+          //     return;
+          //   }
 
-        const matches = products.filter((product) =>
-          product.product_name.toLowerCase().includes(query)          
-        );
+          //   const matches = products.filter((product) =>
+          //     product.product_name.toLowerCase().includes(query)
+          //   );
 
-        if (matches.length > 0) {
-          matches.slice(0, 5).forEach((product) => {
-            const li = document.createElement("li");
-            const img = document.createElement("img");
-            img.src = product.image_url || "assets/image/default.png"; // Fallback image
-            img.alt = product.product_name;
-            img.className = "suggestion-image";
-            img.style.width = "50px"; // Set a fixed width for images
-            img.style.height = "50px"; // Set a fixed height for images
-            img.style.objectFit = "cover"; // Ensure images fit well
-            img.style.marginRight = "10px"; // Add some space between image and text
-            img.style.borderRadius = "5px"; // Optional: round the corners of the image
-            img.style.display = "inline-block"; // Ensure image is inline with text
-            li.appendChild(img);
-           
-            li.textContent = product.product_name;
+          //   if (matches.length > 0) {
+          //     matches.slice(0, 5).forEach((product) => {
+          //       const li = document.createElement("li");
+          //       const img = document.createElement("img");
+          //       img.src = product.image_url || "assets/image/default.png"; // Fallback image
+          //       img.alt = product.product_name;
+          //       img.className = "suggestion-image";
+          //       img.style.width = "50px"; // Set a fixed width for images
+          //       img.style.height = "50px"; // Set a fixed height for images
+          //       img.style.objectFit = "cover"; // Ensure images fit well
+          //       img.style.marginRight = "10px"; // Add some space between image and text
+          //       img.style.borderRadius = "5px"; // Optional: round the corners of the image
+          //       img.style.display = "inline-block"; // Ensure image is inline with text
+          //       li.appendChild(img);
 
-            li.onclick = () => {
-              searchInput.value = product.product_name;
+          //       li.textContent = product.product_name;
+
+          //       li.onclick = () => {
+          //         searchInput.value = product.product_name;
+          //         suggestionBox.style.display = "none";
+          //         handleSearch();
+          //       };
+          //       suggestionBox.appendChild(li);
+          //     });
+          //     suggestionBox.style.display = "block";
+          //   } else {
+          //     suggestionBox.style.display = "none";
+          //   }
+          // });
+
+          // Real-time suggestions
+          searchInput.addEventListener("input", () => {
+            const query = searchInput.value.trim().toLowerCase();
+            suggestionBox.innerHTML = "";
+
+            if (!query) {
               suggestionBox.style.display = "none";
-              handleSearch();
-            };
-            suggestionBox.appendChild(li);
-            
+              return;
+            }
+
+            const matches = products.filter((product) =>
+              product.product_name.toLowerCase().includes(query)
+            );
+
+            if (matches.length > 0) {
+              matches.forEach((product) => {
+                // removed slice(0,5) to show all
+                const li = document.createElement("li");
+
+                const img = document.createElement("img");
+                img.src = product.image_url || "assets/image/default.png";
+                img.alt = product.product_name;
+                img.className = "suggestion-image";
+                img.style.width = "50px";
+                img.style.height = "50px";
+                img.style.objectFit = "cover";
+                img.style.marginRight = "10px";
+                img.style.borderRadius = "5px";
+
+                const span = document.createElement("span");
+                span.textContent = product.product_name;
+
+                li.appendChild(img);
+                li.appendChild(span);
+
+                li.onclick = () => {
+                  searchInput.value = product.product_name;
+                  suggestionBox.style.display = "none";
+                  handleSearch();
+                };
+
+                suggestionBox.appendChild(li);
+              });
+              suggestionBox.style.display = "block";
+            } else {
+              suggestionBox.style.display = "none";
+            }
           });
-          suggestionBox.style.display = "block";
 
-        } else {
-          suggestionBox.style.display = "none";
-        }
-      });
+          // Hide suggestions when clicking outside
+          document.addEventListener("click", (e) => {
+            if (!e.target.closest(".search")) {
+              suggestionBox.style.display = "none";
+            }
+          });
 
-      // Hide suggestions when clicking outside
-      document.addEventListener("click", (e) => {
-        if (!e.target.closest(".search")) {
-          suggestionBox.style.display = "none";
-        }
-      });
+          // Search and redirect if exact match found
+          function handleSearch() {
+            const query = searchInput.value.trim();
+            const matchingProduct = products.find(
+              (product) => product.product_name === query
+            );
 
-      // Search and redirect if exact match found
-      function handleSearch() {
-        const query = searchInput.value.trim();
-        const matchingProduct = products.find(
-          (product) => product.product_name === query
-        );
+            if (matchingProduct) {
+              window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
+            } else {
+              alert("No matching product found.");
+            }
+          }
 
-        if (matchingProduct) {
-          window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
-        } else {
-          alert("No matching product found.");
+          // Button click or Enter = search
+          searchButton.addEventListener("click", handleSearch);
+          searchInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              handleSearch();
+            }
+          });
+
+          // Filtering product cards (if present on page)
+          const productCards = document.querySelectorAll(".product");
+          function filterProducts() {
+            const query = searchInput.value.trim().toLowerCase();
+
+            productCards.forEach((product) => {
+              const productName = product.dataset.name.toLowerCase();
+              product.style.display = productName.includes(query)
+                ? "block"
+                : "none";
+            });
+          }
+
+          searchInput.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              filterProducts();
+            }
+          });
+
+          searchButton.addEventListener("click", filterProducts);
+        } catch (error) {
+          console.error("Error fetching products:", error);
         }
       }
 
-      // Button click or Enter = search
-      searchButton.addEventListener("click", handleSearch);
-      searchInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          handleSearch();
+      buildProductSearch();
+    </script>
+    <!-- popup -->
+    <div id="promoPopup" class="popup-overlay">
+      <div class="popup-banner">
+        <button id="closePopup" class="popup-close">&times;</button>
+
+        <div class="banner-content">
+          <div class="banner-text">
+            <div class="offer-box">
+              <span class="offer-title">FIRST ORDER</span>
+              <span class="offer-subtitle">Cash on Delivery</span>
+            </div>
+            <p class="terms">*T&C Apply</p>
+          </div>
+          <div class="banner-image">
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/869/869636.png"
+              alt="Shopping Bags"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style></style>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const overlay = document.getElementById("promoPopup");
+        const closeBtn = document.getElementById("closePopup");
+        let autoTimer;
+
+        function showPopup() {
+          overlay.classList.add("is-open");
+          autoTimer = setTimeout(closePopup, 5000);
         }
-      });
+        function closePopup() {
+          overlay.classList.remove("is-open");
+          if (autoTimer) clearTimeout(autoTimer);
+        }
 
-      // Filtering product cards (if present on page)
-      const productCards = document.querySelectorAll(".product");
-      function filterProducts() {
-        const query = searchInput.value.trim().toLowerCase();
+        const navEntry =
+          (performance.getEntriesByType &&
+            performance.getEntriesByType("navigation")[0]) ||
+          null;
+        let navType = navEntry ? navEntry.type : undefined;
+        if (!navType && performance.navigation) {
+          const map = {
+            0: "navigate",
+            1: "reload",
+            2: "back_forward",
+            255: "prerender",
+          };
+          navType = map[performance.navigation.type] || "navigate";
+        }
+        const isReload = navType === "reload";
+        const hasReferrer = !!document.referrer;
+        let isExternalReferrer = false;
+        if (hasReferrer) {
+          try {
+            isExternalReferrer =
+              new URL(document.referrer).origin !== window.location.origin;
+          } catch (e) {
+            isExternalReferrer = true;
+          }
+        }
+        const shouldShow = isReload || !hasReferrer || isExternalReferrer;
+        if (shouldShow) showPopup();
 
-        productCards.forEach((product) => {
-          const productName = product.dataset.name.toLowerCase();
-          product.style.display = productName.includes(query) ? "block" : "none";
+        closeBtn.addEventListener("click", closePopup);
+        overlay.addEventListener("click", function (e) {
+          if (e.target === overlay) closePopup();
         });
-      }
-
-      searchInput.addEventListener("keydown", function (event) {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          filterProducts();
-        }
       });
-
-      searchButton.addEventListener("click", filterProducts);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    }
-  }
-
-  buildProductSearch();
-</script>
-
+    </script>
   </body>
 </html>
