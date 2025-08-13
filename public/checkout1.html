@@ -855,7 +855,7 @@
             // Validate cart data structure
             const validatedCartData = cartData.map((item, index) => {
               console.log(`🔍 Validating cart item ${index + 1}:`, item);
-
+              const cleanPrice = item.price.toString().replace(/,/g, "").replace(/[^0-9.]/g, "")
               // Ensure all required fields exist
               const validatedItem = {
                 id: item.id || index + 1,
@@ -863,10 +863,10 @@
                 name: item.name || "Unknown Product",
                 mg: item.mg || item.strength || "",
                 quantity: parseInt(item.quantity || 1, 10),
-                price: parseFloat(item.price || 0).toFixed(2),
+                price: parseFloat(cleanPrice).toFixed(2),
                 category_id: item.category_id || item.categoryId || 1,
               };
-
+              
               // Log any missing or converted fields
               Object.keys(validatedItem).forEach((key) => {
                 if (item[key] !== validatedItem[key]) {
@@ -923,18 +923,20 @@
 
         let subtotal = 0;
         cartItemsElement.innerHTML = "";
-
         // Display each cart item
         cartData.forEach((item) => {
+          const cleanPrice = item.price.toString().replace(/,/g, "").replace(/[^0-9.]/g, "");
           const itemPrice = parseFloat(item.price);
-          subtotal += itemPrice;
+          console.log("pricing is ", cleanPrice);
+          subtotal += parseFloat(item.price);
+
 
           const row = `
             <tr>
               <td>${item.name} ${item.mg ? item.mg + "mg" : ""} × ${
             item.quantity
           }</td>
-              <td>$${itemPrice.toFixed(2)}</td>
+              <td>$${item.price}</td>
             </tr>
           `;
           cartItemsElement.innerHTML += row;
