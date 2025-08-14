@@ -169,6 +169,8 @@
         <button onclick="selectPayment('Venmo')"><img src="./assets/image/venmo.png" alt="" style="max-width: 100px"></button>
         <div id="qr-container" style="margin-top: 20px; display: none">
           <img id="qr-code" src="" alt="QR Code" style="max-width: 200px" />
+         
+          <h3 id="qrtext_id" ></h3>
           <br />
           <button onclick="confirmPayment()">OK</button>
           <button onclick="cancelPayment()">Cancel</button>
@@ -185,14 +187,18 @@
       function selectPayment(method) {
         selectedPayment = method;
         const qr = document.getElementById("qr-code");
+        const qr_text_id = document.getElementById("qrtext_id");
         const container = document.getElementById("qr-container");
         container.style.display = "block";
 
         if (method === "Zelle") {
+           qr_text_id.textContent = " ";
           qr.src = "./assets/image/";
         } else if (method === "Bitcoin") {
-          qr.src = "./assets/images/qr-bitcoin.png";
+          qr.src = "./assets/image/bitcoinScanner.jpg";
+          qr_text_id.textContent = "Bitcoin (BTC) Address: bc1q4mgysdwjsxhw3qwzycnzgtvh2xc2akf5xfaras";
         } else if (method === "Venmo") {
+          qr_text_id.textContent = " ";
           qr.src = "./assets/image/venom.jpg";
         }
       }
