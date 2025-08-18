@@ -92,39 +92,215 @@
           <button id="nextSlide" class="carousel__nav carousel__nav--right">
             &#10095;
           </button>
+
+          <!-- Add these new elements -->
+          <div class="zoom-icon" title="Click to zoom">🔍</div>
+          <div class="zoom-indicator">Click image to zoom</div>
         </div>
         <script>
-          function enableImageZoom() {
+          // Enhanced Image carousel functionality with zoom
+          function setupCarousel() {
             const carousel = document.querySelector(".carousel__slide");
+            const prevButton = document.getElementById("prevSlide");
+            const nextButton = document.getElementById("nextSlide");
+            let currentSlide = 0;
 
-            carousel.addEventListener("click", function (e) {
-              if (e.target.tagName === "IMG") {
-                const src = e.target.src;
+            function showSlide(index) {
+              const containers = carousel.querySelectorAll(".zoom-container");
+              if (containers.length === 0) return;
 
-                // Create overlay
-                const overlay = document.createElement("div");
-                overlay.classList.add("image-zoom-overlay");
+              containers.forEach((container, i) => {
+                container.style.display = i === index ? "flex" : "none";
+              });
+            }
 
-                // Create zoomed image
-                const zoomImg = document.createElement("img");
-                zoomImg.src = src;
+            function addHoverZoom(img, container) {
+              img.addEventListener("mouseenter", () => {
+                if (window.innerWidth > 768) {
+                  img.style.transform = "scale(5)";
+                  img.style.cursor = "zoom-in";
+                }
+              });
 
-                // Append image to overlay
-                overlay.appendChild(zoomImg);
-                document.body.appendChild(overlay);
+              img.addEventListener("mouseleave", () => {
+                img.style.transform = "scale(1)";
+              });
 
-                // Close overlay on click
-                overlay.addEventListener("click", () => {
-                  overlay.remove();
+              img.addEventListener("mousemove", (e) => {
+                if (window.innerWidth > 768) {
+                  const rect = container.getBoundingClientRect();
+                  const x = e.clientX - rect.left;
+                  const y = e.clientY - rect.top;
+
+                  const xPercent = (x / rect.width) * 100;
+                  const yPercent = (y / rect.height) * 100;
+
+                  img.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+                }
+              });
+            }
+
+            function openZoom(imageSrc) {
+              const zoomOverlay = document.getElementById("zoomOverlay");
+              const zoomedImage = document.getElementById("zoomedImage");
+
+              zoomedImage.src = imageSrc;
+              zoomOverlay.classList.add("active");
+              document.body.style.overflow = "hidden";
+
+              setupZoomInteraction(zoomedImage);
+            }
+
+            function setupZoomInteraction(img) {
+              let scale = 1;
+              let isDragging = false;
+              let startX = 0;
+              let startY = 0;
+              let translateX = 0;
+              let translateY = 0;
+
+              img.style.transform = "scale(3) translate(0, 0)";
+              scale = 1;
+              translateX = 0;
+              translateY = 0;
+
+              const handleWheel = (e) => {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                scale += delta;
+                scale = Math.min(Math.max(0.5, scale), 3);
+
+                img.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
+              };
+
+              const handleClick = (e) => {
+                if (!isDragging) {
+                  scale = scale > 1 ? 1 : 2;
+                  translateX = 0;
+                  translateY = 0;
+                  img.style.transform = `scale(${scale}) translate(0, 0)`;
+                }
+              };
+
+              const handleMouseDown = (e) => {
+                if (scale > 1) {
+                  isDragging = true;
+                  startX = e.clientX - translateX;
+                  startY = e.clientY - translateY;
+                  img.style.cursor = "grabbing";
+                }
+              };
+
+              const handleMouseMove = (e) => {
+                if (isDragging && scale > 1) {
+                  translateX = e.clientX - startX;
+                  translateY = e.clientY - startY;
+                  img.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
+                }
+              };
+
+              const handleMouseUp = () => {
+                isDragging = false;
+                img.style.cursor = scale > 1 ? "grab" : "zoom-in";
+              };
+
+              img.addEventListener("wheel", handleWheel);
+              img.addEventListener("click", handleClick);
+              img.addEventListener("mousedown", handleMouseDown);
+              document.addEventListener("mousemove", handleMouseMove);
+              document.addEventListener("mouseup", handleMouseUp);
+            }
+
+            function closeZoom() {
+              const zoomOverlay = document.getElementById("zoomOverlay");
+              zoomOverlay.classList.remove("active");
+              document.body.style.overflow = "auto";
+            }
+
+            function initCarousel() {
+              const images = carousel.querySelectorAll("img");
+              if (images.length === 0) return;
+
+              // Clear carousel and rebuild with zoom containers
+              carousel.innerHTML = "";
+
+              Array.from(images).forEach((img, index) => {
+                const zoomContainer = document.createElement("div");
+                zoomContainer.className = "zoom-container";
+                zoomContainer.style.display = index === 0 ? "flex" : "none";
+
+                const newImg = img.cloneNode(true);
+                newImg.addEventListener("click", () => openZoom(newImg.src));
+
+                addHoverZoom(newImg, zoomContainer);
+
+                zoomContainer.appendChild(newImg);
+                carousel.appendChild(zoomContainer);
+              });
+
+              showSlide(currentSlide);
+
+              // Navigation events
+              prevButton.addEventListener("click", () => {
+                const containers = carousel.querySelectorAll(".zoom-container");
+                currentSlide =
+                  (currentSlide - 1 + containers.length) % containers.length;
+                showSlide(currentSlide);
+              });
+
+              nextButton.addEventListener("click", () => {
+                const containers = carousel.querySelectorAll(".zoom-container");
+                currentSlide = (currentSlide + 1) % containers.length;
+                showSlide(currentSlide);
+              });
+
+              // Zoom overlay events
+              document
+                .getElementById("zoomClose")
+                .addEventListener("click", closeZoom);
+              document
+                .getElementById("zoomOverlay")
+                .addEventListener("click", (e) => {
+                  if (e.target.id === "zoomOverlay") closeZoom();
                 });
-              }
-            });
-          }
 
-          // Initialize zoom after DOM loaded
-          document.addEventListener("DOMContentLoaded", () => {
-            enableImageZoom();
-          });
+              // Keyboard navigation
+              document.addEventListener("keydown", (e) => {
+                const zoomOverlay = document.getElementById("zoomOverlay");
+                if (zoomOverlay.classList.contains("active")) {
+                  if (e.key === "Escape") closeZoom();
+                }
+                if (e.key === "ArrowLeft") {
+                  const containers =
+                    carousel.querySelectorAll(".zoom-container");
+                  currentSlide =
+                    (currentSlide - 1 + containers.length) % containers.length;
+                  showSlide(currentSlide);
+                }
+                if (e.key === "ArrowRight") {
+                  const containers =
+                    carousel.querySelectorAll(".zoom-container");
+                  currentSlide = (currentSlide + 1) % containers.length;
+                  showSlide(currentSlide);
+                }
+              });
+            }
+
+            // Observer to initialize carousel after images are loaded
+            const observer = new MutationObserver((mutations) => {
+              mutations.forEach((mutation) => {
+                if (
+                  mutation.type === "childList" &&
+                  carousel.querySelectorAll("img").length > 0
+                ) {
+                  initCarousel();
+                  observer.disconnect();
+                }
+              });
+            });
+
+            observer.observe(carousel, { childList: true });
+          }
         </script>
 
         <div class="tabs-wrapper">
@@ -859,58 +1035,58 @@
       }
 
       // Image carousel functionality
-      function setupCarousel() {
-        const carousel = document.querySelector(".carousel__slide");
-        const prevButton = document.getElementById("prevSlide");
-        const nextButton = document.getElementById("nextSlide");
-        let currentSlide = 0;
+      // function setupCarousel() {
+      //   const carousel = document.querySelector(".carousel__slide");
+      //   const prevButton = document.getElementById("prevSlide");
+      //   const nextButton = document.getElementById("nextSlide");
+      //   let currentSlide = 0;
 
-        function showSlide(index) {
-          const slides = carousel.querySelectorAll("img");
-          if (slides.length === 0) return;
+      //   function showSlide(index) {
+      //     const slides = carousel.querySelectorAll("img");
+      //     if (slides.length === 0) return;
 
-          // Hide all slides
-          slides.forEach((slide) => {
-            slide.style.display = "none";
-          });
+      //     // Hide all slides
+      //     slides.forEach((slide) => {
+      //       slide.style.display = "none";
+      //     });
 
-          // Show the current slide
-          slides[index].style.display = "block";
-        }
+      //     // Show the current slide
+      //     slides[index].style.display = "block";
+      //   }
 
-        // Initialize carousel
-        function initCarousel() {
-          const slides = carousel.querySelectorAll("img");
-          if (slides.length === 0) return;
+      //   // Initialize carousel
+      //   function initCarousel() {
+      //     const slides = carousel.querySelectorAll("img");
+      //     if (slides.length === 0) return;
 
-          showSlide(currentSlide);
+      //     showSlide(currentSlide);
 
-          prevButton.addEventListener("click", () => {
-            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-            showSlide(currentSlide);
-          });
+      //     prevButton.addEventListener("click", () => {
+      //       currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+      //       showSlide(currentSlide);
+      //     });
 
-          nextButton.addEventListener("click", () => {
-            currentSlide = (currentSlide + 1) % slides.length;
-            showSlide(currentSlide);
-          });
-        }
+      //     nextButton.addEventListener("click", () => {
+      //       currentSlide = (currentSlide + 1) % slides.length;
+      //       showSlide(currentSlide);
+      //     });
+      //   }
 
-        // Run after images are loaded
-        const observer = new MutationObserver((mutations) => {
-          mutations.forEach((mutation) => {
-            if (
-              mutation.type === "childList" &&
-              carousel.querySelectorAll("img").length > 0
-            ) {
-              initCarousel();
-              observer.disconnect();
-            }
-          });
-        });
+      //   // Run after images are loaded
+      //   const observer = new MutationObserver((mutations) => {
+      //     mutations.forEach((mutation) => {
+      //       if (
+      //         mutation.type === "childList" &&
+      //         carousel.querySelectorAll("img").length > 0
+      //       ) {
+      //         initCarousel();
+      //         observer.disconnect();
+      //       }
+      //     });
+      //   });
 
-        observer.observe(carousel, { childList: true });
-      }
+      //   observer.observe(carousel, { childList: true });
+      // }
 
       // Initialize everything when the DOM is loaded
       document.addEventListener("DOMContentLoaded", function () {
@@ -921,5 +1097,10 @@
         // setupCustomOrderModal();
       });
     </script>
+    <!-- Add this just before </body> -->
+    <div class="zoom-overlay" id="zoomOverlay">
+      <div class="zoom-close" id="zoomClose">&times;</div>
+      <img id="zoomedImage" src="" alt="Zoomed Image" />
+    </div>
   </body>
 </html>
