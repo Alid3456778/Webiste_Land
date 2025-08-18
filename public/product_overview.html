@@ -878,48 +878,6 @@
         observer.observe(carousel, { childList: true });
       }
 
-      // Custom order modal functionality
-      // function setupCustomOrderModal() {
-      //   const showButton = document.getElementById("showButton");
-      //   const modal = document.getElementById("toggleBox");
-      //   const overlay = document.getElementById("overlay");
-      //   const submitButton = document.getElementById("submit-selection");
-
-      //   showButton.addEventListener("click", () => {
-      //     modal.style.display = "block";
-      //     overlay.style.display = "block";
-      //   });
-
-      //   overlay.addEventListener("click", () => {
-      //     modal.style.display = "none";
-      //     overlay.style.display = "none";
-      //   });
-
-      //   submitButton.addEventListener("click", () => {
-      //     const mgSelect = document.getElementById("mg-select");
-      //     const quantityInput = document.getElementById("quantity-select");
-
-      //     const selectedMg = mgSelect.value;
-      //     const selectedQuantity = quantityInput.value;
-
-      //     if (
-      //       !selectedQuantity ||
-      //       isNaN(selectedQuantity) ||
-      //       selectedQuantity <= 0
-      //     ) {
-      //       alert("Please enter a valid quantity");
-      //       return;
-      //     }
-
-      //     // Handle custom order processing here
-      //     alert(
-      //       `Custom order placed: ${selectedMg}MG, Quantity: ${selectedQuantity}`
-      //     );
-
-      //     modal.style.display = "none";
-      //     overlay.style.display = "none";
-      //   });
-      // }
 
       // Initialize everything when the DOM is loaded
       document.addEventListener("DOMContentLoaded", function () {

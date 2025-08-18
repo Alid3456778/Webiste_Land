@@ -599,20 +599,20 @@
         <div class="footer-section resources">
           <h3>Resources</h3>
           <ul>
-            <li><a href="#">Shipping</a></li>
-            <li><a href="#">Returns & Refunds</a></li>
-            <li><a href="#">Payment Methods</a></li>
-            <li><a href="#">FAQs</a></li>
+            <li><a href="info.html?section=shipping">Shipping</a></li>
+            <li><a href="info.html?section=returns">Returns & Refunds</a></li>
+            <li><a href="info.html?section=payment">Payment Methods</a></li>
+            <li><a href="info.html?section=faqs">FAQs</a></li>
           </ul>
         </div>
         <div class="footer-section legal">
           <h3>Legal</h3>
           <ul>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Contact Us</a></li>
-            <li><a href="#">Terms & Conditions</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Cancellation Policy</a></li>
+            <li><a href="info.html?section=about">About Us</a></li>
+            <li><a href="info.html?section=contact">Contact Us</a></li>
+            <li><a href="info.html?section=terms">Terms & Conditions</a></li>
+            <li><a href="info.html?section=privacy">Privacy Policy</a></li>
+            <li><a href="info.html?section=cancellation">Cancellation Policy</a></li>
           </ul>
         </div>
         <div class="footer-section support">
@@ -671,49 +671,7 @@
           const searchButton = document.getElementById("search-button");
           const suggestionBox = document.getElementById("suggestions");
 
-          // Real-time suggestions
-          // searchInput.addEventListener("input", () => {
-          //   const query = searchInput.value.trim().toLowerCase();
-          //   suggestionBox.innerHTML = "";
-
-          //   if (!query) {
-          //     suggestionBox.style.display = "none";
-          //     return;
-          //   }
-
-          //   const matches = products.filter((product) =>
-          //     product.product_name.toLowerCase().includes(query)
-          //   );
-
-          //   if (matches.length > 0) {
-          //     matches.slice(0, 5).forEach((product) => {
-          //       const li = document.createElement("li");
-          //       const img = document.createElement("img");
-          //       img.src = product.image_url || "assets/image/default.png"; // Fallback image
-          //       img.alt = product.product_name;
-          //       img.className = "suggestion-image";
-          //       img.style.width = "50px"; // Set a fixed width for images
-          //       img.style.height = "50px"; // Set a fixed height for images
-          //       img.style.objectFit = "cover"; // Ensure images fit well
-          //       img.style.marginRight = "10px"; // Add some space between image and text
-          //       img.style.borderRadius = "5px"; // Optional: round the corners of the image
-          //       img.style.display = "inline-block"; // Ensure image is inline with text
-          //       li.appendChild(img);
-
-          //       li.textContent = product.product_name;
-
-          //       li.onclick = () => {
-          //         searchInput.value = product.product_name;
-          //         suggestionBox.style.display = "none";
-          //         handleSearch();
-          //       };
-          //       suggestionBox.appendChild(li);
-          //     });
-          //     suggestionBox.style.display = "block";
-          //   } else {
-          //     suggestionBox.style.display = "none";
-          //   }
-          // });
+         
 
           // Real-time suggestions
           searchInput.addEventListener("input", () => {
