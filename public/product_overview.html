@@ -17,42 +17,42 @@
         /></a>
       </div>
       <div class="header__search-cart header__right">
-          <div class="search">
-            <input
-              type="text"
-              placeholder="Search products..."
-              class="search__input"
-              id="search-input"
-              autocomplete="off"
-            />
-            <ul id="suggestions" class="search-suggestions"></ul>
+        <div class="search">
+          <input
+            type="text"
+            placeholder="Search products..."
+            class="search__input"
+            id="search-input"
+            autocomplete="off"
+          />
+          <ul id="suggestions" class="search-suggestions"></ul>
 
-            <button class="btn btn--search" id="search-button">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                width="20"
-                height="20"
-                fill="currentColor"
-              >
-                <path
-                  d="M10 2a8 8 0 015.292 13.708l4.5 4.5a1 1 0 01-1.415 1.414l-4.5-4.5A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"
-                />
-              </svg>
-            </button>
-          </div>
-
-          <a href="cart" id="cart-a-section">
-            <button class="btn btn--icon">
-              <img
-                src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
-                alt="Cart"
-                class="cart-icon"
+          <button class="btn btn--search" id="search-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              fill="currentColor"
+            >
+              <path
+                d="M10 2a8 8 0 015.292 13.708l4.5 4.5a1 1 0 01-1.415 1.414l-4.5-4.5A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"
               />
-            </button>
-            <span id="cart-count" class="cart-count">0</span>
-          </a>
+            </svg>
+          </button>
         </div>
+
+        <a href="cart" id="cart-a-section">
+          <button class="btn btn--icon">
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png"
+              alt="Cart"
+              class="cart-icon"
+            />
+          </button>
+          <span id="cart-count" class="cart-count">0</span>
+        </a>
+      </div>
     </header>
     <script>
       document.addEventListener("DOMContentLoaded", async () => {
@@ -93,6 +93,39 @@
             &#10095;
           </button>
         </div>
+        <script>
+          function enableImageZoom() {
+            const carousel = document.querySelector(".carousel__slide");
+
+            carousel.addEventListener("click", function (e) {
+              if (e.target.tagName === "IMG") {
+                const src = e.target.src;
+
+                // Create overlay
+                const overlay = document.createElement("div");
+                overlay.classList.add("image-zoom-overlay");
+
+                // Create zoomed image
+                const zoomImg = document.createElement("img");
+                zoomImg.src = src;
+
+                // Append image to overlay
+                overlay.appendChild(zoomImg);
+                document.body.appendChild(overlay);
+
+                // Close overlay on click
+                overlay.addEventListener("click", () => {
+                  overlay.remove();
+                });
+              }
+            });
+          }
+
+          // Initialize zoom after DOM loaded
+          document.addEventListener("DOMContentLoaded", () => {
+            enableImageZoom();
+          });
+        </script>
 
         <div class="tabs-wrapper">
           <div class="tabs">
@@ -197,7 +230,7 @@
         </div>
 
         <!-- TABS -->
-       
+
         <h2 class="product-info__subtitle">
           Select The Strength & Quantity <span>💊</span>
         </h2>
@@ -254,7 +287,6 @@
             <button id="submit-selection">Submit</button>
           </div>
         </div>
-        
 
         <!-- FAQ ACCORDION -->
         <div class="faq">
@@ -339,7 +371,7 @@
         </div>
       </div>
     </footer>
-    
+
     <script>
       let name_dabba = "";
       let imgg = "";
@@ -377,100 +409,102 @@
 
       // Build search options for the datalist
       async function buildProductSearch() {
-    try {
-      const response = await fetch(`/products`);
-      const products = await response.json();
+        try {
+          const response = await fetch(`/products`);
+          const products = await response.json();
 
-      const searchInput = document.getElementById("search-input");
-      const searchButton = document.getElementById("search-button");
-      const suggestionBox = document.getElementById("suggestions");
+          const searchInput = document.getElementById("search-input");
+          const searchButton = document.getElementById("search-button");
+          const suggestionBox = document.getElementById("suggestions");
 
-      // Real-time suggestions
-      searchInput.addEventListener("input", () => {
-        const query = searchInput.value.trim().toLowerCase();
-        suggestionBox.innerHTML = "";
+          // Real-time suggestions
+          searchInput.addEventListener("input", () => {
+            const query = searchInput.value.trim().toLowerCase();
+            suggestionBox.innerHTML = "";
 
-        if (!query) {
-          suggestionBox.style.display = "none";
-          return;
-        }
-
-        const matches = products.filter((product) =>
-          product.product_name.toLowerCase().includes(query)
-        );
-
-        if (matches.length > 0) {
-          matches.slice(0, 5).forEach((product) => {
-            const li = document.createElement("li");
-            li.textContent = product.product_name;
-            li.onclick = () => {
-              searchInput.value = product.product_name;
+            if (!query) {
               suggestionBox.style.display = "none";
-              handleSearch();
-            };
-            suggestionBox.appendChild(li);
+              return;
+            }
+
+            const matches = products.filter((product) =>
+              product.product_name.toLowerCase().includes(query)
+            );
+
+            if (matches.length > 0) {
+              matches.slice(0, 5).forEach((product) => {
+                const li = document.createElement("li");
+                li.textContent = product.product_name;
+                li.onclick = () => {
+                  searchInput.value = product.product_name;
+                  suggestionBox.style.display = "none";
+                  handleSearch();
+                };
+                suggestionBox.appendChild(li);
+              });
+              suggestionBox.style.display = "block";
+            } else {
+              suggestionBox.style.display = "none";
+            }
           });
-          suggestionBox.style.display = "block";
-        } else {
-          suggestionBox.style.display = "none";
-        }
-      });
 
-      // Hide suggestions when clicking outside
-      document.addEventListener("click", (e) => {
-        if (!e.target.closest(".search")) {
-          suggestionBox.style.display = "none";
-        }
-      });
+          // Hide suggestions when clicking outside
+          document.addEventListener("click", (e) => {
+            if (!e.target.closest(".search")) {
+              suggestionBox.style.display = "none";
+            }
+          });
 
-      // Search and redirect if exact match found
-      function handleSearch() {
-        const query = searchInput.value.trim();
-        const matchingProduct = products.find(
-          (product) => product.product_name === query
-        );
+          // Search and redirect if exact match found
+          function handleSearch() {
+            const query = searchInput.value.trim();
+            const matchingProduct = products.find(
+              (product) => product.product_name === query
+            );
 
-        if (matchingProduct) {
-          window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
-        } else {
-          alert("No matching product found.");
+            if (matchingProduct) {
+              window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
+            } else {
+              alert("No matching product found.");
+            }
+          }
+
+          // Button click or Enter = search
+          searchButton.addEventListener("click", handleSearch);
+          searchInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              handleSearch();
+            }
+          });
+
+          // Filtering product cards (if present on page)
+          const productCards = document.querySelectorAll(".product");
+          function filterProducts() {
+            const query = searchInput.value.trim().toLowerCase();
+
+            productCards.forEach((product) => {
+              const productName = product.dataset.name.toLowerCase();
+              product.style.display = productName.includes(query)
+                ? "block"
+                : "none";
+            });
+          }
+
+          searchInput.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              filterProducts();
+            }
+          });
+
+          searchButton.addEventListener("click", filterProducts);
+        } catch (error) {
+          console.error("Error fetching products:", error);
         }
       }
 
-      // Button click or Enter = search
-      searchButton.addEventListener("click", handleSearch);
-      searchInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          handleSearch();
-        }
-      });
-
-      // Filtering product cards (if present on page)
-      const productCards = document.querySelectorAll(".product");
-      function filterProducts() {
-        const query = searchInput.value.trim().toLowerCase();
-
-        productCards.forEach((product) => {
-          const productName = product.dataset.name.toLowerCase();
-          product.style.display = productName.includes(query) ? "block" : "none";
-        });
-      }
-
-      searchInput.addEventListener("keydown", function (event) {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          filterProducts();
-        }
-      });
-
-      searchButton.addEventListener("click", filterProducts);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    }
-  }
-
-  buildProductSearch();
+      buildProductSearch();
       // Update the UI with product details and variants
       function updateProductUI(product, variants) {
         name_dabba = product.product_name;
@@ -718,7 +752,7 @@
         document.querySelectorAll(".btn--add").forEach((button) => {
           button.addEventListener("click", function () {
             const variantId = this.getAttribute("data-variant-id");
-           
+
             const quantity = this.getAttribute("data-quantity") || 1;
             const mg = this.getAttribute("data-mg") || "default_mg_value";
             const price =
@@ -877,7 +911,6 @@
 
         observer.observe(carousel, { childList: true });
       }
-
 
       // Initialize everything when the DOM is loaded
       document.addEventListener("DOMContentLoaded", function () {
