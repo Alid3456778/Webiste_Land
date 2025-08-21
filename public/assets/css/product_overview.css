@@ -1030,6 +1030,9 @@ margin-left: 5px;
 
 /* Enhanced Zoom Styles */
 .carousel__slide {
+  width: 80%;
+  height: 100%;
+  /* border: #028c7e solid; */
   position: relative;
   overflow: hidden;
   cursor: crosshair;
