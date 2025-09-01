@@ -228,15 +228,51 @@ app.post("/api/checkout", async (req, res) => {
       to: email, // Recipient's email
       subject: "Order Confirmation - Mcland Pharma",
       html: `
-                <h1>Thank you for your order, ${firstName} ${lastName}!</h1>
-                <p>Your order has been successfully placed. Here are the details:</p>
+                <h1>✅ Thank you for your order, ${firstName} ${lastName}!</h1>
+                <p>Your order has been successfully placed. 🎉 </p>
+                <br>
+                <h2>📒 Customer Details</h2>
                 <ul>
+                    <li><strong>Name:</strong> ${firstName} ${lastName}</li>
                     <li><strong>Phone:</strong> ${phone}</li>
                     <li><strong>Email:</strong> ${email}</li>
-                    <li><strong>Company Name:</strong> ${companyName}</li>
                     <li><strong>Address:</strong> ${billingStreetAddress}, ${apartment}, ${billingCity}, ${billingState}, ${billingZip}, ${country}</li>
+                    <li><strong>Company Name:</strong> ${companyName}</li>
                 </ul>
-                <p>We will contact you shortly with further details.</p>
+                <br width="2px" hight="10px" color="black" >
+                <h2>🛒 Order Summary</h2>
+                <table border="1" cellpadding="5" cellspacing="0">
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Mg</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                    </tr>
+                    ${cartItems
+                      .map(
+                        (item) => `
+                        <tr>
+                            <td>${item.name}</td>
+                            <td>${item.mg}</td>
+                            <td>${item.quantity}</td>
+                            <td>$${parseFloat(item.price).toFixed(2)}</td>
+                        </tr>
+                    `
+                      )
+                      .join("")}
+                </table>
+                <br>
+
+                
+                <p><strong>Shipping Cost:</strong> $${parseFloat(shippingCost).toFixed(2)}</p>
+                <p><strong>Total Cost:</strong> $${parseFloat(totalCost).toFixed(2)}</p>
+                <br><br>
+                <h2>📞 Contact Us</h2>
+                <p>If you have any questions, feel free to reply to this email or call us at +1 209 593 7171.</p>
+                <p>Or WhatsApp us at +91 887 920 1044 WhatsApp Link: https://t.ly/cMdMT</p>
+                <p>📩 E-mil: customerinfo2024@gmail.com</p>
+                <br>
+                <p>💫 We appreciate your business!</p>
             `,
     };
 

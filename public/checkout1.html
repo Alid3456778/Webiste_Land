@@ -158,11 +158,24 @@
         opacity: 0.7;
       }
     </style> -->
+  <style>
+    .X_button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+    }
+  </style>
+ 
   </head>
   <body>
     <!-- Payment Modal -->
     <div id="paymentModal" class="modal1">
       <div class="modal-content1">
+        <button onclick="cancelPayment()" class="X_button">X</button>
         <h2>Select Payment Method</h2>
         <button onclick="selectPayment('Zelle')"><img src="./assets/image/zelle.png" alt="" style="max-width: 100px"></button>
         <button onclick="selectPayment('Bitcoin')"><img src="./assets/image/bitcoin.png" alt="" style="max-width: 100px"></button>
