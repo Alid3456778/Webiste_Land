@@ -826,7 +826,65 @@ async function isVPN(ip) {
   }
 }
 
-// Middleware to block VPNs
+// New function to check IP geolocation and VPN status
+async function checkIPAccess(ip) {
+  if (WHITELIST_IPS.includes(ip)) return { allowed: true, reason: "whitelisted" };
+  if (isPrivateIP(ip)) return { allowed: true, reason: "private_ip" };
+
+  // Check cache first
+  const cacheKey = `access_${ip}`;
+  if (ipCache.has(cacheKey)) {
+    const cached = ipCache.get(cacheKey);
+    if (Date.now() - cached.timestamp < CACHE_TTL) {
+      return { allowed: cached.allowed, reason: cached.reason };
+    }
+  }
+
+  try {
+    // Get comprehensive IP information including country and VPN detection
+    const res = await fetch(`http://ip-api.com/json/${ip}?fields=country,countryCode,proxy,hosting,status,message`);
+    const data = await res.json();
+
+    if (data.status !== "success") {
+      console.warn(`IP-API error: ${data.message}`);
+      // Allow access on API failure to avoid blocking legitimate users
+      return { allowed: true, reason: "api_error" };
+    }
+
+    const isFromIndia = data.countryCode === "IN";
+    const isVPNOrProxy = data.proxy === true || data.hosting === true;
+
+    let allowed = false;
+    let reason = "";
+
+    if (isFromIndia) {
+      // Indian users: BLOCKED regardless of VPN status
+      allowed = false;
+      reason = isVPNOrProxy ? "india_with_vpn_blocked" : "india_direct_blocked";
+    } else {
+      // Non-Indian users: ALLOWED regardless of VPN status
+      allowed = true;
+      reason = isVPNOrProxy ? "foreign_with_vpn" : "foreign_direct";
+    }
+
+    // Cache the result
+    ipCache.set(cacheKey, { 
+      allowed, 
+      reason, 
+      country: data.country,
+      timestamp: Date.now() 
+    });
+
+    return { allowed, reason, country: data.country };
+
+  } catch (err) {
+    console.error("Error checking IP access:", err.message);
+    // Allow access on error to avoid blocking legitimate users
+    return { allowed: true, reason: "check_error" };
+  }
+}
+
+// Updated middleware with geolocation-based VPN blocking
 app.use(async (req, res, next) => {
   // Get client IP (handle Nginx & direct)
   const ip =
@@ -836,14 +894,22 @@ app.use(async (req, res, next) => {
 
   console.log("Client IP detected:", ip);
 
-  if (await isVPN(ip)) {
-    console.log(`❌ Blocked VPN/Proxy IP: ${ip}`);
-    return res.status(403).send("Access denied: VPN/Proxy not allowed");
+  const accessCheck = await checkIPAccess(ip);
+
+  if (!accessCheck.allowed) {
+    console.log(`❌ Access denied for IP: ${ip} | Reason: ${accessCheck.reason} | Country: ${accessCheck.country || 'Unknown'}`);
+    return res.status(403).json({
+      error: "Access denied",
+      message: "Access from India is not permitted for this service.",
+      reason: "india_blocked"
+    });
   }
 
+  // Log successful access
+  console.log(`✅ Access granted for IP: ${ip} | Reason: ${accessCheck.reason} | Country: ${accessCheck.country || 'Unknown'}`);
+  
   next();
 });
-
 
 
 
