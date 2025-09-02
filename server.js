@@ -781,135 +781,136 @@ app.get("/api/customers/:id", async (req, res) => {
   }
 });
 
-// Whitelisted IPs (always allowed)
-const WHITELIST_IPS = ["123.45.67.89"];
 
-// Function to check if IP is private/local
-function isPrivateIP(ip) {
-  return (
-    ip.startsWith("10.") ||
-    ip.startsWith("192.168.") ||
-    ip.startsWith("172.") ||
-    ip === "127.0.0.1" ||
-    ip === "::1"
-  );
-}
+// // Whitelisted IPs (always allowed)
+// const WHITELIST_IPS = ["123.45.67.89"];
 
-// Simple in-memory cache
-const ipCache = new Map();
-const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+// // Function to check if IP is private/local
+// function isPrivateIP(ip) {
+//   return (
+//     ip.startsWith("10.") ||
+//     ip.startsWith("192.168.") ||
+//     ip.startsWith("172.") ||
+//     ip === "127.0.0.1" ||
+//     ip === "::1"
+//   );
+// }
 
-async function isVPN(ip) {
-  if (WHITELIST_IPS.includes(ip)) return false;
-  if (isPrivateIP(ip)) return false;
+// // Simple in-memory cache
+// const ipCache = new Map();
+// const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
-  if (ipCache.has(ip)) {
-    const cached = ipCache.get(ip);
-    if (Date.now() - cached.timestamp < CACHE_TTL) return cached.isVPN;
-  }
+// async function isVPN(ip) {
+//   if (WHITELIST_IPS.includes(ip)) return false;
+//   if (isPrivateIP(ip)) return false;
 
-  try {
-    const res = await fetch(`http://ip-api.com/json/${ip}?fields=proxy,hosting,status,message`);
-    const data = await res.json();
+//   if (ipCache.has(ip)) {
+//     const cached = ipCache.get(ip);
+//     if (Date.now() - cached.timestamp < CACHE_TTL) return cached.isVPN;
+//   }
 
-    if (data.status !== "success") {
-      console.warn(`IP-API error: ${data.message}`);
-      return false;
-    }
+//   try {
+//     const res = await fetch(`http://ip-api.com/json/${ip}?fields=proxy,hosting,status,message`);
+//     const data = await res.json();
 
-    const vpnDetected = data.proxy === true || data.hosting === true;
-    ipCache.set(ip, { isVPN: vpnDetected, timestamp: Date.now() });
-    return vpnDetected;
-  } catch (err) {
-    console.error("Error checking VPN:", err.message);
-    return false;
-  }
-}
+//     if (data.status !== "success") {
+//       console.warn(`IP-API error: ${data.message}`);
+//       return false;
+//     }
 
-// New function to check IP geolocation and VPN status
-async function checkIPAccess(ip) {
-  if (WHITELIST_IPS.includes(ip)) return { allowed: true, reason: "whitelisted" };
-  if (isPrivateIP(ip)) return { allowed: true, reason: "private_ip" };
+//     const vpnDetected = data.proxy === true || data.hosting === true;
+//     ipCache.set(ip, { isVPN: vpnDetected, timestamp: Date.now() });
+//     return vpnDetected;
+//   } catch (err) {
+//     console.error("Error checking VPN:", err.message);
+//     return false;
+//   }
+// }
 
-  // Check cache first
-  const cacheKey = `access_${ip}`;
-  if (ipCache.has(cacheKey)) {
-    const cached = ipCache.get(cacheKey);
-    if (Date.now() - cached.timestamp < CACHE_TTL) {
-      return { allowed: cached.allowed, reason: cached.reason };
-    }
-  }
+// // New function to check IP geolocation and VPN status
+// async function checkIPAccess(ip) {
+//   if (WHITELIST_IPS.includes(ip)) return { allowed: true, reason: "whitelisted" };
+//   if (isPrivateIP(ip)) return { allowed: true, reason: "private_ip" };
 
-  try {
-    // Get comprehensive IP information including country and VPN detection
-    const res = await fetch(`http://ip-api.com/json/${ip}?fields=country,countryCode,proxy,hosting,status,message`);
-    const data = await res.json();
+//   // Check cache first
+//   const cacheKey = `access_${ip}`;
+//   if (ipCache.has(cacheKey)) {
+//     const cached = ipCache.get(cacheKey);
+//     if (Date.now() - cached.timestamp < CACHE_TTL) {
+//       return { allowed: cached.allowed, reason: cached.reason };
+//     }
+//   }
 
-    if (data.status !== "success") {
-      console.warn(`IP-API error: ${data.message}`);
-      // Allow access on API failure to avoid blocking legitimate users
-      return { allowed: true, reason: "api_error" };
-    }
+//   try {
+//     // Get comprehensive IP information including country and VPN detection
+//     const res = await fetch(`http://ip-api.com/json/${ip}?fields=country,countryCode,proxy,hosting,status,message`);
+//     const data = await res.json();
 
-    const isFromIndia = data.countryCode === "IN";
-    const isVPNOrProxy = data.proxy === true || data.hosting === true;
+//     if (data.status !== "success") {
+//       console.warn(`IP-API error: ${data.message}`);
+//       // Allow access on API failure to avoid blocking legitimate users
+//       return { allowed: true, reason: "api_error" };
+//     }
 
-    let allowed = false;
-    let reason = "";
+//     const isFromIndia = data.countryCode === "IN";
+//     const isVPNOrProxy = data.proxy === true || data.hosting === true;
 
-    if (isFromIndia) {
-      // Indian users: BLOCKED regardless of VPN status
-      allowed = false;
-      reason = isVPNOrProxy ? "india_with_vpn_blocked" : "india_direct_blocked";
-    } else {
-      // Non-Indian users: ALLOWED regardless of VPN status
-      allowed = true;
-      reason = isVPNOrProxy ? "foreign_with_vpn" : "foreign_direct";
-    }
+//     let allowed = false;
+//     let reason = "";
 
-    // Cache the result
-    ipCache.set(cacheKey, { 
-      allowed, 
-      reason, 
-      country: data.country,
-      timestamp: Date.now() 
-    });
+//     if (isFromIndia) {
+//       // Indian users: BLOCKED regardless of VPN status
+//       allowed = false;
+//       reason = isVPNOrProxy ? "india_with_vpn_blocked" : "india_direct_blocked";
+//     } else {
+//       // Non-Indian users: ALLOWED regardless of VPN status
+//       allowed = true;
+//       reason = isVPNOrProxy ? "foreign_with_vpn" : "foreign_direct";
+//     }
 
-    return { allowed, reason, country: data.country };
+//     // Cache the result
+//     ipCache.set(cacheKey, { 
+//       allowed, 
+//       reason, 
+//       country: data.country,
+//       timestamp: Date.now() 
+//     });
 
-  } catch (err) {
-    console.error("Error checking IP access:", err.message);
-    // Allow access on error to avoid blocking legitimate users
-    return { allowed: true, reason: "check_error" };
-  }
-}
+//     return { allowed, reason, country: data.country };
 
-// Updated middleware with geolocation-based VPN blocking
-app.use(async (req, res, next) => {
-  // Get client IP (handle Nginx & direct)
-  const ip =
-    req.headers["x-real-ip"] ||
-    req.headers["x-forwarded-for"]?.split(",")[0].trim() ||
-    req.socket.remoteAddress;
+//   } catch (err) {
+//     console.error("Error checking IP access:", err.message);
+//     // Allow access on error to avoid blocking legitimate users
+//     return { allowed: true, reason: "check_error" };
+//   }
+// }
 
-  console.log("Client IP detected:", ip);
+// // Updated middleware with geolocation-based VPN blocking
+// app.use(async (req, res, next) => {
+//   // Get client IP (handle Nginx & direct)
+//   const ip =
+//     req.headers["x-real-ip"] ||
+//     req.headers["x-forwarded-for"]?.split(",")[0].trim() ||
+//     req.socket.remoteAddress;
 
-  const accessCheck = await checkIPAccess(ip);
+//   console.log("Client IP detected:", ip);
 
-  if (!accessCheck.allowed) {
-    console.log(`❌ Access denied for IP: ${ip} | Reason: ${accessCheck.reason} | Country: ${accessCheck.country || 'Unknown'}`);
-    return res.status(403).json({
-      error: "Access denied",
-      message: "Access from India is not permitted for this service.",
-      reason: "india_blocked"
-    });
-  }
+//   const accessCheck = await checkIPAccess(ip);
 
-  // Log successful access
-  console.log(`✅ Access granted for IP: ${ip} | Reason: ${accessCheck.reason} | Country: ${accessCheck.country || 'Unknown'}`);
+//   if (!accessCheck.allowed) {
+//     console.log(`❌ Access denied for IP: ${ip} | Reason: ${accessCheck.reason} | Country: ${accessCheck.country || 'Unknown'}`);
+//     return res.status(403).json({
+//       error: "Access denied",
+//       message: "Access from India is not permitted for this service.",
+//       reason: "india_blocked"
+//     });
+//   }
+
+//   // Log successful access
+//   console.log(`✅ Access granted for IP: ${ip} | Reason: ${accessCheck.reason} | Country: ${accessCheck.country || 'Unknown'}`);
   
-  next();
-});
+//   next();
+// });
 
 
 
