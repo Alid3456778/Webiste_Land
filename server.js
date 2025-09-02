@@ -781,10 +781,11 @@ app.get("/api/customers/:id", async (req, res) => {
   }
 });
 
-// Helper to check if IP belongs to India
 async function isIndia(ip) {
   try {
-    const res = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,countryCode,message`);
+    const res = await fetch(
+      `http://ip-api.com/json/${ip}?fields=status,country,countryCode,message`
+    );
     const data = await res.json();
 
     if (data.status !== "success") {
@@ -792,28 +793,32 @@ async function isIndia(ip) {
       return false;
     }
 
-    return data.countryCode === "IN"; // True if India
+    console.log(`IP ${ip} resolved to country: ${data.countryCode}`);
+    return data.countryCode === "IN"; // true if India
   } catch (err) {
     console.error("Error checking IP:", err);
     return false;
   }
 }
 
-// Middleware to block India completely
 app.use(async (req, res, next) => {
-  const ip =
+  let ip =
     req.headers["x-real-ip"] ||
     (req.headers["x-forwarded-for"]
       ? req.headers["x-forwarded-for"].split(",")[0].trim()
       : null) ||
     req.socket.remoteAddress;
 
+  // Clean IPv6 localhost (::1) or IPv6-mapped IPv4 (::ffff:192.168.x.x)
+  if (ip && ip.startsWith("::ffff:")) ip = ip.replace("::ffff:", "");
+  if (ip === "::1") ip = "127.0.0.1";
+
   console.log("Client IP detected:", ip);
 
   const inIndia = await isIndia(ip);
 
   if (inIndia) {
-    return res.status(403).send("Access denied: Users from India are blocked.");
+    return res.status(403).send("❌ Access denied: India traffic blocked.");
   }
 
   next();
