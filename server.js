@@ -813,7 +813,7 @@ app.use(async (req, res, next) => {
   const inIndia = await isIndia(ip);
 
   if (inIndia) {
-    return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+    return res.status(403).send("Access denied: Users from India are blocked.");
   }
 
   next();
