@@ -270,7 +270,7 @@ app.post("/api/checkout", async (req, res) => {
                 <h2>📞 Contact Us</h2>
                 <p>If you have any questions, feel free to reply to this email or call us at +1 209 593 7171.</p>
                 <p>Or WhatsApp us at +91 887 920 1044 WhatsApp Link: https://t.ly/cMdMT</p>
-                <p>📩 E-mil: customerinfo2024@gmail.com</p>
+                <p>📩 E-mail: customerinfo2024@gmail.com</p>
                 <br>
                 <p>💫 We appreciate your business!</p>
             `,
