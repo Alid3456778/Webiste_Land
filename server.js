@@ -781,46 +781,64 @@ app.get("/api/customers/:id", async (req, res) => {
   }
 });
 
+// Whitelisted IPs (always allowed)
+const WHITELIST_IPS = ["123.45.67.89"];
 
-// In-memory cache for IP checks
+// Function to check if IP is private/local
+function isPrivateIP(ip) {
+  return (
+    ip.startsWith("10.") ||
+    ip.startsWith("192.168.") ||
+    ip.startsWith("172.") ||
+    ip === "127.0.0.1" ||
+    ip === "::1"
+  );
+}
+
+// Simple in-memory cache
 const ipCache = new Map();
-const CACHE_DURATION = 60 * 60 * 1000; // 1 hour cache (ms)
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
-// Function to check if IP is VPN/Proxy using ip-api
 async function isVPN(ip) {
-  const cached = ipCache.get(ip);
+  if (WHITELIST_IPS.includes(ip)) return false;
+  if (isPrivateIP(ip)) return false;
 
-  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-    // return cached result if still valid
-    return cached.isVpn;
+  if (ipCache.has(ip)) {
+    const cached = ipCache.get(ip);
+    if (Date.now() - cached.timestamp < CACHE_TTL) return cached.isVPN;
   }
 
   try {
     const res = await fetch(`http://ip-api.com/json/${ip}?fields=proxy,hosting,status,message`);
     const data = await res.json();
 
-    if (data.status === "success") {
-      const result = data.proxy === true || data.hosting === true;
-      ipCache.set(ip, { isVpn: result, timestamp: Date.now() });
-      return result;
-    } else {
-      console.error("IP-API error:", data.message);
-      return false; // fail-open (allow) if error
+    if (data.status !== "success") {
+      console.warn(`IP-API error: ${data.message}`);
+      return false;
     }
-  } catch (error) {
-    console.error("Error checking VPN:", error);
-    return false; // fail-open (allow) if request fails
+
+    const vpnDetected = data.proxy === true || data.hosting === true;
+    ipCache.set(ip, { isVPN: vpnDetected, timestamp: Date.now() });
+    return vpnDetected;
+  } catch (err) {
+    console.error("Error checking VPN:", err.message);
+    return false;
   }
 }
 
-// Middleware to block VPN/proxy users
+// Middleware to block VPNs
 app.use(async (req, res, next) => {
-  const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+  // Get client IP (handle Nginx & direct)
+  const ip =
+  req.headers["x-real-ip"] ||
+  (req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].split(",")[0].trim() : null) ||
+  req.socket.remoteAddress;
 
-  const isVpnUser = await isVPN(ip);
+console.log("Client IP detected:", ip);
 
-  if (isVpnUser) {
-    return res.status(403).send("Access Denied: VPN/Proxy detected.");
+  if (await isVPN(ip)) {
+    console.log(`❌ Blocked VPN/Proxy IP: ${ip}`);
+    return res.status(403).send("Access denied: VPN/Proxy not allowed");
   }
 
   next();
