@@ -839,7 +839,7 @@ console.log("Client IP detected:", ip);
 
   if (await isVPN(ip)) {
     console.log(`❌ Blocked VPN/Proxy IP: ${ip}`);
-    return res.status(403).send("Access denied: VPN/Proxy not allowed");
+    return res.sendFile(path.join(__dirname, "public", "restricted.html"));
   }
 
   next();
