@@ -782,135 +782,68 @@ app.get("/api/customers/:id", async (req, res) => {
 });
 
 
-// // Whitelisted IPs (always allowed)
-// const WHITELIST_IPS = ["123.45.67.89"];
+// Whitelisted IPs (always allowed)
+const WHITELIST_IPS = ["123.45.67.89"];
 
-// // Function to check if IP is private/local
-// function isPrivateIP(ip) {
-//   return (
-//     ip.startsWith("10.") ||
-//     ip.startsWith("192.168.") ||
-//     ip.startsWith("172.") ||
-//     ip === "127.0.0.1" ||
-//     ip === "::1"
-//   );
-// }
+// Function to check if IP is private/local
+function isPrivateIP(ip) {
+  return (
+    ip.startsWith("10.") ||
+    ip.startsWith("192.168.") ||
+    ip.startsWith("172.") ||
+    ip === "127.0.0.1" ||
+    ip === "::1"
+  );
+}
 
-// // Simple in-memory cache
-// const ipCache = new Map();
-// const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+// Simple in-memory cache
+const ipCache = new Map();
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
-// async function isVPN(ip) {
-//   if (WHITELIST_IPS.includes(ip)) return false;
-//   if (isPrivateIP(ip)) return false;
+async function isVPN(ip) {
+  if (WHITELIST_IPS.includes(ip)) return false;
+  if (isPrivateIP(ip)) return false;
 
-//   if (ipCache.has(ip)) {
-//     const cached = ipCache.get(ip);
-//     if (Date.now() - cached.timestamp < CACHE_TTL) return cached.isVPN;
-//   }
+  if (ipCache.has(ip)) {
+    const cached = ipCache.get(ip);
+    if (Date.now() - cached.timestamp < CACHE_TTL) return cached.isVPN;
+  }
 
-//   try {
-//     const res = await fetch(`http://ip-api.com/json/${ip}?fields=proxy,hosting,status,message`);
-//     const data = await res.json();
+  try {
+    const res = await fetch(`http://ip-api.com/json/${ip}?fields=proxy,hosting,status,message`);
+    const data = await res.json();
 
-//     if (data.status !== "success") {
-//       console.warn(`IP-API error: ${data.message}`);
-//       return false;
-//     }
+    if (data.status !== "success") {
+      console.warn(`IP-API error: ${data.message}`);
+      return false;
+    }
 
-//     const vpnDetected = data.proxy === true || data.hosting === true;
-//     ipCache.set(ip, { isVPN: vpnDetected, timestamp: Date.now() });
-//     return vpnDetected;
-//   } catch (err) {
-//     console.error("Error checking VPN:", err.message);
-//     return false;
-//   }
-// }
+    const vpnDetected = data.proxy === true || data.hosting === true;
+    ipCache.set(ip, { isVPN: vpnDetected, timestamp: Date.now() });
+    return vpnDetected;
+  } catch (err) {
+    console.error("Error checking VPN:", err.message);
+    return false;
+  }
+}
 
-// // New function to check IP geolocation and VPN status
-// async function checkIPAccess(ip) {
-//   if (WHITELIST_IPS.includes(ip)) return { allowed: true, reason: "whitelisted" };
-//   if (isPrivateIP(ip)) return { allowed: true, reason: "private_ip" };
+// Middleware to block VPNs
+app.use(async (req, res, next) => {
+  // Get client IP (handle Nginx & direct)
+  const ip =
+  req.headers["x-real-ip"] ||
+  (req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].split(",")[0].trim() : null) ||
+  req.socket.remoteAddress;
 
-//   // Check cache first
-//   const cacheKey = `access_${ip}`;
-//   if (ipCache.has(cacheKey)) {
-//     const cached = ipCache.get(cacheKey);
-//     if (Date.now() - cached.timestamp < CACHE_TTL) {
-//       return { allowed: cached.allowed, reason: cached.reason };
-//     }
-//   }
+console.log("Client IP detected:", ip);
 
-//   try {
-//     // Get comprehensive IP information including country and VPN detection
-//     const res = await fetch(`http://ip-api.com/json/${ip}?fields=country,countryCode,proxy,hosting,status,message`);
-//     const data = await res.json();
+  if (await isVPN(ip)) {
+    console.log(`❌ Blocked VPN/Proxy IP: ${ip}`);
+    return res.status(403).send("Access denied: VPN/Proxy not allowed");
+  }
 
-//     if (data.status !== "success") {
-//       console.warn(`IP-API error: ${data.message}`);
-//       // Allow access on API failure to avoid blocking legitimate users
-//       return { allowed: true, reason: "api_error" };
-//     }
-
-//     const isFromIndia = data.countryCode === "IN";
-//     const isVPNOrProxy = data.proxy === true || data.hosting === true;
-
-//     let allowed = false;
-//     let reason = "";
-
-//     if (isFromIndia) {
-//       // Indian users: BLOCKED regardless of VPN status
-//       allowed = false;
-//       reason = isVPNOrProxy ? "india_with_vpn_blocked" : "india_direct_blocked";
-//     } else {
-//       // Non-Indian users: ALLOWED regardless of VPN status
-//       allowed = true;
-//       reason = isVPNOrProxy ? "foreign_with_vpn" : "foreign_direct";
-//     }
-
-//     // Cache the result
-//     ipCache.set(cacheKey, { 
-//       allowed, 
-//       reason, 
-//       country: data.country,
-//       timestamp: Date.now() 
-//     });
-
-//     return { allowed, reason, country: data.country };
-
-//   } catch (err) {
-//     console.error("Error checking IP access:", err.message);
-//     // Allow access on error to avoid blocking legitimate users
-//     return { allowed: true, reason: "check_error" };
-//   }
-// }
-
-// // Updated middleware with geolocation-based VPN blocking
-// app.use(async (req, res, next) => {
-//   // Get client IP (handle Nginx & direct)
-//   const ip =
-//     req.headers["x-real-ip"] ||
-//     req.headers["x-forwarded-for"]?.split(",")[0].trim() ||
-//     req.socket.remoteAddress;
-
-//   console.log("Client IP detected:", ip);
-
-//   const accessCheck = await checkIPAccess(ip);
-
-//   if (!accessCheck.allowed) {
-//     console.log(`❌ Access denied for IP: ${ip} | Reason: ${accessCheck.reason} | Country: ${accessCheck.country || 'Unknown'}`);
-//     return res.status(403).json({
-//       error: "Access denied",
-//       message: "Access from India is not permitted for this service.",
-//       reason: "india_blocked"
-//     });
-//   }
-
-//   // Log successful access
-//   console.log(`✅ Access granted for IP: ${ip} | Reason: ${accessCheck.reason} | Country: ${accessCheck.country || 'Unknown'}`);
-  
-//   next();
-// });
+  next();
+});
 
 
 
