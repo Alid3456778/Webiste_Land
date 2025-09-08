@@ -849,8 +849,7 @@ console.log("Client IP detected:", ip);
 const WHITELISTED_IPS = ["192.168.0.212", "223.185.36.119"];
 
 // Simple user/password
-const ACCESS_USERS = [{ username: process.env.USERNAME , password: process.env.PASSWORD }];
-
+const ACCESS_USERS = [{ username: "special", password: "letmein123" }];
 
 // Middleware to enforce IP/login access
 app.use((req, res, next) => {
