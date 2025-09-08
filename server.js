@@ -878,7 +878,7 @@ app.use((req, res, next) => {
   }
 
   // 3. Otherwise force login page
-  return res.sendFile(path.join(__dirname, "public", "login.html"));
+  return res.sendFile(path.join(__dirname, "public", "restricted.html"));
 });
 
 
