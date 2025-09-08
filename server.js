@@ -845,6 +845,61 @@ console.log("Client IP detected:", ip);
   next();
 });
 
+// List of allowed IPs (always allowed)
+const WHITELISTED_IPS = ["192.168.0.212", "223.185.36.119"];
+
+// Simple user/password
+const ACCESS_USERS = [{ username: process.env.USERNAME , password: process.env.PASSWORD }];
+
+
+// Middleware to enforce IP/login access
+app.use((req, res, next) => {
+  // Skip protection for login routes
+  if (req.path === "/access-login" || req.path === "/restricted.html") {
+    return next();
+  }
+
+  const ip =
+    req.headers["x-real-ip"] ||
+    (req.headers["x-forwarded-for"]
+      ? req.headers["x-forwarded-for"].split(",")[0].trim()
+      : null) ||
+    req.socket.remoteAddress;
+
+  console.log("Client IP detected:", ip);
+
+  // 1. Allow whitelisted IPs
+  if (WHITELISTED_IPS.includes(ip)) {
+    return next();
+  }
+
+  // 2. Allow if cookie is set
+  if (req.cookies.allowedAccess === "yes") {
+    return next();
+  }
+
+  // 3. Otherwise force login page
+  return res.sendFile(path.join(__dirname, "public", "login.html"));
+});
+
+
+// Handle login POST
+app.post("/access-login", express.json(), (req, res) => {
+  const { username, password } = req.body;
+  const user = ACCESS_USERS.find(
+    (u) => u.username === username && u.password === password
+  );
+  if (!user) {
+    return res.json({ success: false });
+  }
+
+  // Set cookie for 2 hours
+  res.cookie("allowedAccess", "yes", {
+    httpOnly: true,
+    maxAge: 2 * 60 * 60 * 1000,
+  });
+  res.json({ success: true });
+});
 
 
 

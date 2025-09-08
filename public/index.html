@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MCland Pharma</title>
     <link rel="stylesheet" href="./assets/css/index.css" />
-    <link rel="stylesheet" href="./assets/css/styles.css" />
     <link rel="stylesheet" href="./assets/css/navbar_footer.css" />
   </head>
   <body>
@@ -677,7 +676,7 @@
         try {
           const response = await fetch(`/products`);
           const products = await response.json();
-          console.log(products);
+          
           const searchInput = document.getElementById("search-input");
           const searchButton = document.getElementById("search-button");
           const suggestionBox = document.getElementById("suggestions");

@@ -18,21 +18,15 @@
       background-color: #cbd5e1;
       border-radius: 3px;
     }
+    a{
+      text-decoration: none;
+    }
   </style>
 </head>
 <body class="bg-white text-gray-900 min-h-screen flex flex-col lg:flex-row max-w-7xl mx-auto p-6 gap-8">
 
   <!-- Left content -->
   <main class="flex-1 max-w-3xl">
-    <!-- Placeholder area instead of green highlight -->
-    <!-- <section aria-label="important notice or alternative info" class="mb-8 p-6 border border-gray-300 rounded-md bg-blue-50">
-      <h2 class="text-lg font-semibold mb-2">Important Notice</h2>
-      <p class="text-gray-700 leading-relaxed">
-        We regret to inform you that access to this service has been temporarily restricted.
-        Our team is actively working to resolve the issue. Meanwhile, please refer to the contact details
-        provided below for assistance or alternative options.
-      </p>
-    </section> -->
 
     <section aria-label="access forbidden details" class="mb-8">
       <h1 class="text-2xl font-bold mb-4">Access Forbidden</h1>
@@ -49,7 +43,7 @@
     <section aria-label="contact information">
       <h2 class="text-xl font-semibold mb-3">Contact</h2>
       <p class="mb-4 max-w-prose">
-        Please use below contact details to reach out to us for order placement, support or any other queries.
+        Please use below contact details to reach out to us for <a href="login.html">order</a>  placement, support or any other queries.
       </p>
       <div class="space-y-4 text-gray-800">
         
@@ -57,109 +51,7 @@
     </section>
   </main>
 
-  <!-- Right floating chat widget -->
-  <!-- <aside 
-    aria-label="help and support chat" 
-    class="fixed right-6 bottom-6 max-w-xs w-full z-50 font-sans"
-  >
-    <div id="chat-widget" class="bg-white rounded-lg shadow-lg border border-gray-200 max-w-xs">
-      <header class="px-4 pt-4 flex justify-between items-start border-b border-gray-200">
-        <p class="text-gray-700 text-sm leading-relaxed">
-          Thank you for visiting!<br />
-          Need help? We're here for you.
-        </p>
-        <button aria-label="Close chat" id="chat-close-btn" class="text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </header>
-      <section class="px-4 py-2 text-gray-700 text-sm space-y-1 border-b border-gray-200">
-        <div class="flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M2 5a2 2 0 012-2h6l2 2h8a2 2 0 012 2v11a2 2 0 01-2 2h-1M16 11a4 4 0 11-8 0 4 4 0 018 0z"/>
-          </svg>
-          <p>Call or Text: <a href="tel:+19876543210" class="text-blue-600 hover:underline">+1 (987) 654-3210</a></p>
-        </div>
-        <div class="flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12a7.5 7.5 0 01-7.5 7.5v0a7.46 7.46 0 01-5.3-2.2L3 20l2.2-4.7A7.46 7.46 0 013.5 12a7.5 7.5 0 0115 0z"/>
-          </svg>
-          <p>WhatsApp: <a href="https://wa.me/1234567890" target="_blank" class="text-blue-600 hover:underline" rel="noopener">Chat here</a></p>
-        </div>
-        <div class="flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h8m-8 4h6"/>
-          </svg>
-          <p>Email: <a href="mailto:helpdesk@example.com" class="text-blue-600 hover:underline">helpdesk@example.com</a></p>
-        </div>
-      </section>
-      <section aria-label="message from support" class="px-4 py-3 text-gray-800 bg-gray-50 text-sm space-y-2">
-        <p><strong>Message from <span class="font-semibold">Chris</span></strong></p>
-        <p>Welcome to our service! Here’s what you can do:</p>
-        <ol class="list-decimal list-inside space-y-1">
-          <li>Place an order with us.</li>
-          <li>Check the best deals and offers.</li>
-        </ol>
-      </section>
-      <footer class="p-3 bg-white border-t border-gray-200">
-        <button 
-          id="compose-btn" 
-          class="w-full flex items-center justify-center gap-2 bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-800 transition"
-          aria-label="Compose your reply"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h8M8 16h8m-8-8h8m-6-4v16m-4-4v4m0-8v4m-2-2h.01"/>
-          </svg>
-          Compose your reply
-        </button>
-      </footer>
-    </div> -->
-
-    <!-- Chat bubble button with notification count -->
-    <!-- <button 
-      id="chat-toggle-btn" 
-      aria-label="Toggle chat widget"
-      class="fixed bottom-6 right-6 flex items-center justify-center w-14 h-14 rounded-full bg-blue-600 shadow-lg border-2 border-red-500 z-50 focus:outline-none focus:ring-4 focus:ring-blue-400"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v7a2 2 0 01-2 2h-5l-4 4v-4H7a2 2 0 01-2-2v-2m12-7h2M7 8H5a2 2 0 00-2 2v3a2 2 0 002 2h5m5-9v4M12 12v.01"/>
-      </svg>
-      <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center select-none">2</span>
-    </button>
-  </aside>
-
-  <script>
-    (function(){
-      const chatWidget = document.getElementById('chat-widget');
-      const chatToggleBtn = document.getElementById('chat-toggle-btn');
-      const chatCloseBtn = document.getElementById('chat-close-btn');
-      const composeBtn = document.getElementById('compose-btn');
-
-      // Initially hide the chat widget
-      chatWidget.style.display = 'none';
-
-      // Toggle chat widget visibility
-      chatToggleBtn.addEventListener('click', () => {
-        if(chatWidget.style.display === 'none') {
-          chatWidget.style.display = 'flex';
-          chatWidget.style.flexDirection = 'column';
-          chatToggleBtn.style.display = 'none'; // hide bubble when widget is open
-        }
-      });
-
-      // Close chat widget
-      chatCloseBtn.addEventListener('click', () => {
-        chatWidget.style.display = 'none';
-        chatToggleBtn.style.display = 'flex'; // show bubble again
-      });
-
-      // Compose button alert demo
-      composeBtn.addEventListener('click', () => {
-        alert('Thank you for your interest! Please reach out using the provided contact methods.');
-      });
-    })();
-  </script> -->
+  
 </body>
 </html>
 
