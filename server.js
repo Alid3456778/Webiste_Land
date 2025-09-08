@@ -827,78 +827,83 @@ async function isVPN(ip) {
   }
 }
 
-// Middleware to block VPNs
-app.use(async (req, res, next) => {
-  // Get client IP (handle Nginx & direct)
-  const ip =
-  req.headers["x-real-ip"] ||
-  (req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].split(",")[0].trim() : null) ||
-  req.socket.remoteAddress;
+// // Middleware to block VPNs
+// app.use(async (req, res, next) => {
+//   // Get client IP (handle Nginx & direct)
+//   const ip =
+//   req.headers["x-real-ip"] ||
+//   (req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].split(",")[0].trim() : null) ||
+//   req.socket.remoteAddress;
 
-console.log("Client IP detected:", ip);
+// console.log("Client IP detected:", ip);
 
-  if (await isVPN(ip)) {
-    console.log(`❌ Blocked VPN/Proxy IP: ${ip}`);
-    return res.sendFile(path.join(__dirname, "public", "restricted.html"));
-  }
+//   if (await isVPN(ip)) {
+//     console.log(`❌ Blocked VPN/Proxy IP: ${ip}`);
+//     return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+//   }
 
-  next();
-});
+//   next();
+// });
 
-// List of allowed IPs (always allowed)
-const WHITELISTED_IPS = ["192.168.0.212", "223.185.36.119"];
+// // List of allowed IPs (always allowed)
+// const WHITELISTED_IPS = ["192.168.0.212", "223.185.36.119"];
 
-// Simple user/password
-const ACCESS_USERS = [{ username: "special", password: "letmein123" }];
+// let use = process.env.USERNAMES ;
+// let pass = process.env.PASSWORD ;
 
-// Middleware to enforce IP/login access
-app.use((req, res, next) => {
-  // Skip protection for login routes
-  if (req.path === "/access-login" || req.path === "/restricted.html") {
-    return next();
-  }
+// console.log("User:", use);
+// console.log("Pass:", pass);
+// // Simple user/password
+// const ACCESS_USERS = [{ username: "special", password: "letmein123" }];
 
-  const ip =
-    req.headers["x-real-ip"] ||
-    (req.headers["x-forwarded-for"]
-      ? req.headers["x-forwarded-for"].split(",")[0].trim()
-      : null) ||
-    req.socket.remoteAddress;
+// // Middleware to enforce IP/login access
+// app.use((req, res, next) => {
+//   // Skip protection for login routes
+//   if (req.path === "/access-login" || req.path === "/restricted.html") {
+//     return next();
+//   }
 
-  console.log("Client IP detected:", ip);
+//   const ip =
+//     req.headers["x-real-ip"] ||
+//     (req.headers["x-forwarded-for"]
+//       ? req.headers["x-forwarded-for"].split(",")[0].trim()
+//       : null) ||
+//     req.socket.remoteAddress;
 
-  // 1. Allow whitelisted IPs
-  if (WHITELISTED_IPS.includes(ip)) {
-    return next();
-  }
+//   console.log("Client IP detected:", ip);
 
-  // 2. Allow if cookie is set
-  if (req.cookies.allowedAccess === "yes") {
-    return next();
-  }
+//   // 1. Allow whitelisted IPs
+//   if (WHITELISTED_IPS.includes(ip)) {
+//     return next();
+//   }
 
-  // 3. Otherwise force login page
-  return res.sendFile(path.join(__dirname, "public", "restricted.html"));
-});
+//   // // 2. Allow if cookie is set
+//   // if (req.cookies.allowedAccess === "yes") {
+//   //   return next();
+//   // }
+
+//   // 3. Otherwise force login page
+//   return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+// });
 
 
-// Handle login POST
-app.post("/access-login", express.json(), (req, res) => {
-  const { username, password } = req.body;
-  const user = ACCESS_USERS.find(
-    (u) => u.username === username && u.password === password
-  );
-  if (!user) {
-    return res.json({ success: false });
-  }
+// // Handle login POST
+// app.post("/access-login", express.json(), (req, res) => {
+//   const { username, password } = req.body;
+//   const user = ACCESS_USERS.find(
+//     (u) => u.username === username && u.password === password
+//   );
+//   if (!user) {
+//     return res.json({ success: false });
+//   }
 
-  // Set cookie for 2 hours
-  res.cookie("allowedAccess", "yes", {
-    httpOnly: true,
-    maxAge: 2 * 60 * 60 * 1000,
-  });
-  res.json({ success: true });
-});
+//   // Set cookie for 2 hours
+//   res.cookie("allowedAccess", "yes", {
+//     httpOnly: true,
+//     maxAge: 2 * 60 * 60 * 1000,
+//   });
+//   res.json({ success: true });
+// });
 
 
 
