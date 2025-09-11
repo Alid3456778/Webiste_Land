@@ -1018,7 +1018,7 @@ app.use(async (req, res, next) => {
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
 
-app.get('/ip-test', (req, res) => {
+app.get('/ip_test', (req, res) => {
   res.send(`Your IP is: ${req.ip}`);
 });
 
