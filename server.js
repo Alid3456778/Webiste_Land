@@ -8,6 +8,9 @@ const path = require("path");
 const bcrypt = require("bcrypt"); // For password hashing comparison
 const jwt = require("jsonwebtoken"); // For generating authentication tokens
 require("dotenv").config();
+const nodemailer = require("nodemailer");
+const fetch = require("node-fetch");
+
 const app = express();
 
 // Middleware
@@ -779,72 +782,6 @@ app.get("/api/customers/:id", async (req, res) => {
 });
 
 
-// // Whitelisted IPs (always allowed)
-// const WHITELIST_IPS = ["123.45.67.89"];
-
-// // Function to check if IP is private/local
-// function isPrivateIP(ip) {
-//   return (
-//     ip.startsWith("10.") ||
-//     ip.startsWith("192.168.") ||
-//     ip.startsWith("172.") ||
-//     ip === "127.0.0.1" ||
-//     ip === "::1" ||
-//     ip === "localhost:3000"
-//   );
-// }
-
-// // Simple in-memory cache
-// const ipCache = new Map();
-// const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
-
-// async function isVPN(ip) {
-//   if (WHITELIST_IPS.includes(ip)) return false;
-//   if (isPrivateIP(ip)) return false;
-
-//   if (ipCache.has(ip)) {
-//     const cached = ipCache.get(ip);
-//     if (Date.now() - cached.timestamp < CACHE_TTL) return cached.isVPN;
-//   }
-
-//   try {
-//     const res = await fetch(`http://ip-api.com/json/${ip}?fields=proxy,hosting,status,message`);
-//     const data = await res.json();
-
-//     if (data.status !== "success") {
-//       console.warn(`IP-API error: ${data.message}`);
-//       return false;
-//     }
-
-//     const vpnDetected = data.proxy === true || data.hosting === true;
-//     ipCache.set(ip, { isVPN: vpnDetected, timestamp: Date.now() });
-//     return vpnDetected;
-//   } catch (err) {
-//     console.error("Error checking VPN:", err.message);
-//     return false;
-//   }
-// }
-
-// // Middleware to block VPNs
-// app.use(async (req, res, next) => {
-//   // Get client IP (handle Nginx & direct)
-//   const ip =
-//   req.headers["x-real-ip"] ||
-//   (req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].split(",")[0].trim() : null) ||
-//   req.socket.remoteAddress;
-
-// console.log("Client IP detected:", ip);
-
-//   if (await isVPN(ip)) {
-//     console.log(`❌ Blocked VPN/Proxy IP: ${ip}`);
-//     return res.sendFile(path.join(__dirname, "public", "restricted.html"));
-//   }
-
-//   next();
-// });
-
-
-
 // Whitelisted IPs (always allowed)
 const WHITELIST_IPS = ["123.45.67.89"];
 
@@ -855,7 +792,8 @@ function isPrivateIP(ip) {
     ip.startsWith("192.168.") ||
     ip.startsWith("172.") ||
     ip === "127.0.0.1" ||
-    ip === "::1"
+    ip === "::1" ||
+    ip === "localhost:3000"
   );
 }
 
@@ -875,7 +813,7 @@ async function isVPN(ip) {
   try {
     const res = await fetch(`http://ip-api.com/json/${ip}?fields=proxy,hosting,status,message`);
     const data = await res.json();
-
+    console.log("IP-API response:", data);
     if (data.status !== "success") {
       console.warn(`IP-API error: ${data.message}`);
       return false;
@@ -898,19 +836,15 @@ app.use(async (req, res, next) => {
   (req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].split(",")[0].trim() : null) ||
   req.socket.remoteAddress;
 
-  console.log("Client IP detected:", ip);
+console.log("Client IP detected:", ip);
 
   if (await isVPN(ip)) {
     console.log(`❌ Blocked VPN/Proxy IP: ${ip}`);
-    return res.status(403).send("Access denied: VPN/Proxy not allowed");
+    return res.sendFile(path.join(__dirname, "public", "restricted.html"));
   }
 
   next();
 });
-
-
-
-
 
 
 
