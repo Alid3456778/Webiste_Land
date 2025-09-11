@@ -927,12 +927,10 @@ app.set("trust proxy", true);
 
 // Middleware to block VPNs
 app.use(async (req, res, next) => {
-  let ip =
-    req.headers["x-real-ip"] ||
-    (req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].split(",")[0].trim() : null) ||
-    req.socket.remoteAddress;
-
-  if (ip === "::1") ip = "127.0.0.1"; // normalize
+  const ip =
+    req.headers['x-real-ip'] ||
+    req.headers['x-forwarded-for']?.split(',')[0].trim() ||
+    req.ip;
 
   console.log("Client IP detected:", ip);
 
@@ -1019,6 +1017,10 @@ app.use(async (req, res, next) => {
 
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
+
+app.get('/ip-test', (req, res) => {
+  res.send(`Your IP is: ${req.ip}`);
+});
 
 // Page routes
 app.get("/product_overview", (req, res) => {
