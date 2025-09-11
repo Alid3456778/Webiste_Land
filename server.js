@@ -9,6 +9,8 @@ const bcrypt = require("bcrypt"); // For password hashing comparison
 const jwt = require("jsonwebtoken"); // For generating authentication tokens
 require("dotenv").config();
 const nodemailer = require("nodemailer");
+// const fetch = require("node-fetch");
+ 
 
 const app = express();
 
@@ -808,9 +810,9 @@ app.get("/api/customers/:id", async (req, res) => {
 //   }
 
 //   try {
-//     const res = await fetch(`http://ip-api.com/json/${ip}?fields=proxy,hosting,status,message`);
+//     const res = await fetch(`https://vpnapi.io/api/106.193.228.253?key=e34959be44264418bc6610fc4b382d59`);
 //     const data = await res.json();
-//     console.log("IP-API response:", data);
+//     console.log("IP-API response:", res);
 //     if (data.status !== "success") {
 //       console.warn(`IP-API error: ${data.message}`);
 //       return false;
@@ -851,97 +853,304 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 // Whitelisted IPs (always allowed)
 const WHITELIST_IPS = ["123.45.67.89"];
 
+// API Configuration
+const VPNAPI_KEY = "e34959be44264418bc6610fc4b382d59";
+const API_TIMEOUT = 5000; // 5 seconds timeout for API calls
+
 // Function to check if IP is private/local
 function isPrivateIP(ip) {
+  if (!ip || typeof ip !== 'string') return true; // Treat invalid IPs as private for safety
+  
   return (
     ip.startsWith("10.") ||
     ip.startsWith("192.168.") ||
     ip.startsWith("172.") ||
     ip === "127.0.0.1" ||
-    ip === "::1"
+    ip === "::1" ||
+    ip.startsWith("169.254.") || // Link-local
+    ip.startsWith("fc00:") || // IPv6 private
+    ip.startsWith("fd00:") // IPv6 private
   );
 }
 
-// Simple in-memory cache
+// Simple in-memory cache with cleanup
 const ipCache = new Map();
 const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
-async function isVPN(ip) {
-  if (!ip) return false;
-  if (WHITELIST_IPS.includes(ip)) return false;
-  if (isPrivateIP(ip)) return false;
+// Cleanup old cache entries periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, data] of ipCache.entries()) {
+    if (now - data.timestamp > CACHE_TTL) {
+      ipCache.delete(ip);
+    }
+  }
+}, 5 * 60 * 1000); // Clean every 5 minutes
 
-  // Check cache
+// Helper function to make API calls with timeout
+async function fetchWithTimeout(url, timeout = API_TIMEOUT) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+  
+  try {
+    const response = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; VPN-Detector/1.0)'
+      }
+    });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw error;
+  }
+}
+
+// Primary VPN check using vpnapi.io
+async function checkWithVpnApi(ip) {
+  try {
+    console.log(`🔍 Checking IP ${ip} with vpnapi.io`);
+    const response = await fetchWithTimeout(`https://vpnapi.io/api/${ip}?key=${VPNAPI_KEY}`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log("VpnAPI.io response:", JSON.stringify(data, null, 2));
+    
+    // Check if the response has the expected structure
+    if (!data.security) {
+      throw new Error("Invalid response structure from vpnapi.io");
+    }
+    
+    const { vpn, proxy, tor, relay } = data.security;
+    const isVpnDetected = vpn || proxy || tor || relay;
+    
+    console.log(`VpnAPI.io result: VPN=${vpn}, Proxy=${proxy}, Tor=${tor}, Relay=${relay}`);
+    return { success: true, isVPN: isVpnDetected, service: 'vpnapi.io' };
+    
+  } catch (error) {
+    console.error("Error checking with vpnapi.io:", error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+// Fallback 1: ip-api.com
+async function checkWithIpApi(ip) {
+  try {
+    console.log(`🔍 Checking IP ${ip} with ip-api.com (fallback 1)`);
+    const response = await fetchWithTimeout(`http://ip-api.com/json/${ip}?fields=proxy,hosting,status,message`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log("IP-API response:", JSON.stringify(data, null, 2));
+    
+    if (data.status !== "success") {
+      throw new Error(`IP-API error: ${data.message || 'Unknown error'}`);
+    }
+    
+    const isVpnDetected = data.proxy === true || data.hosting === true;
+    return { success: true, isVPN: isVpnDetected, service: 'ip-api.com' };
+    
+  } catch (error) {
+    console.error("Error checking with ip-api.com:", error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+// Fallback 2: ipwho.is
+async function checkWithIpWho(ip) {
+  try {
+    console.log(`🔍 Checking IP ${ip} with ipwho.is (fallback 2)`);
+    const response = await fetchWithTimeout(`https://ipwho.is/${ip}`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log("IpWho.is response:", JSON.stringify(data, null, 2));
+    
+    if (data.success === false) {
+      throw new Error(`IpWho.is error: ${data.message || 'Unknown error'}`);
+    }
+    
+    // ipwho.is may not have proxy field, so we check what's available
+    const isVpnDetected = data.proxy === true || data.hosting === true;
+    return { success: true, isVPN: isVpnDetected, service: 'ipwho.is' };
+    
+  } catch (error) {
+    console.error("Error checking with ipwho.is:", error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+// Main VPN detection function with multiple fallbacks
+async function isVPN(ip) {
+  // Input validation
+  if (!ip || typeof ip !== 'string') {
+    console.warn("Invalid IP provided to isVPN function");
+    return false;
+  }
+  
+  // Clean the IP (remove any whitespace)
+  ip = ip.trim();
+  
+  // Check whitelist first
+  if (WHITELIST_IPS.includes(ip)) {
+    console.log(`✅ IP ${ip} is whitelisted`);
+    return false;
+  }
+  
+  // Check if private/local IP
+  if (isPrivateIP(ip)) {
+    console.log(`✅ IP ${ip} is private/local`);
+    return false;
+  }
+  
+  // Check cache first
   if (ipCache.has(ip)) {
     const cached = ipCache.get(ip);
-    if (Date.now() - cached.timestamp < CACHE_TTL) return cached.isVPN;
-  }
-
-  let vpnDetected = false;
-
-  try {
-    // Primary API: ip-api.com
-    const res = await fetch(`https://vpnapi.io/api/${ip}?key=e34959be44264418bc6610fc4b382d59`);
-    const data = await res.json();
-    console.log("IP-API response:", data);
-
-    if (data.security.vpn === "true") {
-      vpnDetected = data.proxy === true || data.hosting === true;
-    } else {
-      console.warn(`IP-API error: ${data.message}`);
-      // Fall back to ipwho.is
-      vpnDetected = await checkWithFallback(ip);
+    if (Date.now() - cached.timestamp < CACHE_TTL) {
+      console.log(`📋 Using cached result for ${ip}: ${cached.isVPN}`);
+      return cached.isVPN;
     }
-  } catch (err) {
-    console.error("Error checking VPN (ip-api):", err.message);
-    // Fall back to ipwho.is
-    vpnDetected = await checkWithFallback(ip);
   }
-
-  // Save result in cache
-  ipCache.set(ip, { isVPN: vpnDetected, timestamp: Date.now() });
+  
+  // Try primary service first (vpnapi.io)
+  let result = await checkWithVpnApi(ip);
+  
+  // If primary fails, try fallback 1 (ip-api.com)
+  if (!result.success) {
+    console.log("🔄 Falling back to ip-api.com");
+    result = await checkWithIpApi(ip);
+  }
+  
+  // If fallback 1 fails, try fallback 2 (ipwho.is)
+  if (!result.success) {
+    console.log("🔄 Falling back to ipwho.is");
+    result = await checkWithIpWho(ip);
+  }
+  
+  // If all services fail, default to false (allow access)
+  let vpnDetected = false;
+  let serviceUsed = 'none (all failed)';
+  
+  if (result.success) {
+    vpnDetected = result.isVPN;
+    serviceUsed = result.service;
+  } else {
+    console.warn(`⚠️ All VPN detection services failed for IP ${ip}. Defaulting to ALLOW.`);
+  }
+  
+  // Cache the result
+  ipCache.set(ip, { 
+    isVPN: vpnDetected, 
+    timestamp: Date.now(),
+    service: serviceUsed
+  });
+  
+  console.log(`🎯 Final result for ${ip}: ${vpnDetected ? 'VPN DETECTED' : 'ALLOWED'} (via ${serviceUsed})`);
   return vpnDetected;
 }
 
-// Fallback function (ipwho.is)
-async function checkWithFallback(ip) {
-  try {
-    const res = await fetch(`https://ipwho.is/${ip}`);
-    const data = await res.json();
-    console.log("Fallback API response:", data);
-
-    // ipwho.is marks "proxy" directly
-    if (data.success === false) {
-      console.warn(`ipwho.is error: ${data.message}`);
-      return false;
+// Enhanced IP extraction function
+function extractClientIP(req) {
+  // Try multiple headers in order of preference
+  const possibleHeaders = [
+    'x-real-ip',
+    'x-forwarded-for',
+    'x-client-ip',
+    'cf-connecting-ip', // Cloudflare
+    'x-forwarded',
+    'forwarded-for',
+    'forwarded'
+  ];
+  
+  for (const header of possibleHeaders) {
+    const value = req.headers[header];
+    if (value) {
+      // Handle comma-separated IPs (take the first one)
+      const ip = value.split(',')[0].trim();
+      if (ip && ip !== 'unknown') {
+        return ip;
+      }
     }
-
-    return data.proxy === true || data.hosting === true;
-  } catch (err) {
-    console.error("Error checking VPN (fallback):", err.message);
-    return false;
   }
+  
+  // Fallback to req.ip
+  return req.ip || req.connection?.remoteAddress || 'unknown';
 }
 
+// Express.js setup
 app.set("trust proxy", true);
 
-// Middleware to block VPNs
+// Middleware to block VPNs with enhanced error handling
 app.use(async (req, res, next) => {
-  const ip =
-    req.headers['x-real-ip'] ||
-    req.headers['x-forwarded-for']?.split(',')[0].trim() ||
-    req.ip;
-
-  console.log("Client IP detected:", ip);
-
-  if (await isVPN(ip)) {
-    console.log(`❌ Blocked VPN/Proxy IP: ${ip}`);
-    return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+  try {
+    const ip = extractClientIP(req);
+    console.log(`🌐 Client IP detected: ${ip} (from ${req.headers['user-agent']?.substring(0, 50) || 'unknown user-agent'})`);
+    
+    // Skip VPN check for invalid IPs
+    if (!ip || ip === 'unknown') {
+      console.warn("⚠️ Could not determine client IP, allowing request");
+      return next();
+    }
+    
+    const vpnDetected = await isVPN(ip);
+    
+    if (vpnDetected) {
+      console.log(`❌ Blocked VPN/Proxy IP: ${ip}`);
+      // Add security headers
+      res.set({
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'DENY',
+        'X-XSS-Protection': '1; mode=block'
+      });
+      return res.status(403).sendFile(path.join(__dirname, "public", "restricted.html"));
+    } else {
+      console.log(`✅ Allowed IP: ${ip}`);
+      return next();
+    }
+    
+  } catch (error) {
+    console.error("❌ Error in VPN detection middleware:", error);
+    // In case of middleware error, log it but don't block the user
+    console.log("⚠️ Allowing request due to middleware error");
+    next();
   }
-
-  next();
 });
 
+// Optional: Add a health check endpoint for monitoring
+app.get('/health/vpn-detector', (req, res) => {
+  res.json({
+    status: 'ok',
+    cacheSize: ipCache.size,
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Optional: Add an endpoint to manually check IPs (for testing)
+app.get('/admin/check-ip/:ip', async (req, res) => {
+  try {
+    const { ip } = req.params;
+    const result = await isVPN(ip);
+    res.json({
+      ip,
+      isVPN: result,
+      cached: ipCache.has(ip),
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 
 
