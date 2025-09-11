@@ -923,6 +923,7 @@ async function checkWithFallback(ip) {
   }
 }
 
+app.set("trust proxy", true);
 
 // Middleware to block VPNs
 app.use(async (req, res, next) => {
