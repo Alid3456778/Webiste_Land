@@ -881,11 +881,11 @@ async function isVPN(ip) {
 
   try {
     // Primary API: ip-api.com
-    const res = await fetch(`http://ip-api.com/json/${ip}?fields=proxy,hosting,status,message`);
+    const res = await fetch(`https://vpnapi.io/api/${ip}?key=e34959be44264418bc6610fc4b382d59`);
     const data = await res.json();
     console.log("IP-API response:", data);
 
-    if (data.status === "success") {
+    if (data.security.vpn === "true") {
       vpnDetected = data.proxy === true || data.hosting === true;
     } else {
       console.warn(`IP-API error: ${data.message}`);
@@ -1018,9 +1018,9 @@ app.use(async (req, res, next) => {
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
 
-app.get('/ip_test', (req, res) => {
-  res.send(`Your IP is: ${req.ip}`);
-});
+// app.get('/ip_test', (req, res) => {
+//   res.send(`Your IP is: ${req.ip}`);
+// });
 
 // Page routes
 app.get("/product_overview", (req, res) => {
