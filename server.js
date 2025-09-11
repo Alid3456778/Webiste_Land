@@ -10,10 +10,6 @@ const jwt = require("jsonwebtoken"); // For generating authentication tokens
 require("dotenv").config();
 const nodemailer = require("nodemailer");
 
-const session = require("express-session");
-const bodyParser = require("body-parser");
-const geoip = require("geoip-lite");
-
 
 const app = express();
 
@@ -831,78 +827,89 @@ async function isVPN(ip) {
   }
 }
 
-// ===== Middleware =====
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(
-  session({
-    secret: "my-secret-key", // change this to a strong secret
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false },
-  })
-);
-
-// ===== Fake user (for demo) =====
-const USER = { username: "admin", password: "12345" };
-
-// ===== Middleware: Country & Login Protection =====
-function countryAndLoginCheck(req, res, next) {
+// Middleware to block VPNs
+app.use(async (req, res, next) => {
+  // Get client IP (handle Nginx & direct)
   const ip =
-    req.headers["x-forwarded-for"]?.split(",")[0] || req.connection.remoteAddress;
+  req.headers["x-real-ip"] ||
+  (req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].split(",")[0].trim() : null) ||
+  req.socket.remoteAddress;
 
-  const geo = geoip.lookup(ip);
-  const country = geo ? geo.country : "UNKNOWN";
+console.log("Client IP detected:", ip);
 
-  if (country === "IN") {
-    // If from India → must login
-    if (req.session.user) {
-      return next(); // logged in → allow
-    } else if (req.path === "/login" || req.path === "/login-check") {
-      return next(); // allow login routes
-    } else {
-      return res.redirect("/login");
-    }
-  } else {
-    // Outside India → allow freely
-    return next();
+  if (await isVPN(ip)) {
+    console.log(`❌ Blocked VPN/Proxy IP: ${ip}`);
+    return res.sendFile(path.join(__dirname, "public", "restricted.html"));
   }
-}
 
-// Apply check for all routes
-app.use(countryAndLoginCheck);
+  next();
+});
+
+// // List of allowed IPs (always allowed)
+// const WHITELISTED_IPS = ["192.168.0.212", "223.185.36.119"];
+
+// let use = process.env.USERNAMES ;
+// let pass = process.env.PASSWORD ;
+
+// console.log("User:", use);
+// console.log("Pass:", pass);
+// // Simple user/password
+// const ACCESS_USERS = [{ username: "special", password: "letmein123" }];
+
+// // Middleware to enforce IP/login access
+// app.use((req, res, next) => {
+//   // Skip protection for login routes
+//   if (req.path === "/access-login" || req.path === "/restricted.html") {
+//     return next();
+//   }
+
+//   const ip =
+//     req.headers["x-real-ip"] ||
+//     (req.headers["x-forwarded-for"]
+//       ? req.headers["x-forwarded-for"].split(",")[0].trim()
+//       : null) ||
+//     req.socket.remoteAddress;
+
+//   console.log("Client IP detected:", ip);
+
+//   // 1. Allow whitelisted IPs
+//   if (WHITELISTED_IPS.includes(ip)) {
+//     return next();
+//   }
+
+//   // // 2. Allow if cookie is set
+//   // if (req.cookies.allowedAccess === "yes") {
+//   //   return next();
+//   // }
+
+//   // 3. Otherwise force login page
+//   return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+// });
 
 
+// // Handle login POST
+// app.post("/access-login", express.json(), (req, res) => {
+//   const { username, password } = req.body;
+//   const user = ACCESS_USERS.find(
+//     (u) => u.username === username && u.password === password
+//   );
+//   if (!user) {
+//     return res.json({ success: false });
+//   }
 
+//   // Set cookie for 2 hours
+//   res.cookie("allowedAccess", "yes", {
+//     httpOnly: true,
+//     maxAge: 2 * 60 * 60 * 1000,
+//   });
+//   res.json({ success: true });
+// });
 
 
 
 
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
-
-// ===== Login routes =====
-app.get("/login", (req, res) => {
-  res.sendFile(path.join(__dirname, "public","login.html"));
-});
-
-app.post("/login-check", (req, res) => {
-  const { username, password } = req.body;
-  if (username === USER.username && password === USER.password) {
-    req.session.user = username;
-    return res.redirect("/");
-  } else {
-    return res.send("Invalid credentials. <a href='/login'>Try again</a>");
-  }
-});
-
-app.get("/logout", (req, res) => {
-  req.session.destroy(() => {
-    res.redirect("/login");
-  });
-});
-
-
-
 
 // Page routes
 app.get("/product_overview", (req, res) => {
