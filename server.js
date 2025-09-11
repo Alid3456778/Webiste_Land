@@ -871,6 +871,15 @@ function countryAndLoginCheck(req, res, next) {
 // Apply check for all routes
 app.use(countryAndLoginCheck);
 
+
+
+
+
+
+
+// Static files
+app.use(express.static(path.join(__dirname, "public")));
+
 // ===== Login routes =====
 app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, "public","login.html"));
@@ -894,10 +903,6 @@ app.get("/logout", (req, res) => {
 
 
 
-
-
-// Static files
-app.use(express.static(path.join(__dirname, "public")));
 
 // Page routes
 app.get("/product_overview", (req, res) => {
