@@ -845,51 +845,64 @@ app.get("/api/customers/:id", async (req, res) => {
 
 
 
+// Whitelisted IPs (always allowed)
+const WHITELIST_IPS = ["123.45.67.89"];
 
-// Helper to check if IP is VPN
+// Function to check if IP is private/local
+function isPrivateIP(ip) {
+  return (
+    ip.startsWith("10.") ||
+    ip.startsWith("192.168.") ||
+    ip.startsWith("172.") ||
+    ip === "127.0.0.1" ||
+    ip === "::1"
+  );
+}
+
+// Simple in-memory cache
+const ipCache = new Map();
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
 async function isVPN(ip) {
+  if (WHITELIST_IPS.includes(ip)) return false;
+  if (isPrivateIP(ip)) return false;
+
+  if (ipCache.has(ip)) {
+    const cached = ipCache.get(ip);
+    if (Date.now() - cached.timestamp < CACHE_TTL) return cached.isVPN;
+  }
+
   try {
-    const res = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,countryCode,org,isp,message`);
+    const res = await fetch(`http://ip-api.com/json/${ip}?fields=proxy,hosting,status,message`);
     const data = await res.json();
 
     if (data.status !== "success") {
-      console.log("IP-API error:", data.message || "Unknown error");
-      return { vpn: false, country: null };
+      console.warn(`IP-API error: ${data.message}`);
+      return false;
     }
 
-    const isIndian = data.countryCode === "IN";
-
-    // crude VPN/hosting check
-    const isHosting =
-      /hosting|vpn|proxy|data center|cloud/i.test(data.org || "") ||
-      /hosting|vpn|proxy|data center|cloud/i.test(data.isp || "");
-
-    if (isIndian && isHosting) {
-      return { vpn: true, country: "IN" };
-    }
-
-    return { vpn: false, country: data.countryCode };
+    const vpnDetected = data.proxy === true || data.hosting === true;
+    ipCache.set(ip, { isVPN: vpnDetected, timestamp: Date.now() });
+    return vpnDetected;
   } catch (err) {
-    console.error("Error checking VPN:", err);
-    return { vpn: false, country: null };
+    console.error("Error checking VPN:", err.message);
+    return false;
   }
 }
 
-// Middleware to block only Indian VPNs
+// Middleware to block VPNs
 app.use(async (req, res, next) => {
+  // Get client IP (handle Nginx & direct)
   const ip =
-    req.headers["x-real-ip"] ||
-    (req.headers["x-forwarded-for"]
-      ? req.headers["x-forwarded-for"].split(",")[0].trim()
-      : null) ||
-    req.socket.remoteAddress;
+  req.headers["x-real-ip"] ||
+  (req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].split(",")[0].trim() : null) ||
+  req.socket.remoteAddress;
 
   console.log("Client IP detected:", ip);
 
-  const { vpn, country } = await isVPN(ip);
-
-  if (vpn && country === "IN") {
-    return res.status(403).send("Access denied: VPN users in India are blocked.");
+  if (await isVPN(ip)) {
+    console.log(`❌ Blocked VPN/Proxy IP: ${ip}`);
+    return res.status(403).send("Access denied: VPN/Proxy not allowed");
   }
 
   next();
