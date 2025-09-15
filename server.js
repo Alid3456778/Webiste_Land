@@ -802,7 +802,7 @@ function requireEmployeeLogin(req, res, next) {
 }
 
 // Apply middleware globally
-app.use(requireEmployeeLogin);
+// app.use(requireEmployeeLogin);
 
 
 
