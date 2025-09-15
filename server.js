@@ -783,89 +783,89 @@ app.get("/api/customers/:id", async (req, res) => {
 });
 
 
-function requireEmployeeLogin(req, res, next) {
-  const country = req.get('X-Country-Code') || '';
-  const isIndia = country === 'IN';
+// function requireEmployeeLogin(req, res, next) {
+//   const country = req.get('X-Country-Code') || '';
+//   const isIndia = country === 'IN';
 
-  if (isIndia) {
-    if (req.path === '/employee-login') {
-      return next(); // allow login page
-    }
-    if (req.session && req.session.user) {
-      return next(); // logged in employee
-    }
-    return res.redirect('/employee-login'); // block others in India
-  }
+//   if (isIndia) {
+//     if (req.path === '/employee-login') {
+//       return next(); // allow login page
+//     }
+//     if (req.session && req.session.user) {
+//       return next(); // logged in employee
+//     }
+//     return res.redirect('/employee-login'); // block others in India
+//   }
 
-  // 🌍 outside India → allow normally
-  return next();
-}
+//   // 🌍 outside India → allow normally
+//   return next();
+// }
 
-// Apply middleware globally
-// app.use(requireEmployeeLogin);
-
-
-
-// const express = require("express");
-const session = require("express-session");
-const bodyParser = require("body-parser");
-
-// const app = express();
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({
-  secret: "verysecretkey",
-  resave: false,
-  saveUninitialized: true
-}));
-
-// Simple login form
-app.get("/employee-login", (req, res) => {
-  if (req.session.loggedIn) {
-    return res.redirect("/"); // redirect if already logged in
-  }
-  res.sendFile(path.join(__dirname, "public","login.html"));
-});
+// // Apply middleware globally
+// // app.use(requireEmployeeLogin);
 
 
-// Handle login
-app.post("/employee-login", async (req, res) => {
-  const { username, password } = req.body;
 
-  try {
-    const result = await pool.query(
-      "SELECT * FROM employees WHERE username = $1",
-      [username]
-    );
+// // const express = require("express");
+// const session = require("express-session");
+// const bodyParser = require("body-parser");
+
+// // const app = express();
+// app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(session({
+//   secret: "verysecretkey",
+//   resave: false,
+//   saveUninitialized: true
+// }));
+
+// // Simple login form
+// app.get("/employee-login", (req, res) => {
+//   if (req.session.loggedIn) {
+//     return res.redirect("/"); // redirect if already logged in
+//   }
+//   res.sendFile(path.join(__dirname, "public","login.html"));
+// });
+
+
+// // Handle login
+// app.post("/employee-login", async (req, res) => {
+//   const { username, password } = req.body;
+
+//   try {
+//     const result = await pool.query(
+//       "SELECT * FROM employees WHERE username = $1",
+//       [username]
+//     );
     
 
-    if (result.rows.length === 0) {
-      return res.send("Invalid credentials <a href='/employee-login'>Try again</a>");
-    }
+//     if (result.rows.length === 0) {
+//       return res.send("Invalid credentials <a href='/employee-login'>Try again</a>");
+//     }
 
-    const user = result.rows[0];
+//     const user = result.rows[0];
 
-    // 🔹 For now: plain password match
-    if (password === user.password_hash) {
-      req.session.loggedIn = true;
-      req.session.user = { id: user.id, username: user.username };
-      return res.redirect("/"); // secure page
-    }
+//     // 🔹 For now: plain password match
+//     if (password === user.password_hash) {
+//       req.session.loggedIn = true;
+//       req.session.user = { id: user.id, username: user.username };
+//       return res.redirect("/"); // secure page
+//     }
 
-    res.send("Invalid credentials <a href='/employee-login'>Try again</a>");
-  } catch (err) {
-    console.error("Login error:", err);
-    res.status(500).send("Server error");
-  }
-});
+//     res.send("Invalid credentials <a href='/employee-login'>Try again</a>");
+//   } catch (err) {
+//     console.error("Login error:", err);
+//     res.status(500).send("Server error");
+//   }
+// });
 
 
-// Protect all other routes
-app.use((req, res, next) => {
-  if (!req.session.loggedIn) {
-    return res.redirect("/employee-login");
-  }
-  next();
-});
+// // Protect all other routes
+// app.use((req, res, next) => {
+//   if (!req.session.loggedIn) {
+//     return res.redirect("/employee-login");
+//   }
+//   next();
+// });
 
 // // Example home page
 // app.get("/", (req, res) => {
