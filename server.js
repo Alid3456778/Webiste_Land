@@ -782,454 +782,79 @@ app.get("/api/customers/:id", async (req, res) => {
   }
 });
 
+// const express = require("express");
+const session = require("express-session");
+const bodyParser = require("body-parser");
 
-// // Whitelisted IPs (always allowed)
-// const WHITELIST_IPS = ["123.45.67.89"];
+// const app = express();
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(session({
+  secret: "verysecretkey",
+  resave: false,
+  saveUninitialized: true
+}));
 
-// // Function to check if IP is private/local
-// function isPrivateIP(ip) {
-//   return (
-//     ip.startsWith("10.") ||
-//     ip.startsWith("192.168.") ||
-//     ip.startsWith("172.") ||
-//     ip === "127.0.0.1"
-//   );
-// }
-
-// // Simple in-memory cache
-// const ipCache = new Map();
-// const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
-
-// async function isVPN(ip) {
-//   if (WHITELIST_IPS.includes(ip)) return false;
-//   if (isPrivateIP(ip)) return false;
-
-//   if (ipCache.has(ip)) {
-//     const cached = ipCache.get(ip);
-//     if (Date.now() - cached.timestamp < CACHE_TTL) return cached.isVPN;
-//   }
-
-//   try {
-//     const res = await fetch(`https://vpnapi.io/api/106.193.228.253?key=e34959be44264418bc6610fc4b382d59`);
-//     const data = await res.json();
-//     console.log("IP-API response:", res);
-//     if (data.status !== "success") {
-//       console.warn(`IP-API error: ${data.message}`);
-//       return false;
-//     }
-
-//     const vpnDetected = data.proxy === true || data.hosting === true;
-//     ipCache.set(ip, { isVPN: vpnDetected, timestamp: Date.now() });
-//     return vpnDetected;
-//   } catch (err) {
-//     console.error("Error checking VPN:", err.message);
-//     return false;
-//   }
-// }
-
-// // Middleware to block VPNs
-// app.use(async (req, res, next) => {
-//   // Get client IP (handle Nginx & direct)
-//   const ip =
-//   req.headers["x-real-ip"] ||
-//   (req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].split(",")[0].trim() : null) ||
-//   req.socket.remoteAddress;
-
-// console.log("Client IP detected:", ip);
-
-//   if (await isVPN(ip)) {
-//     console.log(`❌ Blocked VPN/Proxy IP: ${ip}`);
-//     return res.sendFile(path.join(__dirname, "public", "restricted.html"));
-//   }else{
-//     // console.log(`Not Allowed IP: ${ip}`);
-//   }
-
-//   next();
-// });
-
-
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-
-// Whitelisted IPs (always allowed)
-const WHITELIST_IPS = ["123.45.67.89"];
-
-// API Configuration
-const VPNAPI_KEY = "e34959be44264418bc6610fc4b382d59";
-const API_TIMEOUT = 5000; // 5 seconds timeout for API calls
-
-// Function to check if IP is private/local
-function isPrivateIP(ip) {
-  if (!ip || typeof ip !== 'string') return true; // Treat invalid IPs as private for safety
-  
-  return (
-    ip.startsWith("10.") ||
-    ip.startsWith("192.168.") ||
-    ip.startsWith("172.") ||
-    ip === "127.0.0.1" ||
-    ip === "::1" ||
-    ip.startsWith("169.254.") || // Link-local
-    ip.startsWith("fc00:") || // IPv6 private
-    ip.startsWith("fd00:") // IPv6 private
-  );
-}
-
-// Simple in-memory cache with cleanup
-const ipCache = new Map();
-const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
-
-// Cleanup old cache entries periodically
-setInterval(() => {
-  const now = Date.now();
-  for (const [ip, data] of ipCache.entries()) {
-    if (now - data.timestamp > CACHE_TTL) {
-      ipCache.delete(ip);
-    }
+// Simple login form
+app.get("/employee-login", (req, res) => {
+  if (req.session.loggedIn) {
+    return res.redirect("/"); // redirect if already logged in
   }
-}, 5 * 60 * 1000); // Clean every 5 minutes
-
-// Helper function to make API calls with timeout
-async function fetchWithTimeout(url, timeout = API_TIMEOUT) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
-  
-  try {
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; VPN-Detector/1.0)'
-      }
-    });
-    clearTimeout(timeoutId);
-    return response;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    throw error;
-  }
-}
-
-// Primary VPN check using vpnapi.io
-async function checkWithVpnApi(ip) {
-  try {
-    console.log(`🔍 Checking IP ${ip} with vpnapi.io`);
-    const response = await fetchWithTimeout(`https://vpnapi.io/api/${ip}?key=${VPNAPI_KEY}`);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-    
-    const data = await response.json();
-    console.log("VpnAPI.io response:", JSON.stringify(data, null, 2));
-    
-    // Check if the response has the expected structure
-    if (!data.security) {
-      throw new Error("Invalid response structure from vpnapi.io");
-    }
-    
-    const { vpn, proxy, tor, relay } = data.security;
-    const isVpnDetected = vpn || proxy || tor || relay;
-    
-    console.log(`VpnAPI.io result: VPN=${vpn}, Proxy=${proxy}, Tor=${tor}, Relay=${relay}`);
-    return { success: true, isVPN: isVpnDetected, service: 'vpnapi.io' };
-    
-  } catch (error) {
-    console.error("Error checking with vpnapi.io:", error.message);
-    return { success: false, error: error.message };
-  }
-}
-
-// Fallback 1: ip-api.com
-async function checkWithIpApi(ip) {
-  try {
-    console.log(`🔍 Checking IP ${ip} with ip-api.com (fallback 1)`);
-    const response = await fetchWithTimeout(`http://ip-api.com/json/${ip}?fields=proxy,hosting,status,message`);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-    
-    const data = await response.json();
-    console.log("IP-API response:", JSON.stringify(data, null, 2));
-    
-    if (data.status !== "success") {
-      throw new Error(`IP-API error: ${data.message || 'Unknown error'}`);
-    }
-    
-    const isVpnDetected = data.proxy === true || data.hosting === true;
-    return { success: true, isVPN: isVpnDetected, service: 'ip-api.com' };
-    
-  } catch (error) {
-    console.error("Error checking with ip-api.com:", error.message);
-    return { success: false, error: error.message };
-  }
-}
-
-// Fallback 2: ipwho.is
-async function checkWithIpWho(ip) {
-  try {
-    console.log(`🔍 Checking IP ${ip} with ipwho.is (fallback 2)`);
-    const response = await fetchWithTimeout(`https://ipwho.is/${ip}`);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-    
-    const data = await response.json();
-    console.log("IpWho.is response:", JSON.stringify(data, null, 2));
-    
-    if (data.success === false) {
-      throw new Error(`IpWho.is error: ${data.message || 'Unknown error'}`);
-    }
-    
-    // ipwho.is may not have proxy field, so we check what's available
-    const isVpnDetected = data.proxy === true || data.hosting === true;
-    return { success: true, isVPN: isVpnDetected, service: 'ipwho.is' };
-    
-  } catch (error) {
-    console.error("Error checking with ipwho.is:", error.message);
-    return { success: false, error: error.message };
-  }
-}
-
-// Main VPN detection function with multiple fallbacks
-async function isVPN(ip) {
-  // Input validation
-  if (!ip || typeof ip !== 'string') {
-    console.warn("Invalid IP provided to isVPN function");
-    return false;
-  }
-  
-  // Clean the IP (remove any whitespace)
-  ip = ip.trim();
-  
-  // Check whitelist first
-  if (WHITELIST_IPS.includes(ip)) {
-    console.log(`✅ IP ${ip} is whitelisted`);
-    return false;
-  }
-  
-  // Check if private/local IP
-  if (isPrivateIP(ip)) {
-    console.log(`✅ IP ${ip} is private/local`);
-    return false;
-  }
-  
-  // Check cache first
-  if (ipCache.has(ip)) {
-    const cached = ipCache.get(ip);
-    if (Date.now() - cached.timestamp < CACHE_TTL) {
-      console.log(`📋 Using cached result for ${ip}: ${cached.isVPN}`);
-      return cached.isVPN;
-    }
-  }
-  
-  // Try primary service first (vpnapi.io)
-  let result = await checkWithVpnApi(ip);
-  
-  // If primary fails, try fallback 1 (ip-api.com)
-  if (!result.success) {
-    console.log("🔄 Falling back to ip-api.com");
-    result = await checkWithIpApi(ip);
-  }
-  
-  // If fallback 1 fails, try fallback 2 (ipwho.is)
-  if (!result.success) {
-    console.log("🔄 Falling back to ipwho.is");
-    result = await checkWithIpWho(ip);
-  }
-  
-  // If all services fail, default to false (allow access)
-  let vpnDetected = false;
-  let serviceUsed = 'none (all failed)';
-  
-  if (result.success) {
-    vpnDetected = result.isVPN;
-    serviceUsed = result.service;
-  } else {
-    console.warn(`⚠️ All VPN detection services failed for IP ${ip}. Defaulting to ALLOW.`);
-  }
-  
-  // Cache the result
-  ipCache.set(ip, { 
-    isVPN: vpnDetected, 
-    timestamp: Date.now(),
-    service: serviceUsed
-  });
-  
-  console.log(`🎯 Final result for ${ip}: ${vpnDetected ? 'VPN DETECTED' : 'ALLOWED'} (via ${serviceUsed})`);
-  return vpnDetected;
-}
-
-// Enhanced IP extraction function
-function extractClientIP(req) {
-  // Try multiple headers in order of preference
-  const possibleHeaders = [
-    'x-real-ip',
-    'x-forwarded-for',
-    'x-client-ip',
-    'cf-connecting-ip', // Cloudflare
-    'x-forwarded',
-    'forwarded-for',
-    'forwarded'
-  ];
-  
-  for (const header of possibleHeaders) {
-    const value = req.headers[header];
-    if (value) {
-      // Handle comma-separated IPs (take the first one)
-      const ip = value.split(',')[0].trim();
-      if (ip && ip !== 'unknown') {
-        return ip;
-      }
-    }
-  }
-  
-  // Fallback to req.ip
-  return req.ip || req.connection?.remoteAddress || 'unknown';
-}
-
-// Express.js setup
-app.set("trust proxy", true);
-
-// Middleware to block VPNs with enhanced error handling
-app.use(async (req, res, next) => {
-  try {
-    const ip = extractClientIP(req);
-    console.log(`🌐 Client IP detected: ${ip} (from ${req.headers['user-agent']?.substring(0, 50) || 'unknown user-agent'})`);
-    
-    // Skip VPN check for invalid IPs
-    if (!ip || ip === 'unknown') {
-      console.warn("⚠️ Could not determine client IP, allowing request");
-      return next();
-    }
-    
-    const vpnDetected = await isVPN(ip);
-    
-    if (vpnDetected) {
-      console.log(`❌ Blocked VPN/Proxy IP: ${ip}`);
-      // Add security headers
-      res.set({
-        'X-Content-Type-Options': 'nosniff',
-        'X-Frame-Options': 'DENY',
-        'X-XSS-Protection': '1; mode=block'
-      });
-      return res.status(403).sendFile(path.join(__dirname, "public", "restricted.html"));
-    } else {
-      console.log(`✅ Allowed IP: ${ip}`);
-      return next();
-    }
-    
-  } catch (error) {
-    console.error("❌ Error in VPN detection middleware:", error);
-    // In case of middleware error, log it but don't block the user
-    console.log("⚠️ Allowing request due to middleware error");
-    next();
-  }
+  res.sendFile(path.join(__dirname, "public","login.html"));
 });
 
-// Optional: Add a health check endpoint for monitoring
-app.get('/health/vpn-detector', (req, res) => {
-  res.json({
-    status: 'ok',
-    cacheSize: ipCache.size,
-    uptime: process.uptime(),
-    timestamp: new Date().toISOString()
-  });
-});
 
-// Optional: Add an endpoint to manually check IPs (for testing)
-app.get('/admin/check-ip/:ip', async (req, res) => {
+// Handle login
+app.post("/employee-login", async (req, res) => {
+  const { username, password } = req.body;
+
   try {
-    const { ip } = req.params;
-    const result = await isVPN(ip);
-    res.json({
-      ip,
-      isVPN: result,
-      cached: ipCache.has(ip),
-      timestamp: new Date().toISOString()
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    const result = await pool.query(
+      "SELECT * FROM employees WHERE username = $1",
+      [username]
+    );
+    
+
+    if (result.rows.length === 0) {
+      return res.send("Invalid credentials <a href='/employee-login'>Try again</a>");
+    }
+
+    const user = result.rows[0];
+
+    // 🔹 For now: plain password match
+    if (password === user.password_hash) {
+      req.session.loggedIn = true;
+      req.session.user = { id: user.id, username: user.username };
+      return res.redirect("/"); // secure page
+    }
+
+    res.send("Invalid credentials <a href='/employee-login'>Try again</a>");
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).send("Server error");
   }
 });
 
 
+// Protect all other routes
+app.use((req, res, next) => {
+  if (!req.session.loggedIn) {
+    return res.redirect("/employee-login");
+  }
+  next();
+});
 
-
-
-
-
-
-
-
-// // List of allowed IPs (always allowed)
-// const WHITELISTED_IPS = ["192.168.0.212", "223.185.36.119"];
-
-// let use = process.env.USERNAMES ;
-// let pass = process.env.PASSWORD ;
-
-// console.log("User:", use);
-// console.log("Pass:", pass);
-// // Simple user/password
-// const ACCESS_USERS = [{ username: "special", password: "letmein123" }];
-
-// // Middleware to enforce IP/login access
-// app.use((req, res, next) => {
-//   // Skip protection for login routes
-//   if (req.path === "/access-login" || req.path === "/restricted.html") {
-//     return next();
-//   }
-
-//   const ip =
-//     req.headers["x-real-ip"] ||
-//     (req.headers["x-forwarded-for"]
-//       ? req.headers["x-forwarded-for"].split(",")[0].trim()
-//       : null) ||
-//     req.socket.remoteAddress;
-
-//   console.log("Client IP detected:", ip);
-
-//   // 1. Allow whitelisted IPs
-//   if (WHITELISTED_IPS.includes(ip)) {
-//     return next();
-//   }
-
-//   // // 2. Allow if cookie is set
-//   // if (req.cookies.allowedAccess === "yes") {
-//   //   return next();
-//   // }
-
-//   // 3. Otherwise force login page
-//   return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+// // Example home page
+// app.get("/", (req, res) => {
+//   res.send("Welcome Employee, here are the sales.");
 // });
 
-
-// // Handle login POST
-// app.post("/access-login", express.json(), (req, res) => {
-//   const { username, password } = req.body;
-//   const user = ACCESS_USERS.find(
-//     (u) => u.username === username && u.password === password
-//   );
-//   if (!user) {
-//     return res.json({ success: false });
-//   }
-
-//   // Set cookie for 2 hours
-//   res.cookie("allowedAccess", "yes", {
-//     httpOnly: true,
-//     maxAge: 2 * 60 * 60 * 1000,
-//   });
-//   res.json({ success: true });
-// });
+// app.listen(3000, () => console.log("App running on port 3000"));
 
 
 
 
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
-
-// app.get('/ip_test', (req, res) => {
-//   res.send(`Your IP is: ${req.ip}`);
-// });
 
 // Page routes
 app.get("/product_overview", (req, res) => {
