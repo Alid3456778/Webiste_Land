@@ -782,6 +782,30 @@ app.get("/api/customers/:id", async (req, res) => {
   }
 });
 
+
+function requireEmployeeLogin(req, res, next) {
+  const country = req.get('X-Country-Code') || '';
+  const isIndia = country === 'IN';
+
+  if (isIndia) {
+    if (req.path === '/employee-login') {
+      return next(); // allow login page
+    }
+    if (req.session && req.session.user) {
+      return next(); // logged in employee
+    }
+    return res.redirect('/employee-login'); // block others in India
+  }
+
+  // 🌍 outside India → allow normally
+  return next();
+}
+
+// Apply middleware globally
+app.use(requireEmployeeLogin);
+
+
+
 // const express = require("express");
 const session = require("express-session");
 const bodyParser = require("body-parser");
