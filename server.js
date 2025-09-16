@@ -229,52 +229,91 @@ app.post("/api/checkout", async (req, res) => {
       to: email, // Recipient's email
       subject: "Order Confirmation - Mcland Pharma",
       html: `
-                <h1>✅ Thank you for your order, ${firstName} ${lastName}!</h1>
-                <p>Your order has been successfully placed. 🎉 </p>
-                <br>
-                <h2>📒 Customer Details</h2>
-                <ul>
-                    <li><strong>Name:</strong> ${firstName} ${lastName}</li>
-                    <li><strong>Phone:</strong> ${phone}</li>
-                    <li><strong>Email:</strong> ${email}</li>
-                    <li><strong>Address:</strong> ${billingStreetAddress}, ${apartment}, ${billingCity}, ${billingState}, ${billingZip}, ${country}</li>
-                    <li><strong>Company Name:</strong> ${companyName}</li>
-                </ul>
-                <br width="2px" hight="10px" color="black" >
-                <h2>🛒 Order Summary</h2>
-                <table border="1" cellpadding="5" cellspacing="0">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; }
+        .header { background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 5px; }
+        .content { padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .total { font-weight: bold; font-size: 16px; }
+        .footer { background-color: #f8f9fa; padding: 15px; margin-top: 20px; border-radius: 5px; }
+        .contact-info { margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Order Confirmation - Mcland Pharma</h1>
+        <p>Thank you for your order, ${firstName} ${lastName}!</p>
+    </div>
+    
+    <div class="content">
+        <p>Your order has been successfully placed and is being processed.</p>
+        
+        <h2>Customer Information</h2>
+        <table>
+            <tr><td><strong>Name:</strong></td><td>${firstName} ${lastName}</td></tr>
+            <tr><td><strong>Phone:</strong></td><td>${phone}</td></tr>
+            <tr><td><strong>Email:</strong></td><td>${email}</td></tr>
+            <tr><td><strong>Address:</strong></td><td>${billingStreetAddress}, ${apartment}, ${billingCity}, ${billingState}, ${billingZip}, ${country}</td></tr>
+            <tr><td><strong>Company:</strong></td><td>${companyName}</td></tr>
+        </table>
+        
+        <h2>Order Summary</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Strength (mg)</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${cartItems.map(item => `
                     <tr>
-                        <th>Product Name</th>
-                        <th>Mg</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
+                        <td>${item.name}</td>
+                        <td>${item.mg}</td>
+                        <td>${item.quantity}</td>
+                        <td>$${parseFloat(item.price).toFixed(2)}</td>
                     </tr>
-                    ${cartItems
-                      .map(
-                        (item) => `
-                        <tr>
-                            <td>${item.name}</td>
-                            <td>${item.mg}</td>
-                            <td>${item.quantity}</td>
-                            <td>$${parseFloat(item.price).toFixed(2)}</td>
-                        </tr>
-                    `
-                      )
-                      .join("")}
-                </table>
-                <br>
-
-                
-                <p><strong>Shipping Cost:</strong> $${parseFloat(shippingCost).toFixed(2)}</p>
-                <p><strong>Total Cost:</strong> $${parseFloat(totalCost).toFixed(2)}</p>
-                <br><br>
-                <h2>📞 Contact Us</h2>
-                <p>If you have any questions, feel free to reply to this email or call us at +1 209 593 7171.</p>
-                <p>Or WhatsApp us at +91 887 920 1044 WhatsApp Link: https://t.ly/cMdMT</p>
-                <p>📩 E-mail: customerinfo2024@gmail.com</p>
-                <br>
-                <p>💫 We appreciate your business!</p>
-            `,
+                `).join('')}
+            </tbody>
+        </table>
+        
+        <div class="total">
+            <p>Shipping Cost: $${parseFloat(shippingCost).toFixed(2)}</p>
+            <p>Total Amount: $${parseFloat(totalCost).toFixed(2)}</p>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <h3>Contact Information</h3>
+        <div class="contact-info">
+            <p><strong>Phone:</strong> +1 209 593 7171</p>
+            <p><strong>WhatsApp:</strong> +91 887 920 1044 | <a href="https://t.ly/cMdMT">Chat with us</a></p>
+            <p><strong>Email:</strong> <a href="mailto:customerinfo2024@gmail.com">customerinfo2024@gmail.com</a></p>
+        </div>
+        <p><em>This is an automated confirmation email. Please do not reply directly to this message.</em></p>
+        <p>© ${new Date().getFullYear()} Mcland Pharma. All rights reserved.</p>
+    </div>
+</body>
+</html>
+    `,
+    
+    // Additional headers to improve deliverability
+    headers: {
+      'X-Priority': '3',
+      'X-MSMail-Priority': 'Normal',
+      'X-Mailer': 'Mcland Pharma Order System',
+      'X-MimeOLE': 'Produced By Mcland Pharma',
+    },
     };
 
     // Send the email
