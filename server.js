@@ -10,6 +10,7 @@ const jwt = require("jsonwebtoken"); // For generating authentication tokens
 require("dotenv").config();
 const nodemailer = require("nodemailer");
 // const fetch = require("node-fetch");
+const axios = require("axios");
  
 
 const app = express();
@@ -914,7 +915,42 @@ app.get("/api/customers/:id", async (req, res) => {
 // app.listen(3000, () => console.log("App running on port 3000"));
 
 
+app.use(cookieParser());
 
+// Middleware to block VPN users
+async function blockVPN(req, res, next) {
+  try {
+    // If cookie already says blocked → deny immediately
+    if (req.cookies.vpn_blocked === "true") {
+      return res.status(403).send("Not allowed (VPN detected)");
+    }
+
+    // Get client IP
+    const clientIp =
+      req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
+
+      console.log("Client IP:", clientIp);
+    // Check with ip-api
+    const response = await axios.get(
+      `http://ip-api.com/json/${clientIp}?fields=proxy,hosting`
+    );
+
+    const data = response.data;
+
+    if (data.proxy || data.hosting) {
+      // Set cookie for 1 day
+      res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
+      return res.status(403).send("Not allowed (VPN detected)");
+    }
+
+    next();
+  } catch (error) {
+    console.error("VPN check failed:", error.message);
+    next();
+  }
+}
+
+app.use(blockVPN);
 
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
