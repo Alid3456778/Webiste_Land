@@ -921,9 +921,9 @@ app.use(cookieParser());
 async function blockVPN(req, res, next) {
   try {
     // If cookie already says blocked → deny immediately
-    if (req.cookies.vpn_blocked === "true") {
-      return res.status(403).send("Not allowed (VPN detected)");
-    }
+    // if (req.cookies.vpn_blocked === "true") {
+    //   return res.status(403).send("Not allowed (VPN detected)");
+    // }
 
     // Get client IP
     const clientIp =
