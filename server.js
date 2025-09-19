@@ -915,42 +915,193 @@ app.get("/api/customers/:id", async (req, res) => {
 // app.listen(3000, () => console.log("App running on port 3000"));
 
 
+// app.use(cookieParser());
+
+// // Middleware to block VPN users
+// async function blockVPN(req, res, next) {
+//   try {
+//     // If cookie already says blocked → deny immediately
+//     if (req.cookies.vpn_blocked === "true") {
+//       return res.status(403).send("Not allowed (VPN detected)");
+//     }
+
+//     // Get client IP
+//     const clientIp =
+//       req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
+
+//       console.log("Client IP:", clientIp);
+//     // Check with ip-api
+//     const response = await axios.get(
+//       `http://ip-api.com/json/${clientIp}?fields=proxy,hosting`
+//     );
+
+//     const data = response.data;
+
+//     if (data.proxy || data.hosting) {
+//       // Set cookie for 1 day
+//       res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
+//       return res.status(403).send("Not allowed (VPN detected)");
+//     }
+
+//     next();
+//   } catch (error) {
+//     console.error("VPN check failed:", error.message);
+//     next();
+//   }
+// }
+
+// app.use(blockVPN);
+
+const axios = require("axios");
+const cookieParser = require("cookie-parser");
 app.use(cookieParser());
+
+const BLOCK_COOKIE_DURATION = 10 * 60 * 1000; // 10 minutes
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+const vpnCache = new Map(); // Cache: IP -> { isVPN, timestamp }
+
+function getClientIp(req) {
+  return (
+    req.headers["x-forwarded-for"]?.split(",")[0] ||
+    req.headers["x-real-ip"] ||
+    req.headers["cf-connecting-ip"] || // Cloudflare
+    req.socket.remoteAddress
+  )?.replace("::ffff:", ""); // clean IPv6-mapped IPv4
+}
 
 // Middleware to block VPN users
 async function blockVPN(req, res, next) {
   try {
-    // If cookie already says blocked → deny immediately
-    // if (req.cookies.vpn_blocked === "true") {
-    //   return res.status(403).send("Not allowed (VPN detected)");
-    // }
+    const clientIp = getClientIp(req);
 
-    // Get client IP
-    const clientIp =
-      req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
-
-      console.log("Client IP:", clientIp);
-    // Check with ip-api
-    const response = await axios.get(
-      `http://ip-api.com/json/${clientIp}?fields=proxy,hosting`
-    );
-
-    const data = response.data;
-
-    if (data.proxy || data.hosting) {
-      // Set cookie for 1 day
-      res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
-      return res.status(403).send("Not allowed (VPN detected)");
+    if (!clientIp) {
+      console.error("Could not determine client IP");
+      return res.status(400).send("Could not determine your IP");
     }
 
+    console.log("Client IP:", clientIp);
+
+    const now = Date.now();
+
+    // ✅ If cookie says blocked → re-check IP
+    if (req.cookies.vpn_blocked === "true") {
+      console.log("VPN cookie found → rechecking IP");
+
+      // Check cache first
+      const cached = vpnCache.get(clientIp);
+      if (cached && now - cached.timestamp < CACHE_DURATION) {
+        if (!cached.isVPN) {
+          console.log("Cache says clean → clear cookie");
+          res.clearCookie("vpn_blocked");
+          return next();
+        }
+        console.log("Cache says VPN → block");
+        return res.status(403).send(blockPage());
+      }
+
+      // Cache miss → call API
+      const { isVPN } = await checkIpWithApi(clientIp);
+      vpnCache.set(clientIp, { isVPN, timestamp: now });
+
+      if (!isVPN) {
+        console.log("Re-check: VPN disabled → clear cookie");
+        res.clearCookie("vpn_blocked");
+        return next();
+      }
+
+      console.log("Re-check: still VPN → block");
+      return res.status(403).send(blockPage());
+    }
+
+    // ✅ No blocking cookie → normal check
+    const cached = vpnCache.get(clientIp);
+    if (cached && now - cached.timestamp < CACHE_DURATION) {
+      console.log(`Cache hit for ${clientIp} → ${cached.isVPN ? "VPN" : "Clean"}`);
+      if (cached.isVPN) {
+        res.cookie("vpn_blocked", "true", {
+          maxAge: BLOCK_COOKIE_DURATION,
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+        });
+        return res.status(403).send(blockPage());
+      }
+      return next();
+    }
+
+    // Cache miss → call API
+    const { isVPN } = await checkIpWithApi(clientIp);
+    vpnCache.set(clientIp, { isVPN, timestamp: now });
+
+    if (isVPN) {
+      console.log("VPN detected → set cookie + block");
+      res.cookie("vpn_blocked", "true", {
+        maxAge: BLOCK_COOKIE_DURATION,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+      });
+      return res.status(403).send(blockPage());
+    }
+
+    // Clean IP → allow
     next();
   } catch (error) {
     console.error("VPN check failed:", error.message);
-    next();
+    next(); // allow if API fails
   }
 }
 
+// Helper to call API
+async function checkIpWithApi(ip) {
+  try {
+    const response = await axios.get(
+      `http://ip-api.com/json/${ip}?fields=proxy,hosting,status,message`,
+      { timeout: 5000 }
+    );
+
+    const data = response.data;
+    if (data.status === "fail") {
+      console.error(`API failed for ${ip}: ${data.message}`);
+      return { isVPN: false }; // fail-open
+    }
+
+    return { isVPN: Boolean(data.proxy || data.hosting) };
+  } catch (err) {
+    console.error(`API error for ${ip}:`, err.message);
+    return { isVPN: false }; // fail-open
+  }
+}
+
+// 🚨 Custom block page with Retry button
+function blockPage() {
+  return `
+    <html>
+      <head>
+        <title>Access Denied</title>
+      </head>
+      <body style="font-family: Arial; text-align: center; margin-top: 50px;">
+        <h1>Access Denied</h1>
+        <p>VPN/Proxy connections are not allowed.<br>
+        Please disable your VPN or Proxy and try again.</p>
+        <form action="/retry" method="POST">
+          <button type="submit" style="padding: 10px 20px; font-size: 16px;">
+            Retry Access
+          </button>
+        </form>
+      </body>
+    </html>
+  `;
+}
+
+// 🚨 Retry route → clears cookie and re-checks
+app.post("/retry", (req, res) => {
+  res.clearCookie("vpn_blocked");
+  console.log("User requested retry → cookie cleared");
+  res.redirect("/"); // Send back to homepage (or any safe route)
+});
+
 app.use(blockVPN);
+
+
 
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
