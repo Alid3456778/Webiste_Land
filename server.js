@@ -822,6 +822,13 @@ app.get("/api/customers/:id", async (req, res) => {
   }
 });
 
+// 🚨 Retry route → clears cookie and re-checks
+app.post("/retry", (req, res) => {
+  res.clearCookie("vpn_blocked");
+  // console.log("User requested retry → cookie cleared");
+  res.redirect("/"); // Send back to homepage (or any safe route)
+});
+
 
 // function requireEmployeeLogin(req, res, next) {
 //   const country = req.get('X-Country-Code') || '';
@@ -921,9 +928,9 @@ app.use(cookieParser());
 async function blockVPN(req, res, next) {
   try {
     // If cookie already says blocked → deny immediately
-    // if (req.cookies.vpn_blocked === "true") {
-    //   return res.status(403).send("Not allowed (VPN detected)");
-    // }
+    if (req.cookies.vpn_blocked === "true") {
+      return res.status(403).send("Not allowed (VPN detected)");
+    }
 
     // Get client IP
     const clientIp =
@@ -940,7 +947,8 @@ async function blockVPN(req, res, next) {
     if (data.proxy || data.hosting) {
       // Set cookie for 1 day
       res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
-      return res.status(403).send("Not allowed (VPN detected)");
+      // return res.status(403).send("Not allowed (VPN detected)");
+      return res.sendFile(path.join(__dirname, "public", "restricted.html"));
     }
 
     next();
