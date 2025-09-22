@@ -922,21 +922,67 @@ app.post("/retry", (req, res) => {
 // app.listen(3000, () => console.log("App running on port 3000"));
 
 
+// app.use(cookieParser());
+
+// // Middleware to block VPN users
+// async function blockVPN(req, res, next) {
+//   try {
+//     // If cookie already says blocked → deny immediately
+//     if (req.cookies.vpn_blocked === "true") {
+//       //return res.status(403).send("Not allowed (VPN detected)");
+//       return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+//     }
+
+//     // Get client IP
+//     const clientIp =
+//       req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
+
+//       console.log("Client IP:", clientIp);
+//     // Check with ip-api
+//     const response = await axios.get(
+//       `http://ip-api.com/json/${clientIp}?fields=proxy,hosting`
+//     );
+
+//     const data = response.data;
+
+//     if (data.proxy || data.hosting) {
+//       // Set cookie for 1 day
+//       res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
+//        return res.status(403).send("Not allowed (VPN detected)");
+//       //return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+//     }
+
+//     next();
+//   } catch (error) {
+//     console.error("VPN check failed:", error.message);
+//     next();
+//   }
+// }
+
+// app.use(blockVPN);
+
 app.use(cookieParser());
 
 // Middleware to block VPN users
 async function blockVPN(req, res, next) {
   try {
-    // If cookie already says blocked → deny immediately
+    // 🚨 If cookie already says blocked → deny immediately
     if (req.cookies.vpn_blocked === "true") {
-      return res.status(403).send("Not allowed (VPN detected)");
+      return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+    }
+
+    // 🚨 If cookie already says valid user → allow immediately (skip API check)
+    if (req.cookies.valid_user === "true") {
+      console.log("Trusted valid user → skipping VPN check");
+      return next();
     }
 
     // Get client IP
     const clientIp =
       req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
 
-      console.log("Client IP:", clientIp);
+    console.log("Client IP:", clientIp);
+
     // Check with ip-api
     const response = await axios.get(
       `http://ip-api.com/json/${clientIp}?fields=proxy,hosting`
@@ -945,11 +991,14 @@ async function blockVPN(req, res, next) {
     const data = response.data;
 
     if (data.proxy || data.hosting) {
-      // Set cookie for 1 day
+      // 🚨 VPN detected → block + set cookie
       res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
-      // return res.status(403).send("Not allowed (VPN detected)");
-      return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+      return res.status(403).send("Not allowed (VPN detected)");
+      // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
     }
+
+    // 🚨 If user is clean → set valid_user cookie for 1 day
+    res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
 
     next();
   } catch (error) {
@@ -959,6 +1008,7 @@ async function blockVPN(req, res, next) {
 }
 
 app.use(blockVPN);
+
 
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
