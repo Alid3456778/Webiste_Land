@@ -905,6 +905,8 @@
         );
         // console.log(variants);
         const fragment = document.createDocumentFragment();
+        //for sorting the quantity in ascending order
+        matchingVariants.sort((a, b) => a.qty - b.qty);
 
         matchingVariants.forEach((variant) => {
           // console.log("varietns are ", variant);
