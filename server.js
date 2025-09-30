@@ -990,7 +990,7 @@ async function blockVPN(req, res, next) {
 
     const data = response.data;
 
-    if (data.proxy || data.hosting) {
+    if (data.proxy ) {
       // 🚨 VPN detected → block + set cookie
       res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
       return res.status(403).send("Not allowed (VPN detected)");
