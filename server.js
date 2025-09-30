@@ -924,42 +924,42 @@ app.post("/retry", (req, res) => {
 
 // app.use(cookieParser());
 
-// // Middleware to block VPN users
-// async function blockVPN(req, res, next) {
-//   try {
-//     // If cookie already says blocked → deny immediately
-//     if (req.cookies.vpn_blocked === "true") {
-//       //return res.status(403).send("Not allowed (VPN detected)");
-//       return res.sendFile(path.join(__dirname, "public", "restricted.html"));
-//     }
+// Middleware to block VPN users
+async function blockVPN(req, res, next) {
+  try {
+    // If cookie already says blocked → deny immediately
+    if (req.cookies.vpn_blocked === "true") {
+      //return res.status(403).send("Not allowed (VPN detected)");
+      return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+    }
 
-//     // Get client IP
-//     const clientIp =
-//       req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
+    // Get client IP
+    const clientIp =
+      req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
 
-//       console.log("Client IP:", clientIp);
-//     // Check with ip-api
-//     const response = await axios.get(
-//       `http://ip-api.com/json/${clientIp}?fields=proxy,hosting`
-//     );
+      console.log("Client IP:", clientIp);
+    // Check with ip-api
+    const response = await axios.get(
+      `http://ip-api.com/json/${clientIp}?fields=proxy,hosting`
+    );
 
-//     const data = response.data;
+    const data = response.data;
 
-//     if (data.proxy || data.hosting) {
-//       // Set cookie for 1 day
-//       res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
-//        return res.status(403).send("Not allowed (VPN detected)");
-//       //return res.sendFile(path.join(__dirname, "public", "restricted.html"));
-//     }
+    if (data.proxy || data.hosting) {
+      // Set cookie for 1 day
+      res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
+       return res.status(403).send("Not allowed (VPN detected)");
+      //return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+    }
 
-//     next();
-//   } catch (error) {
-//     console.error("VPN check failed:", error.message);
-//     next();
-//   }
-// }
+    next();
+  } catch (error) {
+    console.error("VPN check failed:", error.message);
+    next();
+  }
+}
 
-// app.use(blockVPN);
+app.use(blockVPN);
 
 app.use(cookieParser());
 
