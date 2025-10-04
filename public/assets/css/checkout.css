@@ -462,7 +462,7 @@ body {
 }
 
 /* Payment buttons container */
-.modal-content1 button {
+.Payment_Button {
   background: none;
   border: none;
   cursor: pointer;
@@ -494,4 +494,38 @@ body {
   .modal-content1 button img {
     max-width: 80px;
   }
+}
+
+
+.X_button {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+.Ok_Button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+.Cancel_Button {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px;
 }

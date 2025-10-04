@@ -366,8 +366,7 @@ app.get("/api/invoice/:orderId", async (req, res) => {
   }
 });
 
-const JWT_SECRET =
-  "3db7f92394dfb627bdbe12fbfc34f63b2f9c2296da88c4c3dfbf9eb48b8a5e29a81f1df435ad8abfe3dc9a4edcd45f71d8fb5e38d6c93ed2f5f8451b5b9e2565";
+const JWT_SECRET = "3db7f92394dfb627bdbe12fbfc34f63b2f9c2296da88c4c3dfbf9eb48b8a5e29a81f1df435ad8abfe3dc9a4edcd45f71d8fb5e38d6c93ed2f5f8451b5b9e2565";
 
 app.post("/api/login", async (req, res) => {
   const { username, password } = req.body;
@@ -755,11 +754,26 @@ app.get("/product-prices", async (req, res) => {
 });
 
 // Endpoint to fetch requests
+// app.get("/api/requests", async (req, res) => {
+//   try {
+//     const result = await pool.query("SELECT * FROM orders"); // Adjust query for your table schema
+//     res.json(result.rows);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
+
 app.get("/api/requests", async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM orders"); // Adjust query for your table schema
+    const result = await pool.query(`
+      SELECT 
+        *
+      FROM orders 
+      ORDER BY created_at DESC
+    `);
     res.json(result.rows);
   } catch (err) {
+    console.error("Error fetching requests:", err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -829,102 +843,216 @@ app.post("/retry", (req, res) => {
   res.redirect("/"); // Send back to homepage (or any safe route)
 });
 
+// Add this endpoint to your server.js file (before the "Start server" section)
 
-// function requireEmployeeLogin(req, res, next) {
-//   const country = req.get('X-Country-Code') || '';
-//   const isIndia = country === 'IN';
+// GET: Customer Order Tracking - Complete customer data with all orders
+app.get("/api/customer-tracking/:userId", async (req, res) => {
+  const { userId } = req.params;
 
-//   if (isIndia) {
-//     if (req.path === '/employee-login') {
-//       return next(); // allow login page
-//     }
-//     if (req.session && req.session.user) {
-//       return next(); // logged in employee
-//     }
-//     return res.redirect('/employee-login'); // block others in India
-//   }
+  try {
+    // 1) Fetch customer details
+    const customerResult = await pool.query(
+      "SELECT * FROM customers WHERE id = $1",
+      [userId]
+    );
 
-//   // 🌍 outside India → allow normally
-//   return next();
-// }
+    if (customerResult.rows.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Customer not found" 
+      });
+    }
 
-// // Apply middleware globally
-// // app.use(requireEmployeeLogin);
+    const customer = customerResult.rows[0];
 
+    // 2) Fetch all orders for this customer with timestamps
+    const ordersResult = await pool.query(
+      `SELECT *
+       FROM orders 
+       WHERE user_id = $1 
+       ORDER BY created_at DESC`,
+      [userId]
+    );
 
+    const orders = ordersResult.rows;
 
-// // const express = require("express");
-// const session = require("express-session");
-// const bodyParser = require("body-parser");
+    // 3) For each order, fetch its items
+    const ordersWithItems = await Promise.all(
+      orders.map(async (order) => {
+        const itemsResult = await pool.query(
+          `SELECT *
+           FROM order_items 
+           WHERE order_id = $1`,
+          [order.order_id]
+        );
 
-// // const app = express();
-// app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(session({
-//   secret: "verysecretkey",
-//   resave: false,
-//   saveUninitialized: true
-// }));
+        return {
+          ...order,
+          items: itemsResult.rows,
+          itemCount: itemsResult.rows.length,
+        };
+      })
+    );
 
-// // Simple login form
-// app.get("/employee-login", (req, res) => {
-//   if (req.session.loggedIn) {
-//     return res.redirect("/"); // redirect if already logged in
-//   }
-//   res.sendFile(path.join(__dirname, "public","login.html"));
-// });
+    // 4) Calculate total lifetime value
+    const totalSpent = orders.reduce(
+      (sum, order) => sum + parseFloat(order.total_amount || 0),
+      0
+    );
 
-
-// // Handle login
-// app.post("/employee-login", async (req, res) => {
-//   const { username, password } = req.body;
-
-//   try {
-//     const result = await pool.query(
-//       "SELECT * FROM employees WHERE username = $1",
-//       [username]
-//     );
-    
-
-//     if (result.rows.length === 0) {
-//       return res.send("Invalid credentials <a href='/employee-login'>Try again</a>");
-//     }
-
-//     const user = result.rows[0];
-
-//     // 🔹 For now: plain password match
-//     if (password === user.password_hash) {
-//       req.session.loggedIn = true;
-//       req.session.user = { id: user.id, username: user.username };
-//       return res.redirect("/"); // secure page
-//     }
-
-//     res.send("Invalid credentials <a href='/employee-login'>Try again</a>");
-//   } catch (err) {
-//     console.error("Login error:", err);
-//     res.status(500).send("Server error");
-//   }
-// });
-
-
-// // Protect all other routes
-// app.use((req, res, next) => {
-//   if (!req.session.loggedIn) {
-//     return res.redirect("/employee-login");
-//   }
-//   next();
-// });
-
-// // Example home page
-// app.get("/", (req, res) => {
-//   res.send("Welcome Employee, here are the sales.");
-// });
-
-// app.listen(3000, () => console.log("App running on port 3000"));
+    // 5) Return complete data
+    res.json({
+      success: true,
+      data: {
+        customer,
+        orders: ordersWithItems,
+        totalOrders: orders.length,
+        totalSpent: totalSpent.toFixed(2),
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching customer tracking data:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Server error", 
+      error: error.message 
+    });
+  }
+});
 
 
-// app.use(cookieParser());
+// PUT: Update payment status for an order
+app.put("/api/orders/:orderId/payment-status", async (req, res) => {
+  const { orderId } = req.params;
+  const { status } = req.body;
 
-// Middleware to block VPN users
+  const validStatuses = ['pending', 'completed', 'failed', 'refunded'];
+  if (!status || !validStatuses.includes(status)) {
+    return res.status(400).json({ 
+      success: false, 
+      message: "Invalid payment status" 
+    });
+  }
+
+  try {
+    const query = status === 'completed'
+      ? `UPDATE orders 
+         SET payment_status = $1, payment_date = CURRENT_TIMESTAMP 
+         WHERE order_id = $2 
+         RETURNING *`
+      : `UPDATE orders 
+         SET payment_status = $1 
+         WHERE order_id = $2 
+         RETURNING *`;
+
+    const result = await pool.query(query, [status, orderId]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Order not found" 
+      });
+    }
+
+    res.json({ 
+      success: true, 
+      message: `Payment status updated to '${status}'`,
+      order: result.rows[0]
+    });
+  } catch (error) {
+    console.error("Error updating payment status:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Server error", 
+      error: error.message 
+    });
+  }
+});
+
+// GET: Get payment status for an order
+app.get("/api/orders/:orderId/payment-status", async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `SELECT order_id, payment_status, payment_date, total_amount 
+       FROM orders 
+       WHERE order_id = $1`,
+      [orderId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Order not found" 
+      });
+    }
+
+    res.json({ 
+      success: true, 
+      data: result.rows[0]
+    });
+  } catch (error) {
+    console.error("Error fetching payment status:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Server error", 
+      error: error.message 
+    });
+  }
+});
+
+
+ 
+
+app.post("/api/orders/:orderId/send-tracking", async (req, res) => {
+  const { orderId } = req.params;
+  const { trackingNumber, userId } = req.body;
+
+  try {
+    // Email Setup for Zoho Mail
+    const transporter = nodemailer.createTransport({
+      host: "smtp.zoho.in",
+      port: 465,
+      secure: true,
+      auth: {
+        user: "orderconfirmation@mclandpharma.com",
+        pass: "YFc3HfTpMu5S",
+      },
+    });
+
+   // Fetch customer email from Postgres
+    const result = await pool.query(
+      "SELECT email, first_name FROM customers WHERE id = $1",
+      [userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Customer not found" });
+    }
+
+    const customer = result.rows[0];
+    const email = customer.email;
+    const name = customer.first_name;
+
+    // Send email
+    await transporter.sendMail({
+      from: '"Mcland Pharma" <orderconfirmation@mclandpharma.com>',
+      to: email,
+      subject: "Your Order has been Shipped",
+      text: `Hello ${name},\n\nYour order #${orderId} has been shipped.\nTracking Number: ${trackingNumber}\n\nThank you for shopping with us!`,
+    });
+
+    res.json({ success: true, message: "Tracking email sent successfully" });
+  } catch (err) {
+    console.error("Error sending tracking email:", err);
+    res.status(500).json({ success: false, message: "Error sending email" });
+  }
+});
+
+
+
+//Middleware to block VPN users
 async function blockVPN(req, res, next) {
   try {
     // If cookie already says blocked → deny immediately
@@ -990,7 +1118,7 @@ async function blockVPN(req, res, next) {
 
     const data = response.data;
 
-    if (data.proxy ) {
+    if (data.proxy && data.hosting) {
       // 🚨 VPN detected → block + set cookie
       res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
       return res.status(403).send("Not allowed (VPN detected)");

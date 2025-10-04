@@ -189,17 +189,18 @@
     <div id="paymentModal" class="modal1">
       <div class="modal-content1">
         <h2>Select Payment Method</h2>
-        <button onclick="selectPayment('Zelle')"><img src="./assets/image/zelle.png" alt="" style="max-width: 100px"></button>
-        <button onclick="selectPayment('Bitcoin')"><img src="./assets/image/bitcoin.png" alt="" style="max-width: 100px"></button>
-        <button onclick="selectPayment('Venmo')"><img src="./assets/image/venmo.png" alt="" style="max-width: 100px"></button>
-        <button onclick="cancelPayment()" class="X_button">Cancel Payment</button>
+        <button onclick="selectPayment('Zelle')" class="Payment_Button"><img src="./assets/image/zelle.png" alt="" style="max-width: 100px"></button>
+        <button onclick="selectPayment('Bitcoin')" class="Payment_Button"><img src="./assets/image/bitcoin.png" alt="" style="max-width: 100px"></button>
+        <button onclick="selectPayment('Venmo')" class="Payment_Button"><img src="./assets/image/venmo.png" alt="" style="max-width: 100px"></button>
+        <button onclick="confirmPayment()" class="X_button">Cancel Payment</button>
         <div id="qr-container" style="margin-top: 20px; display: none">
           <img id="qr-code" src="" alt="QR Code" style="max-width: 200px" />
          
           <h3 id="qrtext_id" ></h3>
           <br />
-          <button onclick="confirmPayment()">OK</button>
-          <button onclick="cancelPayment()">Cancel</button>
+          <button onclick="confirmPayment()" class="Ok_Button">OK</button>
+          <!-- <button onclick="cancelPayment()">Cancel</button> -->
+           <button onclick="confirmPayment()" class="Cancel_Button">Cancel</button>
         </div>
       </div>
     </div>
