@@ -477,7 +477,7 @@
 
         <!-- FAQ ACCORDION -->
         <div class="faq">
-          <h3>FAQs</h3>
+          <h3  >FAQs</h3>
           <div class="faq__item">
             <button class="faq__q">How quickly does it work?</button>
             <div class="faq__a hidden">
@@ -826,7 +826,7 @@
 `;
        if(product.stocks == 0){
           const tableBody = document.getElementById("popil");
-        tableBody.innerHTML = "<p>Out of Stock</p>";
+        tableBody.innerHTML = `<p style="color: red;" >Out of Stock</p>`;
        }
        else{
         // Set up variant buttons and table rows
