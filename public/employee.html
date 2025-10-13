@@ -1,1130 +1,685 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Employee Dashboard - McLand Pharma</title>
-    <style></style>
-    <link rel="stylesheet" href="./assets/css/employee.css" />
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employee Dashboard - McLand Pharma</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="./assets/css/employee.css">
+  <style></style>
+</head>
 
-  <body>
-    <header>
-      <h1>McLand Pharma - Employee Dashboard</h1>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo-icon">
+          <i class="fas fa-pills"></i>
+        </div>
+        <div>
+          <h1>McLand Pharma</h1>
+          <div class="header-subtitle">Employee Dashboard</div>
+        </div>
+      </div>
       <nav>
-        <button id="logoutBtn">Logout</button>
+        <button id="logoutBtn">
+          <i class="fas fa-sign-out-alt"></i>
+          Logout
+        </button>
       </nav>
-    </header>
-    <script>
-      //— 1) On load, check localStorage. If not logged in, redirect to login.html.
-      document.addEventListener("DOMContentLoaded", () => {
-        const isLoggedIn = localStorage.getItem("employeeLoggedIn");
-        if (isLoggedIn !== "true") {
-          // Not logged in → force to login page:
-          window.location.href = "employee-login.html";
-          return;
-        }
-      });
+    </div>
+  </header>
 
-      //— 2) Logout button clears localStorage and redirects to login:
-      document.getElementById("logoutBtn").addEventListener("click", () => {
-        localStorage.removeItem("employeeLoggedIn");
-        localStorage.removeItem("employeeId");
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const isLoggedIn = localStorage.getItem("employeeLoggedIn");
+      if (isLoggedIn !== "true") {
         window.location.href = "employee-login.html";
+        return;
+      }
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("employeeLoggedIn");
+      localStorage.removeItem("employeeId");
+      window.location.href = "employee-login.html";
+    });
+  </script>
+
+  <div class="container">
+    <!-- Dashboard Section -->
+    <!-- <section id="dashboard" class="card">
+      <h2><i class="fas fa-chart-line"></i> Dashboard Overview</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>Clients Handled</h3>
+          <div class="number">50</div>
+        </div>
+        <div class="stat-card">
+          <h3>Payment Pending</h3>
+          <div class="number">10</div>
+        </div>
+        <div class="stat-card">
+          <h3>Payment Done</h3>
+          <div class="number">5</div>
+        </div>
+        <div class="stat-card">
+          <h3>Transferred</h3>
+          <div class="number">3</div>
+        </div>
+        <div class="stat-card">
+          <h3>Pending Requests</h3>
+          <div class="number">8</div>
+        </div>
+      </div>
+    </section> -->
+
+    <section id="dashboard" class="card">
+  <h2><i class="fas fa-chart-line"></i> Dashboard Overview</h2>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h3>Clients</h3>
+      <div class="number" id="clientsHandled">0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Payment Pending</h3>
+      <div class="number" id="paymentPending">0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Payment Done</h3>
+      <div class="number" id="paymentDone">0</div>
+    </div>
+    
+    <div class="stat-card">
+      <h3>Pending Requests</h3>
+      <div class="number" id="pendingRequests">0</div>
+    </div>
+  </div>
+</section>
+
+<script>
+async function loadDashboardData() {
+  try {
+    const res = await fetch('/api/requests');
+    const orders = await res.json();
+
+    // ✅ Count unique clients
+    const clients = new Set(orders.map(o => o.user_id));
+
+    // ✅ Categorize by payment status
+    let pending = 0, done = 0, transferred = 0, pendingRequests = 0;
+
+    orders.forEach(o => {
+      if (o.payment_status === 'pending') pending++;
+      else if (o.payment_status === 'completed') done++;
+      else if (o.payment_status === 'transferred') transferred++;
+
+      // If order is still unprocessed
+      if (!o.payment_status || o.payment_status === 'pending') pendingRequests++;
+    });
+
+    // ✅ Update dashboard
+    document.getElementById('clientsHandled').textContent = clients.size;
+    document.getElementById('paymentPending').textContent = pending;
+    document.getElementById('paymentDone').textContent = done;
+  
+    document.getElementById('pendingRequests').textContent = pendingRequests;
+
+  } catch (err) {
+    console.error('Error loading dashboard data:', err);
+  }
+}
+
+// Load data when the page opens
+document.addEventListener('DOMContentLoaded', loadDashboardData);
+</script>
+
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const productForm = document.getElementById("product-form");
+        productForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          try {
+            const formData = new FormData(productForm);
+            const formObject = Object.fromEntries(formData.entries());
+            const response = await fetch(`/api/set_products`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(formObject),
+            });
+            const result = await response.json();
+            if (response.ok) {
+              alert(result.message || "Product added successfully!");
+              productForm.reset();
+            } else {
+              throw new Error(result.error || "Failed to add product.");
+            }
+          } catch (err) {
+            console.error("Error submitting form:", err);
+            alert("Error saving product. Check console for details.");
+          }
+        });
       });
     </script>
 
-    <div class="container">
-      <!-- Dashboard Section -->
-      <section id="dashboard" class="card">
-        <h2>Dashboard</h2>
-        <p><strong>Clients Handled:</strong> 50</p>
-        <p><strong>Orders:</strong></p>
-        <ul>
-          <li>Payment Pending: 10</li>
-          <li>Payment Done, Delivery Pending: 5</li>
-          <li>Transferred to Higher-Ups: 3</li>
-          <li>Pending Requests: 8</li>
-        </ul>
-      </section>
+    <section id="existing-products" class="card">
+      <h3><i class="fas fa-search"></i> Search Product by ID or Name</h3>
+      <form id="search-form">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label for="product_id">Product ID:</label>
+            <input type="number" id="product_id" name="product_id" placeholder="Enter Product ID" />
+          </div>
+          <div>
+            <label for="product_name">Product Name:</label>
+            <input type="text" id="product_name_2" name="product_name_2" placeholder="Enter Product Name" />
+          </div>
+        </div>
+        <button type="submit"><i class="fas fa-search"></i> Search</button>
+      </form>
 
-      <script>
-        document.addEventListener("DOMContentLoaded", () => {
-          const productForm = document.getElementById("product-form");
+      <div id="result" class="result" style="display: none">
+        <h3 style="margin-top: 2rem;">Product Details:</h3>
+        <table class="product-table">
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Product ID</td><td id="product-id"></td></tr>
+            <tr><td>Category ID</td><td id="category-id"></td></tr>
+            <tr><td>Product Name</td><td id="product-name"></td></tr>
+            <tr><td>Description</td><td id="product-description"></td></tr>
+            <tr><td>Trade Names</td><td id="trade-names"></td></tr>
+            <tr><td>Ingredients</td><td id="ingreds"></td></tr>
+            <tr><td>Manufacturer</td><td id="manufacturer"></td></tr>
+            <tr><td>Packaging</td><td id="packaging"></td></tr>
+            <tr><td>Usage Instructions</td><td id="usage-instructions"></td></tr>
+            <tr><td>Drug Interaction</td><td id="drug-interaction"></td></tr>
+            <tr><td>Side Effects</td><td id="side-effects"></td></tr>
+            <tr><td>Safety</td><td id="safety"></td></tr>
+            <tr><td>Withdrawal Symptoms</td><td id="withdrawal-symptoms"></td></tr>
+            <tr><td>Drug Abuse Potential</td><td id="drug-abuse"></td></tr>
+            <tr><td>Storage</td><td id="storage"></td></tr>
+            <tr><td>Primary Image</td><td id="image_url"></td></tr>
+            <tr><td>Additional Image 1</td><td id="addtional-img1"></td></tr>
+            <tr><td>Additional Image 2</td><td id="addtional-img2"></td></tr>
+            <tr><td>Additional Image 3</td><td id="addtional-img3"></td></tr>
+            <tr><td>Additional Image 4</td><td id="addtional-img4"></td></tr>
+            <tr><td>Additional Image 5</td><td id="addtional-img5"></td></tr>
+            <tr><td>Additional Image 6</td><td id="addtional-img6"></td></tr>
+            <tr><td>Stock</td><td id="stocks"></td></tr>
+          </tbody>
+        </table>
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+          <button id="edit-button"><i class="fas fa-edit"></i> Edit</button>
+          <button id="delete-button" style="background: linear-gradient(135deg, #ef4444, #dc2626);"><i class="fas fa-trash"></i> Delete</button>
+        </div>
+      </div>
 
-          productForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
-
-            try {
-              // Collect form data
-              const formData = new FormData(productForm);
-              const formObject = Object.fromEntries(formData.entries());
-
-              console.log("Submitting form data:", formObject);
-
-              // Send POST request to backend
-              const response = await fetch(`/api/set_products`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formObject),
-              });
-
-              const result = await response.json();
-              if (response.ok) {
-                alert(result.message || "Product added successfully!");
-                productForm.reset();
-              } else {
-                throw new Error(result.error || "Failed to add product.");
-              }
-            } catch (err) {
-              console.error("Error submitting form:", err);
-              alert("Error saving product. Check console for details.");
-            }
-          });
-        });
-      </script>
-
-      <section id="existing-products" class="card">
-        <h3>Existing Products</h3>
-        <h1>Search Product by ID or Name</h1>
-        <form id="search-form">
-          <label for="product_id">Product ID:</label>
-          <input
-            type="number"
-            id="product_id"
-            name="product_id"
-            placeholder="Enter Product ID"
-          />
-
-          <label for="product_name">Product Name:</label>
-          <input
-            type="text"
-            id="product_name_2"
-            name="product_name_2"
-            placeholder="Enter Product Name"
-          />
-
-          <button type="submit">Search</button>
+      <div id="edit-section" style="display: none">
+        <form id="edit-form">
+          <div id="editable-fields"></div>
+          <button type="submit"><i class="fas fa-save"></i> Submit Changes</button>
         </form>
+      </div>
+    </section>
 
-        <div id="result" class="result" style="display: none">
-          <h3>Product Details:</h3>
-          <p id="product-data"></p>
-          <table class="product-table">
-            <thead>
-              <tr>
-                <th>Field</th>
-                <th>Details</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Product ID</td>
-                <td id="product-id"></td>
-              </tr>
-              <tr>
-                <td>Category ID</td>
-                <td id="category-id"></td>
-              </tr>
-              <tr>
-                <td>Product Name</td>
-                <td id="product-name"></td>
-              </tr>
-              <tr>
-                <td>Description</td>
-                <td id="product-description"></td>
-              </tr>
-              <tr>
-                <td>Trade Names</td>
-                <td id="trade-names"></td>
-              </tr>
-              <tr>
-                <td>Ingredients</td>
-                <td id="ingreds"></td>
-              </tr>
-              <tr>
-                <td>Manufacturer</td>
-                <td id="manufacturer"></td>
-              </tr>
-              <tr>
-                <td>Packaging</td>
-                <td id="packaging"></td>
-              </tr>
-              <tr>
-                <td>Usage Instructions</td>
-                <td id="usage-instructions"></td>
-              </tr>
-              <tr>
-                <td>Drug Interaction</td>
-                <td id="drug-interaction"></td>
-              </tr>
-              <tr>
-                <td>Side Effects</td>
-                <td id="side-effects"></td>
-              </tr>
-              <tr>
-                <td>Safety</td>
-                <td id="safety"></td>
-              </tr>
-              <tr>
-                <td>Withdrawal Symptoms</td>
-                <td id="withdrawal-symptoms"></td>
-              </tr>
-              <tr>
-                <td>Drug Abuse Potential</td>
-                <td id="drug-abuse"></td>
-              </tr>
-              <tr>
-                <td>Storage</td>
-                <td id="storage"></td>
-              </tr>
-              <tr>
-                <td>Primary Image</td>
-                <td id="image_url"></td>
-              </tr>
-              <tr>
-                <td>Additional Image 1</td>
-                <td id="addtional-img1"></td>
-              </tr>
-              <tr>
-                <td>Additional Image 2</td>
-                <td id="addtional-img2"></td>
-              </tr>
-              <tr>
-                <td>Additional Image 3</td>
-                <td id="addtional-img3"></td>
-              </tr>
-              <tr>
-                <td>Additional Image 4</td>
-                <td id="addtional-img4"></td>
-              </tr>
-              <tr>
-                <td>Additional Image 5</td>
-                <td id="addtional-img5"></td>
-              </tr>
-              <tr>
-                <td>Additional Image 6</td>
-                <td id="addtional-img6"></td>
-              </tr>
-              <tr>
-                <td>Stock</td>
-                <td id="stocks"></td>
-              </tr>
-            </tbody>
-          </table>
-          <button id="edit-button">Edit</button>
-          <button
-            id="delete-button"
-            style="background-color: red; color: white"
-          >
-            Delete
-          </button>
-        </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const searchForm = document.getElementById("search-form");
+        const resultDiv = document.getElementById("result");
+        const editSection = document.getElementById("edit-section");
+        const editForm = document.getElementById("edit-form");
+        const editableFieldsDiv = document.getElementById("editable-fields");
 
-        <div id="edit-section" style="display: none">
-          <form id="edit-form">
-            <div id="editable-fields">
-              <!-- Editable fields will be dynamically generated -->
-            </div>
-            <button type="submit">Submit Changes</button>
-          </form>
-        </div>
-      </section>
+        searchForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const productId = document.getElementById("product_id").value.trim();
+          const productName = document.getElementById("product_name_2").value.trim();
+          
+          if (!productId && !productName) {
+            alert("Please enter either a Product ID or Product Name.");
+            return;
+          }
 
-      <script>
-        document.addEventListener("DOMContentLoaded", () => {
-          const searchForm = document.getElementById("search-form");
-          const resultDiv = document.getElementById("result");
-          const editSection = document.getElementById("edit-section");
-          const editForm = document.getElementById("edit-form");
-          const editableFieldsDiv = document.getElementById("editable-fields");
-
-          searchForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
-
-            const productId = document
-              .getElementById("product_id")
-              .value.trim();
-            const productName = document
-              .getElementById("product_name_2")
-              .value.trim();
-            console.log("Product name is ", productName);
-            if (!productId && !productName) {
-              alert("Please enter either a Product ID or Product Name.");
-              return;
-            }
-
-            try {
-              const response = await fetch(`/api/products/search`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id: productId, name: productName }),
-              });
-
-              if (!response.ok) {
-                throw new Error("Failed to fetch product data.");
-              }
-
-              const result = await response.json();
-              const productData = result.data;
-              console.log(productData);
-              // Populate text fields
-              document.getElementById("product-id").textContent =
-                productData.product_id || "N/A";
-              document.getElementById("category-id").textContent =
-                productData.category_id || "N/A";
-              document.getElementById("product-name").textContent =
-                productData.product_name || "N/A";
-              document.getElementById("product-description").textContent =
-                productData.product_description || "N/A";
-              document.getElementById("trade-names").textContent =
-                productData.trade_names || "N/A";
-              document.getElementById("ingreds").textContent =
-                productData.ingredients || "N/A";
-              document.getElementById("manufacturer").textContent =
-                productData.manufacturer || "N/A";
-              document.getElementById("packaging").textContent =
-                productData.packaging || "N/A";
-              document.getElementById("usage-instructions").textContent =
-                productData.usage_instructions || "N/A";
-              document.getElementById("drug-interaction").textContent =
-                productData.drug_interaction || "N/A";
-              document.getElementById("side-effects").textContent =
-                productData.side_effects || "N/A";
-              document.getElementById("safety").textContent =
-                productData.safety || "N/A";
-              document.getElementById("withdrawal-symptoms").textContent =
-                productData.withdrawal_symptoms || "N/A";
-              document.getElementById("drug-abuse").textContent =
-                productData.drug_abuse || "N/A";
-              document.getElementById("storage").textContent =
-                productData.storage || "N/A";
-              document.getElementById("image_url").textContent =
-                productData.image_url || "N/A";
-              document.getElementById("addtional-img1").textContent =
-                productData.addtional_img1;
-              document.getElementById("addtional-img2").textContent =
-                productData.addtional_img2;
-              document.getElementById("addtional-img3").textContent =
-                productData.addtional_img3;
-              document.getElementById("addtional-img4").textContent =
-                productData.addtional_img4;
-              document.getElementById("addtional-img5").textContent =
-                productData.addtional_img5;
-              document.getElementById("addtional-img6").textContent =
-                productData.addtional_img6;
-              document.getElementById("stocks").textContent =
-                productData.stocks;
-
-              resultDiv.style.display = "block";
-            } catch (err) {
-              console.error("Error fetching product:", err);
-              alert("Error fetching product. Please try again.");
-            }
-          });
-
-          document
-            .getElementById("edit-button")
-            .addEventListener("click", () => {
-              editableFieldsDiv.innerHTML = ""; // Clear previous editable fields
-              const fields = [
-                "category-id",
-                "product-name",
-                "product-description",
-                "trade-names",
-                "ingreds",
-                "manufacturer",
-                "packaging",
-                "usage-instructions",
-                "drug-interaction",
-                "side-effects",
-                "safety",
-                "withdrawal-symptoms",
-                "drug-abuse",
-                "storage",
-                "image_url", // ID for the image
-                "addtional-img1",
-                "addtional-img2",
-                "addtional-img3",
-                "addtional-img4",
-                "addtional-img5",
-                "addtional-img6",
-                "stocks",
-              ];
-
-              fields.forEach((field) => {
-                const label = document.createElement("label");
-                label.textContent = field.replace("-", " ").toUpperCase();
-
-                const input = document.createElement("input");
-                input.type = "text";
-                input.id = `edit-${field}`;
-                const originalField = document.getElementById(field);
-                input.value = originalField ? originalField.textContent : "";
-
-                editableFieldsDiv.appendChild(label);
-                editableFieldsDiv.appendChild(input);
-              });
-
-              editSection.style.display = "block";
+          try {
+            const response = await fetch(`/api/products/search`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ id: productId, name: productName }),
             });
 
-          // Edit Form Submission Handler
-          editForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
+            if (!response.ok) throw new Error("Failed to fetch product data.");
 
-            const productId = document.getElementById("product-id").textContent;
-            const updates = {};
+            const result = await response.json();
+            const productData = result.data;
+            
+            document.getElementById("product-id").textContent = productData.product_id || "N/A";
+            document.getElementById("category-id").textContent = productData.category_id || "N/A";
+            document.getElementById("product-name").textContent = productData.product_name || "N/A";
+            document.getElementById("product-description").textContent = productData.product_description || "N/A";
+            document.getElementById("trade-names").textContent = productData.trade_names || "N/A";
+            document.getElementById("ingreds").textContent = productData.ingredients || "N/A";
+            document.getElementById("manufacturer").textContent = productData.manufacturer || "N/A";
+            document.getElementById("packaging").textContent = productData.packaging || "N/A";
+            document.getElementById("usage-instructions").textContent = productData.usage_instructions || "N/A";
+            document.getElementById("drug-interaction").textContent = productData.drug_interaction || "N/A";
+            document.getElementById("side-effects").textContent = productData.side_effects || "N/A";
+            document.getElementById("safety").textContent = productData.safety || "N/A";
+            document.getElementById("withdrawal-symptoms").textContent = productData.withdrawal_symptoms || "N/A";
+            document.getElementById("drug-abuse").textContent = productData.drug_abuse || "N/A";
+            document.getElementById("storage").textContent = productData.storage || "N/A";
+            document.getElementById("image_url").textContent = productData.image_url || "N/A";
+            document.getElementById("addtional-img1").textContent = productData.addtional_img1;
+            document.getElementById("addtional-img2").textContent = productData.addtional_img2;
+            document.getElementById("addtional-img3").textContent = productData.addtional_img3;
+            document.getElementById("addtional-img4").textContent = productData.addtional_img4;
+            document.getElementById("addtional-img5").textContent = productData.addtional_img5;
+            document.getElementById("addtional-img6").textContent = productData.addtional_img6;
+            document.getElementById("stocks").textContent = productData.stocks;
 
-            const fields = [
-              "category-id",
-              "product-name",
-              "product-description",
-              "trade-names",
-              "ingreds",
-              "manufacturer",
-              "packaging",
-              "usage-instructions",
-              "drug-interaction",
-              "side-effects",
-              "safety",
-              "withdrawal-symptoms",
-              "drug-abuse",
-              "storage",
-              "storage",
-              "image_url", // ID for the image
-              "addtional-img1",
-              "addtional-img2",
-              "addtional-img3",
-              "addtional-img4",
-              "addtional-img5",
-              "addtional-img6",
-              "stocks",
-            ];
-
-            fields.forEach((field) => {
-              const inputElement = document.getElementById(`edit-${field}`);
-              if (inputElement) {
-                const newValue = inputElement.value;
-                const originalValue =
-                  document.getElementById(field)?.textContent || "";
-
-                if (newValue !== originalValue) {
-                  updates[field.replace("-", "_")] = newValue;
-                }
-              } else {
-                console.warn(`Editable field "edit-${field}" not found.`);
-              }
-            });
-
-            try {
-              const response = await fetch(
-                `/api/products/update/${productId}`,
-                {
-                  method: "PUT",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(updates),
-                }
-              );
-
-              if (!response.ok) {
-                throw new Error("Failed to update product data.");
-              }
-
-              alert("Product updated successfully!");
-              resultDiv.style.display = "none";
-              editSection.style.display = "none";
-            } catch (err) {
-              console.error("Error updating product:", err);
-              alert("Error updating product. Please try again.");
-            }
-          });
+            resultDiv.style.display = "block";
+          } catch (err) {
+            console.error("Error fetching product:", err);
+            alert("Error fetching product. Please try again.");
+          }
         });
 
-        document
-          .getElementById("delete-button")
-          .addEventListener("click", async () => {
-            const productId = document.getElementById("product-id").textContent;
+        document.getElementById("edit-button").addEventListener("click", () => {
+          editableFieldsDiv.innerHTML = "";
+          const fields = ["category-id", "product-name", "product-description", "trade-names", "ingreds", "manufacturer", "packaging", "usage-instructions", "drug-interaction", "side-effects", "safety", "withdrawal-symptoms", "drug-abuse", "storage", "image_url", "addtional-img1", "addtional-img2", "addtional-img3", "addtional-img4", "addtional-img5", "addtional-img6", "stocks"];
 
-            if (!productId) {
-              alert("No product ID found. Please search for a product first.");
-              return;
-            }
+          fields.forEach((field) => {
+            const label = document.createElement("label");
+            label.textContent = field.replace("-", " ").toUpperCase();
+            const input = document.createElement("input");
+            input.type = "text";
+            input.id = `edit-${field}`;
+            const originalField = document.getElementById(field);
+            input.value = originalField ? originalField.textContent : "";
+            editableFieldsDiv.appendChild(label);
+            editableFieldsDiv.appendChild(input);
+          });
 
-            if (
-              !confirm(
-                `Are you sure you want to delete the product with ID: ${productId}?`
-              )
-            ) {
-              return; // User canceled the delete operation
-            }
+          editSection.style.display = "block";
+        });
 
-            try {
-              const response = await fetch(
-                `/api/products/delete/${productId}`,
-                {
-                  method: "DELETE",
-                }
-              );
-              const responseData = await response.json();
-              console.log("Response Data:", responseData);
+        editForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const productId = document.getElementById("product-id").textContent;
+          const updates = {};
+          const fields = ["category-id", "product-name", "product-description", "trade-names", "ingreds", "manufacturer", "packaging", "usage-instructions", "drug-interaction", "side-effects", "safety", "withdrawal-symptoms", "drug-abuse", "storage", "image_url", "addtional-img1", "addtional-img2", "addtional-img3", "addtional-img4", "addtional-img5", "addtional-img6", "stocks"];
 
-              if (!response.ok) {
-                throw new Error("Failed to delete product data.");
+          fields.forEach((field) => {
+            const inputElement = document.getElementById(`edit-${field}`);
+            if (inputElement) {
+              const newValue = inputElement.value;
+              const originalValue = document.getElementById(field)?.textContent || "";
+              if (newValue !== originalValue) {
+                updates[field.replace("-", "_")] = newValue;
               }
-
-              alert("Product deleted successfully!");
-              // Hide the result section after deletion
-              document.getElementById("result").style.display = "none";
-            } catch (err) {
-              console.error("Error deleting product:", err);
-              alert("Error deleting product. Please try again.");
             }
           });
-      </script>
 
-      <!-- Customer Order Tracking Section -->
-      <section id="customer-tracking" class="card">
-        <h2>Customer Order Tracking</h2>
+          try {
+            const response = await fetch(`/api/products/update/${productId}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(updates),
+            });
 
-        <!-- Search Form -->
-        <div class="tracking-search">
-          <label for="tracking-user-id">Enter Customer ID:</label>
-          <input
-            type="number"
-            id="tracking-user-id"
-            placeholder="Enter User ID"
-            min="1"
-            required
-          />
-          <button id="btn-track-customer">Track Customer</button>
+            if (!response.ok) throw new Error("Failed to update product data.");
+            alert("Product updated successfully!");
+            resultDiv.style.display = "none";
+            editSection.style.display = "none";
+          } catch (err) {
+            console.error("Error updating product:", err);
+            alert("Error updating product. Please try again.");
+          }
+        });
+      });
+
+      document.getElementById("delete-button").addEventListener("click", async () => {
+        const productId = document.getElementById("product-id").textContent;
+        if (!productId) {
+          alert("No product ID found. Please search for a product first.");
+          return;
+        }
+        if (!confirm(`Are you sure you want to delete the product with ID: ${productId}?`)) return;
+
+        try {
+          const response = await fetch(`/api/products/delete/${productId}`, { method: "DELETE" });
+          const responseData = await response.json();
+          if (!response.ok) throw new Error("Failed to delete product data.");
+          alert("Product deleted successfully!");
+          document.getElementById("result").style.display = "none";
+        } catch (err) {
+          console.error("Error deleting product:", err);
+          alert("Error deleting product. Please try again.");
+        }
+      });
+    </script>
+
+    <!-- Customer Order Tracking Section -->
+    <section id="customer-tracking" class="card">
+      <h2><i class="fas fa-user-check"></i> Customer Order Tracking</h2>
+      <div class="tracking-search">
+        <div style="flex: 1;">
+          <label for="tracking-user-id">Customer ID:</label>
+          <input type="number" id="tracking-user-id" placeholder="Enter User ID" min="1" required />
         </div>
+        <button id="btn-track-customer"><i class="fas fa-search"></i> Track Customer</button>
+      </div>
 
-        <!-- Results Container -->
-        <div id="tracking-results" style="display: none">
-          <!-- Customer Info Card -->
-          <div class="customer-info-card">
-            <h3>Customer Information</h3>
-            <table class="info-table">
-              <tr>
-                <td><strong>Customer ID:</strong></td>
-                <td id="track-customer-id"></td>
-              </tr>
-              <tr>
-                <td><strong>Name:</strong></td>
-                <td id="track-customer-name"></td>
-              </tr>
-              <tr>
-                <td><strong>Email:</strong></td>
-                <td id="track-customer-email"></td>
-              </tr>
-              <tr>
-                <td><strong>Phone:</strong></td>
-                <td id="track-customer-phone"></td>
-              </tr>
-              <tr>
-                <td><strong>Company:</strong></td>
-                <td id="track-customer-company"></td>
-              </tr>
-              <tr>
-                <td><strong>Address:</strong></td>
-                <td id="track-customer-address"></td>
-              </tr>
-            </table>
-          </div>
-
-          <!-- Summary Stats -->
-          <div class="customer-stats">
-            <div class="stat-box">
-              <h4>Total Orders</h4>
-              <p id="track-total-orders" class="stat-number">0</p>
-            </div>
-            <div class="stat-box">
-              <h4>Lifetime Value</h4>
-              <p id="track-lifetime-value" class="stat-number">$0.00</p>
-            </div>
-          </div>
-
-          <!-- Orders List -->
-          <div class="orders-container">
-            <h3>Order History</h3>
-            <div id="orders-list">
-              <!-- Orders will be dynamically inserted here -->
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Process Requests Section -->
-      <section id="process-requests" class="card">
-        <h2>Process Requests</h2>
-        <div id="existing-products-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Serial No.</th>
-                <th>Order No.</th>
-                <th>User ID</th>
-                <th>Cost</th>
-                <th>Payment Status</th>
-                <th>Action's</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Rows will be dynamically populated -->
-            </tbody>
+      <div id="tracking-results" style="display: none">
+        <div class="customer-info-card">
+          <h3>Customer Information</h3>
+          <table class="info-table">
+            <tr><td><strong>Customer ID:</strong></td><td id="track-customer-id"></td></tr>
+            <tr><td><strong>Name:</strong></td><td id="track-customer-name"></td></tr>
+            <tr><td><strong>Email:</strong></td><td id="track-customer-email"></td></tr>
+            <tr><td><strong>Phone:</strong></td><td id="track-customer-phone"></td></tr>
+            <tr><td><strong>Company:</strong></td><td id="track-customer-company"></td></tr>
+            <tr><td><strong>Address:</strong></td><td id="track-customer-address"></td></tr>
           </table>
         </div>
-      </section>
 
-      <section id="order-details" class="card hidden">
-        <h2>Order Details</h2>
+        <div class="customer-stats">
+          <div class="stat-box">
+            <h4>Total Orders</h4>
+            <p id="track-total-orders" class="stat-number">0</p>
+          </div>
+          <div class="stat-box">
+            <h4>Lifetime Value</h4>
+            <p id="track-lifetime-value" class="stat-number">$0.00</p>
+          </div>
+        </div>
+
+        <div class="orders-container">
+          <h3>Order History</h3>
+          <div id="orders-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Process Requests Section -->
+    <section id="process-requests" class="card">
+      <h2><i class="fas fa-tasks"></i> Process Requests</h2>
+      <div id="existing-products-table">
         <table>
           <thead>
             <tr>
-              <th>Item Name</th>
-              <th>Quantity</th>
-              <th>MG</th>
-              <th>Price</th>
-            </tr>
-          </thead>
-          <tbody id="order-details-body">
-            <!-- Order items will be populated dynamically -->
-          </tbody>
-        </table>
-        <button id="close-details">Close</button>
-      </section>
-
-      <section id="customer-details" class="card hidden">
-        <h2>Customer Details</h2>
-        <div id="customer-details-body">
-          <!-- Customer details will be dynamically populated -->
-        </div>
-        <button id="close-customer-details">Close</button>
-      </section>
-
-      <!-- <script>
-        document.addEventListener("DOMContentLoaded", () => {
-          const tableBody = document.querySelector("#process-requests tbody");
-          const orderDetailsSection = document.getElementById("order-details");
-          const orderDetailsBody =
-            document.getElementById("order-details-body");
-          const customerDetailsSection =
-            document.getElementById("customer-details");
-          const customerDetailsBody = document.getElementById(
-            "customer-details-body"
-          );
-          const closeDetailsButton = document.getElementById("close-details");
-          const closeCustomerDetailsButton = document.getElementById(
-            "close-customer-details"
-          );
-
-          const fetchRequests = async () => {
-            try {
-              const response = await fetch(`/api/requests`);
-              const requests = await response.json();
-              // console.log(requests);
-              tableBody.innerHTML = "";
-
-              requests.forEach((request) => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-            <td>${request.user_id}</td>
-            <td>${request.total_amount}</td>
-            <td class="action">
-              <button onclick="viewOrderItems(${request.order_id})">View Items</button>
-              <button onclick="viewCustomerDetails(${request.user_id})">View Customer</button>
-              <button onclick="deleteRequest(${request.order_id})">Delete</button>
-            </td>
-          `;
-                tableBody.appendChild(row);
-              });
-            } catch (err) {
-              console.error("Error fetching requests:", err);
-            }
-          };
-
-          window.viewOrderItems = async (orderId) => {
-            try {
-              const response = await fetch(`/api/order-items/${orderId}`);
-              const orderItems = await response.json();
-              orderDetailsBody.innerHTML = "";
-
-              orderItems.forEach((item) => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-            <td>${item.name}</td>
-            <td>${item.quantity}</td>
-            <td>${item.mg}</td>
-            <td>${item.price}</td>
-          `;
-                orderDetailsBody.appendChild(row);
-              });
-
-              orderDetailsSection.classList.remove("hidden");
-            } catch (err) {
-              console.error("Error fetching order items:", err);
-            }
-          };
-
-          window.viewCustomerDetails = async (id) => {
-            try {
-              console.log(id);
-              const response = await fetch(`/api/customers/${id}`);
-              const customer = await response.json();
-
-              customerDetailsBody.innerHTML = `
-          <p><strong>Name:</strong> ${customer.first_name} ${customer.last_name}</p>
-          <p><strong>Email:</strong> ${customer.email}</p>
-          <p><strong>Phone:</strong> ${customer.phone}</p>
-          <p><strong>Address:</strong> ${customer.street_address}</p>
-        `;
-
-              customerDetailsSection.classList.remove("hidden");
-            } catch (err) {
-              console.error("Error fetching customer details:", err);
-            }
-          };
-
-          window.deleteRequest = async (orderId) => {
-            if (!confirm("Are you sure you want to delete this order?")) return;
-            try {
-              const res = await fetch(`/api/requests/${orderId}`, {
-                method: "DELETE",
-              });
-              const json = await res.json();
-              if (!json.success) throw new Error(json.error || "Delete failed");
-              alert(json.message);
-              fetchRequests(); // refresh the table
-            } catch (err) {
-              console.error("Error deleting request:", err);
-              alert("Could not delete order: " + err.message);
-            }
-          };
-
-          closeDetailsButton.addEventListener("click", () => {
-            orderDetailsSection.classList.add("hidden");
-          });
-
-          closeCustomerDetailsButton.addEventListener("click", () => {
-            customerDetailsSection.classList.add("hidden");
-          });
-
-          fetchRequests();
-        });
-      </script> -->
-
-      <section id="manage-prices">
-        <h2>Manage Product Pricing</h2>
-
-        <div class="lookup">
-          <label
-            >Product ID:
-            <input type="number" id="lookup-product-id" min="1" />
-          </label>
-          <button id="btn-load-variants">Load Variants</button>
-        </div>
-
-        <table
-          id="variants-table"
-          border="1"
-          style="margin-top: 1em; display: none"
-        >
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Unit Type</th>
-              <th>Unit Value</th>
-              <th>QTY</th>
-              <th>Price / Pill</th>
-              <th>Price / Box</th>
-              <th>Delivery Time</th>
+              <th>Serial No.</th>
+              <th>Order No.</th>
+              <th>User ID</th>
+              <th>Cost</th>
+              <th>Payment Status</th>
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody id="variants-body">
-            <td>
-              <button class="update-btn">Update</button>
-              <button class="delete-btn">Delete</button>
-            </td>
-          </tbody>
+          <tbody></tbody>
         </table>
+      </div>
+    </section>
 
-        <button id="btn-add-new" style="display: none; margin-top: 1em">
-          + Add New Variant
-        </button>
-      </section>
+    <section id="order-details" class="card hidden">
+      <h2><i class="fas fa-box"></i> Order Details</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Item Name</th>
+            <th>Quantity</th>
+            <th>MG</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody id="order-details-body"></tbody>
+      </table>
+      <button id="close-details" style="margin-top: 1rem;"><i class="fas fa-times"></i> Close</button>
+    </section>
 
-      <script>
-        document.addEventListener("DOMContentLoaded", () => {
-          const lookupInput = document.getElementById("lookup-product-id");
-          const loadBtn = document.getElementById("btn-load-variants");
-          const table = document.getElementById("variants-table");
-          const tbody = table.querySelector("tbody");
-          const addBtn = document.getElementById("btn-add-new");
+    <section id="customer-details" class="card hidden">
+      <h2><i class="fas fa-user"></i> Customer Details</h2>
+      <div id="customer-details-body"></div>
+      <button id="close-customer-details" style="margin-top: 1rem;"><i class="fas fa-times"></i> Close</button>
+    </section>
 
-          // helper to create an <input> cell
-          function makeCell(value, field) {
-            const td = document.createElement("td");
-            const inp = document.createElement("input");
-            inp.value = value || "";
-            inp.dataset.field = field;
-            td.appendChild(inp);
-            return td;
-          }
+    <section id="manage-prices" class="card">
+      <h2><i class="fas fa-dollar-sign"></i> Manage Product Pricing</h2>
+      <div class="lookup">
+        <div style="flex: 1;">
+          <label>Product ID:</label>
+          <input type="number" id="lookup-product-id" min="1" />
+        </div>
+        <button id="btn-load-variants"><i class="fas fa-download"></i> Load Variants</button>
+      </div>
 
-          // render a variant row
-          function renderRow(variant) {
-            const tr = document.createElement("tr");
-            tr.dataset.id = variant.variation_id;
+      <table id="variants-table" border="1" style="display: none">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Unit Type</th>
+            <th>Unit Value</th>
+            <th>QTY</th>
+            <th>Price / Pill</th>
+            <th>Price / Box</th>
+            <th>Delivery Time</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="variants-body"></tbody>
+      </table>
 
-            // ID readonly
-            const idTd = document.createElement("td");
-            idTd.textContent = variant.variation_id;
-            tr.appendChild(idTd);
+      <button id="btn-add-new" style="display: none; margin-top: 1em"><i class="fas fa-plus"></i> Add New Variant</button>
+    </section>
 
-            tr.appendChild(makeCell(variant.unit_type, "unit_type"));
-            tr.appendChild(makeCell(variant.unit_value, "unit_value"));
-            tr.appendChild(makeCell(variant.qty, "qty"));
-            tr.appendChild(makeCell(variant.price_per_pill, "price_per_pill"));
-            tr.appendChild(makeCell(variant.price_per_box, "price_per_box"));
-            tr.appendChild(makeCell(variant.delivery_time, "delivery_time"));
-
-            // actions
-            const actTd = document.createElement("td");
-            const saveBtn = document.createElement("button");
-            const delBtn = document.createElement("button");
-            saveBtn.textContent = "Save";
-            delBtn.textContent = "Delete";
-
-            saveBtn.addEventListener("click", () => updateVariant(tr));
-            delBtn.addEventListener("click", () => {
-              if (!confirm(`Really delete this variation? ${tr.dataset.id}`))
-                return;
-              deleteVariant(tr.dataset.id)
-                .then(() => {
-                  tr.remove();
-                  alert("Variation deleted");
-                })
-                .catch((err) => {
-                  console.error(err);
-                  alert("Delete failed");
-                });
-            });
-            actTd.appendChild(saveBtn);
-            actTd.appendChild(delBtn);
-            tr.appendChild(actTd);
-
-            return tr;
-          }
-
-          // fetch & show
-          loadBtn.addEventListener("click", async () => {
-            const pid = lookupInput.value.trim();
-            if (!pid) return alert("enter product id");
-            const resp = await fetch(`/api/variants/${pid}`);
-            const variants = await resp.json();
-            tbody.innerHTML = "";
-            variants.forEach((v) => tbody.appendChild(renderRow(v)));
-            table.style.display = "";
-            addBtn.style.display = "";
-          });
-
-          async function deleteVariant(variationId) {
-            const res = await fetch(`/api/variants/${variationId}`, {
-              method: "DELETE",
-            });
-            if (!res.ok) {
-              const { error } = await res.json();
-              throw new Error(error || res.statusText);
-            }
-          }
-
-          // update one
-          async function updateVariant(row) {
-            const id = row.dataset.id;
-            if (!/^\d+$/.test(id)) {
-              return alert(
-                "Cannot update — no valid variation ID yet. Use Create."
-              );
-            }
-            const payload = {};
-            row.querySelectorAll("input").forEach((inp) => {
-              payload[inp.dataset.field] = inp.value;
-            });
-            try {
-              const res = await fetch(`/api/variants/${id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-              });
-              if (!res.ok) throw new Error(res.statusText);
-              alert("Updated");
-            } catch (err) {
-              console.error("updateVariant error", err);
-              alert("Update failed: " + err.message);
-            }
-          }
-
-          // add new row UI
-          addBtn.addEventListener("click", () => {
-            const pid = lookupInput.value.trim();
-            const empty = {
-              variation_id: "",
-              unit_type: "",
-              unit_value: "",
-              qty: "",
-              price_per_pill: "",
-              price_per_box: "",
-              delivery_time: "",
-            };
-            const newRow = renderRow(empty);
-
-            // Create a separate "Create" button
-            const createBtn = document.createElement("button");
-            createBtn.textContent = "Create";
-            createBtn.id = "create-btn";
-
-            // Add event listener for the "Create" button
-            createBtn.addEventListener("click", () =>
-              createVariant(newRow, pid)
-            );
-
-            // Append the new "Create" button to the action cell
-            const actionCell = newRow.querySelector("td:last-child");
-            actionCell.appendChild(createBtn);
-
-            // Append the new row to the table body
-            tbody.appendChild(newRow);
-          });
-
-          // POST new
-          async function createVariant(row, pid) {
-            // build payload
-            const payload = { product_id: +pid };
-            row.querySelectorAll("input").forEach((inp) => {
-              payload[inp.dataset.field] = inp.value;
-            });
-            try {
-              const res = await fetch(`/api/variants`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-              });
-              if (!res.ok) throw new Error(res.statusText);
-              const created = await res.json();
-              // render a fresh row with a real numeric ID
-              tbody.replaceChild(renderRow(created), row);
-              alert("Created");
-            } catch (err) {
-              console.error("createVariant error", err);
-              alert("Create failed: " + err.message);
-            }
-          }
-        });
-      </script>
-
-      <!-- Customer Assistance Section -->
-
-      <section id="product-form-section" class="card">
-        <h2>Add New Product</h2>
-        <form id="product-form" id="product-form-items">
-          <label for="category_id">Category ID (integer):</label>
-          <input type="number" id="category_id" name="category_id" required />
-
-          <label for="product_name">Product Name:</label>
-          <input type="text" id="product_name" name="product_name" required />
-
-          <label for="product_description">Product Description:</label>
-          <textarea
-            id="product_description"
-            name="product_description"
-            rows="3"
-            required
-          ></textarea>
-
-          <label for="trade_names">Trade Names:</label>
-          <input type="text" id="trade_names" name="trade_names" required />
-
-          <label for="ingredients">Ingredients:</label>
-          <textarea
-            id="ingredients"
-            name="ingredients"
-            rows="3"
-            required
-          ></textarea>
-
-          <label for="manufactured_by">Manufactured By:</label>
-          <input
-            type="text"
-            id="manufactured_by"
-            name="manufactured_by"
-            required
-          />
-
-          <label for="packaging_details">Packaging Details:</label>
-          <textarea
-            id="packaging_details"
-            name="packaging_details"
-            rows="3"
-            required
-          ></textarea>
-
-          <label for="how_to_use">How To Use:</label>
-          <textarea
-            id="how_to_use"
-            name="how_to_use"
-            rows="3"
-            required
-          ></textarea>
-
-          <label for="drug_interaction">Drug Interaction:</label>
-          <textarea
-            id="drug_interaction"
-            name="drug_interaction"
-            rows="3"
-            required
-          ></textarea>
-
-          <label for="side_effects">Side Effects:</label>
-          <textarea
-            id="side_effects"
-            name="side_effects"
-            rows="3"
-            required
-          ></textarea>
-
-          <label for="warnings_precautions">Warnings/Precautions:</label>
-          <textarea
-            id="warnings_precautions"
-            name="warnings_precautions"
-            rows="3"
-            required
-          ></textarea>
-
-          <label for="withdrawal_symptoms">Withdrawal Symptoms:</label>
-          <textarea
-            id="withdrawal_symptoms"
-            name="withdrawal_symptoms"
-            rows="3"
-            required
-          ></textarea>
-
-          <label for="drug_abuse">Drug Abuse:</label>
-          <textarea
-            id="drug_abuse"
-            name="drug_abuse"
-            rows="3"
-            required
-          ></textarea>
-
-          <label for="storages">Storage:</label>
-          <textarea id="storages" name="storage" rows="3" required></textarea>
-
-          <label for="primary_img">Primary Image URL:</label>
-          <input type="text" id="primary_img" name="primary_img" required />
-
-          <label for="additional_img1">Additional Image 1 URL:</label>
-          <input type="text" id="additional_img1" name="additional_img1" />
-
-          <label for="additional_img2">Additional Image 2 URL:</label>
-          <input type="text" id="additional_img2" name="additional_img2" />
-
-          <label for="additional_img3">Additional Image 3 URL:</label>
-          <input type="text" id="additional_img3" name="additional_img3" />
-
-          <label for="additional_img4">Additional Image 4 URL:</label>
-          <input type="text" id="additional_img4" name="additional_img4" />
-
-          <label for="additional_img5">Additional Image 5 URL:</label>
-          <input type="text" id="additional_img5" name="additional_img5" />
-
-          <label for="additional_img6">Additional Image 6 URL:</label>
-          <input type="text" id="additional_img6" name="additional_img6" />
-
-          <button type="submit">Submit</button>
-        </form>
-      </section>
-    </div>
     <script>
-      document
-        .getElementById("product-form")
-        .addEventListener("submit", async function (event) {
-          event.preventDefault();
+      document.addEventListener("DOMContentLoaded", () => {
+        const lookupInput = document.getElementById("lookup-product-id");
+        const loadBtn = document.getElementById("btn-load-variants");
+        const table = document.getElementById("variants-table");
+        const tbody = table.querySelector("tbody");
+        const addBtn = document.getElementById("btn-add-new");
 
-          // Gather main product details
-          const formData = {
-            category_id: document.getElementById("category-id").value,
-            category_name: document.getElementById("category-name").value,
-            product_name: document.getElementById("product-name").value,
-            product_description: document.getElementById("product-description")
-              .value,
-            trade_names: document.getElementById("trade-names").value,
-            ingredients: document.getElementById("ingredients").value,
-            manufactured_by: document.getElementById("manufactured-by").value,
-            packaging_details:
-              document.getElementById("packaging-details").value,
-            how_to_use: document.getElementById("how-to-use").value,
-            drug_interaction: document.getElementById("drug-interaction").value,
-            side_effects: document.getElementById("side-effects").value,
-            warnings_precautions: document.getElementById(
-              "warnings-precautions"
-            ).value,
-            withdrawal_symptoms: document.getElementById("withdrawal-symptoms")
-              .value,
-            drug_abuse: document.getElementById("drug-abuse").value,
-            storage: document.getElementById("storage").value,
-          };
+        function makeCell(value, field) {
+          const td = document.createElement("td");
+          const inp = document.createElement("input");
+          inp.value = value || "";
+          inp.dataset.field = field;
+          td.appendChild(inp);
+          return td;
+        }
 
-          // Gather variations
-          formData.variations = Array.from(
-            document.querySelectorAll(".variation-item")
-          ).map((variation) => ({
-            unit_type: variation.querySelector('[name="unit_type[]"]').value,
-            unit_value: variation.querySelector('[name="unit_value[]"]').value,
-            qty: variation.querySelector('[name="qty[]"]').value,
-            price_per_pill: variation.querySelector('[name="price_per_pill[]"]')
-              .value,
-            price_per_box: variation.querySelector('[name="price_per_box[]"]')
-              .value,
-            delivery_time: variation.querySelector('[name="delivery_time[]"]')
-              .value,
-          }));
+        function renderRow(variant) {
+          const tr = document.createElement("tr");
+          tr.dataset.id = variant.variation_id;
+          const idTd = document.createElement("td");
+          idTd.textContent = variant.variation_id;
+          tr.appendChild(idTd);
+          tr.appendChild(makeCell(variant.unit_type, "unit_type"));
+          tr.appendChild(makeCell(variant.unit_value, "unit_value"));
+          tr.appendChild(makeCell(variant.qty, "qty"));
+          tr.appendChild(makeCell(variant.price_per_pill, "price_per_pill"));
+          tr.appendChild(makeCell(variant.price_per_box, "price_per_box"));
+          tr.appendChild(makeCell(variant.delivery_time, "delivery_time"));
 
-          // Gather FAQs
-          formData.faqs = Array.from(
-            document.querySelectorAll(".faq-item")
-          ).map((faq) => ({
-            question: faq.querySelector('[name="faq_question[]"]').value,
-            answer: faq.querySelector('[name="faq_answer[]"]').value,
-          }));
+          const actTd = document.createElement("td");
+          const saveBtn = document.createElement("button");
+          const delBtn = document.createElement("button");
+          saveBtn.innerHTML = '<i class="fas fa-save"></i> Save';
+          delBtn.innerHTML = '<i class="fas fa-trash"></i> Delete';
 
-          try {
-            // Send data to the backend API using Fetch
-            const response = await fetch(`/products`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(formData),
+          saveBtn.addEventListener("click", () => updateVariant(tr));
+          delBtn.addEventListener("click", () => {
+            if (!confirm(`Really delete this variation? ${tr.dataset.id}`)) return;
+            deleteVariant(tr.dataset.id).then(() => {
+              tr.remove();
+              alert("Variation deleted");
+            }).catch((err) => {
+              console.error(err);
+              alert("Delete failed");
             });
+          });
+          actTd.appendChild(saveBtn);
+          actTd.appendChild(delBtn);
+          tr.appendChild(actTd);
+          return tr;
+        }
 
-            const data = await response.json();
-            if (response.ok) {
-              alert("Product added successfully!");
-            } else {
-              alert("Failed to add product: " + data.message);
-            }
-          } catch (error) {
-            console.error("Error:", error);
-            alert("An error occurred while adding the product.");
-          }
+        loadBtn.addEventListener("click", async () => {
+          const pid = lookupInput.value.trim();
+          if (!pid) return alert("enter product id");
+          const resp = await fetch(`/api/variants/${pid}`);
+          const variants = await resp.json();
+          tbody.innerHTML = "";
+          variants.forEach((v) => tbody.appendChild(renderRow(v)));
+          table.style.display = "";
+          addBtn.style.display = "";
         });
+
+        async function deleteVariant(variationId) {
+          const res = await fetch(`/api/variants/${variationId}`, { method: "DELETE" });
+          if (!res.ok) {
+            const { error } = await res.json();
+            throw new Error(error || res.statusText);
+          }
+        }
+
+        async function updateVariant(row) {
+          const id = row.dataset.id;
+          if (!/^\d+$/.test(id)) return alert("Cannot update — no valid variation ID yet. Use Create.");
+          const payload = {};
+          row.querySelectorAll("input").forEach((inp) => {
+            payload[inp.dataset.field] = inp.value;
+          });
+          try {
+            const res = await fetch(`/api/variants/${id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            if (!res.ok) throw new Error(res.statusText);
+            alert("Updated");
+          } catch (err) {
+            console.error("updateVariant error", err);
+            alert("Update failed: " + err.message);
+          }
+        }
+
+        addBtn.addEventListener("click", () => {
+          const pid = lookupInput.value.trim();
+          const empty = { variation_id: "", unit_type: "", unit_value: "", qty: "", price_per_pill: "", price_per_box: "", delivery_time: "" };
+          const newRow = renderRow(empty);
+          const createBtn = document.createElement("button");
+          createBtn.innerHTML = '<i class="fas fa-plus"></i> Create';
+          createBtn.addEventListener("click", () => createVariant(newRow, pid));
+          const actionCell = newRow.querySelector("td:last-child");
+          actionCell.appendChild(createBtn);
+          tbody.appendChild(newRow);
+        });
+
+        async function createVariant(row, pid) {
+          const payload = { product_id: +pid };
+          row.querySelectorAll("input").forEach((inp) => {
+            payload[inp.dataset.field] = inp.value;
+          });
+          try {
+            const res = await fetch(`/api/variants`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            if (!res.ok) throw new Error(res.statusText);
+            const created = await res.json();
+            tbody.replaceChild(renderRow(created), row);
+            alert("Created");
+          } catch (err) {
+            console.error("createVariant error", err);
+            alert("Create failed: " + err.message);
+          }
+        }
+      });
     </script>
 
-    <!-- Add this section to your employee.html (after the "Process Requests" section) -->
-
-    <style></style>
+    <section id="product-form-section" class="card">
+      <h2><i class="fas fa-plus-circle"></i> Add New Product</h2>
+      <form id="product-form">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+          <div>
+            <label for="category_id">Category ID:</label>
+            <input type="number" id="category_id" name="category_id" required />
+          </div>
+          <div>
+            <label for="product_name">Product Name:</label>
+            <input type="text" id="product_name" name="product_name" required />
+          </div>
+        </div>
+        <label for="product_description">Product Description:</label>
+        <textarea id="product_description" name="product_description" rows="3" required></textarea>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+          <div>
+            <label for="trade_names">Trade Names:</label>
+            <input type="text" id="trade_names" name="trade_names" required />
+          </div>
+          <div>
+            <label for="manufactured_by">Manufactured By:</label>
+            <input type="text" id="manufactured_by" name="manufactured_by" required />
+          </div>
+        </div>
+        <label for="ingredients">Ingredients:</label>
+        <textarea id="ingredients" name="ingredients" rows="3" required></textarea>
+        <label for="packaging_details">Packaging Details:</label>
+        <textarea id="packaging_details" name="packaging_details" rows="3" required></textarea>
+        <label for="how_to_use">How To Use:</label>
+        <textarea id="how_to_use" name="how_to_use" rows="3" required></textarea>
+        <label for="drug_interaction">Drug Interaction:</label>
+        <textarea id="drug_interaction" name="drug_interaction" rows="3" required></textarea>
+        <label for="side_effects">Side Effects:</label>
+        <textarea id="side_effects" name="side_effects" rows="3" required></textarea>
+        <label for="warnings_precautions">Warnings/Precautions:</label>
+        <textarea id="warnings_precautions" name="warnings_precautions" rows="3" required></textarea>
+        <label for="withdrawal_symptoms">Withdrawal Symptoms:</label>
+        <textarea id="withdrawal_symptoms" name="withdrawal_symptoms" rows="3" required></textarea>
+        <label for="drug_abuse">Drug Abuse:</label>
+        <textarea id="drug_abuse" name="drug_abuse" rows="3" required></textarea>
+        <label for="storages">Storage:</label>
+        <textarea id="storages" name="storage" rows="3" required></textarea>
+        <label for="primary_img">Primary Image URL:</label>
+        <input type="text" id="primary_img" name="primary_img" required />
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+          <div>
+            <label for="additional_img1">Additional Image 1:</label>
+            <input type="text" id="additional_img1" name="additional_img1" />
+          </div>
+          <div>
+            <label for="additional_img2">Additional Image 2:</label>
+            <input type="text" id="additional_img2" name="additional_img2" />
+          </div>
+          <div>
+            <label for="additional_img3">Additional Image 3:</label>
+            <input type="text" id="additional_img3" name="additional_img3" />
+          </div>
+          <div>
+            <label for="additional_img4">Additional Image 4:</label>
+            <input type="text" id="additional_img4" name="additional_img4" />
+          </div>
+          <div>
+            <label for="additional_img5">Additional Image 5:</label>
+            <input type="text" id="additional_img5" name="additional_img5" />
+          </div>
+          <div>
+            <label for="additional_img6">Additional Image 6:</label>
+            <input type="text" id="additional_img6" name="additional_img6" />
+          </div>
+        </div>
+        <button type="submit"><i class="fas fa-save"></i> Submit Product</button>
+      </form>
+    </section>
 
     <script>
       document.addEventListener("DOMContentLoaded", () => {
@@ -1134,359 +689,80 @@
 
         trackBtn.addEventListener("click", async () => {
           const userId = userIdInput.value.trim();
-
           if (!userId) {
             alert("Please enter a Customer ID");
             return;
           }
 
           try {
-            // Show loading state
             trackBtn.textContent = "Loading...";
             trackBtn.disabled = true;
-
             const response = await fetch(`/api/customer-tracking/${userId}`);
             const result = await response.json();
 
-            if (!response.ok) {
-              throw new Error(
-                result.message || "Failed to fetch customer data"
-              );
-            }
-
-            if (!result.success) {
-              throw new Error(result.message || "Customer not found");
-            }
+            if (!response.ok) throw new Error(result.message || "Failed to fetch customer data");
+            if (!result.success) throw new Error(result.message || "Customer not found");
 
             const { customer, orders, totalOrders, totalSpent } = result.data;
+            document.getElementById("track-customer-id").textContent = customer.id;
+            document.getElementById("track-customer-name").textContent = `${customer.first_name} ${customer.last_name}`;
+            document.getElementById("track-customer-email").textContent = customer.email;
+            document.getElementById("track-customer-phone").textContent = customer.phone;
+            document.getElementById("track-customer-company").textContent = customer.company_name || "N/A";
+            document.getElementById("track-customer-address").textContent = `${customer.street_address}, ${customer.apartment || ""}, ${customer.city}, ${customer.state}, ${customer.zip_code}, ${customer.country}`;
+            document.getElementById("track-total-orders").textContent = totalOrders;
+            document.getElementById("track-lifetime-value").textContent = `${totalSpent}`;
 
-            // Populate customer info
-            document.getElementById("track-customer-id").textContent =
-              customer.id;
-            document.getElementById(
-              "track-customer-name"
-            ).textContent = `${customer.first_name} ${customer.last_name}`;
-            document.getElementById("track-customer-email").textContent =
-              customer.email;
-            document.getElementById("track-customer-phone").textContent =
-              customer.phone;
-            document.getElementById("track-customer-company").textContent =
-              customer.company_name || "N/A";
-            document.getElementById("track-customer-address").textContent = `${
-              customer.street_address
-            }, ${customer.apartment || ""}, ${customer.city}, ${
-              customer.state
-            }, ${customer.zip_code}, ${customer.country}`;
-
-            // Populate stats
-            document.getElementById("track-total-orders").textContent =
-              totalOrders;
-            document.getElementById(
-              "track-lifetime-value"
-            ).textContent = `$${totalSpent}`;
-
-            // Populate orders
             const ordersListDiv = document.getElementById("orders-list");
             ordersListDiv.innerHTML = "";
 
             if (orders.length === 0) {
-              ordersListDiv.innerHTML =
-                '<div class="no-orders">No orders found for this customer</div>';
+              ordersListDiv.innerHTML = '<div class="no-orders">No orders found for this customer</div>';
             } else {
               orders.forEach((order) => {
                 const orderCard = document.createElement("div");
                 orderCard.className = "order-card";
-
-                // Format date
                 const orderDate = new Date(order.created_at);
                 const formattedDate = orderDate.toLocaleString("en-US", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
+                  year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
                 });
 
-                // Build items table
                 let itemsHtml = "";
                 if (order.items.length > 0) {
-                  itemsHtml = `
-              <table class="order-items-table">
-                <thead>
-                  <tr>
-                    <th>Product Name</th>
-                    <th>Strength (mg)</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${order.items
-                    .map(
-                      (item) => `
-                    <tr>
-                      <td>${item.name}</td>
-                      <td>${item.mg}</td>
-                      <td>${item.quantity}</td>
-                      <td>$${parseFloat(item.price).toFixed(2)}</td>
-                    </tr>
-                  `
-                    )
-                    .join("")}
-                </tbody>
-              </table>
-            `;
+                  itemsHtml = `<table class="order-items-table"><thead><tr><th>Product Name</th><th>Strength (mg)</th><th>Quantity</th><th>Price</th></tr></thead><tbody>${order.items.map(item => `<tr><td>${item.name}</td><td>${item.mg}</td><td>${item.quantity}</td><td>${parseFloat(item.price).toFixed(2)}</td></tr>`).join("")}</tbody></table>`;
                 }
-                console.log(order);
 
                 orderCard.innerHTML = `
-            <div class="order-header">
-              <div>
-                <div class="order-number">Order #${order.order_id}</div>
-                <div class="order-date">${formattedDate}</div>
-              </div>
-              <div class="order-total">$${parseFloat(
-                order.total_amount
-              ).toFixed(2)}</div>
-            </div>
-            ${itemsHtml}
-            <div style="margin-top: 10px; font-size: 13px; color: #666;">
-              <strong>Shipping:</strong> $${parseFloat(order.shipping).toFixed(
-                2
-              )} | 
-              <strong>Items:</strong> ${order.itemCount} |
-              <strong>Payment:</strong> ${order.payment_status}
-            </div>
-          `;
-
+                  <div class="order-header">
+                    <div>
+                      <div class="order-number">Order #${order.order_id}</div>
+                      <div class="order-date"><strong>Date</strong> : ${formattedDate}</div>
+                    </div>
+                    <div class="order-total"><strong>Price</strong> : ${parseFloat(order.total_amount).toFixed(2)}</div>
+                  </div>
+                  ${itemsHtml}
+                  <div style="margin-top: 10px; font-size: 13px; color: #666;">
+                    <strong>Shipping:</strong> ${parseFloat(order.shipping).toFixed(2)} | 
+                    <strong>Items:</strong> ${order.itemCount} |
+                    <strong>Payment:</strong> ${order.payment_status}
+                  </div>
+                `;
                 ordersListDiv.appendChild(orderCard);
               });
             }
-
-            // Show results
             resultsDiv.style.display = "block";
           } catch (error) {
             console.error("Error tracking customer:", error);
-            alert(
-              error.message || "Error fetching customer data. Please try again."
-            );
+            alert(error.message || "Error fetching customer data. Please try again.");
           } finally {
-            // Reset button state
             trackBtn.textContent = "Track Customer";
             trackBtn.disabled = false;
           }
         });
 
-        // Allow Enter key to trigger search
         userIdInput.addEventListener("keypress", (e) => {
-          if (e.key === "Enter") {
-            trackBtn.click();
-          }
+          if (e.key === "Enter") trackBtn.click();
         });
-      });
-    </script>
-
-    <!-- REPLACE your "Process Requests Section" in employee.html with this -->
-
-    <style></style>
-
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const tableBody = document.querySelector("#process-requests tbody");
-        const orderDetailsSection = document.getElementById("order-details");
-        const orderDetailsBody = document.getElementById("order-details-body");
-        const customerDetailsSection =
-          document.getElementById("customer-details");
-        const customerDetailsBody = document.getElementById(
-          "customer-details-body"
-        );
-        const closeDetailsButton = document.getElementById("close-details");
-        const closeCustomerDetailsButton = document.getElementById(
-          "close-customer-details"
-        );
-
-        const fetchRequests = async () => {
-          try {
-            const response = await fetch(`/api/requests`);
-            const requests = await response.json();
-            tableBody.innerHTML = "";
-
-            requests.forEach((request) => {
-              const row = document.createElement("tr");
-
-              // Get payment status (default to 'pending' if not set)
-              const paymentStatus = request.payment_status || "pending";
-
-              // Create status badge with icon
-              let statusBadgeHtml = "";
-              if (paymentStatus === "completed") {
-                statusBadgeHtml = `
-            <span class="payment-status-badge completed">
-              <span class="status-icon">✅</span>
-              Paid
-            </span>
-          `;
-              } else {
-                statusBadgeHtml = `
-            <span class="payment-status-badge pending">
-              <span class="status-icon">⏳</span>
-              Pending
-            </span>
-          `;
-              }
-
-              // Show "Payment Done" button only if payment is pending
-              let paymentButton = "";
-              if (paymentStatus === "pending") {
-                paymentButton = `
-            <button class="payment-done-btn" onclick="markPaymentDone(${request.order_id}, this)">
-              💰 Payment Done
-            </button>
-          `;
-              }
-
-              row.innerHTML = `
-          <td>#${request.order_id}</td>
-          <td>${request.user_id}</td>
-          <td>$${parseFloat(request.total_amount).toFixed(2)}</td>
-          <td>${statusBadgeHtml}</td>
-          <td class="action">
-            <button onclick="viewOrderItems(${
-              request.order_id
-            })">View Items</button>
-            <button onclick="viewCustomerDetails(${
-              request.user_id
-            })">View Customer</button>
-            ${paymentButton}
-            <button onclick="deleteRequest(${
-              request.order_id
-            })" style="background-color: #dc3545; color: white;">Delete</button>
-          </td>
-        `;
-              tableBody.appendChild(row);
-            });
-          } catch (err) {
-            console.error("Error fetching requests:", err);
-          }
-        };
-
-        // Mark payment as done
-        window.markPaymentDone = async (orderId, buttonElement) => {
-          if (!confirm("Mark this payment as completed?")) return;
-
-          // Disable button and show loading state
-          buttonElement.disabled = true;
-          buttonElement.textContent = "Processing...";
-
-          try {
-            const response = await fetch(
-              `/api/orders/${orderId}/payment-status`,
-              {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status: "completed" }),
-              }
-            );
-
-            const result = await response.json();
-
-            if (!response.ok) {
-              throw new Error(
-                result.message || "Failed to update payment status"
-              );
-            }
-
-            if (result.success) {
-              // Show success message
-              alert("✅ Payment marked as completed!");
-
-              // Refresh the table to show green checkmark
-              fetchRequests();
-            } else {
-              throw new Error(result.message || "Update failed");
-            }
-          } catch (err) {
-            console.error("Error updating payment status:", err);
-            alert("❌ Error: " + err.message);
-
-            // Re-enable button on error
-            buttonElement.disabled = false;
-            buttonElement.textContent = "💰 Payment Done";
-          }
-        };
-
-        window.viewOrderItems = async (orderId) => {
-          try {
-            const response = await fetch(`/api/order-items/${orderId}`);
-            const orderItems = await response.json();
-            orderDetailsBody.innerHTML = "";
-
-            orderItems.forEach((item) => {
-              const row = document.createElement("tr");
-              row.innerHTML = `
-          <td>${item.name}</td>
-          <td>${item.quantity}</td>
-          <td>${item.mg}</td>
-          <td>$${parseFloat(item.price).toFixed(2)}</td>
-        `;
-              orderDetailsBody.appendChild(row);
-            });
-
-            orderDetailsSection.classList.remove("hidden");
-          } catch (err) {
-            console.error("Error fetching order items:", err);
-          }
-        };
-
-        window.viewCustomerDetails = async (id) => {
-          try {
-            const response = await fetch(`/api/customers/${id}`);
-            const customer = await response.json();
-
-            customerDetailsBody.innerHTML = `
-        <p><strong>Name:</strong> ${customer.first_name} ${
-              customer.last_name
-            }</p>
-        <p><strong>Email:</strong> ${customer.email}</p>
-        <p><strong>Phone:</strong> ${customer.phone}</p>
-        <p><strong>Address:</strong> ${customer.street_address}, ${
-              customer.apartment || ""
-            }, ${customer.city}, ${customer.state}, ${customer.zip_code}</p>
-        <p><strong>Company:</strong> ${customer.company_name || "N/A"}</p>
-      `;
-
-            customerDetailsSection.classList.remove("hidden");
-          } catch (err) {
-            console.error("Error fetching customer details:", err);
-          }
-        };
-
-        window.deleteRequest = async (orderId) => {
-          if (!confirm("Are you sure you want to delete this order?")) return;
-          try {
-            const res = await fetch(`/api/requests/${orderId}`, {
-              method: "DELETE",
-            });
-            const json = await res.json();
-            if (!json.success) throw new Error(json.error || "Delete failed");
-            alert(json.message);
-            fetchRequests();
-          } catch (err) {
-            console.error("Error deleting request:", err);
-            alert("Could not delete order: " + err.message);
-          }
-        };
-
-        closeDetailsButton.addEventListener("click", () => {
-          orderDetailsSection.classList.add("hidden");
-        });
-
-        closeCustomerDetailsButton.addEventListener("click", () => {
-          customerDetailsSection.classList.add("hidden");
-        });
-
-        // Initial load
-        fetchRequests();
       });
     </script>
 
@@ -1495,167 +771,41 @@
         const tableBody = document.querySelector("#process-requests tbody");
         const orderDetailsSection = document.getElementById("order-details");
         const orderDetailsBody = document.getElementById("order-details-body");
-        const customerDetailsSection =
-          document.getElementById("customer-details");
-        const customerDetailsBody = document.getElementById(
-          "customer-details-body"
-        );
+        const customerDetailsSection = document.getElementById("customer-details");
+        const customerDetailsBody = document.getElementById("customer-details-body");
         const closeDetailsButton = document.getElementById("close-details");
-        const closeCustomerDetailsButton = document.getElementById(
-          "close-customer-details"
-        );
-
-        // --- Pagination container ---
+        const closeCustomerDetailsButton = document.getElementById("close-customer-details");
         const paginationDiv = document.createElement("div");
         paginationDiv.id = "pagination";
-        paginationDiv.style.marginTop = "10px";
         document.getElementById("process-requests").appendChild(paginationDiv);
 
         let pages = [];
         let currentPage = 1;
 
-        // Fetch and group requests
-        // const fetchRequests = async () => {
-        //   try {
-        //     const response = await fetch(`/api/requests`);
-        //     const requests = await response.json();
-
-        //     // Group orders by date (YYYY-MM-DD)
-        //     const grouped = {};
-        //     requests.forEach((order) => {
-        //       const date = new Date(order.created_at).toISOString().split("T")[0];
-        //       if (!grouped[date]) grouped[date] = [];
-        //       grouped[date].push(order);
-        //     });
-
-        //     // Build pages (strict date-based, max 10 per page)
-        //     pages = [];
-        //     Object.keys(grouped)
-        //       .sort((a, b) => new Date(b) - new Date(a)) // newest first
-        //       .forEach((date) => {
-        //         const orders = grouped[date];
-        //         for (let i = 0; i < orders.length; i += 10) {
-        //           pages.push({
-        //             date,
-        //             orders: orders.slice(i, i + 10),
-        //           });
-        //         }
-        //       });
-
-        //     renderPage(1);
-        //   } catch (err) {
-        //     console.error("Error fetching requests:", err);
-        //   }
-        // };
-
-        // function renderPage(pageNumber) {
-        //   currentPage = pageNumber;
-        //   tableBody.innerHTML = "";
-
-        //   const page = pages[pageNumber - 1];
-        //   if (!page) return;
-
-        //   // --- Date header row ---
-        //   const headerRow = document.createElement("tr");
-        //   headerRow.innerHTML = `<td colspan="5" style="font-weight:bold; background:#f0f0f0;">
-        //     Orders for ${page.date}
-        //   </td>`;
-        //   tableBody.appendChild(headerRow);
-
-        //   // --- Render each order (keep your existing functionality) ---
-        //   page.orders.forEach((request) => {
-        //     const row = document.createElement("tr");
-
-        //     // Payment status
-        //     const paymentStatus = request.payment_status || "pending";
-        //     let statusBadgeHtml = "";
-        //     if (paymentStatus === "completed") {
-        //       statusBadgeHtml = `
-        //         <span class="payment-status-badge completed">
-        //           <span class="status-icon">✅</span>
-        //           Paid
-        //         </span>
-        //       `;
-        //     } else {
-        //       statusBadgeHtml = `
-        //         <span class="payment-status-badge pending">
-        //           <span class="status-icon">⏳</span>
-        //           Pending
-        //         </span>
-        //       `;
-        //     }
-
-        //     // Payment button only if pending
-        //     let paymentButton = "";
-        //     if (paymentStatus === "pending") {
-        //       paymentButton = `
-        //         <button class="payment-done-btn" onclick="markPaymentDone(${request.order_id}, this)">
-        //           💰 Payment Done
-        //         </button>
-        //       `;
-        //     }
-
-        //     row.innerHTML = `
-        //       <td>#${request.order_id}</td>
-        //       <td>${request.user_id}</td>
-        //       <td>$${parseFloat(request.total_amount).toFixed(2)}</td>
-        //       <td>${statusBadgeHtml}</td>
-        //       <td class="action">
-        //         <button onclick="viewOrderItems(${request.order_id})">View Items</button>
-        //         <button onclick="viewCustomerDetails(${request.user_id})">View Customer</button>
-        //         ${paymentButton}
-        //         <button onclick="deleteRequest(${request.order_id})" style="background-color: #dc3545; color: white;">Delete</button>
-        //       </td>
-        //     `;
-        //     tableBody.appendChild(row);
-        //   });
-
-        //   // Fill empty rows if less than 10
-        //   const emptyRows = 10 - page.orders.length;
-        //   for (let i = 0; i < emptyRows; i++) {
-        //     const empty = document.createElement("tr");
-        //     empty.innerHTML = `<td colspan="5">&nbsp;</td>`;
-        //     tableBody.appendChild(empty);
-        //   }
-
-        //   renderPagination();
-        // }
-
         const fetchRequests = async () => {
           try {
             const response = await fetch(`/api/requests`);
             const requests = await response.json();
-
-            // Group orders by date (YYYY-MM-DD)
             const grouped = {};
             requests.forEach((order) => {
-              const date = new Date(order.created_at)
-                .toISOString()
-                .split("T")[0];
+              const date = new Date(order.created_at).toISOString().split("T")[0];
               if (!grouped[date]) grouped[date] = [];
               grouped[date].push(order);
             });
 
-            // Assign serial numbers within each date group
             Object.keys(grouped).forEach((date) => {
               grouped[date].forEach((order, index) => {
-                order.serial = index + 1; // start from 1
+                order.serial = index + 1;
               });
             });
 
-            // Build pages (strict date-based, max 10 per page)
             pages = [];
-            Object.keys(grouped)
-              .sort((a, b) => new Date(b) - new Date(a)) // newest first
-              .forEach((date) => {
-                const orders = grouped[date];
-                for (let i = 0; i < orders.length; i += 10) {
-                  pages.push({
-                    date,
-                    orders: orders.slice(i, i + 10),
-                  });
-                }
-              });
+            Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a)).forEach((date) => {
+              const orders = grouped[date];
+              for (let i = 0; i < orders.length; i += 10) {
+                pages.push({ date, orders: orders.slice(i, i + 10) });
+              }
+            });
 
             renderPage(1);
           } catch (err) {
@@ -1666,130 +816,40 @@
         function renderPage(pageNumber) {
           currentPage = pageNumber;
           tableBody.innerHTML = "";
-
           const page = pages[pageNumber - 1];
           if (!page) return;
 
-          // --- Date header row ---
           const headerRow = document.createElement("tr");
-          headerRow.innerHTML = `<td colspan="6" style="font-weight:bold; background:#f0f0f0;">
-             Orders for ${page.date}
-             </td>`;
+          headerRow.innerHTML = `<td colspan="6" style="font-weight:bold; background:var(--light-gray); text-align:center;">Orders for ${page.date}</td>`;
           tableBody.appendChild(headerRow);
 
-          // --- Render each order (with serial number) ---
           page.orders.forEach((request) => {
             const row = document.createElement("tr");
-
-            // Payment status
             const paymentStatus = request.payment_status || "pending";
-            let statusBadgeHtml = "";
-            if (paymentStatus === "completed") {
-              statusBadgeHtml = `
-          <span class="payment-status-badge completed">
-            <span class="status-icon">✅</span>
-            Paid
-          </span>
-        `;
-            } else {
-              statusBadgeHtml = `
-          <span class="payment-status-badge pending">
-            <span class="status-icon">⏳</span>
-            Pending
-          </span>
-        `;
-            }
+            let statusBadgeHtml = paymentStatus === "completed" 
+              ? `<span class="payment-status-badge completed"><span class="status-icon">✅</span> Paid</span>`
+              : `<span class="payment-status-badge pending"><span class="status-icon">⏳</span> Pending</span>`;
 
-            // Payment button only if pending
-            let paymentButton = "";
-            if (paymentStatus === "pending") {
-              paymentButton = `
-          <button class="payment-done-btn" onclick="markPaymentDone(${request.order_id}, this)">
-            💰 Payment Done
-          </button>
-        `;
-            }
+            let paymentButton = paymentStatus === "pending" 
+              ? `<button class="payment-done-btn" onclick="markPaymentDone(${request.order_id}, this)"><i class="fas fa-check"></i> Payment Done</button>`
+              : "";
 
-            window.sendTrackingEmail = async (orderId, userId) => {
-              const input = document.getElementById(`track-${orderId}`);
-              const trackingNumber = input.value.trim();
-              if (!trackingNumber) {
-                alert("⚠️ Please enter a tracking number first.");
-                return;
-              }
-
-              try {
-                const response = await fetch(
-                  `/api/orders/${orderId}/send-tracking`,
-                  {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ trackingNumber, userId }),
-                  }
-                );
-
-                const result = await response.json();
-                if (!response.ok || !result.success) {
-                  throw new Error(
-                    result.message || "Failed to send tracking email"
-                  );
-                }
-
-                alert("📧 Tracking email sent successfully!");
-                input.value = ""; // clear field
-              } catch (err) {
-                console.error("Error sending tracking email:", err);
-                alert("❌ Could not send email: " + err.message);
-              }
-            };
-
-            //     row.innerHTML = `
-            // <td>${request.serial}</td>
-            // <td>#${request.order_id}</td>
-            // <td>${request.user_id}</td>
-            // <td>$${parseFloat(request.total_amount).toFixed(2)}</td>
-            // <td>${statusBadgeHtml}</td>
-            // <td class="action">
-            //   <button onclick="viewOrderItems(${request.order_id})">View Items</button>
-            //   <button onclick="viewCustomerDetails(${request.user_id})">View Customer</button>
-            //   ${paymentButton}
-            //   <button onclick="deleteRequest(${request.order_id})" style="background-color: #dc3545; color: white;">Delete</button>
-            //   <br/>
-            //   <input type="text" id="track-${request.order_id}" placeholder="Tracking No" style="margin-top:5px; width:120px;" />
-            //   <button onclick="sendTrackingEmail(${request.order_id}, ${request.user_id})" style="background-color:#007bff; color:white; margin-top:5px;">
-            //     Send Tracking Email
-            //   </button>
-            // </td>
-            //     `;
-            //     tableBody.appendChild(row);
-            //   });
             row.innerHTML = `
-  <td>${request.serial}</td>
-  <td>#${request.order_id}</td>
-  <td>${request.user_id}</td>
-  <td>$${parseFloat(request.total_amount).toFixed(2)}</td>
-  <td>${statusBadgeHtml}</td>
-  <td class="action">
-
-    <button class="view-details-btn" onclick="openDetailsModal(${
-      request.order_id
-    }, ${request.user_id})">View Details</button>
-    ${paymentButton}
-    
-    <input type="text" id="track-${
-      request.order_id
-    }" placeholder="Tracking No" style="margin-top:5px; width:120px;" />
-    <button onclick="sendTrackingEmail(${request.order_id}, ${
-              request.user_id
-            })" style="background-color:#007bff; color:white; margin-top:5px;">
-      Send Tracking Email
-    </button>
-  </td>
-      `;
+              <td>${request.serial}</td>
+              <td>#${request.order_id}</td>
+              <td>${request.user_id}</td>
+              <td>${parseFloat(request.total_amount).toFixed(2)}</td>
+              <td>${statusBadgeHtml}</td>
+              <td class="action">
+                <button class="view-details-btn" onclick="openDetailsModal(${request.order_id}, ${request.user_id})"><i class="fas fa-eye"></i> View Details</button>
+                ${paymentButton}
+                <input type="text" id="track-${request.order_id}" placeholder="Tracking No" style="margin-top:5px; width:120px;" />
+                <button onclick="sendTrackingEmail(${request.order_id}, ${request.user_id})" style="background: linear-gradient(135deg, #3b82f6, #2563eb); margin-top:5px;"><i class="fas fa-envelope"></i> Send Tracking</button>
+              </td>
+            `;
             tableBody.appendChild(row);
           });
 
-          // Fill empty rows if less than 10
           const emptyRows = 10 - page.orders.length;
           for (let i = 0; i < emptyRows; i++) {
             const empty = document.createElement("tr");
@@ -1798,182 +858,113 @@
           }
 
           renderPagination();
-
-          // Add smooth scroll to table
-          document.querySelector("#process-requests").scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
+          document.querySelector("#process-requests").scrollIntoView({ behavior: "smooth", block: "start" });
         }
 
-        // function renderPagination() {
-        //   paginationDiv.innerHTML = "";
-
-        //   const totalPages = pages.length;
-        //   if (totalPages <= 1) return;
-
-        //   // Prev
-        //   const prevBtn = document.createElement("button");
-        //   prevBtn.textContent = "< Prev";
-        //   prevBtn.disabled = currentPage === 1;
-        //   prevBtn.onclick = () => renderPage(currentPage - 1);
-        //   paginationDiv.appendChild(prevBtn);
-
-        //   // Numbers
-        //   for (let i = 1; i <= totalPages; i++) {
-        //     const btn = document.createElement("button");
-        //     btn.textContent = i;
-        //     if (i === currentPage) btn.style.fontWeight = "bold";
-        //     btn.onclick = () => renderPage(i);
-        //     paginationDiv.appendChild(btn);
-        //   }
-
-        //   // Next
-        //   const nextBtn = document.createElement("button");
-        //   nextBtn.textContent = "Next >";
-        //   nextBtn.disabled = currentPage === totalPages;
-        //   nextBtn.onclick = () => renderPage(currentPage + 1);
-        //   paginationDiv.appendChild(nextBtn);
-        // }
-
-        // Smart page number calculation with ellipsis
         function getPageNumbers() {
-          const delta = 2; // Number of pages to show on each side of current page
+          const delta = 2;
           const range = [];
           const rangeWithDots = [];
           let l;
-
-          // Always show first page
           range.push(1);
-
-          // Calculate range around current page
           for (let i = currentPage - delta; i <= currentPage + delta; i++) {
-            if (i > 1 && i < pages.length) {
-              range.push(i);
-            }
+            if (i > 1 && i < pages.length) range.push(i);
           }
-
-          // Always show last page
-          if (pages.length > 1) {
-            range.push(pages.length);
-          }
-
-          // Add ellipsis where needed
+          if (pages.length > 1) range.push(pages.length);
           for (let i of range) {
             if (l) {
-              if (i - l === 2) {
-                rangeWithDots.push(l + 1);
-              } else if (i - l !== 1) {
-                rangeWithDots.push("...");
-              }
+              if (i - l === 2) rangeWithDots.push(l + 1);
+              else if (i - l !== 1) rangeWithDots.push("...");
             }
             rangeWithDots.push(i);
             l = i;
           }
-
           return rangeWithDots;
         }
 
-        // Create button element
-        function createPaginationButton(text, onClick, extraClass = "") {
-          const btn = document.createElement("button");
-          btn.className = `pagination-btn ${extraClass}`;
-          btn.textContent = text;
-          btn.onclick = onClick;
-          return btn;
-        }
-
-        // Improved renderPagination function
         function renderPagination() {
           paginationDiv.innerHTML = "";
-
           const totalPages = pages.length;
           if (totalPages <= 1) return;
 
-          // Previous button
-          const prevBtn = createPaginationButton(
-            "← Previous",
-            () => renderPage(currentPage - 1),
-            "nav-btn"
-          );
+          const prevBtn = document.createElement("button");
+          prevBtn.className = "pagination-btn nav-btn";
+          prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i> Previous';
+          prevBtn.onclick = () => renderPage(currentPage - 1);
           prevBtn.disabled = currentPage === 1;
           paginationDiv.appendChild(prevBtn);
 
-          // Calculate which page numbers to show
           const pageNumbers = getPageNumbers();
-
           pageNumbers.forEach((pageNum) => {
             if (pageNum === "...") {
-              // Add ellipsis
               const ellipsis = document.createElement("span");
               ellipsis.className = "pagination-ellipsis";
               ellipsis.textContent = "...";
               paginationDiv.appendChild(ellipsis);
             } else {
-              // Add page button
-              const pageBtn = createPaginationButton(pageNum, () =>
-                renderPage(pageNum)
-              );
-              if (pageNum === currentPage) {
-                pageBtn.classList.add("active");
-              }
+              const pageBtn = document.createElement("button");
+              pageBtn.className = "pagination-btn";
+              pageBtn.textContent = pageNum;
+              if (pageNum === currentPage) pageBtn.classList.add("active");
+              pageBtn.onclick = () => renderPage(pageNum);
               paginationDiv.appendChild(pageBtn);
             }
           });
 
-          // Next button
-          const nextBtn = createPaginationButton(
-            "Next →",
-            () => renderPage(currentPage + 1),
-            "nav-btn"
-          );
+          const nextBtn = document.createElement("button");
+          nextBtn.className = "pagination-btn nav-btn";
+          nextBtn.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
+          nextBtn.onclick = () => renderPage(currentPage + 1);
           nextBtn.disabled = currentPage === totalPages;
           paginationDiv.appendChild(nextBtn);
-
-          // Page info
-          const pageInfo = document.createElement("span");
-          pageInfo.className = "page-info";
-          pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-          paginationDiv.appendChild(pageInfo);
         }
 
-        // --- Existing functions unchanged ---
         window.markPaymentDone = async (orderId, buttonElement) => {
           if (!confirm("Mark this payment as completed?")) return;
-
           buttonElement.disabled = true;
           buttonElement.textContent = "Processing...";
-
           try {
-            const response = await fetch(
-              `/api/orders/${orderId}/payment-status`,
-              {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status: "completed" }),
-              }
-            );
-
+            const response = await fetch(`/api/orders/${orderId}/payment-status`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ status: "completed" }),
+            });
             const result = await response.json();
-
-            if (!response.ok) {
-              throw new Error(
-                result.message || "Failed to update payment status"
-              );
-            }
-
+            if (!response.ok) throw new Error(result.message || "Failed to update payment status");
             if (result.success) {
               alert("✅ Payment marked as completed!");
-              fetchRequests(); // refresh
+              fetchRequests();
             } else {
               throw new Error(result.message || "Update failed");
             }
           } catch (err) {
             console.error("Error updating payment status:", err);
             alert("❌ Error: " + err.message);
-
             buttonElement.disabled = false;
             buttonElement.textContent = "💰 Payment Done";
+          }
+        };
+
+        window.sendTrackingEmail = async (orderId, userId) => {
+          const input = document.getElementById(`track-${orderId}`);
+          const trackingNumber = input.value.trim();
+          if (!trackingNumber) {
+            alert("⚠️ Please enter a tracking number first.");
+            return;
+          }
+          try {
+            const response = await fetch(`/api/orders/${orderId}/send-tracking`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ trackingNumber, userId }),
+            });
+            const result = await response.json();
+            if (!response.ok || !result.success) throw new Error(result.message || "Failed to send tracking email");
+            alert("📧 Tracking email sent successfully!");
+            input.value = "";
+          } catch (err) {
+            console.error("Error sending tracking email:", err);
+            alert("❌ Could not send email: " + err.message);
           }
         };
 
@@ -1982,18 +973,16 @@
             const response = await fetch(`/api/order-items/${orderId}`);
             const orderItems = await response.json();
             orderDetailsBody.innerHTML = "";
-
             orderItems.forEach((item) => {
               const row = document.createElement("tr");
               row.innerHTML = `
-          <td>${item.name}</td>
-          <td>${item.quantity}</td>
-          <td>${item.mg}</td>
-          <td>$${parseFloat(item.price).toFixed(2)}</td>
-        `;
+                <td>${item.name}</td>
+                <td>${item.quantity}</td>
+                <td>${item.mg}</td>
+                <td>${parseFloat(item.price).toFixed(2)}</td>
+              `;
               orderDetailsBody.appendChild(row);
             });
-
             orderDetailsSection.classList.remove("hidden");
           } catch (err) {
             console.error("Error fetching order items:", err);
@@ -2004,19 +993,13 @@
           try {
             const response = await fetch(`/api/customers/${id}`);
             const customer = await response.json();
-
             customerDetailsBody.innerHTML = `
-        <p><strong>Name:</strong> ${customer.first_name} ${
-              customer.last_name
-            }</p>
-        <p><strong>Email:</strong> ${customer.email}</p>
-        <p><strong>Phone:</strong> ${customer.phone}</p>
-        <p><strong>Address:</strong> ${customer.street_address}, ${
-              customer.apartment || ""
-            }, ${customer.city}, ${customer.state}, ${customer.zip_code}</p>
-        <p><strong>Company:</strong> ${customer.company_name || "N/A"}</p>
-      `;
-
+              <p><strong>Name:</strong> ${customer.first_name} ${customer.last_name}</p>
+              <p><strong>Email:</strong> ${customer.email}</p>
+              <p><strong>Phone:</strong> ${customer.phone}</p>
+              <p><strong>Address:</strong> ${customer.street_address}, ${customer.apartment || ""}, ${customer.city}, ${customer.state}, ${customer.zip_code}</p>
+              <p><strong>Company:</strong> ${customer.company_name || "N/A"}</p>
+            `;
             customerDetailsSection.classList.remove("hidden");
           } catch (err) {
             console.error("Error fetching customer details:", err);
@@ -2026,9 +1009,7 @@
         window.deleteRequest = async (orderId) => {
           if (!confirm("Are you sure you want to delete this order?")) return;
           try {
-            const res = await fetch(`/api/requests/${orderId}`, {
-              method: "DELETE",
-            });
+            const res = await fetch(`/api/requests/${orderId}`, { method: "DELETE" });
             const json = await res.json();
             if (!json.success) throw new Error(json.error || "Delete failed");
             alert(json.message);
@@ -2047,7 +1028,6 @@
           customerDetailsSection.classList.add("hidden");
         });
 
-        // Initial load
         fetchRequests();
       });
     </script>
@@ -2056,10 +1036,8 @@
     <div id="detailsModal" class="modal-overlay">
       <div class="modal-container">
         <div class="modal-header">
-          <h2>Order & Customer Details</h2>
-          <button class="modal-close" onclick="closeDetailsModal()">
-            &times;
-          </button>
+          <h2><i class="fas fa-info-circle"></i> Order & Customer Details</h2>
+          <button class="modal-close" onclick="closeDetailsModal()">&times;</button>
         </div>
         <div class="modal-body" id="modalBodyContent">
           <div class="loading-spinner">
@@ -2070,17 +1048,11 @@
     </div>
 
     <script>
-      // Open modal and fetch data
       async function openDetailsModal(orderId, userId) {
         const modal = document.getElementById("detailsModal");
         const modalBody = document.getElementById("modalBodyContent");
-
         modal.classList.add("active");
-        modalBody.innerHTML = `
-        <div class="loading-spinner">
-            <div class="spinner"></div>
-        </div>
-    `;
+        modalBody.innerHTML = `<div class="loading-spinner"><div class="spinner"></div></div>`;
 
         try {
           const [orderItemsResponse, customerResponse] = await Promise.all([
@@ -2088,121 +1060,92 @@
             fetch(`/api/customers/${userId}`),
           ]);
 
-          if (!orderItemsResponse.ok || !customerResponse.ok) {
-            throw new Error("Failed to fetch data");
-          }
+          if (!orderItemsResponse.ok || !customerResponse.ok) throw new Error("Failed to fetch data");
 
           const orderItems = await orderItemsResponse.json();
           const customer = await customerResponse.json();
-
           renderDetailsContent(orderItems, customer, orderId);
         } catch (error) {
           console.error("Error fetching details:", error);
-          modalBody.innerHTML = `
-            <div class="error-message">
-                Failed to load details. Please try again.
-            </div>
-        `;
+          modalBody.innerHTML = `<div class="error-message">Failed to load details. Please try again.</div>`;
         }
       }
 
       function renderDetailsContent(orderItems, customer, orderId) {
         const modalBody = document.getElementById("modalBodyContent");
-        const total = orderItems.reduce(
-          (sum, item) => sum + parseFloat(item.price),
-          0
-        );
+        const total = orderItems.reduce((sum, item) => sum + parseFloat(item.price), 0);
 
         modalBody.innerHTML = `
-        <div class="details-grid">
+          <div class="details-grid">
             <div class="detail-section">
-                <h3>Customer Information</h3>
-                <div class="info-grid">
-                    <div class="info-row">
-                        <div class="info-label">Name:</div>
-                        <div class="info-value">${customer.first_name} ${
-          customer.last_name
-        }</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Email:</div>
-                        <div class="info-value">${customer.email}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Phone:</div>
-                        <div class="info-value">${customer.phone}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Company:</div>
-                        <div class="info-value">${
-                          customer.company_name || "N/A"
-                        }</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Address:</div>
-                        <div class="info-value">
-                            ${customer.street_address}, 
-                            ${
-                              customer.apartment
-                                ? customer.apartment + ", "
-                                : ""
-                            }
-                            ${customer.city}, ${customer.state}, 
-                            ${customer.zip_code}, ${customer.country}
-                        </div>
-                    </div>
+              <h3><i class="fas fa-user"></i> Customer Information</h3>
+              <div class="info-grid">
+                <div class="info-row">
+                  <div class="info-label">Name:</div>
+                  <div class="info-value">${customer.first_name} ${customer.last_name}</div>
                 </div>
+                <div class="info-row">
+                  <div class="info-label">Email:</div>
+                  <div class="info-value">${customer.email}</div>
+                </div>
+                <div class="info-row">
+                  <div class="info-label">Phone:</div>
+                  <div class="info-value">${customer.phone}</div>
+                </div>
+                <div class="info-row">
+                  <div class="info-label">Company:</div>
+                  <div class="info-value">${customer.company_name || "N/A"}</div>
+                </div>
+                <div class="info-row">
+                  <div class="info-label">Address:</div>
+                  <div class="info-value">${customer.street_address}, ${customer.apartment ? customer.apartment + ", " : ""}${customer.city}, ${customer.state}, ${customer.zip_code}, ${customer.country}</div>
+                </div>
+              </div>
             </div>
             
             <div class="detail-section">
-                <h3>Order Summary</h3>
-                <div class="info-grid">
-                    <div class="info-row">
-                        <div class="info-label">Order ID:</div>
-                        <div class="info-value">#${orderId}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Total Items:</div>
-                        <div class="info-value">${orderItems.length}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Total Amount:</div>
-                        <div class="info-value price">$${total.toFixed(2)}</div>
-                    </div>
+              <h3><i class="fas fa-clipboard-list"></i> Order Summary</h3>
+              <div class="info-grid">
+                <div class="info-row">
+                  <div class="info-label">Order ID:</div>
+                  <div class="info-value">#${orderId}</div>
                 </div>
+                <div class="info-row">
+                  <div class="info-label">Total Items:</div>
+                  <div class="info-value">${orderItems.length}</div>
+                </div>
+                <div class="info-row">
+                  <div class="info-label">Total Amount:</div>
+                  <div class="info-value price">${total.toFixed(2)}</div>
+                </div>
+              </div>
             </div>
             
             <div class="detail-section order-items-section">
-                <h3>Order Items</h3>
-                <table class="items-table">
-                    <thead>
-                        <tr>
-                            <th>Product Name</th>
-                            <th>Strength (mg)</th>
-                            <th>Quantity</th>
-                            <th>Price</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${orderItems
-                          .map(
-                            (item) => `
-                            <tr>
-                                <td>${item.name}</td>
-                                <td>${item.mg}</td>
-                                <td>${item.quantity}</td>
-                                <td class="price">$${parseFloat(
-                                  item.price
-                                ).toFixed(2)}</td>
-                            </tr>
-                        `
-                          )
-                          .join("")}
-                    </tbody>
-                </table>
+              <h3><i class="fas fa-box-open"></i> Order Items</h3>
+              <table class="items-table">
+                <thead>
+                  <tr>
+                    <th>Product Name</th>
+                    <th>Strength (mg)</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${orderItems.map(item => `
+                    <tr>
+                      <td>${item.name}</td>
+                      <td>${item.mg}</td>
+                      <td>${item.quantity}</td>
+                      <td class="price">${parseFloat(item.price).toFixed(2)}</td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
             </div>
-        </div>
-    `;
+          </div>
+        `;
       }
 
       function closeDetailsModal() {
@@ -2210,16 +1153,15 @@
       }
 
       document.addEventListener("DOMContentLoaded", () => {
-        document
-          .getElementById("detailsModal")
-          .addEventListener("click", function (e) {
-            if (e.target === this) closeDetailsModal();
-          });
+        document.getElementById("detailsModal").addEventListener("click", function (e) {
+          if (e.target === this) closeDetailsModal();
+        });
 
         document.addEventListener("keydown", function (e) {
           if (e.key === "Escape") closeDetailsModal();
         });
       });
     </script>
-  </body>
+  </div>
+</body>
 </html>
