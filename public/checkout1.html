@@ -327,7 +327,7 @@
             <div class="error" id="last-name-error"></div>
           </div>
 
-          <div class="form-group input-group">
+          <!-- <div class="form-group input-group">
             <input
               type="text"
               id="company-name"
@@ -335,7 +335,7 @@
               placeholder=" "
             />
             <label for="company-name">Company Name (Optional)</label>
-          </div>
+          </div> -->
 
           <div class="form-group input-group">
             <input
@@ -351,7 +351,7 @@
             <div class="error" id="street-address-error"></div>
           </div>
 
-          <div class="form-group input-group">
+          <!-- <div class="form-group input-group">
             <input
               type="text"
               id="apartment"
@@ -359,7 +359,7 @@
               placeholder=" "
             />
             <label for="apartment">Apartment, suite, etc. (Optional)</label>
-          </div>
+          </div> -->
 
           <div class="form-group input-group">
             <input type="text" id="city" name="city" placeholder=" " required />
@@ -436,8 +436,8 @@
 
           <!-- Shipping Address Checkbox -->
           <div class="form-group">
-            <input type="checkbox" id="different-address" />
-            <label for="different-address">Ship to a different address?</label>
+            <input hidden ="checkbox" id="different-address" />
+            <!-- <label for="different-address">Ship to a different address?</label> -->
           </div>
 
           <!-- Additional Address Form -->
@@ -1022,14 +1022,12 @@
             lastName: document.getElementById("last-name").value.trim(),
             phone: document.getElementById("phone").value.trim(),
             email: document.getElementById("email").value.trim(),
-            companyName:
-              document.getElementById("company-name").value.trim() || null,
+            
             country: document.getElementById("country").value,
             billingStreetAddress: document
               .getElementById("street-address")
               .value.trim(),
-            apartment:
-              document.getElementById("apartment").value.trim() || null,
+           
             billingCity: document.getElementById("city").value.trim(),
             billingState: document.getElementById("state").value,
             billingZip: document.getElementById("zip-code").value.trim(),
@@ -1206,17 +1204,17 @@
           });
 
         // Handle test data fill button click
-        document
-          .getElementById("fill-test-data-btn")
-          .addEventListener("click", fillTestData);
+        // document
+        //   .getElementById("fill-test-data-btn")
+        //   .addEventListener("click", fillTestData);
 
-        // Close modal when clicking outside
-        window.addEventListener("click", function (event) {
-          const modal = document.getElementById("confirmationModal");
-          if (event.target === modal) {
-            modal.style.display = "none";
-          }
-        });
+        // // Close modal when clicking outside
+        // window.addEventListener("click", function (event) {
+        //   const modal = document.getElementById("confirmationModal");
+        //   if (event.target === modal) {
+        //     modal.style.display = "none";
+        //   }
+        // });
 
         // Real-time form validation
         document.querySelectorAll("input, select").forEach((field) => {

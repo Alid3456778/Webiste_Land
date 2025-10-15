@@ -407,6 +407,167 @@ document.addEventListener('DOMContentLoaded', loadDashboardData);
       </div>
     </section>
 
+    <section id="manual-order" class="card">
+  <h2>Manual Order</h2>
+  <input type="number" id="manual-user-id" placeholder="Enter Customer User ID" />
+  <button id="fetch-customer">Fetch Customer</button>
+</section>
+
+<!-- Manual Order Popup -->
+<div id="manual-order-popup" class="popup hidden">
+  <div class="popup-content">
+    <h3>Manual Order Form</h3>
+    <form id="manual-order-form">
+      <label>First Name: <input id="firstName" required></label>
+      <label>Last Name: <input id="lastName" required></label>
+      <label>Email: <input id="email" required></label>
+      <label>Phone: <input id="phone" required></label>
+      <label>Address: <input id="billingStreetAddress" required></label>
+      <label>City: <input id="billingCity" required></label>
+      <label>State: <input id="billingState" required></label>
+      <label>Zip: <input id="billingZip" required></label>
+      <label>Country: <input id="country" required></label>
+
+      <h4>Medicines</h4>
+      <table id="medicine-table">
+        <thead>
+          <tr><th>Name</th><th>MG</th><th>Qty</th><th>Price</th><th></th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button type="button" id="add-medicine">Add Medicine</button>
+
+      <label>Shipping Cost: <input type="number" id="shippingCost" step="0.01"></label>
+      <label>Total Cost: <input type="number" id="totalCost" step="0.01"></label>
+
+      <button type="submit">Submit Manual Order</button>
+      <button type="button" id="close-popup">Cancel</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+  const manualBtn = document.getElementById("fetch-customer");
+  const manualPopup = document.getElementById("manual-order-popup");
+  const form = document.getElementById("manual-order-form");
+  const tbody = document.querySelector("#medicine-table tbody");
+  const addMedicine = document.getElementById("add-medicine");
+  const closePopup = document.getElementById("close-popup");
+
+  let currentUserId = null;
+
+  manualBtn.addEventListener("click", async () => {
+  const userId = document.getElementById("manual-user-id").value.trim();
+
+  // if no ID entered, ask to create new customer directly
+  if (!userId) {
+    if (confirm("No Customer ID entered. Do you want to create a new customer?")) {
+      openManualOrderForm(); // open blank form
+    }
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/customers/${userId}`);
+    if (!res.ok) {
+      // if user not found
+      if (confirm("No customer found with this ID. Do you want to create a new customer?")) {
+        openManualOrderForm(); // open blank form
+      }
+      return;
+    }
+
+    // if user found, prefill details
+    const user = await res.json();
+    currentUserId = user.id;
+
+    openManualOrderForm(user); // prefill form with customer data
+  } catch (err) {
+    alert("Error fetching user: " + err.message);
+  }
+});
+
+// Reusable function for opening the manual order popup
+function openManualOrderForm(user = null) {
+  const form = document.getElementById("manual-order-form");
+  manualPopup.classList.remove("hidden");
+
+  // Prefill or clear form
+  document.getElementById("firstName").value = user ? user.first_name : "";
+  document.getElementById("lastName").value = user ? user.last_name : "";
+  document.getElementById("email").value = user ? user.email : "";
+  document.getElementById("phone").value = user ? user.phone : "";
+  document.getElementById("billingStreetAddress").value = user ? user.street_address : "";
+  document.getElementById("billingCity").value = user ? user.city : "";
+  document.getElementById("billingState").value = user ? user.state : "";
+  document.getElementById("billingZip").value = user ? user.zip_code : "";
+  document.getElementById("country").value = user ? user.country : "";
+
+  // Reset medicine table
+  const tbody = document.querySelector("#medicine-table tbody");
+  tbody.innerHTML = "";
+}
+
+
+  addMedicine.addEventListener("click", () => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td><input class="name" required></td>
+      <td><input class="mg" required></td>
+      <td><input class="qty" type="number" value="1" required></td>
+      <td><input class="price" type="number" step="0.01" required></td>
+      <td><button type="button" class="remove">❌</button></td>
+    `;
+    row.querySelector(".remove").addEventListener("click", () => row.remove());
+    tbody.appendChild(row);
+  });
+
+  closePopup.addEventListener("click", () => manualPopup.classList.add("hidden"));
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const medicines = Array.from(tbody.querySelectorAll("tr")).map(row => ({
+      name: row.querySelector(".name").value,
+      mg: row.querySelector(".mg").value,
+      quantity: row.querySelector(".qty").value,
+      price: row.querySelector(".price").value
+    }));
+
+    const data = {
+      userId: currentUserId,
+      firstName: form.firstName.value,
+      lastName: form.lastName.value,
+      email: form.email.value,
+      phone: form.phone.value,
+      billingStreetAddress: form.billingStreetAddress.value,
+      billingCity: form.billingCity.value,
+      billingState: form.billingState.value,
+      billingZip: form.billingZip.value,
+      country: form.country.value,
+      shippingCost: parseFloat(form.shippingCost.value || 0),
+      totalCost: parseFloat(form.totalCost.value || 0),
+      cartItems: medicines
+    };
+
+    const res = await fetch("/api/manual-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+    if (result.success) {
+      alert("✅ Manual order created successfully!");
+      manualPopup.classList.add("hidden");
+    } else {
+      alert("❌ Error: " + result.message);
+    }
+  });
+});
+
+</script>
+
     <!-- Process Requests Section -->
     <section id="process-requests" class="card">
       <h2><i class="fas fa-tasks"></i> Process Requests</h2>
@@ -1048,29 +1209,59 @@ document.addEventListener('DOMContentLoaded', loadDashboardData);
     </div>
 
     <script>
+      // async function openDetailsModal(orderId, userId) {
+      //   const modal = document.getElementById("detailsModal");
+      //   const modalBody = document.getElementById("modalBodyContent");
+      //   modal.classList.add("active");
+      //   modalBody.innerHTML = `<div class="loading-spinner"><div class="spinner"></div></div>`;
+
+      //   try {
+      //     const [orderItemsResponse, customerResponse] = await Promise.all([
+      //       fetch(`/api/order-items/${orderId}`),
+      //       fetch(`/api/customers/${userId}`),
+      //     ]);
+
+      //     if (!orderItemsResponse.ok || !customerResponse.ok) throw new Error("Failed to fetch data");
+
+      //     const orderItems = await orderItemsResponse.json();
+      //     const customer = await customerResponse.json();
+      //     renderDetailsContent(orderItems, customer, orderId);
+      //   } catch (error) {
+      //     console.error("Error fetching details:", error);
+      //     modalBody.innerHTML = `<div class="error-message">Failed to load details. Please try again.</div>`;
+      //   }
+      // }
+
       async function openDetailsModal(orderId, userId) {
-        const modal = document.getElementById("detailsModal");
-        const modalBody = document.getElementById("modalBodyContent");
-        modal.classList.add("active");
-        modalBody.innerHTML = `<div class="loading-spinner"><div class="spinner"></div></div>`;
+  const modal = document.getElementById("detailsModal");
+  const modalBody = document.getElementById("modalBodyContent");
+  modal.classList.add("active");
+  modalBody.innerHTML = `<div class="loading-spinner"><div class="spinner"></div></div>`;
 
-        try {
-          const [orderItemsResponse, customerResponse] = await Promise.all([
-            fetch(`/api/order-items/${orderId}`),
-            fetch(`/api/customers/${userId}`),
-          ]);
+  try {
+    // ✅ Fetch order items and order customer (with automatic fallback)
+    const [orderItemsResponse, orderCustomerResponse] = await Promise.all([
+      fetch(`/api/order-items/${orderId}`),
+      fetch(`/api/order-customer/${orderId}`)  // Automatically uses snapshot or fallback
+    ]);
 
-          if (!orderItemsResponse.ok || !customerResponse.ok) throw new Error("Failed to fetch data");
+    if (!orderItemsResponse.ok || !orderCustomerResponse.ok) {
+      throw new Error("Failed to fetch data");
+    }
 
-          const orderItems = await orderItemsResponse.json();
-          const customer = await customerResponse.json();
-          renderDetailsContent(orderItems, customer, orderId);
-        } catch (error) {
-          console.error("Error fetching details:", error);
-          modalBody.innerHTML = `<div class="error-message">Failed to load details. Please try again.</div>`;
-        }
-      }
-
+    const orderItems = await orderItemsResponse.json();
+    const customer = await orderCustomerResponse.json();
+    
+    // Optional: Show where data came from (for debugging)
+    console.log(`Order ${orderId} data source:`, customer.data_source);
+    
+    renderDetailsContent(orderItems, customer, orderId);
+  } catch (error) {
+    console.error("Error fetching details:", error);
+    modalBody.innerHTML = `<div class="error-message">Failed to load details. Please try again.</div>`;
+  }
+}
+      
       function renderDetailsContent(orderItems, customer, orderId) {
         const modalBody = document.getElementById("modalBodyContent");
         const total = orderItems.reduce((sum, item) => sum + parseFloat(item.price), 0);
