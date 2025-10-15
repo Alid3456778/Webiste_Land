@@ -987,14 +987,6 @@ function openManualOrderForm(user = null) {
           page.orders.forEach((request) => {
             const row = document.createElement("tr");
             const paymentStatus = request.payment_status || "pending";
-            let name_or_id = " ";
-            if(request.customer_first_name == null){
-              name_or_id = "#" + request.order_id;
-            }
-            else{
-              name_or_id = request.customer_first_name + ' ' + request.customer_last_name;
-            }
-            console.log(name_or_id);
             let statusBadgeHtml = paymentStatus === "completed" 
               ? `<span class="payment-status-badge completed"><span class="status-icon">✅</span> Paid</span>`
               : `<span class="payment-status-badge pending"><span class="status-icon">⏳</span> Pending</span>`;
@@ -1002,11 +994,10 @@ function openManualOrderForm(user = null) {
             let paymentButton = paymentStatus === "pending" 
               ? `<button class="payment-done-btn" onclick="markPaymentDone(${request.order_id}, this)"><i class="fas fa-check"></i> Payment Done</button>`
               : "";
-             console.log(request);
+            console.log(request);
             row.innerHTML = `
               <td>${request.serial}</td>
-              
-              <td>${name_or_id}</td>
+              <td>#${request.order_id}</td>
               <td>${request.user_id}</td>
               <td>${parseFloat(request.total_amount).toFixed(2)}</td>
               <td>${statusBadgeHtml}</td>
