@@ -994,10 +994,10 @@ function openManualOrderForm(user = null) {
             let paymentButton = paymentStatus === "pending" 
               ? `<button class="payment-done-btn" onclick="markPaymentDone(${request.order_id}, this)"><i class="fas fa-check"></i> Payment Done</button>`
               : "";
-
+            // console.log(request);
             row.innerHTML = `
               <td>${request.serial}</td>
-              <td>#${request.order_id}</td>
+              <td>${request.customer_first_name} ${request.customer_last_name}</td>
               <td>${request.user_id}</td>
               <td>${parseFloat(request.total_amount).toFixed(2)}</td>
               <td>${statusBadgeHtml}</td>
