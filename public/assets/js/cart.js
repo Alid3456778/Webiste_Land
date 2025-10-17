@@ -6,56 +6,96 @@ document.querySelectorAll('.remove-btn').forEach((button) => {
   });
 });
 
-document.getElementById('update-cart-btn').addEventListener('click', updateBillSummary);
 
 document.getElementById('add-products-btn').addEventListener('click', () => {
   alert('Redirecting to the shop page...');
   window.location.href = './categories.html'; // Replace with the actual shop page URL
 });
 
-function updateBillSummary() {
-  const cartItems = document.querySelectorAll('.cart-item');
-  let subtotal = 0;
 
-  cartItems.forEach((item) => {
-    const priceText = item.querySelector('.product-details p:nth-child(3)').innerText;
-    const price = parseFloat(priceText.replace('Price: ₹', ''));
-    const quantity = parseInt(item.querySelector('input').value, 10);
-    subtotal += price * quantity;
-  });
+  async function loadCartItems() {
+        try {
+          const cartResponse = await fetch("/api/cart");
+          const cartData = await cartResponse.json();
+          if (!cartData.success) throw new Error("Failed to fetch cart items.");
 
-  const tax = subtotal * 0.05;
-  const total = subtotal + tax;
+          const cartItems = cartData.data;
+          const container = document.getElementById("cart-items");
+          if (cartItems.length === 0) {
+            container.innerHTML = "<p>Your cart is empty.</p>";
+            return;
+          }
 
-  document.querySelector('.bill-summary .bill-item:nth-child(1) p:last-child').innerText = `₹${subtotal.toFixed(2)}`;
-  document.querySelector('.bill-summary .bill-item:nth-child(2) p:last-child').innerText = `₹${tax.toFixed(2)}`;
-  document.querySelector('.bill-summary .bill-item.total p:last-child').innerText = `₹${total.toFixed(2)}`;
-}
+          container.innerHTML = "";
+          let subtotal = 0;
+          for (const item of cartItems) {
+            const price = parseFloat(item.price.replace(/[^\d.-]/g, "")) || 0;
+            subtotal += price;
+            const mgText = item.mg ? ` (${item.mg} MG)` : "";
+            const div = document.createElement("div");
+            div.className = "cart-item";
+            div.innerHTML = `
+        <img src="${item.image_url}" alt="Product Image" />
+        <div class="product-details">
+          <div class="product-detail-1">
+            <h3>${item.name || "Unnamed Product"}${mgText}</h3>
+            <button class="remove-btn" onclick="removeItem('${
+              item.id
+            }')">Remove</button>
+          </div>
+          <div class="product-detail-2">
+            <p>Price: ₹${price.toFixed(2)}</p>
+            <p>Quantity: ${item.quantity}</p>
+          </div>
+        </div>
+      `;
+            container.appendChild(div);
+          }
 
+          document.getElementById(
+            "subtotal"
+          ).textContent = `$${subtotal.toFixed(2)}`;
+          document.getElementById("total").textContent = `$${subtotal.toFixed(
+            2
+          )}`;
+        } catch (err) {
+          console.error(err);
+          document.getElementById("cart-items").innerHTML =
+            "<p>Error loading cart items.</p>";
+        }
+      }
 
+      function removeItem(id) {
+        fetch("/remove-from-cart", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: id }), // Use unique product_id
+        })
+          .then((res) => res.json())
+          .then((result) => {
+            if (result.success) {
+              showToast("Item removed from cart");
+              loadCartItems(); // Reload cart to update UI
+            } else {
+              alert("Error removing item: " + result.message);
+            }
+          })
+          .catch(() => alert("Server error while removing item."));
+      }
 
-//this code is for the cart quantity increase , decrease icon and make the change in price
-function updateTotalPrice(input) {
-  const unitPrice = parseFloat(input.getAttribute("data-price")); // Get the unit price
-  const quantity = parseInt(input.value); 
-  const totalPriceElement = input.closest('.product-detail-2').querySelector('.total-price');
-  totalPriceElement.textContent = (unitPrice * quantity).toFixed(2); 
-}
+      document.addEventListener("DOMContentLoaded", loadCartItems);
 
-// Function to increase quantity
-function increaseQuantity(button) {
-  const input = button.previousElementSibling; // Get the input field
-  let currentValue = parseInt(input.value);
-  input.value = currentValue + 1; // Increase quantity
-  updateTotalPrice(input); // Update total price
-}
+      function showToast(message, duration = 3000) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.classList.remove("hidden");
+        toast.classList.add("show");
 
-// Function to decrease quantity
-function decreaseQuantity(button) {
-  const input = button.nextElementSibling; // Get the input field
-  let currentValue = parseInt(input.value);
-  if (currentValue > 1) { // Prevent going below 1
-    input.value = currentValue - 1; // Decrease quantity
-    updateTotalPrice(input); // Update total price
-  }
-}
+        setTimeout(() => {
+          toast.classList.remove("show");
+          setTimeout(() => toast.classList.add("hidden"), 300);
+        }, duration);
+      }
+
+      
+

@@ -129,228 +129,6 @@ app.get("/api/cart", async (req, res) => {
   }
 });
 
-// POST /api/checkout — save user + order + items
-// app.post("/api/checkout", async (req, res) => {
-//   const {
-//     firstName,
-//     lastName,
-//     phone,
-//     email,
-//     companyName,
-//     country,
-//     billingStreetAddress,
-//     apartment,
-//     billingCity,
-//     billingState,
-//     billingZip,
-//     cartItems,
-//     shippingCost,
-//     totalCost,
-//   } = req.body;
-//   console.log("data ", req.body);
-
-//   const client = await pool.connect();
-//   try {
-//     await client.query("BEGIN");
-
-//     // 1) insert or find user
-//     const userRes = await client.query(
-//       `INSERT INTO customers (
-//         first_name,last_name,email,phone,company_name,country,
-//         street_address,apartment,city,state,zip_code
-//         ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
-//         ON CONFLICT (email) DO UPDATE SET phone=EXCLUDED.phone
-//         RETURNING id`,
-//       [
-//         firstName,
-//         lastName,
-//         email,
-//         phone,
-//         companyName || null,
-//         country,
-//         billingStreetAddress,
-//         apartment || null,
-//         billingCity,
-//         billingState,
-//         billingZip,
-//       ]
-//     );
-//     const userId = userRes.rows[0].id;
-//     console.log(userId);
-
-//     // 2) insert order
-//     const orderRes = await client.query(
-//       `INSERT INTO orders (user_id, total_amount, shipping)
-//        VALUES ($1,$2,$3) RETURNING order_id`,
-//       [userId, totalCost, shippingCost]
-//     );
-//     const orderId = orderRes.rows[0].order_id;
-
-//     // 3) insert items
-//     const insertItemText = `
-//       INSERT INTO order_items
-//         (order_id, product_id, name, mg, quantity, price)
-//       VALUES ($1,$2,$3,$4,$5,$6)
-//     `;
-//     for (const item of cartItems) {
-//       await client.query(insertItemText, [
-//         orderId,
-//         item.product_id,
-//         item.name,
-//         item.mg,
-//         item.quantity,
-//         item.price,
-//       ]);
-//     }
-
-//     await client.query("COMMIT");
-//     //res.json({ success: true, orderId });
-//   } catch (e) {
-//     await client.query("ROLLBACK");
-//     console.error("Checkout error:", e);
-//     res.status(500).json({ success: false, error: "Server error" });
-//   } finally {
-//     client.release();
-//   }
-
-//   try {
-//     // Email Setup for Zoho Mail
-//     const transporter = nodemailer.createTransport({
-//       host: "smtp.zoho.in",
-//       port: 465,
-//       secure: true,
-//       auth: {
-//         user: "orderconfirmation@mclandpharma.com",
-//         pass: "YFc3HfTpMu5S",
-//       },
-//     });
-
-//     const mailOptions = {
-//       from: '"Mcland Pharma" <orderconfirmation@mclandpharma.com>', // Sender's name and email
-//       to: email, // Recipient's email
-//       subject: "Order Confirmation - Mcland Pharma",
-//       html: `
-// <!DOCTYPE html>
-// <html lang="en">
-// <head>
-//     <meta charset="UTF-8">
-//     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-//     <title>Order Confirmation</title>
-//     <style>
-//         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; }
-//         .header { background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 5px; }
-//         .content { padding: 20px; }
-//         table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-//         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-//         th { background-color: #f2f2f2; }
-//         .total { font-weight: bold; font-size: 16px; }
-//         .footer { background-color: #f8f9fa; padding: 15px; margin-top: 20px; border-radius: 5px; }
-//         .contact-info { margin: 10px 0; }
-//     </style>
-// </head>
-// <body>
-//     <div class="header">
-//         <h1>Order Confirmation - Mcland Pharma</h1>
-//         <p>Thank you for your order, ${firstName} ${lastName}!</p>
-//     </div>
-    
-//     <div class="content">
-//         <p>Your order has been successfully placed and is being processed.</p>
-        
-//         <h2>Customer Information</h2>
-//         <table>
-//             <tr><td><strong>Name:</strong></td><td>${firstName} ${lastName}</td></tr>
-//             <tr><td><strong>Phone:</strong></td><td>${phone}</td></tr>
-//             <tr><td><strong>Email:</strong></td><td>${email}</td></tr>
-//             <tr><td><strong>Address:</strong></td><td>${billingStreetAddress}, ${apartment}, ${billingCity}, ${billingState}, ${billingZip}, ${country}</td></tr>
-//             <tr><td><strong>Company:</strong></td><td>${companyName}</td></tr>
-//         </table>
-        
-//         <h2>Order Summary</h2>
-//         <table>
-//             <thead>
-//                 <tr>
-//                     <th>Product Name</th>
-//                     <th>Strength (mg)</th>
-//                     <th>Quantity</th>
-//                     <th>Price</th>
-//                 </tr>
-//             </thead>
-//             <tbody>
-//                 ${cartItems.map(item => `
-//                     <tr>
-//                         <td>${item.name}</td>
-//                         <td>${item.mg}</td>
-//                         <td>${item.quantity}</td>
-//                         <td>$${parseFloat(item.price).toFixed(2)}</td>
-//                     </tr>
-//                 `).join('')}
-//             </tbody>
-//         </table>
-        
-//         <div class="total">
-//             <p>Shipping Cost: $${parseFloat(shippingCost).toFixed(2)}</p>
-//             <p>Total Amount: $${parseFloat(totalCost).toFixed(2)}</p>
-//         </div>
-//     </div>
-    
-//     <div class="footer">
-//         <h3>Contact Information</h3>
-//         <div class="contact-info">
-//             <p><strong>Phone:</strong> +1 209 593 7171</p>
-//             <p><strong>WhatsApp:</strong> +91 887 920 1044 | <a href="https://t.ly/cMdMT">Chat with us</a></p>
-//             <p><strong>Email:</strong> <a href="mailto:customerinfo2024@gmail.com">customerinfo2024@gmail.com</a></p>
-//         </div>
-//         <p><em>This is an automated confirmation email. Please do not reply directly to this message.</em></p>
-//         <p>© ${new Date().getFullYear()} Mcland Pharma. All rights reserved.</p>
-//     </div>
-// </body>
-// </html>
-//     `,
-    
-//     // Additional headers to improve deliverability
-//     headers: {
-//       'X-Priority': '3',
-//       'X-MSMail-Priority': 'Normal',
-//       'X-Mailer': 'Mcland Pharma Order System',
-//       'X-MimeOLE': 'Produced By Mcland Pharma',
-//     },
-//     };
-
-//     // Send the email
-//     await transporter.sendMail(mailOptions);
-
-//     res.json({
-//       success: true,
-//       message: "Order placed and email sent successfully!",
-//     });
-//   } catch (error) {
-//     console.error("Error in order placement:", error);
-//     res.status(500).json({ success: false, message: "Internal server error." });
-//   }
-// });
-
-// ========================================
-// SOLUTION: Add columns to orders table to store customer snapshot
-// ========================================
-
-// First, you need to ALTER your orders table to add customer snapshot fields
-// Run this SQL in your database:
-
-/*
-ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_first_name VARCHAR(100);
-ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_last_name VARCHAR(100);
-ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_email VARCHAR(255);
-ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_phone VARCHAR(20);
-ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_company VARCHAR(255);
-ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_country VARCHAR(100);
-ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_street_address TEXT;
-ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_apartment VARCHAR(100);
-ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_city VARCHAR(100);
-ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_state VARCHAR(100);
-ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_zip_code VARCHAR(20);
-*/
-
 // ========================================
 // UPDATED /api/checkout endpoint
 // ========================================
@@ -1341,15 +1119,7 @@ app.get("/product-prices", async (req, res) => {
   }
 });
 
-// Endpoint to fetch requests
-// app.get("/api/requests", async (req, res) => {
-//   try {
-//     const result = await pool.query("SELECT * FROM orders"); // Adjust query for your table schema
-//     res.json(result.rows);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// });
+
 
 app.get("/api/requests", async (req, res) => {
   try {
@@ -1598,16 +1368,6 @@ app.post("/api/orders/:orderId/send-tracking", async (req, res) => {
   const { trackingNumber, userId } = req.body;
 
   try {
-    // Email Setup for Zoho Mail
-    const transporter = nodemailer.createTransport({
-      host: "smtp.zoho.in",
-      port: 465,
-      secure: true,
-      auth: {
-        user: "orderconfirmation@mclandpharma.com",
-        pass: "YFc3HfTpMu5S",
-      },
-    });
 
    // Fetch customer email from Postgres
     const result = await pool.query(
@@ -1622,6 +1382,17 @@ app.post("/api/orders/:orderId/send-tracking", async (req, res) => {
     const customer = result.rows[0];
     const email = customer.email;
     const name = customer.first_name;
+
+    // Email Setup for Zoho Mail
+    const transporter = nodemailer.createTransport({
+      host: "smtp.zoho.in",
+      port: 465,
+      secure: true,
+      auth: {
+        user: "orderconfirmation@mclandpharma.com",
+        pass: "YFc3HfTpMu5S",
+      },
+    });
 
     // Send email
     await transporter.sendMail({
@@ -1638,55 +1409,57 @@ app.post("/api/orders/:orderId/send-tracking", async (req, res) => {
   }
 });
 
+
+
 // PUT /api/orders/:orderId/status - Update order status
-// app.put("/api/orders/:orderId/status", async (req, res) => {
-//   const { orderId } = req.params;
-//   const { status, payment_status } = req.body;
+app.put("/api/orders/:orderId/status", async (req, res) => {
+  const { orderId } = req.params;
+  const { status, payment_status } = req.body;
   
-//   // Use either status or payment_status (for backward compatibility)
-//   const newStatus = status || payment_status;
+  // Use either status or payment_status (for backward compatibility)
+  const newStatus = status || payment_status;
   
-//   // Validate status
-//   const validStatuses = ['pending', 'paid', 'processing', 'tracking', 'delivered', 'cancelled'];
-//   if (!validStatuses.includes(newStatus)) {
-//     return res.status(400).json({ 
-//       success: false, 
-//       message: 'Invalid status. Must be one of: ' + validStatuses.join(', ') 
-//     });
-//   }
+  // Validate status
+  const validStatuses = ['pending', 'paid', 'process', 'tracking', 'delivered', 'completed'];
+  if (!validStatuses.includes(newStatus)) {
+    return res.status(400).json({ 
+      success: false, 
+      message: 'Invalid status. Must be one of: ' + validStatuses.join(', ') 
+    });
+  }
 
-//   try {
-//     const result = await pool.query(
-//       `UPDATE orders 
-//        SET payment_status = $1, 
-//            status = $1,
-//            updated_at = CURRENT_TIMESTAMP
-//        WHERE order_id = $2
-//        RETURNING *`,
-//       [newStatus, orderId]
-//     );
+  try {
+    const result = await pool.query(
+      `UPDATE orders 
+       SET payment_status = $1
+       WHERE order_id = $2
+       RETURNING *`,
+      [newStatus, orderId]
+    );
 
-//     if (result.rowCount === 0) {
-//       return res.status(404).json({ 
-//         success: false, 
-//         message: 'Order not found' 
-//       });
-//     }
+    if (result.rowCount === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Order not found' 
+      });
+    }
 
-//     res.json({ 
-//       success: true, 
-//       message: `Order status updated to ${newStatus}`,
-//       order: result.rows[0]
-//     });
-//   } catch (err) {
-//     console.error('Error updating order status:', err);
-//     res.status(500).json({ 
-//       success: false, 
-//       message: 'Failed to update order status',
-//       error: err.message 
-//     });
-//   }
-// });
+    console.log(`✅ Order #${orderId} status updated to: ${newStatus}`);
+
+    res.json({ 
+      success: true, 
+      message: `Order status updated to ${newStatus}`,
+      order: result.rows[0]
+    });
+  } catch (err) {
+    console.error('Error updating order status:', err);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to update order status',
+      error: err.message 
+    });
+  }
+});
 
 
 

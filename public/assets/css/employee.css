@@ -652,3 +652,239 @@
       flex: 1;
     }
   
+      
+/* Status Dropdown Container */
+.status-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Current Status Button */
+.status-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 140px;
+    justify-content: space-between;
+}
+
+.status-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.status-btn i.fa-chevron-down {
+    font-size: 10px;
+    transition: transform 0.3s;
+}
+
+.status-dropdown.active .status-btn i.fa-chevron-down {
+    transform: rotate(180deg);
+}
+
+/* Status Colors */
+.status-pending {
+    background: linear-gradient(135deg, #ffc107, #ff9800);
+    color: #fff;
+}
+
+.status-paid {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: #fff;
+}
+
+.status-processing {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    color: #fff;
+}
+
+.status-tracking {
+    background: linear-gradient(135deg, #6f42c1, #5a32a3);
+    color: #fff;
+}
+
+.status-delivered {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: #fff;
+}
+
+.status-cancelled {
+    background: linear-gradient(135deg, #00fe1ec7, #00ff1e);
+    color: #fff;
+}
+
+/* Dropdown Menu */
+.status-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    padding: 8px;
+    min-width: 200px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+}
+
+.status-dropdown.active .status-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.status-option {
+    padding: 12px 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.status-option:last-child {
+    margin-bottom: 0;
+}
+
+.status-option:hover:not(.current) {
+    background: #f8f9fa;
+    transform: translateX(4px);
+}
+
+.status-option i {
+    width: 20px;
+    text-align: center;
+}
+
+.status-option.pending {
+    color: #ff9800;
+}
+
+.status-option.paid {
+    color: #28a745;
+}
+
+.status-option.processing {
+    color: #17a2b8;
+}
+
+.status-option.tracking {
+    color: #6f42c1;
+}
+
+.status-option.delivered {
+    color: #007bff;
+}
+
+.status-option.cancelled {
+    color: #dc3545;
+}
+
+.status-option.current {
+    background: #e7f6f5;
+    border-left: 3px solid #028c7e;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+/* Loading State */
+.status-btn.loading {
+    pointer-events: none;
+    opacity: 0.7;
+    position: relative;
+}
+
+.status-btn.loading i.fa-chevron-down {
+    display: none;
+}
+
+.status-btn.loading::after {
+    content: "";
+    width: 12px;
+    height: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spinStatus 0.6s linear infinite;
+}
+
+@keyframes spinStatus {
+    to { transform: rotate(360deg); }
+}
+
+/* Toast Notification */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 16px 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 9999;
+    animation: slideInToast 0.3s ease;
+    max-width: 400px;
+}
+
+.toast.success {
+    border-left: 4px solid #28a745;
+}
+
+.toast.error {
+    border-left: 4px solid #dc3545;
+}
+
+.toast i {
+    font-size: 20px;
+}
+
+.toast.success i {
+    color: #28a745;
+}
+
+.toast.error i {
+    color: #dc3545;
+}
+
+@keyframes slideInToast {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutToast {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+}
+
+.toast.hiding {
+    animation: slideOutToast 0.3s ease;
+}

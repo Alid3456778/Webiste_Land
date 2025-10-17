@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Employee Login | McLand Pharma</title>
- <link rel="stylesheet" href="./assets/css/employee-login.css">
-</head>
-<body>
-  <div class="background-shapes">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Employee Login | McLand Pharma</title>
+    <link rel="stylesheet" href="./assets/css/employee-login.css" />
+  </head>
+  <body>
+    <div class="background-shapes">
       <div class="shape shape1"></div>
       <div class="shape shape2"></div>
     </div>
@@ -30,69 +30,9 @@
         </form>
       </div>
     </div>
-  <!-- <h1>Employee Login</h1>
-  <form id="loginForm">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required />
 
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required />
-
-    <button type="submit">Login</button>
-  </form> -->
-
-  <script>
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  
-  const username = document.getElementById('username').value.trim();
-  const password = document.getElementById('password').value;
-  
-  try {
-    const response = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
-    
-    if (!response.ok) {
-      // 401 or 400 means invalid credentials
-      alert('Invalid username or password');
-      return;
-    }
-    
-    const data = await response.json();
-    console.log('Login response:', data);
-    
-    // Check if we got a token (which indicates successful login)
-    if (data.token) {
-      // Store the token and user info
-      localStorage.setItem('employeeLoggedIn', 'true');
-      localStorage.setItem('employeeToken', data.token);
-      localStorage.setItem('employeeId', data.user.id);
-      localStorage.setItem('employeeUsername', data.user.username);
-      
-      // Redirect to employee.html
-      window.location.href = 'employee';
-    } else {
-      alert('Login failed. Please try again.');
-    }
-  } catch (err) {
-    console.error('Login request failed:', err);
-    alert('Server error. Please try again.');
-  }
-});
-  </script>
-</body>
-<script type="text/javascript">
-    window.$crisp = [];
-    window.CRISP_WEBSITE_ID = "68987257-808e-403d-a06c-35b3ec18c3ef";
-    (function () {
-      var d = document;
-      var s = d.createElement("script");
-      s.src = "https://client.crisp.chat/l.js";
-      s.async = 1;
-      d.getElementsByTagName("head")[0].appendChild(s);
-    })();
-  </script>
+    <script></script>
+  </body>
+  <script type="text/javascript"></script>
+  <script src="./assets/js/employee-login.js"></script>
 </html>
