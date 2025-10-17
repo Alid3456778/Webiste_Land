@@ -1,6 +1,3 @@
-
-
-
 // Check if employee is logged in
 document.addEventListener("DOMContentLoaded", () => {
   const isLoggedIn = localStorage.getItem("employeeLoggedIn");
@@ -956,6 +953,12 @@ document.addEventListener("DOMContentLoaded", () => {
         paymentStatus
       );
 
+      //This code was used to delete order requests If neend add this into the future code ...
+      // <button onclick="deleteRequest(${request.order_id})"
+      //                   style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+      //               <i class="fas fa-trash"></i> Delete
+      //           </button>
+
       row.innerHTML = `
             <td>${request.serial}</td>
             <td>${name_or_id}</td>
@@ -963,11 +966,14 @@ document.addEventListener("DOMContentLoaded", () => {
             <td>$${parseFloat(request.total_amount).toFixed(2)}</td>
             <td>${statusDropdownHTML}</td>
             <td class="action">
+
                 <button class="view-details-btn" onclick="openDetailsModal(${
                   request.order_id
                 }, ${request.user_id})">
+
                     <i class="fas fa-eye"></i> View Details
                 </button>
+                
                 <input type="text" id="track-${
                   request.order_id
                 }" placeholder="Tracking No" style="margin-top:5px; width:120px;" />
@@ -1099,7 +1105,7 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({ trackingNumber, userId }),
       });
       const result = await response.json();
-      
+
       if (!response.ok || !result.success)
         throw new Error(result.message || "Failed to send tracking email");
       alert("📧 Tracking email sent successfully!");
