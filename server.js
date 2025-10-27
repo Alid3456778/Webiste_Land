@@ -466,11 +466,6 @@ app.get("/api/order-customer/:orderId", async (req, res) => {
 // UPDATE YOUR MODAL FUNCTION IN employee.html
 // ========================================
 
-/*
-Replace your openDetailsModal function with this:
-
-
-*/
 app.post("/api/manual-order", async (req, res) => {
   const {
     userId,
@@ -1461,6 +1456,45 @@ app.put("/api/orders/:orderId/status", async (req, res) => {
   }
 });
 
+// ============================
+// REVIEWS API ENDPOINTS
+// ============================
+
+// POST: Add a review
+app.post("/api/reviews", async (req, res) => {
+  const { product_id, name, email, rating, review_text } = req.body;
+
+  if (!product_id || !name || !email || !rating || !review_text) {
+    return res.status(400).json({ success: false, message: "All fields required" });
+  }
+
+  try {
+    await pool.query(
+      `INSERT INTO reviews (product_id, name, email, rating, review_text)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [product_id, name, email, rating, review_text]
+    );
+    res.json({ success: true, message: "Review submitted successfully" });
+  } catch (err) {
+    console.error("Error inserting review:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
+// GET: Fetch reviews for a product
+app.get("/api/reviews/:productId", async (req, res) => {
+  const { productId } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT * FROM reviews WHERE product_id = $1 ORDER BY created_at DESC`,
+      [productId]
+    );
+    res.json({ success: true, reviews: result.rows });
+  } catch (err) {
+    console.error("Error fetching reviews:", err);
+    res.status(500).json({ success: false, message: "Failed to fetch reviews" });
+  }
+});
 
 
 

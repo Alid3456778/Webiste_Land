@@ -1,65 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        .review-section {
-  margin-top: 20px;
-}
-.review-section form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.review-section input,
-.review-section textarea,
-.review-section select {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-.review-card {
-  border: 1px solid #eee;
-  padding: 10px;
-  border-radius: 6px;
-  margin-bottom: 10px;
-  background: #f9f9f9;
-}
-.review-card strong {
-  color: #222;
+// ============================
+// INTERACTIVE STAR REVIEW SYSTEM
+// ============================
+let selectedRating = 0;
+
+function setupStarRating() {
+  const stars = document.querySelectorAll("#star-rating span");
+
+  stars.forEach((star) => {
+    star.addEventListener("mouseenter", () => {
+      resetStars();
+      highlightStars(star.dataset.value);
+    });
+
+    star.addEventListener("mouseleave", () => {
+      resetStars();
+      highlightStars(selectedRating);
+    });
+
+    star.addEventListener("click", () => {
+      selectedRating = star.dataset.value;
+      highlightStars(selectedRating);
+    });
+  });
+
+  function highlightStars(value) {
+    stars.forEach((s) => {
+      s.classList.toggle("selected", s.dataset.value <= value);
+    });
+  }
+
+  function resetStars() {
+    stars.forEach((s) => s.classList.remove("selected"));
+  }
 }
 
-    </style>
-</head>
-<body>
-    <div class="review-section">
-  <h3>Customer Reviews</h3>
-  <div id="review-list"></div>
-
-  <h4>Leave a Review</h4>
-  <form id="reviewForm">
-    <div class="rating-input">
-      <label>Rating:</label>
-      <select id="review-rating" required>
-        <option value="">Select</option>
-        <option value="1">⭐</option>
-        <option value="2">⭐⭐</option>
-        <option value="3">⭐⭐⭐</option>
-        <option value="4">⭐⭐⭐⭐</option>
-        <option value="5">⭐⭐⭐⭐⭐</option>
-      </select>
-    </div>
-    <input type="text" id="review-name" placeholder="Your Name" required />
-    <input type="email" id="review-email" placeholder="Your Email" required />
-    <textarea id="review-text" placeholder="Write your review..." required></textarea>
-    <button type="submit">Submit Review</button>
-  </form>
-</div>
-<script>
-    // ============================
-// REVIEWS HANDLING
+// ============================
+// LOAD & SUBMIT REVIEWS
 // ============================
 async function loadReviews(productId) {
   const reviewList = document.getElementById("review-list");
@@ -78,11 +54,11 @@ async function loadReviews(productId) {
       .map(
         (r) => `
         <div class="review-card">
-          <strong>${r.name}</strong> - <span>${"⭐".repeat(r.rating)}</span>
+          <strong>${r.name}</strong> 
+          <span>${"⭐".repeat(r.rating)}</span>
           <p>${r.review_text}</p>
           <small>${new Date(r.created_at).toLocaleDateString()}</small>
-        </div>
-      `
+        </div>`
       )
       .join("");
   } catch (err) {
@@ -98,11 +74,10 @@ async function handleReviewSubmit(event) {
 
   const name = document.getElementById("review-name").value.trim();
   const email = document.getElementById("review-email").value.trim();
-  const rating = parseInt(document.getElementById("review-rating").value);
   const review_text = document.getElementById("review-text").value.trim();
 
-  if (!name || !email || !rating || !review_text) {
-    alert("Please fill all fields");
+  if (!name || !email || !review_text || selectedRating === 0) {
+    alert("Please fill all fields and select a star rating!");
     return;
   }
 
@@ -110,13 +85,21 @@ async function handleReviewSubmit(event) {
     const response = await fetch("/api/reviews", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ product_id, name, email, rating, review_text }),
+      body: JSON.stringify({
+        product_id,
+        name,
+        email,
+        rating: selectedRating,
+        review_text,
+      }),
     });
 
     const result = await response.json();
     if (result.success) {
       alert("Review submitted successfully!");
       document.getElementById("reviewForm").reset();
+      selectedRating = 0;
+      setupStarRating(); // Reset stars
       loadReviews(product_id);
     } else {
       alert(result.message);
@@ -127,15 +110,13 @@ async function handleReviewSubmit(event) {
   }
 }
 
-// Load reviews on product load
+// Initialize review system
 document.addEventListener("DOMContentLoaded", () => {
   const urlParams = new URLSearchParams(window.location.search);
   const productId = urlParams.get("product_ID");
   if (productId) loadReviews(productId);
+  setupStarRating();
+
   const form = document.getElementById("reviewForm");
   if (form) form.addEventListener("submit", handleReviewSubmit);
 });
-
-</script>
-</body>
-</html>

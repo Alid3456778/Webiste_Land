@@ -6,6 +6,7 @@
     <title>Medicine Website Navigation</title>
     <link rel="stylesheet" href="./assets/css/navbar_footer.css" />
     <link rel="stylesheet" href="./assets/css/product_overview.css" />
+    <link rel="stylesheet" href="./assets/css/review.css">
     <script src="./assets/js/product_overview.js"></script>
   </head>
   <body>
@@ -119,14 +120,12 @@
         </h1>
 
         <!-- STAR RATING -->
-        <div id="rating" class="rating">
+        <!-- <div id="rating" class="rating">
           <span data-value="1">★</span><span data-value="2">★</span>
           <span data-value="3">★</span><span data-value="4">★</span>
           <span data-value="5">★</span>
           <small class="rating__count">(24 reviews)</small>
-        </div>
-
-        <script></script>
+        </div> -->
 
         <!-- Strength Selector -->
         <div class="selector">
@@ -212,6 +211,43 @@
           </div>
         </div>
       </div>
+      <div class="review-section">
+        <h3>Customer Reviews</h3>
+        <div id="review-list"></div>
+
+        <h4>Leave a Review</h4>
+        <form id="reviewForm">
+          <!-- ⭐ Interactive Star Rating -->
+          <div class="star-rating" id="star-rating">
+            <span data-value="1">★</span>
+            <span data-value="2">★</span>
+            <span data-value="3">★</span>
+            <span data-value="4">★</span>
+            <span data-value="5">★</span>
+          </div>
+
+          <input
+            type="text"
+            id="review-name"
+            placeholder="Your Name"
+            required
+          />
+          <input
+            type="email"
+            id="review-email"
+            placeholder="Your Email"
+            required
+          />
+          <textarea
+            id="review-text"
+            placeholder="Write your review..."
+            required
+          ></textarea>
+          <button type="submit">Submit Review</button>
+        </form>
+      </div>
+
+      <script src="./assets/js/review.js"></script>
     </main>
 
     <!-- Details Sections -->
