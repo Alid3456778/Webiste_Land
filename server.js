@@ -1118,12 +1118,14 @@ app.get("/product-prices", async (req, res) => {
 
 app.get("/api/requests", async (req, res) => {
   try {
+     console.log("Fetching requests...");
     const result = await pool.query(`
       SELECT 
         *
       FROM orders 
       ORDER BY created_at DESC ;
     `);
+    console.log("Orders sample:", result.rows[0]);
     res.json(result.rows);
   } catch (err) {
     console.error("Error fetching requests:", err);
