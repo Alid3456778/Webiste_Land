@@ -217,6 +217,26 @@
         <h2><i class="fas fa-user-check"></i> Customer Order Tracking</h2>
         <div class="tracking-search">
           <div style="flex: 1">
+            <!-- 🔍 New Name Search -->
+            <div class="name-search" style="margin-bottom: 1rem">
+              <input
+                type="text"
+                id="tracking-first-name"
+                placeholder="Enter First Name"
+              />
+              <input
+                type="text"
+                id="tracking-last-name"
+                placeholder="Enter Last Name (optional)"
+              />
+              <button id="search-tracking-name">
+                <i class="fas fa-search"></i> Search by Name
+              </button>
+            </div>
+
+            <!-- Results area -->
+            <div id="tracking-name-results" style="margin-top: 1rem"></div>
+
             <label for="tracking-user-id">Customer ID:</label>
             <input
               type="number"
@@ -280,7 +300,7 @@
         </div>
       </section>
 
-      <section id="manual-order" class="card">
+      <!-- <section id="manual-order" class="card">
         <h2>Manual Order</h2>
         <input
           type="number"
@@ -288,6 +308,37 @@
           placeholder="Enter Customer User ID"
         />
         <button id="fetch-customer">Fetch Customer</button>
+      </section> -->
+
+      <section id="manual-order" class="card">
+        <h2>Manual Order</h2>
+
+        <!-- 🔍 New Name Search -->
+        <div class="name-search">
+          <input
+            type="text"
+            id="manual-first-name"
+            placeholder="Enter First Name"
+          />
+          <input
+            type="text"
+            id="manual-last-name"
+            placeholder="Enter Last Name (optional)"
+          />
+          <button id="search-customer-name">Search by Name</button>
+        </div>
+
+        <!-- Existing ID option -->
+        <div style="margin-top: 1rem">
+          <input
+            type="number"
+            id="manual-user-id"
+            placeholder="Enter Customer User ID"
+          />
+          <button id="fetch-customer">Fetch Customer</button>
+        </div>
+
+        <div id="name-search-results" style="margin-top: 1rem"></div>
       </section>
 
       <!-- Manual Order Popup -->

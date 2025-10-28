@@ -1125,7 +1125,7 @@ app.get("/api/requests", async (req, res) => {
       FROM orders 
       ORDER BY created_at DESC ;
     `);
-    console.log("Orders sample:", result.rows[0]);
+    // console.log("Orders sample:", result.rows[0]);
     res.json(result.rows);
   } catch (err) {
     console.error("Error fetching requests:", err);
@@ -1170,6 +1170,108 @@ app.get("/api/order-items/:order_id", async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// Robust search endpoint: search by firstName and/or lastName
+app.get("/api/customers/search", async (req, res) => {
+  const firstNameRaw = (req.query.firstName || "").trim();
+  const lastNameRaw = (req.query.lastName || "").trim();
+
+  if (!firstNameRaw && !lastNameRaw) {
+    return res.status(400).json({ success: false, message: "Provide firstName or lastName (or both)" });
+  }
+
+  try {
+    // Build dynamic conditions & params for orders table
+    const orderWhereClauses = [];
+    const orderParams = [];
+
+    if (firstNameRaw && lastNameRaw) {
+      orderParams.push(`%${firstNameRaw} ${lastNameRaw}%`);
+      orderWhereClauses.push("(COALESCE(customer_first_name,'') || ' ' || COALESCE(customer_last_name,'')) ILIKE $" + orderParams.length);
+    }
+    if (firstNameRaw) {
+      orderParams.push(`%${firstNameRaw}%`);
+      orderWhereClauses.push("(COALESCE(customer_first_name,'') ILIKE $" + orderParams.length + " OR COALESCE(customer_last_name,'') ILIKE $" + orderParams.length + ")");
+    }
+    if (lastNameRaw) {
+      orderParams.push(`%${lastNameRaw}%`);
+      orderWhereClauses.push("(COALESCE(customer_first_name,'') ILIKE $" + orderParams.length + " OR COALESCE(customer_last_name,'') ILIKE $" + orderParams.length + ")");
+    }
+
+    const orderQuery = `
+      SELECT DISTINCT
+        COALESCE(customer_first_name, '') AS first_name,
+        COALESCE(customer_last_name, '') AS last_name,
+        user_id,
+        customer_email AS email,
+        customer_phone AS phone
+      FROM orders
+      WHERE ${orderWhereClauses.join(" OR ")}
+      LIMIT 200
+    `;
+
+    const orderResult = await pool.query(orderQuery, orderParams);
+
+    // Build dynamic conditions & params for customers table
+    const custWhereClauses = [];
+    const custParams = [];
+
+    if (firstNameRaw && lastNameRaw) {
+      custParams.push(`%${firstNameRaw} ${lastNameRaw}%`);
+      custWhereClauses.push("(COALESCE(first_name,'') || ' ' || COALESCE(last_name,'')) ILIKE $" + custParams.length);
+    }
+    if (firstNameRaw) {
+      custParams.push(`%${firstNameRaw}%`);
+      custWhereClauses.push("(COALESCE(first_name,'') ILIKE $" + custParams.length + " OR COALESCE(last_name,'') ILIKE $" + custParams.length + ")");
+    }
+    if (lastNameRaw) {
+      custParams.push(`%${lastNameRaw}%`);
+      custWhereClauses.push("(COALESCE(first_name,'') ILIKE $" + custParams.length + " OR COALESCE(last_name,'') ILIKE $" + custParams.length + ")");
+    }
+
+    const custQuery = `
+      SELECT
+        COALESCE(first_name, '') AS first_name,
+        COALESCE(last_name, '') AS last_name,
+        id AS user_id,
+        email,
+        phone
+      FROM customers
+      WHERE ${custWhereClauses.join(" OR ")}
+      LIMIT 200
+    `;
+    const custResult = await pool.query(custQuery, custParams);
+
+    // Combine results and deduplicate by "name-id"
+    const combined = [...orderResult.rows, ...custResult.rows];
+    const seen = new Set();
+    const unique = [];
+
+    combined.forEach((r) => {
+      const fname = (r.first_name || "").trim();
+      const lname = (r.last_name || "").trim();
+      const id = r.user_id === null || r.user_id === undefined ? "" : String(r.user_id);
+      const key = `${fname} ${lname}-${id}`.trim();
+
+      if (!seen.has(key)) {
+        seen.add(key);
+        unique.push({
+          first_name: fname,
+          last_name: lname,
+          user_id: id,
+          email: r.email || null,
+          phone: r.phone || null,
+          source: r.user_id && r.email ? "orders/customers" : (r.email ? "customers" : "orders") // advisory
+        });
+      }
+    });
+
+    return res.json({ success: true, count: unique.length, data: unique });
+  } catch (err) {
+    console.error("Error in /api/customers/search:", err.stack || err);
+    return res.status(500).json({ success: false, message: "Server error", details: err.message });
   }
 });
 
@@ -1274,6 +1376,8 @@ app.get("/api/customer-tracking/:userId", async (req, res) => {
     });
   }
 });
+
+
 
 
 // PUT: Update payment status for an order
