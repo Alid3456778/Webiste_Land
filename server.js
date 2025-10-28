@@ -1122,7 +1122,7 @@ app.get("/api/requests", async (req, res) => {
       SELECT 
         *
       FROM orders 
-      ORDER BY created_at DESC
+      ORDER BY created_at DESC ;
     `);
     res.json(result.rows);
   } catch (err) {
