@@ -140,15 +140,22 @@
     .logo-icon {
       width: 45px;
       height: 45px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      border-radius: 12px;
+      /* background: linear-gradient(135deg, var(--primary), var(--primary-dark)); */
+      /* border-radius: 12px; */
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
       font-weight: 800;
       font-size: 1.5rem;
-      box-shadow: 0 4px 12px rgba(2, 140, 126, 0.2);
+      /* box-shadow: 0 4px 12px rgba(2, 140, 126, 0.2); */
+    }
+
+    .logo-icon img {
+      width: 80%;
+      height: 80%;
+      object-fit: contain;
+
     }
 
     .brand-name {
@@ -359,7 +366,7 @@
     .search-submit {
       position: absolute;
       right: 0.5rem;
-      top: 50%;
+      top: 25px;
       transform: translateY(-50%);
       background: var(--primary);
       border: none;
@@ -946,6 +953,8 @@
       color: #333;
       font-family: var(--font);
     }
+
+    
   </style>
   <body>
     <!-- Trust Banner -->
@@ -1020,7 +1029,9 @@
     <header class="header">
       <div class="header-container">
         <div class="logo-section">
-          <div class="logo-icon">M</div>
+          <div class="logo-icon">
+            <img src="./assets/image2/logo.png" alt="">
+          </div>
           <div>
             <span class="brand-name">MCland Pharma</span>
             <!-- <span class="verified-badge">

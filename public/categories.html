@@ -9,51 +9,85 @@
   </head>
   <body>
     <!-- HEADER / NAVBAR -->
-    <header class="navbar">
-      <div class="navbar-container">
-        <div class="logo" onclick="window.location.href='./index.html'">
-          <img src="./assets/image2/logo.png" alt="MCland Pharma Logo" />
-        </div>
-        
-        <div class="header-right">
-          <div class="search">
-            <input
-              type="text"
-              placeholder="Search products..."
-              class="search__input"
-              id="search-input"
-              autocomplete="off"
-            />
-            <ul id="suggestions" class="search-suggestions"></ul>
-            <button class="btn btn--search" id="search-button">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                width="20"
-                height="20"
-                fill="currentColor"
-              >
+    <header class="header">
+      <div class="header-container">
+          <div class="logo-section">
+              <div class="logo-icon">
+                <img src="./assets/image2/logo.png" alt="">
+              </div>
+              <!-- <div>
+                  <span class="brand-name">MCland Pharma</span>
+                  <span class="verified-badge">
+                      <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      Verified
+                  </span>
+              </div> -->
+          </div>
+    
+    <div class="header-right">
+      <!-- SEARCH BAR (kept from your categories.html) -->
+      <!-- <div class="search">
+        <input
+          type="text"
+          placeholder="Search products..."
+          class="search__input"
+          id="search-input"
+          autocomplete="off"
+        />
+        <ul id="suggestions" class="search-suggestions"></ul>
+        <button class="btn btn--search" id="search-button">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
-                  d="M10 2a8 8 0 015.292 13.708l4.5 4.5a1 1 0 01-1.415 1.414l-4.5-4.5A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                 />
               </svg>
-            </button>
-          </div>
+          </svg>
+        </button>
+      </div> -->
+      <div class="search">
+          <input
+            type="text"
+            placeholder="Search products..."
+            class="search__input"
+            id="search-input"
+            autocomplete="off"
+          />
+          <ul id="suggestions" class="search-suggestions"></ul>
 
-          <a href="cart" id="cart-a-section" class="cart-link">
-            <button class="btn btn--icon cart-button">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="9" cy="21" r="1"></circle>
-                <circle cx="20" cy="21" r="1"></circle>
-                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-              </svg>
-            </button>
-            <span id="cart-count" class="cart-count">0</span>
-          </a>
+          <button class="btn btn--search" id="search-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              fill="currentColor"
+            >
+              <path
+                d="M10 2a8 8 0 015.292 13.708l4.5 4.5a1 1 0 01-1.415 1.414l-4.5-4.5A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"
+              />
+            </svg>
+          </button>
         </div>
-      </div>
-    </header>
 
+      <!-- CART BUTTON (kept from your categories.html) -->
+      <a href="cart" id="cart-a-section" class="cart-link">
+        <button class="btn btn--icon cart-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+        </button>
+        <span id="cart-count" class="cart-count">0</span>
+      </a>
+    </div>
+  </div>
+</header>
     <!-- PRODUCT GRID SECTION -->
     <section id="product-grid">
       <div id="loading-message" class="loading-message">LOADING...</div>
@@ -91,7 +125,7 @@
 
             <div class="footer-section">
                 <h3>About MCland Pharma</h3>
-                <p>Your trusted healthcare partner since 2013. We're committed to providing accessible, affordable, and genuine medications with professional pharmaceutical support.</p>
+                <p>Founded in 2025, we are committed to providing high-quality products with exceptional customer service. Our team of experts carefully curates each item to ensure it meets our strict quality standards. Sustainability and ethical sourcing are at the heart of everything we do.</p>
             </div>
         </div>
 
@@ -104,7 +138,7 @@
                 <span class="payment-method">PayPal</span>
                 <span class="payment-method">Bitcoin</span>
             </div>
-            <p class="copyright">© 2024 MCland Pharma. All rights reserved. Licensed Pharmaceutical Provider.</p>
+            <p class="copyright">© 2024 MCland Pharma. All rights reserved.</p>
         </div>
     </footer>
   </body>
