@@ -1571,33 +1571,113 @@ app.put("/api/orders/:orderId/status", async (req, res) => {
 // ============================
 
 // POST: Add a review
+// app.post("/api/reviews", async (req, res) => {
+//   const { product_id, name, email, rating, review_text } = req.body;
+
+//   if (!product_id || !name || !email || !rating || !review_text) {
+//     return res.status(400).json({ success: false, message: "All fields required" });
+//   }
+
+//   try {
+//     await pool.query(
+//       `INSERT INTO reviews (product_id, name, email, rating, review_text)
+//        VALUES ($1, $2, $3, $4, $5)`,
+//       [product_id, name, email, rating, review_text]
+//     );
+//     res.json({ success: true, message: "Review submitted successfully" });
+//   } catch (err) {
+//     console.error("Error inserting review:", err);
+//     res.status(500).json({ success: false, message: "Internal server error" });
+//   }
+// });
+
+// // GET: Fetch reviews for a product
+// app.get("/api/reviews/:productId", async (req, res) => {
+//   const { productId } = req.params;
+//   try {
+//     const result = await pool.query(
+//       `SELECT * FROM reviews WHERE product_id = $1 ORDER BY created_at DESC`,
+//       [productId]
+//     );
+//     res.json({ success: true, reviews: result.rows });
+//   } catch (err) {
+//     console.error("Error fetching reviews:", err);
+//     res.status(500).json({ success: false, message: "Failed to fetch reviews" });
+//   }
+// });
+
+// ✅ POST: Add a review (with verified purchase check)
 app.post("/api/reviews", async (req, res) => {
   const { product_id, name, email, rating, review_text } = req.body;
 
   if (!product_id || !name || !email || !rating || !review_text) {
-    return res.status(400).json({ success: false, message: "All fields required" });
+    return res
+      .status(400)
+      .json({ success: false, message: "All fields required" });
   }
 
   try {
-    await pool.query(
-      `INSERT INTO reviews (product_id, name, email, rating, review_text)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [product_id, name, email, rating, review_text]
+    // ✅ Check if email exists in both 'customers' and 'orders'
+    const customerCheck = await pool.query(
+      `SELECT id FROM customers WHERE email = $1`,
+      [email]
     );
-    res.json({ success: true, message: "Review submitted successfully" });
+    const orderCheck = await pool.query(
+      `SELECT order_id FROM orders WHERE customer_email = $1`,
+      [email]
+    );
+
+    const isVerified =
+      customerCheck.rows.length > 0 && orderCheck.rows.length > 0;
+
+    // ✅ Insert the review (include verified field)
+    await pool.query(
+      `INSERT INTO reviews (product_id, name, email, rating, review_text, verified)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [product_id, name, email, rating, review_text, isVerified]
+    );
+
+    res.json({
+      success: true,
+      verified: isVerified,
+      message: isVerified
+        ? "Review added and verified as purchase!"
+        : "Review added successfully (unverified).",
+    });
   } catch (err) {
     console.error("Error inserting review:", err);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
   }
 });
 
-// GET: Fetch reviews for a product
 app.get("/api/reviews/:productId", async (req, res) => {
   const { productId } = req.params;
   try {
     const result = await pool.query(
-      `SELECT * FROM reviews WHERE product_id = $1 ORDER BY created_at DESC`,
+      `SELECT name, rating, review_text, verified, created_at
+       FROM reviews
+       WHERE product_id = $1
+       ORDER BY created_at DESC`,
       [productId]
+    );
+    res.json({ success: true, reviews: result.rows });
+  } catch (err) {
+    console.error("Error fetching reviews:", err);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch reviews" });
+  }
+});
+
+app.get("/api/reviews", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT name, rating, review_text, verified
+       FROM reviews
+       ORDER BY created_at DESC
+       LIMIT 10`
     );
     res.json({ success: true, reviews: result.rows });
   } catch (err) {
