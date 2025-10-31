@@ -293,6 +293,128 @@ document.getElementById("delete-button").addEventListener("click", async () => {
   }
 });
 
+// 🔍 Customer Order Tracking — Search by Name
+document.addEventListener("DOMContentLoaded", () => {
+  const searchBtn = document.getElementById("search-tracking-name");
+  const firstInput = document.getElementById("tracking-first-name");
+  const lastInput = document.getElementById("tracking-last-name");
+  const resultsDiv = document.getElementById("tracking-name-results");
+  const idInput = document.getElementById("tracking-user-id");
+  const trackBtn = document.getElementById("btn-track-customer");
+  const fetchBtn = document.getElementById("fetch-customer");
+  const idInputManually = document.getElementById("manual-user-id");
+
+  const clearResults = () => (resultsDiv.innerHTML = "");
+
+  searchBtn.addEventListener("click", async () => {
+    const firstName = firstInput.value.trim();
+    const lastName = lastInput.value.trim();
+
+    if (!firstName && !lastName) {
+      resultsDiv.innerHTML = `<p style="color:red;">⚠️ Enter at least a first or last name.</p>`;
+      return;
+    }
+
+    resultsDiv.innerHTML = `<p>🔎 Searching...</p>`;
+
+    try {
+      const query = new URLSearchParams({ firstName, lastName }).toString();
+      const res = await fetch(`/api/customers/search?${query}`);
+      const data = await res.json();
+
+      if (!data.success) {
+        resultsDiv.innerHTML = `<p style="color:red;">❌ ${
+          data.message || "Server error"
+        }</p>`;
+        return;
+      }
+
+      if (data.data.length === 0) {
+        resultsDiv.innerHTML = `<p>No customers found for "${firstName} ${lastName}".</p>`;
+        return;
+      }
+
+      // Build results table
+      const table = `
+        <table style="width:100%;border-collapse:collapse;margin-top:1rem;">
+          <thead>
+            <tr style="background:#222;color:#fff;">
+              <th style="padding:8px;border:1px solid #444;">#</th>
+              <th style="padding:8px;border:1px solid #444;">Name</th>
+              <th style="padding:8px;border:1px solid #444;">User ID</th>
+              <th style="padding:8px;border:1px solid #444;">Email</th>
+              <th style="padding:8px;border:1px solid #444;">Phone</th>
+              <th style="padding:8px;border:1px solid #444;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${data.data
+              .map(
+                (c, i) => `
+                <tr style="background:${
+                  i % 2 === 0 ? "#f9f9f9" : "#fff"
+                };text-align:center;">
+                  <td style="padding:6px;border:1px solid #ccc;">${i + 1}</td>
+                  <td style="padding:6px;border:1px solid #ccc;">${
+                    c.first_name
+                  } ${c.last_name}</td>
+                  <td style="padding:6px;border:1px solid #ccc;">${
+                    c.user_id
+                  }</td>
+                  <td style="padding:6px;border:1px solid #ccc;">${
+                    c.email || "-"
+                  }</td>
+                  <td style="padding:6px;border:1px solid #ccc;">${
+                    c.phone || "-"
+                  }</td>
+                  <td style="padding:6px;border:1px solid #ccc;">
+                    <button class="select-track-customer"
+                            data-id="${c.user_id}"
+                            style="padding:4px 8px;background:#007bff;color:#fff;border:none;border-radius:4px;cursor:pointer;">
+                      Customer
+                    </button>
+                    <button class="select-customer"
+                            data-id="${c.user_id}"
+                            style="padding:4px 8px;background:#007bff;color:#fff;border:none;border-radius:4px;cursor:pointer;">
+                      Manual Order
+                    </button>
+                  </td>
+                </tr>`
+              )
+              .join("")}
+          </tbody>
+        </table>
+      `;
+
+      resultsDiv.innerHTML = table;
+
+      // When "Select" is clicked → fill ID + trigger existing tracking
+      document.querySelectorAll(".select-track-customer").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const userId = btn.dataset.id;
+          idInput.value = userId;
+          clearResults();
+          trackBtn.click(); // runs your /api/customer-tracking/:userId logic
+        });
+      });
+
+      // Handle click on Select buttons
+      document.querySelectorAll(".select-customer").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const userId = btn.dataset.id;
+          idInputManually.value = userId;
+          clearResults(); // Clear the search results after selection
+          fetchBtn.click(); // Trigger your existing manual order logic
+          document.querySelector("#manual-order-popup").scrollIntoView({ behavior: "smooth"});
+        });
+      });
+    } catch (err) {
+      console.error("Error searching customers:", err);
+      resultsDiv.innerHTML = `<p style="color:red;">⚠️ Unable to fetch results. Try again.</p>`;
+    }
+  });
+});
+
 // 🔍 Enhanced Search by Customer Name (with Email Display)
 document.addEventListener("DOMContentLoaded", () => {
   const searchBtn = document.getElementById("search-customer-name");
@@ -319,12 +441,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const res = await fetch(
-        `/api/customers/search?firstName=${encodeURIComponent(firstName)}&lastName=${encodeURIComponent(lastName)}`
+        `/api/customers/search?firstName=${encodeURIComponent(
+          firstName
+        )}&lastName=${encodeURIComponent(lastName)}`
       );
       const data = await res.json();
 
       if (!data.success) {
-        resultsDiv.innerHTML = `<p style="color:red;">❌ Server error: ${data.message || "Unknown issue"}</p>`;
+        resultsDiv.innerHTML = `<p style="color:red;">❌ Server error: ${
+          data.message || "Unknown issue"
+        }</p>`;
         return;
       }
 
@@ -350,14 +476,26 @@ document.addEventListener("DOMContentLoaded", () => {
             ${data.data
               .map(
                 (c, i) => `
-                <tr style="text-align:center;background:${i % 2 === 0 ? "#f9f9f9" : "#fff"};">
+                <tr style="text-align:center;background:${
+                  i % 2 === 0 ? "#f9f9f9" : "#fff"
+                };">
                   <td style="padding:6px;border:1px solid #ccc;">${i + 1}</td>
-                  <td style="padding:6px;border:1px solid #ccc;">${c.first_name} ${c.last_name}</td>
-                  <td style="padding:6px;border:1px solid #ccc;">${c.user_id}</td>
-                  <td style="padding:6px;border:1px solid #ccc;">${c.email || "-"}</td>
-                  <td style="padding:6px;border:1px solid #ccc;">${c.phone || "-"}</td>
+                  <td style="padding:6px;border:1px solid #ccc;">${
+                    c.first_name
+                  } ${c.last_name}</td>
+                  <td style="padding:6px;border:1px solid #ccc;">${
+                    c.user_id
+                  }</td>
+                  <td style="padding:6px;border:1px solid #ccc;">${
+                    c.email || "-"
+                  }</td>
+                  <td style="padding:6px;border:1px solid #ccc;">${
+                    c.phone || "-"
+                  }</td>
                   <td style="padding:6px;border:1px solid #ccc;">
-                    <button class="select-customer" data-id="${c.user_id}" style="padding:4px 8px;background:#007bff;color:white;border:none;border-radius:4px;cursor:pointer;">Select</button>
+                    <button class="select-customer" data-id="${
+                      c.user_id
+                    }" style="padding:4px 8px;background:#007bff;color:white;border:none;border-radius:4px;cursor:pointer;">Select</button>
                   </td>
                 </tr>`
               )
@@ -383,7 +521,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-
 
 // Handle manual order creation
 document.addEventListener("DOMContentLoaded", () => {
@@ -428,6 +565,9 @@ document.addEventListener("DOMContentLoaded", () => {
       currentUserId = user.id;
 
       openManualOrderForm(user); // prefill form with customer data
+      document
+      .querySelector("#manual-order-popup")
+      .scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (err) {
       alert("Error fetching user: " + err.message);
     }
@@ -1421,101 +1561,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") closeDetailsModal();
-  });
-});
-
-// 🔍 Customer Order Tracking — Search by Name
-document.addEventListener("DOMContentLoaded", () => {
-  const searchBtn = document.getElementById("search-tracking-name");
-  const firstInput = document.getElementById("tracking-first-name");
-  const lastInput = document.getElementById("tracking-last-name");
-  const resultsDiv = document.getElementById("tracking-name-results");
-  const idInput = document.getElementById("tracking-user-id");
-  const trackBtn = document.getElementById("btn-track-customer");
-
-  const clearResults = () => (resultsDiv.innerHTML = "");
-
-  searchBtn.addEventListener("click", async () => {
-    const firstName = firstInput.value.trim();
-    const lastName = lastInput.value.trim();
-
-    if (!firstName && !lastName) {
-      resultsDiv.innerHTML =
-        `<p style="color:red;">⚠️ Enter at least a first or last name.</p>`;
-      return;
-    }
-
-    resultsDiv.innerHTML = `<p>🔎 Searching...</p>`;
-
-    try {
-      const query = new URLSearchParams({ firstName, lastName }).toString();
-      const res = await fetch(`/api/customers/search?${query}`);
-      const data = await res.json();
-
-      if (!data.success) {
-        resultsDiv.innerHTML =
-          `<p style="color:red;">❌ ${data.message || "Server error"}</p>`;
-        return;
-      }
-
-      if (data.data.length === 0) {
-        resultsDiv.innerHTML =
-          `<p>No customers found for "${firstName} ${lastName}".</p>`;
-        return;
-      }
-
-      // Build results table
-      const table = `
-        <table style="width:100%;border-collapse:collapse;margin-top:1rem;">
-          <thead>
-            <tr style="background:#222;color:#fff;">
-              <th style="padding:8px;border:1px solid #444;">#</th>
-              <th style="padding:8px;border:1px solid #444;">Name</th>
-              <th style="padding:8px;border:1px solid #444;">User ID</th>
-              <th style="padding:8px;border:1px solid #444;">Email</th>
-              <th style="padding:8px;border:1px solid #444;">Phone</th>
-              <th style="padding:8px;border:1px solid #444;">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${data.data
-              .map(
-                (c, i) => `
-                <tr style="background:${i % 2 === 0 ? "#f9f9f9" : "#fff"};text-align:center;">
-                  <td style="padding:6px;border:1px solid #ccc;">${i + 1}</td>
-                  <td style="padding:6px;border:1px solid #ccc;">${c.first_name} ${c.last_name}</td>
-                  <td style="padding:6px;border:1px solid #ccc;">${c.user_id}</td>
-                  <td style="padding:6px;border:1px solid #ccc;">${c.email || "-"}</td>
-                  <td style="padding:6px;border:1px solid #ccc;">${c.phone || "-"}</td>
-                  <td style="padding:6px;border:1px solid #ccc;">
-                    <button class="select-track-customer"
-                            data-id="${c.user_id}"
-                            style="padding:4px 8px;background:#007bff;color:#fff;border:none;border-radius:4px;cursor:pointer;">
-                      Select
-                    </button>
-                  </td>
-                </tr>`
-              )
-              .join("")}
-          </tbody>
-        </table>
-      `;
-
-      resultsDiv.innerHTML = table;
-
-      // When "Select" is clicked → fill ID + trigger existing tracking
-      document.querySelectorAll(".select-track-customer").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const userId = btn.dataset.id;
-          idInput.value = userId;
-          clearResults();
-          trackBtn.click(); // runs your /api/customer-tracking/:userId logic
-        });
-      });
-    } catch (err) {
-      console.error("Error searching customers:", err);
-      resultsDiv.innerHTML =
-        `<p style="color:red;">⚠️ Unable to fetch results. Try again.</p>`;
-    }
   });
 });

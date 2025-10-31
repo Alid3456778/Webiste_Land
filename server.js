@@ -28,6 +28,9 @@ const pool = new Pool({
       : false,
 });
 
+const JWT_SECRET2 = process.env.JWT_SECRET;
+
+
 // Middleware to assign session cookie
 app.use((req, res, next) => {
   if (!req.cookies.sessionId) {
@@ -692,7 +695,8 @@ app.get("/api/invoice/:orderId", async (req, res) => {
   }
 });
 
-const JWT_SECRET = "3db7f92394dfb627bdbe12fbfc34f63b2f9c2296da88c4c3dfbf9eb48b8a5e29a81f1df435ad8abfe3dc9a4edcd45f71d8fb5e38d6c93ed2f5f8451b5b9e2565";
+const JWT_SECRET = JWT_SECRET2;
+;
 
 app.get("/api/order-customer/:orderId", async (req, res) => {
   const { orderId } = req.params;
@@ -1118,7 +1122,7 @@ app.get("/product-prices", async (req, res) => {
 
 app.get("/api/requests", async (req, res) => {
   try {
-     console.log("Fetching requests...");
+    //  console.log("Fetching requests...");
     const result = await pool.query(`
       SELECT 
         *
@@ -1603,6 +1607,508 @@ app.get("/api/reviews/:productId", async (req, res) => {
 });
 
 
+// ============================
+// DATABASE BACKUP ROUTES
+// ============================
+// Add these routes to your existing server.js file
+// Required dependencies (add to top of server.js if not present):
+// const archiver = require('archiver');
+// const { format } = require('date-fns');
+
+const archiver = require('archiver');
+
+// Helper function to format date for filenames
+function getBackupTimestamp() {
+  const now = new Date();
+  return now.toISOString().replace(/[:.]/g, '-').slice(0, -5);
+}
+
+// ============================
+// ROUTE 1: Download ALL formats (SQL + JSON + CSV ZIP)
+// ============================
+app.get("/api/backup/full/:Prop", async (req, res) => {
+  const timestamp = getBackupTimestamp();
+  // console.log('Backup Prop:', req.params.Prop);
+  const Prop = req.params.Prop;
+  if(Prop !== process.env.BACKUP){
+    return res.status(403).json({ 
+      success: false, 
+      error: 'Unauthorized access' 
+    });
+  }
+else{
+  try {
+    console.log('🔄 Starting full database backup...');
+    
+    // Set response headers for zip download
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename=mcland_pharma_backup_${timestamp}.zip`);
+    
+    // Create zip archive
+    const archive = archiver('zip', { zlib: { level: 9 } });
+    
+    // Handle archive errors
+    archive.on('error', (err) => {
+      console.error('❌ Archive error:', err);
+      throw err;
+    });
+    
+    // Pipe archive to response
+    archive.pipe(res);
+    
+    // === 1. Generate SQL Dump ===
+    const sqlDump = await generateSQLDump();
+    archive.append(sqlDump, { name: `backup_${timestamp}.sql` });
+    
+    // === 2. Generate JSON Backup ===
+    const jsonBackup = await generateJSONBackup();
+    archive.append(JSON.stringify(jsonBackup, null, 2), { name: `backup_${timestamp}.json` });
+    
+    // === 3. Generate CSV Files ===
+    const csvData = await generateCSVBackup();
+    Object.keys(csvData).forEach(tableName => {
+      archive.append(csvData[tableName], { name: `csv/${tableName}_${timestamp}.csv` });
+    });
+    
+    // Finalize the archive
+    await archive.finalize();
+    
+    console.log('✅ Full backup completed successfully');
+    
+  } catch (error) {
+    console.error('❌ Backup error:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ 
+        success: false, 
+        error: 'Backup failed', 
+        details: error.message 
+      });
+    }
+  }
+  }
+});
+
+// ============================
+// ROUTE 2: Download SQL Only
+// ============================
+app.get("/api/backup/sql", async (req, res) => {
+  const timestamp = getBackupTimestamp();
+  
+  try {
+    console.log('🔄 Generating SQL backup...');
+    
+    const sqlDump = await generateSQLDump();
+    
+    res.setHeader('Content-Type', 'application/sql');
+    res.setHeader('Content-Disposition', `attachment; filename=backup_${timestamp}.sql`);
+    res.send(sqlDump);
+    
+    console.log('✅ SQL backup completed');
+    
+  } catch (error) {
+    console.error('❌ SQL backup error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'SQL backup failed', 
+      details: error.message 
+    });
+  }
+});
+
+// ============================
+// ROUTE 3: Download JSON Only
+// ============================
+app.get("/api/backup/json", async (req, res) => {
+  const timestamp = getBackupTimestamp();
+  
+  try {
+    console.log('🔄 Generating JSON backup...');
+    
+    const jsonBackup = await generateJSONBackup();
+    
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename=backup_${timestamp}.json`);
+    res.json(jsonBackup);
+    
+    console.log('✅ JSON backup completed');
+    
+  } catch (error) {
+    console.error('❌ JSON backup error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'JSON backup failed', 
+      details: error.message 
+    });
+  }
+});
+
+// ============================
+// ROUTE 4: Download CSV ZIP Only
+// ============================
+app.get("/api/backup/csv", async (req, res) => {
+  const timestamp = getBackupTimestamp();
+  
+  try {
+    console.log('🔄 Generating CSV backup...');
+    
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename=csv_backup_${timestamp}.zip`);
+    
+    const archive = archiver('zip', { zlib: { level: 9 } });
+    archive.on('error', (err) => { throw err; });
+    archive.pipe(res);
+    
+    const csvData = await generateCSVBackup();
+    Object.keys(csvData).forEach(tableName => {
+      archive.append(csvData[tableName], { name: `${tableName}.csv` });
+    });
+    
+    await archive.finalize();
+    
+    console.log('✅ CSV backup completed');
+    
+  } catch (error) {
+    console.error('❌ CSV backup error:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ 
+        success: false, 
+        error: 'CSV backup failed', 
+        details: error.message 
+      });
+    }
+  }
+});
+
+// ============================
+// HELPER FUNCTIONS
+// ============================
+
+// Generate SQL dump
+async function generateSQLDump() {
+  const tables = [
+    'customers',
+    'orders', 
+    'order_items',
+    'products',
+    'product_variants',
+    'carts',
+    'reviews',
+    'employee_login'
+  ];
+  
+  let sqlDump = `-- McLand Pharma Database Backup\n`;
+  sqlDump += `-- Generated: ${new Date().toISOString()}\n`;
+  sqlDump += `-- Database: ${process.env.DATABASE_URL ? 'Production' : 'Development'}\n\n`;
+  sqlDump += `SET client_encoding = 'UTF8';\n`;
+  sqlDump += `SET standard_conforming_strings = on;\n\n`;
+  
+  for (const table of tables) {
+    try {
+      sqlDump += `\n-- ============================\n`;
+      sqlDump += `-- Table: ${table}\n`;
+      sqlDump += `-- ============================\n\n`;
+      
+      // Drop table
+      sqlDump += `DROP TABLE IF EXISTS ${table} CASCADE;\n\n`;
+      
+      // Get table structure with detailed column information
+      const structureResult = await pool.query(`
+        SELECT 
+          column_name,
+          data_type,
+          character_maximum_length,
+          numeric_precision,
+          numeric_scale,
+          is_nullable,
+          column_default
+        FROM information_schema.columns
+        WHERE table_name = $1
+        ORDER BY ordinal_position;
+      `, [table]);
+      
+      if (structureResult.rows.length === 0) {
+        sqlDump += `-- Warning: No structure found for table ${table}\n\n`;
+        continue;
+      }
+      
+      // Build CREATE TABLE statement
+      sqlDump += `CREATE TABLE ${table} (\n`;
+      
+      const columnDefs = structureResult.rows.map((col, index) => {
+        let def = `  ${col.column_name} `;
+        
+        // Data type with length/precision
+        if (col.character_maximum_length) {
+          def += `${col.data_type}(${col.character_maximum_length})`;
+        } else if (col.numeric_precision) {
+          def += `${col.data_type}(${col.numeric_precision}${col.numeric_scale ? ',' + col.numeric_scale : ''})`;
+        } else {
+          def += col.data_type;
+        }
+        
+        // NOT NULL constraint
+        if (col.is_nullable === 'NO') {
+          def += ' NOT NULL';
+        }
+        
+        // Default value
+        if (col.column_default) {
+          def += ` DEFAULT ${col.column_default}`;
+        }
+        
+        return def;
+      });
+      
+      sqlDump += columnDefs.join(',\n');
+      
+      // Get primary key constraint
+      const pkResult = await pool.query(`
+        SELECT kcu.column_name
+        FROM information_schema.table_constraints tc
+        JOIN information_schema.key_column_usage kcu 
+          ON tc.constraint_name = kcu.constraint_name
+        WHERE tc.table_name = $1 
+          AND tc.constraint_type = 'PRIMARY KEY'
+        ORDER BY kcu.ordinal_position;
+      `, [table]);
+      
+      if (pkResult.rows.length > 0) {
+        const pkColumns = pkResult.rows.map(r => r.column_name).join(', ');
+        sqlDump += `,\n  PRIMARY KEY (${pkColumns})`;
+      }
+      
+      sqlDump += `\n);\n\n`;
+      
+      // Get all data from table
+      const dataResult = await pool.query(`SELECT * FROM ${table}`);
+      
+      if (dataResult.rows.length > 0) {
+        const columns = Object.keys(dataResult.rows[0]);
+        
+        sqlDump += `-- Data for ${table}\n`;
+        
+        dataResult.rows.forEach(row => {
+          const values = columns.map(col => {
+            const val = row[col];
+            if (val === null) return 'NULL';
+            if (typeof val === 'boolean') return val ? 'TRUE' : 'FALSE';
+            if (typeof val === 'number') return val;
+            if (val instanceof Date) return `'${val.toISOString()}'`;
+            if (typeof val === 'string') {
+              // Escape single quotes and backslashes
+              const escaped = val.replace(/\\/g, '\\\\').replace(/'/g, "''");
+              return `'${escaped}'`;
+            }
+            if (typeof val === 'object') return `'${JSON.stringify(val).replace(/'/g, "''")}'`;
+            return `'${val}'`;
+          });
+          
+          sqlDump += `INSERT INTO ${table} (${columns.join(', ')}) VALUES (${values.join(', ')});\n`;
+        });
+        
+        sqlDump += `\n`;
+      } else {
+        sqlDump += `-- No data in ${table}\n\n`;
+      }
+      
+      // Get indexes (excluding primary key)
+      const indexResult = await pool.query(`
+        SELECT indexname, indexdef
+        FROM pg_indexes
+        WHERE tablename = $1
+          AND indexname NOT LIKE '%_pkey'
+        ORDER BY indexname;
+      `, [table]);
+      
+      if (indexResult.rows.length > 0) {
+        sqlDump += `-- Indexes for ${table}\n`;
+        indexResult.rows.forEach(idx => {
+          sqlDump += `${idx.indexdef};\n`;
+        });
+        sqlDump += `\n`;
+      }
+      
+      // Get foreign keys
+      const fkResult = await pool.query(`
+        SELECT
+          tc.constraint_name,
+          kcu.column_name,
+          ccu.table_name AS foreign_table_name,
+          ccu.column_name AS foreign_column_name
+        FROM information_schema.table_constraints AS tc
+        JOIN information_schema.key_column_usage AS kcu
+          ON tc.constraint_name = kcu.constraint_name
+        JOIN information_schema.constraint_column_usage AS ccu
+          ON ccu.constraint_name = tc.constraint_name
+        WHERE tc.constraint_type = 'FOREIGN KEY'
+          AND tc.table_name = $1;
+      `, [table]);
+      
+      if (fkResult.rows.length > 0) {
+        sqlDump += `-- Foreign keys for ${table}\n`;
+        fkResult.rows.forEach(fk => {
+          sqlDump += `ALTER TABLE ${table} ADD CONSTRAINT ${fk.constraint_name} `;
+          sqlDump += `FOREIGN KEY (${fk.column_name}) `;
+          sqlDump += `REFERENCES ${fk.foreign_table_name}(${fk.foreign_column_name});\n`;
+        });
+        sqlDump += `\n`;
+      }
+      
+    } catch (err) {
+      console.error(`Error backing up table ${table}:`, err);
+      sqlDump += `-- Error backing up table ${table}: ${err.message}\n\n`;
+    }
+  }
+  
+  sqlDump += `\n-- Backup completed successfully\n`;
+  sqlDump += `-- Total tables: ${tables.length}\n`;
+  
+  return sqlDump;
+}
+
+// Generate JSON backup
+async function generateJSONBackup() {
+  const tables = [
+    'customers',
+    'orders',
+    'order_items', 
+    'products',
+    'product_variants',
+    'carts',
+    'reviews',
+    'employee_login'
+  ];
+  
+  const backup = {
+    metadata: {
+      timestamp: new Date().toISOString(),
+      version: '1.0',
+      database: 'mcland_pharma'
+    },
+    tables: {}
+  };
+  
+  for (const table of tables) {
+    try {
+      const result = await pool.query(`SELECT * FROM ${table}`);
+      backup.tables[table] = {
+        count: result.rows.length,
+        data: result.rows
+      };
+    } catch (err) {
+      console.error(`Error backing up table ${table}:`, err);
+      backup.tables[table] = {
+        error: err.message
+      };
+    }
+  }
+  
+  return backup;
+}
+
+// Generate CSV backup
+async function generateCSVBackup() {
+  const tables = [
+    'customers',
+    'orders',
+    'order_items',
+    'products', 
+    'product_variants',
+    'carts',
+    'reviews',
+    'employee_login'
+  ];
+  
+  const csvFiles = {};
+  
+  for (const table of tables) {
+    try {
+      const result = await pool.query(`SELECT * FROM ${table}`);
+      
+      if (result.rows.length === 0) {
+        csvFiles[table] = `No data in ${table} table\n`;
+        continue;
+      }
+      
+      // Get column headers
+      const headers = Object.keys(result.rows[0]);
+      let csv = headers.join(',') + '\n';
+      
+      // Add rows
+      result.rows.forEach(row => {
+        const values = headers.map(header => {
+          const val = row[header];
+          if (val === null) return '';
+          if (typeof val === 'string') {
+            // Escape quotes and wrap in quotes if contains comma
+            const escaped = val.replace(/"/g, '""');
+            return val.includes(',') || val.includes('\n') ? `"${escaped}"` : escaped;
+          }
+          if (val instanceof Date) return val.toISOString();
+          return val;
+        });
+        csv += values.join(',') + '\n';
+      });
+      
+      csvFiles[table] = csv;
+      
+    } catch (err) {
+      console.error(`Error backing up table ${table}:`, err);
+      csvFiles[table] = `Error: ${err.message}\n`;
+    }
+  }
+  
+  return csvFiles;
+}
+
+// ============================
+// ROUTE 5: Backup Status/Info
+// ============================
+app.get("/api/backup/info", async (req, res) => {
+  try {
+    const tables = [
+      'customers',
+      'orders',
+      'order_items',
+      'products',
+      'product_variants',
+      'carts',
+      'reviews',
+      'employee_login'
+    ];
+    
+    const tableInfo = {};
+    
+    for (const table of tables) {
+      const result = await pool.query(`SELECT COUNT(*) as count FROM ${table}`);
+      tableInfo[table] = parseInt(result.rows[0].count);
+    }
+    
+    res.json({
+      success: true,
+      database: 'mcland_pharma',
+      timestamp: new Date().toISOString(),
+      tables: tableInfo,
+      totalRecords: Object.values(tableInfo).reduce((a, b) => a + b, 0),
+      availableFormats: ['full', 'sql', 'json', 'csv'],
+      routes: {
+        full: '/api/backup/full',
+        sql: '/api/backup/sql',
+        json: '/api/backup/json',
+        csv: '/api/backup/csv',
+        info: '/api/backup/info'
+      }
+    });
+    
+  } catch (error) {
+    console.error('Error getting backup info:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to get backup info',
+      details: error.message 
+    });
+  }
+});
 
 
 //Middleware to block VPN users
@@ -1689,6 +2195,261 @@ async function blockVPN(req, res, next) {
 }
 
 app.use(blockVPN);
+
+// // ✅ Move cookieParser BEFORE any middleware that uses cookies
+// // app.use(express.json());
+// // app.use(cookieParser());
+
+// // ============================================
+// // IN-MEMORY CACHE FOR IP CHECKS
+// // ============================================
+// const ipCache = new Map();
+// const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+// const MAX_CACHE_SIZE = 10000; // Prevent memory overflow
+
+// // Clean old cache entries periodically
+// setInterval(() => {
+//   const now = Date.now();
+//   for (const [ip, data] of ipCache.entries()) {
+//     if (now - data.timestamp > CACHE_DURATION) {
+//       ipCache.delete(ip);
+//     }
+//   }
+// }, 60 * 60 * 1000); // Every hour
+
+// // ============================================
+// // RATE LIMITER FOR API CALLS
+// // ============================================
+// let apiCallCount = 0;
+// let lastResetTime = Date.now();
+// const MAX_API_CALLS_PER_MINUTE = 40; // Stay under ip-api's 45/min limit
+
+// function canMakeApiCall() {
+//   const now = Date.now();
+  
+//   // Reset counter every minute
+//   if (now - lastResetTime > 60000) {
+//     apiCallCount = 0;
+//     lastResetTime = now;
+//   }
+  
+//   if (apiCallCount >= MAX_API_CALLS_PER_MINUTE) {
+//     console.warn("⚠️ API rate limit reached, allowing request without check");
+//     return false;
+//   }
+  
+//   apiCallCount++;
+//   return true;
+// }
+
+// // ============================================
+// // IP WHITELIST (for your employees)
+// // ============================================
+// const EMPLOYEE_IPS = new Set([
+//   // Add your office/employee IP addresses here
+//   // "203.0.113.0",
+//   // "198.51.100.0",
+// ]);
+
+// // ============================================
+// // ROUTES TO SKIP VPN CHECK
+// // ============================================
+// const SKIP_VPN_CHECK_PATHS = [
+//   '/assets/',
+//   '/favicon.ico',
+//   '/robots.txt',
+//   '/sitemap.xml',
+//   '/restricted.html',
+//   '/retry'
+// ];
+
+// function shouldSkipVpnCheck(path) {
+//   return SKIP_VPN_CHECK_PATHS.some(skipPath => path.startsWith(skipPath));
+// }
+
+// // ============================================
+// // OPTIMIZED VPN BLOCKING MIDDLEWARE
+// // ============================================
+// async function blockVPN(req, res, next) {
+//   try {
+//     // ✅ Skip VPN check for static assets and specific routes
+//     if (shouldSkipVpnCheck(req.path)) {
+//       return next();
+//     }
+
+//     // ✅ If already blocked → deny immediately
+//     if (req.cookies.vpn_blocked === "true") {
+//       return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+//     }
+
+//     // ✅ If already validated → allow immediately
+//     if (req.cookies.valid_user === "true") {
+//       return next();
+//     }
+
+//     // Get client IP
+//     const clientIp = (req.headers["x-forwarded-for"]?.split(",")[0] || 
+//                       req.socket.remoteAddress || 
+//                       req.connection.remoteAddress).trim();
+
+//     // ✅ Skip localhost/development IPs
+//     if (clientIp === "::1" || clientIp === "127.0.0.1" || clientIp.startsWith("192.168.")) {
+//       res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
+//       return next();
+//     }
+
+//     // ✅ Check employee whitelist
+//     if (EMPLOYEE_IPS.has(clientIp)) {
+//       res.cookie("valid_user", "true", { maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days for employees
+//       return next();
+//     }
+
+//     // ✅ Check cache first
+//     const cached = ipCache.get(clientIp);
+//     if (cached) {
+//       const age = Date.now() - cached.timestamp;
+      
+//       if (age < CACHE_DURATION) {
+//         if (cached.isVpn) {
+//           res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
+//           return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+//         } else {
+//           res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
+//           return next();
+//         }
+//       } else {
+//         // Cache expired, remove it
+//         ipCache.delete(clientIp);
+//       }
+//     }
+
+//     // ✅ Check if we can make an API call (rate limiting)
+//     if (!canMakeApiCall()) {
+//       console.warn(`⚠️ Rate limit reached, allowing ${clientIp} without check`);
+//       return next();
+//     }
+
+//     // ✅ Make API call with timeout
+//     const controller = new AbortController();
+//     const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+//     const response = await axios.get(
+//       `http://ip-api.com/json/${clientIp}?fields=proxy,hosting,status,message`,
+//       { 
+//         signal: controller.signal,
+//         timeout: 5000
+//       }
+//     );
+    
+//     clearTimeout(timeoutId);
+
+//     const data = response.data;
+
+//     // Check if API request was successful
+//     if (data.status === "fail") {
+//       console.error(`❌ IP API failed for ${clientIp}: ${data.message}`);
+//       return next(); // Allow on API failure
+//     }
+
+//     const isVpn = data.proxy === true || data.hosting === true;
+
+//     // ✅ Store in cache
+//     if (ipCache.size < MAX_CACHE_SIZE) {
+//       ipCache.set(clientIp, {
+//         isVpn,
+//         timestamp: Date.now()
+//       });
+//     }
+
+//     if (isVpn) {
+//       console.log(`🚫 VPN/Proxy detected: ${clientIp}`);
+//       res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
+//       return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+//     }
+
+//     // ✅ Valid user
+//     console.log(`✅ Valid user: ${clientIp}`);
+//     res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
+//     next();
+
+//   } catch (error) {
+//     // ✅ Handle errors gracefully
+//     if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+//       console.error("⏱️ VPN check timeout:", error.message);
+//     } else if (error.message.includes('aborted')) {
+//       console.error("⏱️ VPN check aborted (timeout)");
+//     } else {
+//       console.error("❌ VPN check failed:", error.message);
+//     }
+    
+//     // Allow request on error (fail-open approach)
+//     next();
+//   }
+// }
+
+// // ✅ Apply VPN blocking middleware
+// app.use(blockVPN);
+
+// // ============================================
+// // RETRY ROUTE (Clear blocked cookie)
+// // ============================================
+// app.post("/retry", (req, res) => {
+//   const clientIp = (req.headers["x-forwarded-for"]?.split(",")[0] || 
+//                     req.socket.remoteAddress).trim();
+  
+//   // Clear from cache
+//   ipCache.delete(clientIp);
+  
+//   // Clear cookies
+//   res.clearCookie("vpn_blocked");
+//   res.clearCookie("valid_user");
+  
+//   console.log(`🔄 Retry requested for ${clientIp}`);
+//   res.redirect("/");
+// });
+
+// // ============================================
+// // ADMIN ENDPOINT: View Cache Stats
+// // ============================================
+// app.get("/admin/vpn-stats", (req, res) => {
+//   // Add authentication here in production!
+  
+//   res.json({
+//     cacheSize: ipCache.size,
+//     maxCacheSize: MAX_CACHE_SIZE,
+//     apiCallsThisMinute: apiCallCount,
+//     maxApiCallsPerMinute: MAX_API_CALLS_PER_MINUTE,
+//     cachedIPs: Array.from(ipCache.keys()).length,
+//     employeeIPs: EMPLOYEE_IPS.size
+//   });
+// });
+
+// // ============================================
+// // ADMIN ENDPOINT: Clear Cache
+// // ============================================
+// app.post("/admin/clear-cache", (req, res) => {
+//   // Add authentication here in production!
+  
+//   ipCache.clear();
+//   apiCallCount = 0;
+  
+//   res.json({ success: true, message: "Cache cleared" });
+// });
+
+// // ============================================
+// // ADMIN ENDPOINT: Add Employee IP
+// // ============================================
+// app.post("/admin/add-employee-ip", (req, res) => {
+//   // Add authentication here in production!
+  
+//   const { ip } = req.body;
+//   if (!ip) {
+//     return res.status(400).json({ error: "IP address required" });
+//   }
+  
+//   EMPLOYEE_IPS.add(ip);
+//   res.json({ success: true, message: `IP ${ip} added to whitelist` });
+// });
 
 
 // Static files
