@@ -1,3 +1,4 @@
+
 @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Proza+Libre:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&display=swap");
 /* styles.css */
@@ -152,8 +153,31 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
   padding: 2rem;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
+}
+
+/* Position first column items */
+.product-section > div:first-child {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+/* Position product info */
+.product-info {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+/* Position review section and differ section side by side */
+.review-section {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+#differ {
+  grid-column: 2;
+  grid-row: 2;
 }
 
 /* CAROUSEL */
@@ -701,10 +725,31 @@ img {
     padding: 0;
   }
 
+  /* Stack review and differ sections on mobile */
+  .product-section > div:first-child {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .product-info {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .review-section {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  #differ {
+    grid-column: 1;
+    grid-row: 4;
+  }
+
   .header {
-    /* padding: 0.75rem 1rem; */
+    padding: 0.75rem 1rem;
     /* flex-wrap: wrap; */
-    /* gap: 0.1rem; */
+    gap: 1rem;
   }
 
   .header__search-cart {
@@ -713,14 +758,10 @@ img {
     justify-content: space-between;
   }
 
-  .header__search-cart.header__right {
-        gap: 0px;
-    }
-
   .search {
     flex: 1;
-    max-width: 100%;
-    /* margin-right: 1rem; */
+    max-width: none;
+    margin-right: 1rem;
   }
 
   .search__input {
@@ -823,9 +864,6 @@ img {
   }
 
   .btn--search {
-    position: absolute;
-        top: 10%;
-        right: 0;
     padding: 0.4rem;
   }
 
@@ -877,8 +915,8 @@ img {
 
   .product-table th,
   .product-table td {
-    width: fit-content;
-    padding: 2px;
+    /* width: 10vw; */
+    padding: 0.5rem 0.3rem;
     font-size: 0.8rem;
   }
   .product-table tr {
@@ -1186,5 +1224,636 @@ img {
   .zoom-indicator {
     font-size: 0.8rem;
     padding: 6px 12px;
+  }
+}
+
+
+/* ===== PREMIUM CUSTOMER REVIEW SECTION ===== */
+
+.review-section {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 8px 32px rgba(2, 140, 126, 0.08), 
+              0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(2, 140, 126, 0.1);
+  transition: all 0.3s ease;
+}
+
+.review-section:hover {
+  box-shadow: 0 12px 48px rgba(2, 140, 126, 0.12), 
+              0 4px 12px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
+}
+
+.review-section h3 {
+  font-family: var(--font-high);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 3px solid var(--color-accent);
+  display: inline-block;
+  letter-spacing: 0.5px;
+}
+
+.review-section h4 {
+  font-family: var(--font-high);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--color-gray-700);
+  margin: 2.5rem 0 1.5rem 0;
+  letter-spacing: 0.3px;
+}
+
+/* Premium Review List */
+#review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+/* Individual Review Card */
+.review-item {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 255, 254, 0.9) 100%);
+  border-radius: 12px;
+  padding: 1.75rem;
+  border: 1px solid rgba(2, 140, 126, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.review-item::before {
+  content: '"';
+  position: absolute;
+  top: -10px;
+  left: 15px;
+  font-size: 5rem;
+  font-family: Georgia, serif;
+  color: rgba(2, 140, 126, 0.08);
+  line-height: 1;
+}
+
+.review-item:hover {
+  transform: translateX(4px);
+  box-shadow: 0 8px 24px rgba(2, 140, 126, 0.12);
+  border-color: var(--color-primary);
+}
+
+/* Review Header */
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.review-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #02a592 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 1.25rem;
+  box-shadow: 0 4px 12px rgba(2, 140, 126, 0.25);
+  flex-shrink: 0;
+}
+
+.review-info {
+  flex: 1;
+}
+
+.review-name {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--color-gray-700);
+  margin-bottom: 0.25rem;
+}
+
+.review-date {
+  font-size: 0.85rem;
+  color: var(--color-gray-400);
+}
+
+/* Review Stars */
+.review-stars {
+  display: flex;
+  gap: 0.25rem;
+  font-size: 1.1rem;
+}
+
+.review-stars span {
+  color: var(--color-accent);
+  transition: transform 0.2s ease;
+}
+
+.review-item:hover .review-stars span {
+  transform: scale(1.1);
+}
+
+/* Review Text */
+.review-text {
+  color: var(--color-gray-600);
+  line-height: 1.7;
+  font-size: 0.98rem;
+  margin-top: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Verified Badge */
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  background: linear-gradient(135deg, rgba(2, 140, 126, 0.1) 0%, rgba(2, 140, 126, 0.05) 100%);
+  color: var(--color-primary);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-top: 0.75rem;
+}
+
+.verified-badge::before {
+  content: '✓';
+  font-weight: bold;
+}
+
+/* Premium Review Form */
+#reviewForm {
+  background: linear-gradient(135deg, rgba(2, 140, 126, 0.03) 0%, rgba(2, 140, 126, 0.01) 100%);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(2, 140, 126, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+}
+
+/* Star Rating in Form */
+.star-rating {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.star-rating span {
+  color: #ddd;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.star-rating span:hover,
+.star-rating span.selected {
+  color: var(--color-accent);
+  transform: scale(1.15);
+}
+
+.star-rating span:hover ~ span {
+  color: #ddd;
+}
+
+/* Form Inputs */
+#reviewForm input,
+#reviewForm textarea {
+  width: 100%;
+  padding: 0.875rem 1.25rem;
+  border: 2px solid rgba(2, 140, 126, 0.15);
+  border-radius: 8px;
+  font-family: var(--font-base);
+  font-size: 0.95rem;
+  color: var(--color-gray-700);
+  background: white;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+#reviewForm input:focus,
+#reviewForm textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(2, 140, 126, 0.1);
+  transform: translateY(-1px);
+}
+
+#reviewForm input::placeholder,
+#reviewForm textarea::placeholder {
+  color: var(--color-gray-400);
+}
+
+#reviewForm textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* Submit Button */
+#reviewForm button[type="submit"] {
+  width: 100%;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #02a592 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--font-base);
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(2, 140, 126, 0.25);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-top: 0.5rem;
+}
+
+#reviewForm button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(2, 140, 126, 0.35);
+  background: linear-gradient(135deg, #02a592 0%, var(--color-primary) 100%);
+}
+
+#reviewForm button[type="submit"]:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(2, 140, 126, 0.25);
+}
+
+/* Empty State */
+.no-reviews {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--color-gray-400);
+  font-style: italic;
+}
+
+.no-reviews::before {
+  content: '💬';
+  display: block;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* Responsive Adjustments for Review Section */
+@media (max-width: 768px) {
+  .review-section {
+    padding: 1.5rem;
+    border-radius: 12px;
+  }
+
+  .review-section h3 {
+    font-size: 1.4rem;
+  }
+
+  .review-section h4 {
+    font-size: 1.2rem;
+    margin: 2rem 0 1rem 0;
+  }
+
+  .review-item {
+    padding: 1.25rem;
+  }
+
+  .review-header {
+    flex-wrap: wrap;
+  }
+
+  .review-avatar {
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+  }
+
+  .star-rating {
+    font-size: 1.75rem;
+  }
+
+  #reviewForm {
+    padding: 1.5rem;
+  }
+
+  #reviewForm input,
+  #reviewForm textarea {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .review-section {
+    padding: 1.25rem;
+  }
+
+  .review-section h3 {
+    font-size: 1.25rem;
+  }
+
+  .review-section h4 {
+    font-size: 1.1rem;
+  }
+
+  .review-item {
+    padding: 1rem;
+  }
+
+  .review-item::before {
+    font-size: 3.5rem;
+    top: -5px;
+    left: 10px;
+  }
+
+  .review-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .review-name {
+    font-size: 0.95rem;
+  }
+
+  .review-text {
+    font-size: 0.9rem;
+  }
+
+  .star-rating {
+    font-size: 1.5rem;
+    gap: 0.35rem;
+  }
+
+  #reviewForm {
+    padding: 1.25rem;
+  }
+
+  #reviewForm button[type="submit"] {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+
+
+/* ===== PREMIUM DETAILS SECTIONS ===== */
+
+/* Differ Section - Premium Medical Information Display */
+.differ {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
+  border-radius: 16px;
+  padding: 2.5rem;
+  margin: 2rem 0;
+  box-shadow: 0 8px 32px rgba(2, 140, 126, 0.08), 
+              0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(2, 140, 126, 0.1);
+  transition: all 0.3s ease;
+}
+
+.differ:hover {
+  box-shadow: 0 12px 48px rgba(2, 140, 126, 0.12), 
+              0 4px 12px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
+}
+
+/* Premium Headings for Detail Sections */
+.differ h2,
+.differ h3 {
+  color: var(--color-primary);
+  font-family: var(--font-high);
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 3px solid var(--color-accent);
+  display: inline-block;
+  letter-spacing: 0.5px;
+}
+
+.differ h2 {
+  font-size: 1.75rem;
+}
+
+.differ h3 {
+  font-size: 1.4rem;
+  border-bottom-width: 2px;
+}
+
+/* Premium Content Styling */
+.differ p,
+.differ li {
+  color: var(--color-gray-600);
+  line-height: 1.8;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.differ ul,
+.differ ol {
+  padding-left: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.differ li {
+  margin-bottom: 0.85rem;
+  position: relative;
+  padding-left: 0.5rem;
+}
+
+.differ ul li::marker {
+  color: var(--color-primary);
+  font-size: 1.2em;
+}
+
+.differ ol li::marker {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* Premium Info Boxes within Differ */
+.differ .info-box {
+  background: linear-gradient(135deg, rgba(2, 140, 126, 0.05) 0%, rgba(2, 140, 126, 0.02) 100%);
+  border-left: 4px solid var(--color-primary);
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.differ .warning-box {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0.03) 100%);
+  border-left: 4px solid var(--color-accent);
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+/* Three Box Section - Premium Icon Boxes */
+.three-box-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin: 3rem 0;
+  padding: 0 2rem;
+}
+
+.three-box-section .box {
+  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06), 
+              0 2px 8px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(2, 140, 126, 0.08);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.three-box-section .box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+
+.three-box-section .box:hover::before {
+  transform: scaleX(1);
+}
+
+.three-box-section .box:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 48px rgba(2, 140, 126, 0.15), 
+              0 4px 16px rgba(0, 0, 0, 0.08);
+  border-color: var(--color-primary);
+}
+
+.three-box-section .box-icon {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 1.5rem;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #02a592 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: white;
+  box-shadow: 0 8px 24px rgba(2, 140, 126, 0.25);
+  transition: all 0.3s ease;
+}
+
+.three-box-section .box:hover .box-icon {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 12px 32px rgba(2, 140, 126, 0.35);
+}
+
+.three-box-section .box h3 {
+  font-family: var(--font-high);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-gray-700);
+  margin-bottom: 1rem;
+  letter-spacing: 0.3px;
+}
+
+.three-box-section .box p {
+  color: var(--color-gray-600);
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+/* Premium Badges */
+.differ .badge {
+  display: inline-block;
+  padding: 0.4rem 1rem;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #02a592 100%);
+  color: white;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(2, 140, 126, 0.25);
+  margin: 0.5rem 0.5rem 0.5rem 0;
+}
+
+.differ .badge.accent {
+  background: linear-gradient(135deg, var(--color-accent) 0%, #c49d2f 100%);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.25);
+}
+
+/* Premium Divider */
+.differ hr {
+  border: none;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--color-primary) 50%, transparent 100%);
+  margin: 2.5rem 0;
+}
+
+/* Responsive Adjustments for Premium Sections */
+@media (max-width: 768px) {
+  .differ {
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .differ h2 {
+    font-size: 1.4rem;
+  }
+
+  .differ h3 {
+    font-size: 1.2rem;
+  }
+
+  .three-box-section {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+
+  .three-box-section .box {
+    padding: 2rem 1.5rem;
+  }
+
+  .three-box-section .box-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 1.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .differ {
+    padding: 1.25rem;
+    border-radius: 12px;
+  }
+
+  .differ h2 {
+    font-size: 1.25rem;
+  }
+
+  .differ h3 {
+    font-size: 1.1rem;
+  }
+
+  .differ p,
+  .differ li {
+    font-size: 0.95rem;
+  }
+
+  .three-box-section {
+    margin: 2rem 0;
+    padding: 0 0.5rem;
   }
 }
