@@ -91,3 +91,21 @@
       .review-card small {
         color: #666;
       }
+
+      .show-more-btn {
+  display: block;
+  margin: 1rem auto;
+  padding: 8px 16px;
+  background: #222;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.show-more-btn:hover {
+  background: #444;
+  transform: translateY(-2px);
+}
