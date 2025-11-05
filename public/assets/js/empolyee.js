@@ -27,23 +27,25 @@ async function loadDashboardData() {
       done = 0,
       processing = 0,
       tracking = 0,
-      delivered = 0;
+      delivered = 0.
+      paid = 0;
 
     orders.forEach((o) => {
       const status = o.payment_status || o.status || "pending";
 
       if (status === "pending") pending++;
       else if (status === "completed") done++;
-      else if (status === "processing") processing++;
+      else if (status === "process") processing++;
       else if (status === "tracking") tracking++;
       else if (status === "delivered") delivered++;
+      else if (status === "paid") paid++; 
     });
 
     // Update dashboard
     document.getElementById("clientsHandled").textContent = clients.size;
     document.getElementById("paymentPending").textContent = pending;
     document.getElementById("paymentDone").textContent = done;
-    document.getElementById("pendingRequests").textContent = pending; // or adjust as needed
+    document.getElementById("pendingRequests").textContent = processing+tracking+delivered+paid; // or adjust as needed
   } catch (err) {
     console.error("Error loading dashboard data:", err);
   }

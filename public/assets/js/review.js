@@ -51,7 +51,8 @@ async function loadReviews(productId) {
     const result = await response.json();
 
     if (!result.success || result.reviews.length === 0) {
-      reviewList.innerHTML = "<p>No reviews yet. Be the first to write one!</p>";
+      reviewList.innerHTML =
+        "<p>No reviews yet. Be the first to write one!</p>";
       // Reset average rating display
       ratingStars.forEach((s) => (s.style.color = "#ccc"));
       ratingCount.textContent = "(0 reviews)";
@@ -81,7 +82,7 @@ async function loadReviews(productId) {
     //   .map(
     //     (r) => `
     //     <div class="review-card">
-    //       <strong>${r.name}</strong> 
+    //       <strong>${r.name}</strong>
     //       <span>${"⭐".repeat(r.rating)}</span>
     //       <p>${r.review_text}</p>
     //       <small>${new Date(r.created_at).toLocaleDateString()}</small>
@@ -97,9 +98,9 @@ async function loadReviews(productId) {
     //   )
     //   .join("");
     // ✅ Show reviews below with "Show All" toggle
-const allReviewsHTML = result.reviews
-  .map(
-    (r) => `
+    const allReviewsHTML = result.reviews
+      .map(
+        (r) => `
     <div class="review-card">
       <strong>${r.name}</strong> 
       <span>${"⭐".repeat(r.rating)}</span>
@@ -116,12 +117,14 @@ const allReviewsHTML = result.reviews
           : ""
       }
     </div>`
-  )
-  .join("");
+      )
+      .join("");
 
-// ✅ Show only top 2 initially
-const topReviewsHTML = result.reviews.slice(0, 2).map(
-  (r) => `
+    // ✅ Show only top 2 initially
+    const topReviewsHTML = result.reviews
+      .slice(0, 2)
+      .map(
+        (r) => `
     <div class="review-card">
       <strong>${r.name}</strong> 
       <span>${"⭐".repeat(r.rating)}</span>
@@ -138,10 +141,11 @@ const topReviewsHTML = result.reviews.slice(0, 2).map(
           : ""
       }
     </div>`
-).join("");
+      )
+      .join("");
 
-// ✅ Insert HTML with toggle button
-reviewList.innerHTML = `
+    // ✅ Insert HTML with toggle button
+    reviewList.innerHTML = `
   <div id="visible-reviews">
     ${topReviewsHTML}
   </div>
@@ -152,22 +156,21 @@ reviewList.innerHTML = `
   }
 `;
 
-// ✅ Toggle logic
-const toggleBtn = document.getElementById("toggle-reviews-btn");
-if (toggleBtn) {
-  let expanded = false;
-  toggleBtn.addEventListener("click", () => {
-    expanded = !expanded;
-    if (expanded) {
-      document.getElementById("visible-reviews").innerHTML = allReviewsHTML;
-      toggleBtn.textContent = "Show Less ↑";
-    } else {
-      document.getElementById("visible-reviews").innerHTML = topReviewsHTML;
-      toggleBtn.textContent = "Show All ↓";
+    // ✅ Toggle logic
+    const toggleBtn = document.getElementById("toggle-reviews-btn");
+    if (toggleBtn) {
+      let expanded = false;
+      toggleBtn.addEventListener("click", () => {
+        expanded = !expanded;
+        if (expanded) {
+          document.getElementById("visible-reviews").innerHTML = allReviewsHTML;
+          toggleBtn.textContent = "Show Less ↑";
+        } else {
+          document.getElementById("visible-reviews").innerHTML = topReviewsHTML;
+          toggleBtn.textContent = "Show All ↓";
+        }
+      });
     }
-  });
-}
-
   } catch (err) {
     console.error("Error loading reviews:", err);
     reviewList.innerHTML = "<p>Error loading reviews.</p>";
