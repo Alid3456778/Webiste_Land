@@ -1210,7 +1210,8 @@ app.get("/api/customers/search", async (req, res) => {
         COALESCE(customer_last_name, '') AS last_name,
         user_id,
         customer_email AS email,
-        customer_phone AS phone
+        customer_phone AS phone,
+        order_id
       FROM orders
       WHERE ${orderWhereClauses.join(" OR ")}
       LIMIT 200
@@ -1257,6 +1258,7 @@ app.get("/api/customers/search", async (req, res) => {
       const fname = (r.first_name || "").trim();
       const lname = (r.last_name || "").trim();
       const id = r.user_id === null || r.user_id === undefined ? "" : String(r.user_id);
+      const orderId = r.order_id;
       const key = `${fname} ${lname}-${id}`.trim();
 
       if (!seen.has(key)) {
@@ -1267,6 +1269,7 @@ app.get("/api/customers/search", async (req, res) => {
           user_id: id,
           email: r.email || null,
           phone: r.phone || null,
+          order_id: orderId || null,
           source: r.user_id && r.email ? "orders/customers" : (r.email ? "customers" : "orders") // advisory
         });
       }

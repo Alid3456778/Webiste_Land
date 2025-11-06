@@ -27,7 +27,7 @@ async function loadDashboardData() {
       done = 0,
       processing = 0,
       tracking = 0,
-      delivered = 0.
+      delivered = 0;
       paid = 0;
 
     orders.forEach((o) => {
@@ -38,14 +38,15 @@ async function loadDashboardData() {
       else if (status === "process") processing++;
       else if (status === "tracking") tracking++;
       else if (status === "delivered") delivered++;
-      else if (status === "paid") paid++; 
+      else if (status === "paid") paid++;
     });
 
     // Update dashboard
     document.getElementById("clientsHandled").textContent = clients.size;
     document.getElementById("paymentPending").textContent = pending;
     document.getElementById("paymentDone").textContent = done;
-    document.getElementById("pendingRequests").textContent = processing+tracking+delivered+paid; // or adjust as needed
+    document.getElementById("pendingRequests").textContent =
+      processing + tracking + delivered + paid; // or adjust as needed
   } catch (err) {
     console.error("Error loading dashboard data:", err);
   }
@@ -407,7 +408,9 @@ document.addEventListener("DOMContentLoaded", () => {
           idInputManually.value = userId;
           clearResults(); // Clear the search results after selection
           fetchBtn.click(); // Trigger your existing manual order logic
-          document.querySelector("#manual-order-popup").scrollIntoView({ behavior: "smooth"});
+          document
+            .querySelector("#manual-order-popup")
+            .scrollIntoView({ behavior: "smooth" });
         });
       });
     } catch (err) {
@@ -568,8 +571,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       openManualOrderForm(user); // prefill form with customer data
       document
-      .querySelector("#manual-order-popup")
-      .scrollIntoView({ behavior: "smooth", block: "start" });
+        .querySelector("#manual-order-popup")
+        .scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (err) {
       alert("Error fetching user: " + err.message);
     }
@@ -1217,6 +1220,10 @@ document.addEventListener("DOMContentLoaded", () => {
                         style="background: linear-gradient(135deg, #3b82f6, #2563eb); margin-top:5px;">
                     <i class="fas fa-envelope"></i> Send Tracking
                 </button>
+                <button onclick="deleteRequest(${request.order_id})"
+                        style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
             </td>
         `;
       tableBody.appendChild(row);
@@ -1565,3 +1572,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Escape") closeDetailsModal();
   });
 });
+
+
+
+
