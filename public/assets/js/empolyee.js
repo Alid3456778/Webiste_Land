@@ -951,7 +951,7 @@ const STATUS_CONFIG = {
   completed: {
     label: "completed",
     icon: "fa-times-circle",
-    class: "status-cancelled",
+    class: "status-delivered",
   },
 };
 
@@ -1238,9 +1238,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderPagination();
     // Scroll to top of table
-    document
-      .querySelector("#process-requests")
-      .scrollIntoView({ behavior: "smooth", block: "start" });
+    // document
+    //   .querySelector("#process-requests")
+    //   .scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   // Generate page numbers with ellipses
@@ -1572,7 +1572,3 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Escape") closeDetailsModal();
   });
 });
-
-
-
-

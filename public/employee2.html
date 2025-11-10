@@ -937,6 +937,7 @@
       cursor: pointer;
       transition: all 0.2s ease;
       font-size: 0.875rem;
+      color: black;
     }
 
     .pagination-btn:hover:not(:disabled) {
@@ -1017,6 +1018,11 @@
       color: var(--primary);
       font-weight: 600;
     }
+    
+    .varient-design{
+      overflow-x: auto;
+
+    }
   </style>
 </head>
 
@@ -1078,10 +1084,10 @@
         </div>
       </div>
       <div class="header-actions">
-        <div class="search-box">
+        <!-- <div class="search-box">
           <i class="fas fa-search"></i>
           <input type="text" placeholder="Search..." />
-        </div>
+        </div> -->
         <button id="logoutBtn" class="header-btn">
           <i class="fas fa-sign-out-alt"></i>
           Logout
@@ -1423,7 +1429,8 @@
             </div>
           </div>
 
-          <table id="variants-table" border="1" style="display: none; margin-top: 1rem;">
+          <div class="varient-design">
+          <table id="variants-table"  border="1" style="display: none; margin-top: 1rem;">
             <thead>
               <tr>
                 <th>ID</th>
@@ -1438,6 +1445,7 @@
             </thead>
             <tbody id="variants-body"></tbody>
           </table>
+          </div>
 
           <button id="btn-add-new" class="outline" style="display: none; margin-top: 1rem;">
             <i class="fas fa-plus"></i> Add New Variant
@@ -1527,11 +1535,11 @@
 
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem;">
               <div>
-                <label for="additional_img1">Additional Image 1:</label>
+                <label for="addtional-img1">Additional Image 1:</label>
                 <input type="text" id="addtional-img1" name="additional_img1" />
               </div>
               <div>
-                <label for="additional_img2">Additional Image 2:</label>
+                <label for="addtional-img2">Additional Image 2:</label>
                 <input type="text" id="addtional-img2" name="additional_img2" />
               </div>
               <div>
