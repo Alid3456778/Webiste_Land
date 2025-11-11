@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Employee Dashboard - McLand Pharma</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="./assets/css/employee.css" />
+  </head>
+
+  <body>
+    <header>
+      <div class="header-content">
+        <div class="header-left">
+          <div class="logo-icon">
+            <i class="fas fa-pills"></i>
+          </div>
+          <div>
+            <h1>McLand Pharma</h1>
+            <div class="header-subtitle">Employee Dashboard</div>
+          </div>
+        </div>
+        <nav>
+          <button id="logoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <div class="container">
+      <!-- Dashboard Section -->
+      <section id="dashboard" class="card">
+        <h2><i class="fas fa-chart-line"></i> Dashboard Overview</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h3>Clients</h3>
+            <div class="number" id="clientsHandled">0</div>
+          </div>
+          <div class="stat-card">
+            <h3>Payment Pending</h3>
+            <div class="number" id="paymentPending">0</div>
+          </div>
+          <div class="stat-card">
+            <h3>Payment Done</h3>
+            <div class="number" id="paymentDone">0</div>
+          </div>
+
+          <div class="stat-card">
+            <h3>Pending Requests</h3>
+            <div class="number" id="pendingRequests">0</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="existing-products" class="card">
+        <h3><i class="fas fa-search"></i> Search Product by ID or Name</h3>
+        <form id="search-form">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem">
+            <div>
+              <label for="product_id">Product ID:</label>
+              <input
+                type="number"
+                id="product_id"
+                name="product_id"
+                placeholder="Enter Product ID"
+              />
+            </div>
+            <div>
+              <label for="product_name">Product Name:</label>
+              <input
+                type="text"
+                id="product_name_2"
+                name="product_name_2"
+                placeholder="Enter Product Name"
+              />
+            </div>
+          </div>
+          <button type="submit"><i class="fas fa-search"></i> Search</button>
+        </form>
+
+        <div id="result" class="result" style="display: none">
+          <h3 style="margin-top: 2rem">Product Details:</h3>
+          <table class="product-table">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Product ID</td>
+                <td id="product-id"></td>
+              </tr>
+              <tr>
+                <td>Category ID</td>
+                <td id="category-id"></td>
+              </tr>
+              <tr>
+                <td>Product Name</td>
+                <td id="product-name"></td>
+              </tr>
+              <tr>
+                <td>Description</td>
+                <td id="product-description"></td>
+              </tr>
+              <tr>
+                <td>Trade Names</td>
+                <td id="trade-names"></td>
+              </tr>
+              <tr>
+                <td>Ingredients</td>
+                <td id="ingreds"></td>
+              </tr>
+              <tr>
+                <td>Manufacturer</td>
+                <td id="manufacturer"></td>
+              </tr>
+              <tr>
+                <td>Packaging</td>
+                <td id="packaging"></td>
+              </tr>
+              <tr>
+                <td>Usage Instructions</td>
+                <td id="usage-instructions"></td>
+              </tr>
+              <tr>
+                <td>Drug Interaction</td>
+                <td id="drug-interaction"></td>
+              </tr>
+              <tr>
+                <td>Side Effects</td>
+                <td id="side-effects"></td>
+              </tr>
+              <tr>
+                <td>Safety</td>
+                <td id="safety"></td>
+              </tr>
+              <tr>
+                <td>Withdrawal Symptoms</td>
+                <td id="withdrawal-symptoms"></td>
+              </tr>
+              <tr>
+                <td>Drug Abuse Potential</td>
+                <td id="drug-abuse"></td>
+              </tr>
+              <tr>
+                <td>Storage</td>
+                <td id="storage"></td>
+              </tr>
+              <tr>
+                <td>Primary Image</td>
+                <td id="image_url"></td>
+              </tr>
+              <tr>
+                <td>Additional Image 1</td>
+                <td id="addtional-img1"></td>
+              </tr>
+              <tr>
+                <td>Additional Image 2</td>
+                <td id="addtional-img2"></td>
+              </tr>
+              <tr>
+                <td>Additional Image 3</td>
+                <td id="addtional-img3"></td>
+              </tr>
+              <tr>
+                <td>Additional Image 4</td>
+                <td id="addtional-img4"></td>
+              </tr>
+              <tr>
+                <td>Additional Image 5</td>
+                <td id="addtional-img5"></td>
+              </tr>
+              <tr>
+                <td>Additional Image 6</td>
+                <td id="addtional-img6"></td>
+              </tr>
+              <tr>
+                <td>Stock</td>
+                <td id="stocks"></td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="display: flex; gap: 1rem; margin-top: 1.5rem">
+            <button id="edit-button"><i class="fas fa-edit"></i> Edit</button>
+            <button
+              id="delete-button"
+              style="background: linear-gradient(135deg, #ef4444, #dc2626)"
+            >
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          </div>
+        </div>
+
+        <div id="edit-section" style="display: none">
+          <form id="edit-form">
+            <div id="editable-fields"></div>
+            <button type="submit">
+              <i class="fas fa-save"></i> Submit Changes
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Customer Order Tracking Section -->
+      <section id="customer-tracking" class="card">
+        <h2><i class="fas fa-user-check"></i> Customer Order Tracking</h2>
+        <div class="tracking-search">
+          <div style="flex: 1">
+            <!-- 🔍 New Name Search -->
+            <div class="name-search" style="margin-bottom: 1rem">
+              <input
+                type="text"
+                id="tracking-first-name"
+                placeholder="Enter First Name"
+              />
+              <input
+                type="text"
+                id="tracking-last-name"
+                placeholder="Enter Last Name (optional)"
+              />
+              <button id="search-tracking-name">
+                <i class="fas fa-search"></i> Search by Name
+              </button>
+            </div>
+
+            <!-- Results area -->
+            <div id="tracking-name-results" style="margin-top: 1rem"></div>
+
+            <label for="tracking-user-id">Customer ID:</label>
+            <input
+              type="number"
+              id="tracking-user-id"
+              placeholder="Enter User ID"
+              min="1"
+              required
+            />
+          </div>
+          <button id="btn-track-customer">
+            <i class="fas fa-search"></i> Track Customer
+          </button>
+        </div>
+
+        <div id="tracking-results" style="display: none">
+          <div class="customer-info-card">
+            <h3>Customer Information</h3>
+            <table class="info-table">
+              <tr>
+                <td><strong>Customer ID:</strong></td>
+                <td id="track-customer-id"></td>
+              </tr>
+              <tr>
+                <td><strong>Name:</strong></td>
+                <td id="track-customer-name"></td>
+              </tr>
+              <tr>
+                <td><strong>Email:</strong></td>
+                <td id="track-customer-email"></td>
+              </tr>
+              <tr>
+                <td><strong>Phone:</strong></td>
+                <td id="track-customer-phone"></td>
+              </tr>
+              <tr>
+                <td><strong>Company:</strong></td>
+                <td id="track-customer-company"></td>
+              </tr>
+              <tr>
+                <td><strong>Address:</strong></td>
+                <td id="track-customer-address"></td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="customer-stats">
+            <div class="stat-box">
+              <h4>Total Orders</h4>
+              <p id="track-total-orders" class="stat-number">0</p>
+            </div>
+            <div class="stat-box">
+              <h4>Lifetime Value</h4>
+              <p id="track-lifetime-value" class="stat-number">$0.00</p>
+            </div>
+          </div>
+
+          <div class="orders-container">
+            <h3>Order History</h3>
+            <div id="orders-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- <section id="manual-order" class="card">
+        <h2>Manual Order</h2>
+        <input
+          type="number"
+          id="manual-user-id"
+          placeholder="Enter Customer User ID"
+        />
+        <button id="fetch-customer">Fetch Customer</button>
+      </section> -->
+
+      <section id="manual-order" class="card">
+        <h2>Manual Order</h2>
+
+        <!-- 🔍 New Name Search -->
+        <div class="name-search">
+          <input
+            type="text"
+            id="manual-first-name"
+            placeholder="Enter First Name"
+          />
+          <input
+            type="text"
+            id="manual-last-name"
+            placeholder="Enter Last Name (optional)"
+          />
+          <button id="search-customer-name">Search by Name</button>
+        </div>
+
+        <!-- Existing ID option -->
+        <div style="margin-top: 1rem">
+          <input
+            type="number"
+            id="manual-user-id"
+            placeholder="Enter Customer User ID"
+          />
+          <button id="fetch-customer">Fetch Customer</button>
+        </div>
+
+        <div id="name-search-results" style="margin-top: 1rem"></div>
+      </section>
+
+      <!-- Manual Order Popup -->
+      <div id="manual-order-popup" class="popup hidden card">
+        <div class="popup-content">
+          <h3>Manual Order Form</h3>
+          <form id="manual-order-form">
+            <label>First Name: <input id="firstName" required /></label>
+            <label>Last Name: <input id="lastName" required /></label>
+            <label>Email: <input id="email" required /></label>
+            <label>Phone: <input id="phone" required /></label>
+            <label>Address: <input id="billingStreetAddress" required /></label>
+            <label>City: <input id="billingCity" required /></label>
+            <label>State: <input id="billingState" required /></label>
+            <label>Zip: <input id="billingZip" required /></label>
+            <label>Country: <input id="country" required /></label>
+
+            <h4>Medicines</h4>
+            <table id="medicine-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>MG</th>
+                  <th>Qty</th>
+                  <th>Price</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <button type="button" id="add-medicine">Add Medicine</button>
+
+            <label
+              >Shipping Cost:
+              <input type="number" id="shippingCost" step="0.01"
+            /></label>
+            <label
+              >Total Cost: <input type="number" id="totalCost" step="0.01"
+            /></label>
+
+            <button type="submit">Submit Manual Order</button>
+            <button type="button" id="close-popup">Cancel</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Process Requests Section -->
+      <section id="process-requests" class="card">
+        <h2><i class="fas fa-tasks"></i> Process Requests</h2>
+        <div id="existing-products-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Serial No.</th>
+                <th>Order No.</th>
+                <th>User ID</th>
+                <th>Cost</th>
+                <th>Payment Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="order-details" class="card hidden">
+        <h2><i class="fas fa-box"></i> Order Details</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Item Name</th>
+              <th>Quantity</th>
+              <th>MG</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody id="order-details-body"></tbody>
+        </table>
+        <button id="close-details" style="margin-top: 1rem">
+          <i class="fas fa-times"></i> Close
+        </button>
+      </section>
+
+      <section id="customer-details" class="card hidden">
+        <h2><i class="fas fa-user"></i> Customer Details</h2>
+        <div id="customer-details-body"></div>
+        <button id="close-customer-details" style="margin-top: 1rem">
+          <i class="fas fa-times"></i> Close
+        </button>
+      </section>
+
+      <section id="manage-prices" class="card">
+        <h2><i class="fas fa-dollar-sign"></i> Manage Product Pricing</h2>
+        <div class="lookup">
+          <div style="flex: 1">
+            <label>Product ID:</label>
+            <input type="number" id="lookup-product-id" min="1" />
+          </div>
+          <button id="btn-load-variants">
+            <i class="fas fa-download"></i> Load Variants
+          </button>
+        </div>
+
+        <table id="variants-table" border="1" style="display: none">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Unit Type</th>
+              <th>Unit Value</th>
+              <th>QTY</th>
+              <th>Price / Pill</th>
+              <th>Price / Box</th>
+              <th>Delivery Time</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="variants-body"></tbody>
+        </table>
+
+        <button id="btn-add-new" style="display: none; margin-top: 1em">
+          <i class="fas fa-plus"></i> Add New Variant
+        </button>
+      </section>
+
+      <section id="product-form-section" class="card">
+        <h2><i class="fas fa-plus-circle"></i> Add New Product</h2>
+        <form id="product-form">
+          <div
+            style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem"
+          >
+            <div>
+              <label for="category_id">Category ID:</label>
+              <input
+                type="number"
+                id="category_id"
+                name="category_id"
+                required
+              />
+            </div>
+            <div>
+              <label for="product_name">Product Name:</label>
+              <input
+                type="text"
+                id="product_name"
+                name="product_name"
+                required
+              />
+            </div>
+          </div>
+          <label for="product_description">Product Description:</label>
+          <textarea
+            id="product_description"
+            name="product_description"
+            rows="3"
+            required
+          ></textarea>
+          <div
+            style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem"
+          >
+            <div>
+              <label for="trade_names">Trade Names:</label>
+              <input type="text" id="trade_names" name="trade_names" required />
+            </div>
+            <div>
+              <label for="manufactured_by">Manufactured By:</label>
+              <input
+                type="text"
+                id="manufactured_by"
+                name="manufactured_by"
+                required
+              />
+            </div>
+          </div>
+          <label for="ingredients">Ingredients:</label>
+          <textarea
+            id="ingredients"
+            name="ingredients"
+            rows="3"
+            required
+          ></textarea>
+          <label for="packaging_details">Packaging Details:</label>
+          <textarea
+            id="packaging_details"
+            name="packaging_details"
+            rows="3"
+            required
+          ></textarea>
+          <label for="how_to_use">How To Use:</label>
+          <textarea
+            id="how_to_use"
+            name="how_to_use"
+            rows="3"
+            required
+          ></textarea>
+          <label for="drug_interaction">Drug Interaction:</label>
+          <textarea
+            id="drug_interaction"
+            name="drug_interaction"
+            rows="3"
+            required
+          ></textarea>
+          <label for="side_effects">Side Effects:</label>
+          <textarea
+            id="side_effects"
+            name="side_effects"
+            rows="3"
+            required
+          ></textarea>
+          <label for="warnings_precautions">Warnings/Precautions:</label>
+          <textarea
+            id="warnings_precautions"
+            name="warnings_precautions"
+            rows="3"
+            required
+          ></textarea>
+          <label for="withdrawal_symptoms">Withdrawal Symptoms:</label>
+          <textarea
+            id="withdrawal_symptoms"
+            name="withdrawal_symptoms"
+            rows="3"
+            required
+          ></textarea>
+          <label for="drug_abuse">Drug Abuse:</label>
+          <textarea
+            id="drug_abuse"
+            name="drug_abuse"
+            rows="3"
+            required
+          ></textarea>
+          <label for="storages">Storage:</label>
+          <textarea id="storages" name="storage" rows="3" required></textarea>
+          <label for="primary_img">Primary Image URL:</label>
+          <input type="text" id="primary_img" name="primary_img" required />
+          <div
+            style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem"
+          >
+            <div>
+              <label for="additional_img1">Additional Image 1:</label>
+              <input type="text" id="additional_img1" name="additional_img1" />
+            </div>
+            <div>
+              <label for="additional_img2">Additional Image 2:</label>
+              <input type="text" id="additional_img2" name="additional_img2" />
+            </div>
+            <div>
+              <label for="additional_img3">Additional Image 3:</label>
+              <input type="text" id="additional_img3" name="additional_img3" />
+            </div>
+            <div>
+              <label for="additional_img4">Additional Image 4:</label>
+              <input type="text" id="additional_img4" name="additional_img4" />
+            </div>
+            <div>
+              <label for="additional_img5">Additional Image 5:</label>
+              <input type="text" id="additional_img5" name="additional_img5" />
+            </div>
+            <div>
+              <label for="additional_img6">Additional Image 6:</label>
+              <input type="text" id="additional_img6" name="additional_img6" />
+            </div>
+          </div>
+          <button type="submit">
+            <i class="fas fa-save"></i> Submit Product
+          </button>
+        </form>
+      </section>
+
+      <!-- Combined Details Modal -->
+      <div id="detailsModal" class="modal-overlay">
+        <div class="modal-container">
+          <div class="modal-header">
+            <h2><i class="fas fa-info-circle"></i> Order & Customer Details</h2>
+            <button class="modal-close" onclick="closeDetailsModal()">
+              &times;
+            </button>
+          </div>
+          <div class="modal-body" id="modalBodyContent">
+            <div class="loading-spinner">
+              <div class="spinner"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="./assets/js/empolyee.js"></script>
+</html>
