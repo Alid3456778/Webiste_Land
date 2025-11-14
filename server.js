@@ -469,6 +469,10 @@ app.get("/api/order-customer/:orderId", async (req, res) => {
 // UPDATE YOUR MODAL FUNCTION IN employee.html
 // ========================================
 
+// ========================================
+// UPDATED /api/manual-order endpoint
+// ========================================
+
 app.post("/api/manual-order", async (req, res) => {
   const {
     userId,
@@ -476,7 +480,9 @@ app.post("/api/manual-order", async (req, res) => {
     lastName,
     email,
     phone,
+    companyName,
     billingStreetAddress,
+    apartment,
     billingCity,
     billingState,
     billingZip,
@@ -492,67 +498,83 @@ app.post("/api/manual-order", async (req, res) => {
 
     let finalUserId = userId;
 
-    // ✅ If no ID or invalid, create a new customer
-    if (!finalUserId) {
-      const newCustomer = await client.query(
-        `INSERT INTO customers 
-         (first_name, last_name, email, phone, street_address, city, state, zip_code, country)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
-         RETURNING id`,
-        [firstName, lastName, email, phone, billingStreetAddress, billingCity, billingState, billingZip, country]
-      );
-      finalUserId = newCustomer.rows[0].id;
-    } else {
-      // ✅ Update existing customer info
+    // ✅ STEP 1: Check if email already exists in customers table
+    const emailCheckResult = await client.query(
+      `SELECT id FROM customers WHERE email = $1 LIMIT 1`,
+      [email]
+    );
+
+    if (emailCheckResult.rows.length > 0) {
+      // ✅ Email exists - use that customer ID and update their info
+      finalUserId = emailCheckResult.rows[0].id;
+      console.log(`✅ Found existing customer with email ${email}, ID: ${finalUserId}`);
+      
+      // Update existing customer info with latest data
       await client.query(
         `UPDATE customers SET 
-          first_name=$1, last_name=$2, email=$3, phone=$4,
-          street_address=$5, city=$6, state=$7, zip_code=$8, country=$9
-         WHERE id=$10`,
-        [firstName, lastName, email, phone, billingStreetAddress, billingCity, billingState, billingZip, country, finalUserId]
+          first_name=$1, last_name=$2, phone=$3, company_name=$4,
+          street_address=$5, apartment=$6, city=$7, state=$8, zip_code=$9, country=$10
+         WHERE id=$11`,
+        [firstName, lastName, phone, companyName || null, 
+         billingStreetAddress, apartment || null, billingCity, billingState, 
+         billingZip, country, finalUserId]
       );
+    } else {
+      // ✅ Email doesn't exist - create new customer
+      if (userId && !isNaN(userId)) {
+        // User provided an ID but email doesn't match - still create new customer
+        console.log(`⚠️ User ID ${userId} provided but email ${email} not found. Creating new customer.`);
+      }
+      
+      const newCustomer = await client.query(
+        `INSERT INTO customers 
+         (first_name, last_name, email, phone, company_name, country,
+          street_address, apartment, city, state, zip_code)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+         RETURNING id`,
+        [firstName, lastName, email, phone, companyName || null, country,
+         billingStreetAddress, apartment || null, billingCity, billingState, billingZip]
+      );
+      finalUserId = newCustomer.rows[0].id;
+      console.log(`✅ Created new customer with email ${email}, ID: ${finalUserId}`);
     }
 
-    // ✅ Create the order
+    // ✅ STEP 2: Create the order with customer snapshot
     const orderRes = await client.query(
       `INSERT INTO orders (
         user_id, total_amount, shipping,
         customer_first_name, customer_last_name, customer_email, customer_phone,
-        customer_street_address, customer_city, customer_state, customer_zip_code, customer_country
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
+        customer_company, customer_country, customer_street_address, 
+        customer_apartment, customer_city, customer_state, customer_zip_code
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
       RETURNING order_id`,
-      [finalUserId, totalCost, shippingCost, firstName, lastName, email, phone, billingStreetAddress, billingCity, billingState, billingZip, country]
+      [finalUserId, totalCost, shippingCost, 
+       firstName, lastName, email, phone, companyName || null, country,
+       billingStreetAddress, apartment || null, billingCity, billingState, billingZip]
     );
 
     const orderId = orderRes.rows[0].order_id;
 
-    // ✅ Add all medicines
+    // ✅ STEP 3: Add all order items
     for (const item of cartItems) {
       await client.query(
-        `INSERT INTO order_items (order_id, name, mg, quantity, price) VALUES ($1,$2,$3,$4,$5)`,
+        `INSERT INTO order_items (order_id, name, mg, quantity, price) 
+         VALUES ($1,$2,$3,$4,$5)`,
         [orderId, item.name, item.mg, item.quantity, item.price]
       );
     }
 
     await client.query("COMMIT");
 
-    // ✅ Send confirmation email
-    const transporter = nodemailer.createTransport({
-      host: "smtp.zoho.in",
-      port: 465,
-      secure: true,
-      auth: { user: "orderconfirmation@mclandpharma.com", pass: "YFc3HfTpMu5S" },
-    });
-
-    // Send email
+    // ✅ STEP 4: Send confirmation email
     try {
       const transporter = nodemailer.createTransport({
         host: "smtp.zoho.in",
         port: 465,
         secure: true,
-        auth: {
-          user: "orderconfirmation@mclandpharma.com",
-          pass: "YFc3HfTpMu5S",
+        auth: { 
+          user: "orderconfirmation@mclandpharma.com", 
+          pass: "YFc3HfTpMu5S" 
         },
       });
 
@@ -561,99 +583,164 @@ app.post("/api/manual-order", async (req, res) => {
         to: email,
         subject: "Order Confirmation - Mcland Pharma",
         html: `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Order Confirmation</title>
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; }
-        .header { background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 5px; }
-        .content { padding: 20px; }
-        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .total { font-weight: bold; font-size: 16px; }
-        .footer { background-color: #f8f9fa; padding: 15px; margin-top: 20px; border-radius: 5px; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>Order Confirmation - Mcland Pharma</h1>
-        <p>Thank you for your order, ${firstName} ${lastName}!</p>
-    </div>
-    <div class="content">
-        <p>Your order has been successfully placed and is being processed.</p>
-        <h2>Customer Information</h2>
-        <table>
-            <tr><td><strong>Name:</strong></td><td>${firstName} ${lastName}</td></tr>
-            <tr><td><strong>Phone:</strong></td><td>${phone}</td></tr>
-            <tr><td><strong>Email:</strong></td><td>${email}</td></tr>
-            <tr><td><strong>Address:</strong></td><td>${billingStreetAddress}, ${billingCity}, ${billingState}, ${billingZip}, ${country}</td></tr>
-            
-        </table>
-        <h2>Order Summary</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Product Name</th>
-                    <th>Strength (mg)</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${cartItems.map(item => `
-                    <tr>
-                        <td>${item.name}</td>
-                        <td>${item.mg}</td>
-                        <td>${item.quantity}</td>
-                        <td>$${parseFloat(item.price).toFixed(2)}</td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        </table>
-        <div class="total">
-            <p>Shipping Cost: $${parseFloat(shippingCost).toFixed(2)}</p>
-            <p>Total Amount: $${parseFloat(totalCost).toFixed(2)}</p>
-        </div>
-    </div>
-    <div class="footer">
-        <h3>Contact Information</h3>
-        <p><strong>Phone:</strong> +1 209 593 7171</p>
-        <p><strong>WhatsApp:</strong> +91 887 920 1044</p>
-        <p><strong>Email:</strong> customerinfo2024@gmail.com</p>
-        <p><em>This is an automated confirmation email.</em></p>
-        <p>© ${new Date().getFullYear()} Mcland Pharma. All rights reserved.</p>
-    </div>
-</body>
-</html>
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <title>Order Confirmation</title>
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; }
+                    .header { background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 5px; }
+                    .content { padding: 20px; }
+                    table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #f2f2f2; }
+                    .total { font-weight: bold; font-size: 16px; }
+                    .footer { background-color: #f8f9fa; padding: 15px; margin-top: 20px; border-radius: 5px; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>Order Confirmation - Mcland Pharma</h1>
+                    <p>Thank you for your order, ${firstName} ${lastName}!</p>
+                </div>
+                <div class="content">
+                    <p>Your order has been successfully placed and is being processed.</p>
+                    <h2>Customer Information</h2>
+                    <table>
+                        <tr><td><strong>Name:</strong></td><td>${firstName} ${lastName}</td></tr>
+                        <tr><td><strong>Phone:</strong></td><td>${phone}</td></tr>
+                        <tr><td><strong>Email:</strong></td><td>${email}</td></tr>
+                        <tr><td><strong>Address:</strong></td><td>${billingStreetAddress}, ${billingCity}, ${billingState}, ${billingZip}, ${country}</td></tr>
+                    </table>
+                    <h2>Order Summary</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Strength (mg)</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${cartItems.map(item => `
+                                <tr>
+                                    <td>${item.name}</td>
+                                    <td>${item.mg}</td>
+                                    <td>${item.quantity}</td>
+                                    <td>$${parseFloat(item.price).toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <div class="total">
+                        <p>Shipping Cost: $${parseFloat(shippingCost).toFixed(2)}</p>
+                        <p>Total Amount: $${parseFloat(totalCost).toFixed(2)}</p>
+                    </div>
+                </div>
+                <div class="footer">
+                    <h3>Contact Information</h3>
+                    <p><strong>Phone:</strong> +1 209 593 7171</p>
+                    <p><strong>WhatsApp:</strong> +91 887 920 1044</p>
+                    <p><strong>Email:</strong> customerinfo2024@gmail.com</p>
+                    <p><em>This is an automated confirmation email.</em></p>
+                    <p>© ${new Date().getFullYear()} Mcland Pharma. All rights reserved.</p>
+                </div>
+            </body>
+            </html>
         `,
       };
 
       await transporter.sendMail(mailOptions);
+      
       res.json({
         success: true,
-        message: "Order placed and email sent successfully!",
+        message: emailCheckResult.rows.length > 0 
+          ? "Order placed for existing customer! Email sent successfully!" 
+          : "New customer created and order placed! Email sent successfully!",
         orderId: orderId,
-        userId: userId
+        userId: finalUserId,
+        isNewCustomer: emailCheckResult.rows.length === 0
       });
     } catch (emailError) {
       console.error("Error sending email:", emailError);
       res.json({
         success: true,
-        message: "Order placed successfully, but email notification failed.",
+        message: emailCheckResult.rows.length > 0
+          ? "Order placed for existing customer, but email notification failed."
+          : "New customer created and order placed, but email notification failed.",
         orderId: orderId,
-        userId: userId
+        userId: finalUserId,
+        isNewCustomer: emailCheckResult.rows.length === 0
       });
     }
 
   } catch (err) {
     await client.query("ROLLBACK");
     console.error("Manual order error:", err);
-    res.status(500).json({ success: false, message: "Error creating manual order" });
+    res.status(500).json({ 
+      success: false, 
+      message: "Error creating manual order",
+      error: err.message 
+    });
   } finally {
     client.release();
+  }
+});
+
+// ========================================
+// 1️⃣ Get customer info + all orders by email
+// ========================================
+app.get("/api/customers/email/:email", async (req, res) => {
+  const { email } = req.params;
+
+  try {
+    const customerResult = await pool.query(
+      `SELECT * FROM customers WHERE email = $1`,
+      [email]
+    );
+
+    if (customerResult.rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Customer not found" });
+    }
+
+    const customer = customerResult.rows[0];
+
+    const ordersResult = await pool.query(
+      `SELECT order_id, total_amount, shipping, created_at, payment_status 
+       FROM orders WHERE user_id = $1 ORDER BY created_at DESC`,
+      [customer.id]
+    );
+
+    res.json({
+      success: true,
+      customer,
+      orders: ordersResult.rows,
+    });
+  } catch (err) {
+    console.error("Error fetching customer by email:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+
+// ========================================
+// 2️⃣ Get order items for a specific order
+// ========================================
+app.get("/api/order-items_email/:orderId", async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `SELECT name, mg, quantity, price FROM order_items WHERE order_id = $1`,
+      [orderId]
+    );
+
+    res.json({ success: true, items: result.rows });
+  } catch (err) {
+    console.error("Error fetching order items:", err);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 });
 

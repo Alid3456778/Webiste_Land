@@ -28,7 +28,7 @@ async function loadDashboardData() {
       processing = 0,
       tracking = 0,
       delivered = 0;
-      paid = 0;
+    paid = 0;
 
     orders.forEach((o) => {
       const status = o.payment_status || o.status || "pending";
@@ -528,6 +528,141 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Handle manual order creation
+// document.addEventListener("DOMContentLoaded", () => {
+//   const manualBtn = document.getElementById("fetch-customer");
+//   const manualPopup = document.getElementById("manual-order-popup");
+//   const form = document.getElementById("manual-order-form");
+//   const tbody = document.querySelector("#medicine-table tbody");
+//   const addMedicine = document.getElementById("add-medicine");
+//   const closePopup = document.getElementById("close-popup");
+
+//   let currentUserId = null;
+
+//   manualBtn.addEventListener("click", async () => {
+//     const userId = document.getElementById("manual-user-id").value.trim();
+
+//     // if no ID entered, ask to create new customer directly
+//     if (!userId) {
+//       if (
+//         confirm("No Customer ID entered. Do you want to create a new customer?")
+//       ) {
+//         openManualOrderForm(); // open blank form
+//       }
+//       return;
+//     }
+
+//     try {
+//       const res = await fetch(`/api/customers/${userId}`);
+//       if (!res.ok) {
+//         // if user not found
+//         if (
+//           confirm(
+//             "No customer found with this ID. Do you want to create a new customer?"
+//           )
+//         ) {
+//           openManualOrderForm(); // open blank form
+//         }
+//         return;
+//       }
+
+//       // if user found, prefill details
+//       const user = await res.json();
+//       currentUserId = user.id;
+
+//       openManualOrderForm(user); // prefill form with customer data
+//       document
+//         .querySelector("#manual-order-popup")
+//         .scrollIntoView({ behavior: "smooth", block: "start" });
+//     } catch (err) {
+//       alert("Error fetching user: " + err.message);
+//     }
+//   });
+
+//   // Reusable function for opening the manual order popup
+//   function openManualOrderForm(user = null) {
+//     const form = document.getElementById("manual-order-form");
+//     manualPopup.classList.remove("hidden");
+
+//     // Prefill or clear form
+//     document.getElementById("firstName").value = user ? user.first_name : "";
+//     document.getElementById("lastName").value = user ? user.last_name : "";
+//     document.getElementById("email").value = user ? user.email : "";
+//     document.getElementById("phone").value = user ? user.phone : "";
+//     document.getElementById("billingStreetAddress").value = user
+//       ? user.street_address
+//       : "";
+//     document.getElementById("billingCity").value = user ? user.city : "";
+//     document.getElementById("billingState").value = user ? user.state : "";
+//     document.getElementById("billingZip").value = user ? user.zip_code : "";
+//     document.getElementById("country").value = user ? user.country : "";
+
+//     // Reset medicine table
+//     const tbody = document.querySelector("#medicine-table tbody");
+//     tbody.innerHTML = "";
+//   }
+
+//   addMedicine.addEventListener("click", () => {
+//     const row = document.createElement("tr");
+//     row.innerHTML = `
+//       <td><input class="name" required></td>
+//       <td><input class="mg" required></td>
+//       <td><input class="qty" type="number" value="1" required></td>
+//       <td><input class="price" type="number" step="0.01" required></td>
+//       <td><button type="button" class="remove">❌</button></td>
+//         `;
+//     row.querySelector(".remove").addEventListener("click", () => row.remove());
+//     tbody.appendChild(row);
+//   });
+
+//   closePopup.addEventListener("click", () =>
+//     manualPopup.classList.add("hidden")
+//   );
+
+//   form.addEventListener("submit", async (e) => {
+//     e.preventDefault();
+//     const medicines = Array.from(tbody.querySelectorAll("tr")).map((row) => ({
+//       name: row.querySelector(".name").value,
+//       mg: row.querySelector(".mg").value,
+//       quantity: row.querySelector(".qty").value,
+//       price: row.querySelector(".price").value,
+//     }));
+
+//     const data = {
+//       userId: currentUserId,
+//       firstName: form.firstName.value,
+//       lastName: form.lastName.value,
+//       email: form.email.value,
+//       phone: form.phone.value,
+//       billingStreetAddress: form.billingStreetAddress.value,
+//       billingCity: form.billingCity.value,
+//       billingState: form.billingState.value,
+//       billingZip: form.billingZip.value,
+//       country: form.country.value,
+//       shippingCost: parseFloat(form.shippingCost.value || 0),
+//       totalCost: parseFloat(form.totalCost.value || 0),
+//       cartItems: medicines,
+//     };
+
+//     const res = await fetch("/api/manual-order", {
+//       method: "POST",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify(data),
+//     });
+
+//     const result = await res.json();
+//     if (result.success) {
+//       alert("✅ Manual order created successfully!");
+//       manualPopup.classList.add("hidden");
+//     } else {
+//       alert("❌ Error: " + result.message);
+//     }
+//   });
+// });
+
+// ========================================
+// UPDATED MANUAL ORDER FUNCTIONALITY
+// ========================================
+
 document.addEventListener("DOMContentLoaded", () => {
   const manualBtn = document.getElementById("fetch-customer");
   const manualPopup = document.getElementById("manual-order-popup");
@@ -538,52 +673,58 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentUserId = null;
 
+  // ✅ Fetch customer button click
   manualBtn.addEventListener("click", async () => {
     const userId = document.getElementById("manual-user-id").value.trim();
 
-    // if no ID entered, ask to create new customer directly
+    // ✅ If no ID entered, open blank form for new order
     if (!userId) {
-      if (
-        confirm("No Customer ID entered. Do you want to create a new customer?")
-      ) {
-        openManualOrderForm(); // open blank form
-      }
+      console.log("📝 Opening blank form for new manual order");
+      currentUserId = null;
+      openManualOrderForm(); // Open blank form
       return;
     }
 
+    // ✅ If ID is provided, try to fetch customer
     try {
       const res = await fetch(`/api/customers/${userId}`);
+
       if (!res.ok) {
-        // if user not found
+        // Customer not found with this ID
         if (
           confirm(
-            "No customer found with this ID. Do you want to create a new customer?"
+            "No customer found with this ID. Do you want to create a new order anyway?"
           )
         ) {
-          openManualOrderForm(); // open blank form
+          console.log("⚠️ Customer not found, opening blank form");
+          currentUserId = null;
+          openManualOrderForm(); // Open blank form
         }
         return;
       }
 
-      // if user found, prefill details
+      // ✅ Customer found, prefill form with their data
       const user = await res.json();
       currentUserId = user.id;
+      console.log(`✅ Customer found (ID: ${user.id}), prefilling form`);
+      openManualOrderForm(user); // Prefill form with customer data
 
-      openManualOrderForm(user); // prefill form with customer data
+      // Scroll to popup
       document
         .querySelector("#manual-order-popup")
         .scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (err) {
-      alert("Error fetching user: " + err.message);
+      console.error("Error fetching customer:", err);
+      alert("Error fetching customer: " + err.message);
     }
   });
 
-  // Reusable function for opening the manual order popup
+  // ✅ Function to open manual order form (blank or prefilled)
   function openManualOrderForm(user = null) {
-    const form = document.getElementById("manual-order-form");
     manualPopup.classList.remove("hidden");
+    manualPopup.classList.add("active");
 
-    // Prefill or clear form
+    // Prefill or clear form fields
     document.getElementById("firstName").value = user ? user.first_name : "";
     document.getElementById("lastName").value = user ? user.last_name : "";
     document.getElementById("email").value = user ? user.email : "";
@@ -597,29 +738,54 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("country").value = user ? user.country : "";
 
     // Reset medicine table
-    const tbody = document.querySelector("#medicine-table tbody");
     tbody.innerHTML = "";
+
+    // Reset cost fields
+    document.getElementById("shippingCost").value = "0";
+    document.getElementById("totalCost").value = "";
+
+    // Show helpful message
+    if (user) {
+      console.log(
+        `📋 Form prefilled for: ${user.first_name} ${user.last_name} (${user.email})`
+      );
+    } else {
+      console.log("📝 Blank form opened - will check email on submit");
+    }
   }
 
+  // ✅ Add medicine row
   addMedicine.addEventListener("click", () => {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td><input class="name" required></td>
-      <td><input class="mg" required></td>
-      <td><input class="qty" type="number" value="1" required></td>
-      <td><input class="price" type="number" step="0.01" required></td>
-      <td><button type="button" class="remove">❌</button></td>
-        `;
+      <td><input class="name" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px;" /></td>
+      <td><input class="mg" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px;" /></td>
+      <td><input class="qty" type="number" value="1" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px;" /></td>
+      <td><input class="price" type="number" step="0.01" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px;" /></td>
+      <td><button type="button" class="remove danger" style="padding: 0.5rem;">✖</button></td>
+    `;
     row.querySelector(".remove").addEventListener("click", () => row.remove());
     tbody.appendChild(row);
   });
 
-  closePopup.addEventListener("click", () =>
-    manualPopup.classList.add("hidden")
-  );
+  // ✅ Close popup
+  closePopup.addEventListener("click", () => {
+    manualPopup.classList.remove("active");
+    manualPopup.classList.add("hidden");
+  });
 
+  // ✅ Submit manual order form
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+
+    // Validate email format
+    const email = form.email.value.trim();
+    if (!email || !email.includes("@")) {
+      alert("⚠️ Please enter a valid email address");
+      return;
+    }
+
+    // Get all medicines
     const medicines = Array.from(tbody.querySelectorAll("tr")).map((row) => ({
       name: row.querySelector(".name").value,
       mg: row.querySelector(".mg").value,
@@ -627,13 +793,21 @@ document.addEventListener("DOMContentLoaded", () => {
       price: row.querySelector(".price").value,
     }));
 
+    if (medicines.length === 0) {
+      alert("⚠️ Please add at least one medicine");
+      return;
+    }
+
+    // Prepare order data
     const data = {
-      userId: currentUserId,
+      userId: currentUserId, // Will be null if new customer
       firstName: form.firstName.value,
       lastName: form.lastName.value,
-      email: form.email.value,
+      email: email,
       phone: form.phone.value,
+      companyName: form.companyName?.value || "",
       billingStreetAddress: form.billingStreetAddress.value,
+      apartment: form.apartment?.value || "",
       billingCity: form.billingCity.value,
       billingState: form.billingState.value,
       billingZip: form.billingZip.value,
@@ -643,18 +817,61 @@ document.addEventListener("DOMContentLoaded", () => {
       cartItems: medicines,
     };
 
-    const res = await fetch("/api/manual-order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
+    // Show loading state
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML =
+      '<i class="fas fa-spinner fa-spin"></i> Processing...';
 
-    const result = await res.json();
-    if (result.success) {
-      alert("✅ Manual order created successfully!");
+    try {
+      const res = await fetch("/api/manual-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        // Show success message with details
+        const msgType = result.isNewCustomer
+          ? "New customer created"
+          : "Existing customer found";
+        const successMsg = `✅ ${msgType}!\n\nOrder ID: ${result.orderId}\nCustomer ID: ${result.userId}\n\n${result.message}`;
+
+        alert(successMsg);
+        console.log("✅ Order created:", result);
+
+        // Close popup and reset form
+        manualPopup.classList.remove("active");
+        manualPopup.classList.add("hidden");
+        form.reset();
+        tbody.innerHTML = "";
+        currentUserId = null;
+
+        // Refresh dashboard if function exists
+        if (typeof loadDashboardData === "function") {
+          loadDashboardData();
+        }
+      } else {
+        throw new Error(result.message || "Failed to create order");
+      }
+    } catch (err) {
+      console.error("Error creating manual order:", err);
+      alert("❌ Error: " + err.message);
+    } finally {
+      // Restore button state
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalBtnText;
+    }
+  });
+
+  // ✅ Close popup on background click
+  manualPopup.addEventListener("click", (e) => {
+    if (e.target === manualPopup) {
+      manualPopup.classList.remove("active");
       manualPopup.classList.add("hidden");
-    } else {
-      alert("❌ Error: " + result.message);
     }
   });
 });
@@ -1572,3 +1789,640 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Escape") closeDetailsModal();
   });
 });
+
+// ========================================
+// NAVIGATION FUNCTIONALITY
+// ========================================
+
+document.addEventListener("DOMContentLoaded", function () {
+  const navItems = document.querySelectorAll(".nav-item");
+  const sections = document.querySelectorAll("section[id]");
+
+  document.documentElement.style.scrollBehavior = "smooth";
+
+  function getOptimalScrollPosition(element) {
+    const headerHeight = document.querySelector("header").offsetHeight;
+    const scrollOffset = 80;
+    const elementTop = element.offsetTop;
+    const scrollPosition = elementTop - headerHeight - scrollOffset;
+    return Math.max(0, scrollPosition);
+  }
+
+  navItems.forEach((item) => {
+    item.addEventListener("click", function (e) {
+      e.preventDefault();
+
+      navItems.forEach((nav) => {
+        nav.classList.remove("active");
+        nav.setAttribute("aria-current", "false");
+      });
+
+      this.classList.add("active");
+      this.setAttribute("aria-current", "page");
+
+      const targetId = this.getAttribute("href");
+
+      if (targetId && targetId.startsWith("#")) {
+        const targetSection = document.querySelector(targetId);
+
+        if (targetSection) {
+          sections.forEach((s) => s.classList.remove("active-section"));
+
+          const scrollPosition = getOptimalScrollPosition(targetSection);
+
+          window.scrollTo({
+            top: scrollPosition,
+            behavior: "smooth",
+          });
+
+          setTimeout(() => {
+            targetSection.classList.add("active-section");
+          }, 300);
+
+          history.pushState(null, null, targetId);
+        }
+      }
+    });
+  });
+
+  // Handle initial hash
+  const hash = window.location.hash;
+  if (hash) {
+    setTimeout(() => {
+      const targetSection = document.querySelector(hash);
+      if (targetSection) {
+        const scrollPosition = getOptimalScrollPosition(targetSection);
+        window.scrollTo({
+          top: scrollPosition,
+          behavior: "smooth",
+        });
+
+        navItems.forEach((item) => {
+          item.classList.remove("active");
+          if (item.getAttribute("href") === hash) {
+            item.classList.add("active");
+            item.setAttribute("aria-current", "page");
+          }
+        });
+      }
+    }, 100);
+  }
+
+  // Mobile sidebar toggle
+  const sidebar = document.querySelector(".sidebar");
+  const mainWrapper = document.querySelector(".main-wrapper");
+
+  if (window.innerWidth <= 768) {
+    const hamburgerBtn = document.createElement("button");
+    hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
+    hamburgerBtn.style.cssText = `
+          position: fixed;
+          top: 1rem;
+          left: 1rem;
+          width: 45px;
+          height: 45px;
+          border-radius: 8px;
+          background: var(--primary);
+          color: white;
+          border: none;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1001;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        `;
+
+    document.body.appendChild(hamburgerBtn);
+
+    hamburgerBtn.addEventListener("click", function () {
+      sidebar.classList.toggle("show");
+    });
+
+    mainWrapper.addEventListener("click", function () {
+      if (sidebar.classList.contains("show")) {
+        sidebar.classList.remove("show");
+      }
+    });
+  }
+});
+
+// ========================================
+// STATUS DROPDOWN FUNCTIONALITY
+// ========================================
+
+// Only define if not already defined in empolyee.js
+if (typeof STATUS_CONFIG === "undefined") {
+  window.STATUS_CONFIG = {
+    pending: { label: "Pending", icon: "fa-clock", class: "status-pending" },
+    paid: { label: "Paid", icon: "fa-check-circle", class: "status-paid" },
+    process: {
+      label: "Processing",
+      icon: "fa-cog",
+      class: "status-processing",
+    },
+    tracking: {
+      label: "In Transit",
+      icon: "fa-shipping-fast",
+      class: "status-tracking",
+    },
+    delivered: {
+      label: "Delivered",
+      icon: "fa-box-open",
+      class: "status-delivered",
+    },
+    completed: {
+      label: "Completed",
+      icon: "fa-check-double",
+      class: "status-cancelled",
+    },
+  };
+}
+
+// Toggle dropdown visibility - only define if not already defined
+if (typeof window.toggleStatusDropdown === "undefined") {
+  window.toggleStatusDropdown = function (button) {
+    const dropdown = button.closest(".status-dropdown");
+    const allDropdowns = document.querySelectorAll(".status-dropdown");
+
+    // Close all other dropdowns
+    allDropdowns.forEach((d) => {
+      if (d !== dropdown) d.classList.remove("active");
+    });
+
+    // Toggle current dropdown
+    dropdown.classList.toggle("active");
+  };
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".status-dropdown")) {
+    document.querySelectorAll(".status-dropdown").forEach((d) => {
+      d.classList.remove("active");
+    });
+  }
+});
+
+// Update order status - only define if not already defined
+if (typeof window.updateOrderStatus === "undefined") {
+  window.updateOrderStatus = async function (
+    orderId,
+    newStatus,
+    optionElement
+  ) {
+    const dropdown = optionElement.closest(".status-dropdown");
+    const statusBtn = dropdown.querySelector(".status-btn");
+    const currentStatus = dropdown.dataset.currentStatus;
+
+    if (currentStatus === newStatus) {
+      dropdown.classList.remove("active");
+      return;
+    }
+
+    statusBtn.disabled = true;
+    dropdown.classList.remove("active");
+
+    try {
+      const response = await fetch(`/api/orders/${orderId}/status`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus, payment_status: newStatus }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Failed to update status");
+      }
+
+      if (typeof updateStatusUI === "function") {
+        updateStatusUI(dropdown, statusBtn, newStatus);
+      }
+
+      if (typeof showToast === "function") {
+        showToast(
+          `Order #${orderId} status updated to ${
+            (window.STATUS_CONFIG || STATUS_CONFIG)[newStatus].label
+          }`,
+          "success"
+        );
+      }
+
+      if (typeof loadDashboardData === "function") {
+        loadDashboardData();
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+      if (typeof showToast === "function") {
+        showToast("Failed to update status: " + error.message, "error");
+      }
+    } finally {
+      statusBtn.disabled = false;
+    }
+  };
+}
+
+// Update status UI - only define if not already defined
+if (typeof window.updateStatusUI === "undefined") {
+  window.updateStatusUI = function (dropdown, statusBtn, newStatus) {
+    const STATUS_REF = window.STATUS_CONFIG || STATUS_CONFIG;
+    const config = STATUS_REF[newStatus];
+    statusBtn.className = `status-btn ${config.class}`;
+    statusBtn.querySelector(".status-text").textContent = config.label;
+    statusBtn.querySelector("i:first-child").className = `fas ${config.icon}`;
+    dropdown.dataset.currentStatus = newStatus;
+
+    const menu = dropdown.querySelector(".status-menu");
+    menu.querySelectorAll(".status-option").forEach((option) => {
+      option.classList.remove("current");
+    });
+    menu.querySelector(`.status-option.${newStatus}`)?.classList.add("current");
+  };
+}
+
+// Generate status dropdown HTML - only define if not already defined
+if (typeof window.generateStatusDropdown === "undefined") {
+  window.generateStatusDropdown = function (
+    orderId,
+    currentStatus = "pending"
+  ) {
+    const STATUS_REF = window.STATUS_CONFIG || STATUS_CONFIG;
+    const config = STATUS_REF[currentStatus] || STATUS_REF.pending;
+
+    return `
+          <div class="status-dropdown" data-order-id="${orderId}" data-current-status="${currentStatus}">
+            <button class="status-btn ${
+              config.class
+            }" onclick="toggleStatusDropdown(this)">
+              <span>
+                <i class="fas ${config.icon}"></i>
+                <span class="status-text">${config.label}</span>
+              </span>
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="status-menu">
+              ${Object.keys(STATUS_REF)
+                .map(
+                  (status) => `
+                <div class="status-option ${status} ${
+                    status === currentStatus ? "current" : ""
+                  }" 
+                     onclick="updateOrderStatus(${orderId}, '${status}', this)">
+                  <i class="fas ${STATUS_REF[status].icon}"></i>
+                  <span>${STATUS_REF[status].label}</span>
+                </div>
+              `
+                )
+                .join("")}
+            </div>
+          </div>
+        `;
+  };
+}
+
+// ========================================
+// TOAST NOTIFICATION
+// ========================================
+
+// Only define if not already defined in empolyee.js
+if (typeof window.showToast === "undefined") {
+  window.showToast = function (message, type = "success") {
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+          <i class="fas ${
+            type === "success" ? "fa-check-circle" : "fa-exclamation-circle"
+          }"></i>
+          <div>
+            <strong>${type === "success" ? "Success!" : "Error"}</strong>
+            <p style="margin: 4px 0 0 0; font-size: 13px; color: #6c757d;">${message}</p>
+          </div>
+        `;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.classList.add("hiding");
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  };
+}
+
+// ========================================
+// DETAILS MODAL FUNCTIONALITY
+// ========================================
+
+function closeDetailsModal() {
+  document.getElementById("detailsModal").classList.remove("active");
+}
+
+window.openDetailsModal = async function (orderId, userId) {
+  const modal = document.getElementById("detailsModal");
+  const modalBody = document.getElementById("modalBodyContent");
+  modal.classList.add("active");
+  modalBody.innerHTML =
+    '<div class="loading-spinner"><div class="spinner"></div></div>';
+
+  try {
+    const [orderItemsResponse, orderCustomerResponse] = await Promise.all([
+      fetch(`/api/order-items/${orderId}`),
+      fetch(`/api/order-customer/${orderId}`),
+    ]);
+
+    if (!orderItemsResponse.ok || !orderCustomerResponse.ok) {
+      throw new Error("Failed to fetch data");
+    }
+
+    const orderItems = await orderItemsResponse.json();
+    const customer = await orderCustomerResponse.json();
+
+    renderDetailsContent(orderItems, customer, orderId);
+  } catch (error) {
+    console.error("Error fetching details:", error);
+    modalBody.innerHTML =
+      '<div style="color: var(--danger); padding: 2rem; text-align: center;">Failed to load details. Please try again.</div>';
+  }
+};
+
+function renderDetailsContent(orderItems, customer, orderId) {
+  const modalBody = document.getElementById("modalBodyContent");
+  const total = orderItems.reduce(
+    (sum, item) => sum + parseFloat(item.price),
+    0
+  );
+
+  modalBody.innerHTML = `
+        <div class="details-grid">
+          <div class="detail-section">
+            <h3><i class="fas fa-user"></i> Customer Information</h3>
+            <div class="info-grid">
+              <div class="info-row">
+                <div class="info-label">Name:</div>
+                <div class="info-value">${customer.first_name} ${
+    customer.last_name
+  }</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label">Email:</div>
+                <div class="info-value">${customer.email}</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label">Phone:</div>
+                <div class="info-value">${customer.phone}</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label">Company:</div>
+                <div class="info-value">${customer.company_name || "N/A"}</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label">Address:</div>
+                <div class="info-value">${customer.street_address}, ${
+    customer.apartment ? customer.apartment + ", " : ""
+  }${customer.city}, ${customer.state}, ${customer.zip_code}, ${
+    customer.country
+  }</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="detail-section">
+            <h3><i class="fas fa-clipboard-list"></i> Order Summary</h3>
+            <div class="info-grid">
+              <div class="info-row">
+                <div class="info-label">Order ID:</div>
+                <div class="info-value">#${orderId}</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label">Total Items:</div>
+                <div class="info-value">${orderItems.length}</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label">Total Amount:</div>
+                <div class="info-value price">${total.toFixed(2)}</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="detail-section">
+            <h3><i class="fas fa-box-open"></i> Order Items</h3>
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th>Product Name</th>
+                  <th>Strength (mg)</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${orderItems
+                  .map(
+                    (item) => `
+                  <tr>
+                    <td>${item.name}</td>
+                    <td>${item.mg}</td>
+                    <td>${item.quantity}</td>
+                    <td class="price">${parseFloat(item.price).toFixed(2)}</td>
+                  </tr>
+                `
+                  )
+                  .join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+}
+
+// Close modal on background click
+document
+  .getElementById("detailsModal")
+  ?.addEventListener("click", function (e) {
+    if (e.target === this) closeDetailsModal();
+  });
+
+// Close modal on ESC key
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") {
+    closeDetailsModal();
+    document.getElementById("manual-order-popup")?.classList.remove("active");
+  }
+});
+
+// Add console message
+console.log("✅ Employee Dashboard initialized successfully");
+console.log("✅ Status dropdown functionality loaded");
+console.log("✅ Manual order functionality loaded");
+console.log(
+  "ℹ️  Include empolyee.js for additional features (dashboard data, customer tracking, etc.)"
+);
+
+// The following code for searching customer by email 
+// // 🔍 Search customer by email and view their info + orders
+// document.addEventListener("DOMContentLoaded", () => {
+//   const searchBtn = document.getElementById("btn-track-email");
+//   const emailInput = document.getElementById("tracking-email");
+//   const resultsDiv = document.getElementById("email-search-results");
+//   const manualBtn = document.getElementById("fetch-customer"); // existing manual order button
+//   const manualInput = document.getElementById("manual-user-id");
+
+//   searchBtn.addEventListener("click", async () => {
+//     const email = emailInput.value.trim();
+//     if (!email) {
+//       resultsDiv.innerHTML = `<p style="color:red;">⚠️ Please enter an email address.</p>`;
+//       return;
+//     }
+
+//     resultsDiv.innerHTML = `<p>🔎 Searching...</p>`;
+
+//     try {
+//       const res = await fetch(
+//         `/api/customers/email/${encodeURIComponent(email)}`
+//       );
+//       const data = await res.json();
+
+//       if (!data.success) {
+//         resultsDiv.innerHTML = `<p style="color:red;">❌ ${data.message}</p>`;
+//         return;
+//       }
+
+//       const c = data.customer;
+//       const orders = data.orders;
+
+//       let ordersHTML = orders.length
+//         ? `
+//         <table style="width:100%;border-collapse:collapse;margin-top:1rem;">
+//           <thead>
+//             <tr style="background:#222;color:#fff;">
+//               <th style="padding:8px;border:1px solid #444;">Order ID</th>
+//               <th style="padding:8px;border:1px solid #444;">Total</th>
+//               <th style="padding:8px;border:1px solid #444;">Shipping</th>
+//               <th style="padding:8px;border:1px solid #444;">Date</th>
+//               <th style="padding:8px;border:1px solid #444;">Status</th>
+//               <th style="padding:8px;border:1px solid #444;">Actions</th>
+//             </tr>
+//           </thead>
+//           <tbody>
+//             ${orders
+//               .map(
+//                 (o) => `
+//               <tr style="text-align:center;background:#fff;">
+//                 <td style="padding:6px;border:1px solid #ccc;">${
+//                   o.order_id
+//                 }</td>
+//                 <td style="padding:6px;border:1px solid #ccc;">$${
+//                   o.total_amount
+//                 }</td>
+//                 <td style="padding:6px;border:1px solid #ccc;">$${
+//                   o.shipping
+//                 }</td>
+//                 <td style="padding:6px;border:1px solid #ccc;">${new Date(
+//                   o.created_at
+//                 ).toLocaleDateString()}</td>
+//                 <td style="padding:6px;border:1px solid #ccc;">${
+//                   o.payment_status || "N/A"
+//                 }</td>
+//                 <td style="padding:6px;border:1px solid #ccc;">
+//                   <button class="view-items" data-id="${
+//                     o.order_id
+//                   }" style="padding:4px 8px;background:#007bff;color:white;border:none;border-radius:4px;cursor:pointer;">View Items</button>
+//                 </td>
+//               </tr>
+//               <tr id="items-${
+//                 o.order_id
+//               }" style="display:none;background:#f9f9f9;">
+//                 <td colspan="6" style="padding:10px;">
+//                   <div class="items-container">Loading...</div>
+//                 </td>
+//               </tr>`
+//               )
+//               .join("")}
+//           </tbody>
+//         </table>`
+//         : "<p>No orders found for this customer.</p>";
+
+//       resultsDiv.innerHTML = `
+//         <div style="background:#f8f8f8;padding:1rem;border-radius:8px;">
+//           <h3>Customer Info</h3>
+//           <p><strong>Name:</strong> ${c.first_name} ${c.last_name}</p>
+//           <p><strong>Email:</strong> ${c.email}</p>
+//           <p><strong>Phone:</strong> ${c.phone || "-"}</p>
+//           <p><strong>Address:</strong> ${c.street_address}, ${c.city}, ${
+//         c.state
+//       }, ${c.zip_code}</p>
+//           <button id="manual-order-email" style="margin-top:10px;background:#28a745;color:white;padding:6px 10px;border:none;border-radius:4px;cursor:pointer;">
+//             <i class="fas fa-plus-circle"></i> Manual Order
+//           </button>
+//           <h3 style="margin-top:1rem;">Orders</h3>
+//           ${ordersHTML}
+//         </div>`;
+
+//       // 🟢 Add manual order button click (auto-fill customer)
+//       document
+//         .getElementById("manual-order-email")
+//         .addEventListener("click", () => {
+//           manualInput.value = c.id; // auto-fill user ID
+//           manualBtn.click(); // trigger existing manual order popup
+//           document
+//             .querySelector("#manual-order-popup")
+//             .scrollIntoView({ behavior: "smooth" });
+//         });
+
+//       // 🟢 Add order item toggle functionality
+//       document.querySelectorAll(".view-items").forEach((btn) => {
+//         btn.addEventListener("click", async () => {
+//           const orderId = btn.dataset.id;
+//           const row = document.getElementById(`items-${orderId}`);
+//           const container = row.querySelector(".items-container");
+
+//           if (row.style.display === "none") {
+//             row.style.display = "table-row";
+
+//             try {
+//               const itemRes = await fetch(`/api/order-items_email/${orderId}`);
+//               const itemData = await itemRes.json();
+
+//               if (itemData.success && itemData.items.length > 0) {
+//                 container.innerHTML = `
+//                   <table style="width:100%;border-collapse:collapse;">
+//                     <thead>
+//                       <tr style="background:#eee;">
+//                         <th style="padding:5px;border:1px solid #ccc;">Name</th>
+//                         <th style="padding:5px;border:1px solid #ccc;">MG</th>
+//                         <th style="padding:5px;border:1px solid #ccc;">Qty</th>
+//                         <th style="padding:5px;border:1px solid #ccc;">Price</th>
+//                       </tr>
+//                     </thead>
+//                     <tbody>
+//                       ${itemData.items
+//                         .map(
+//                           (i) => `
+//                         <tr>
+//                           <td style="padding:5px;border:1px solid #ccc;">${i.name}</td>
+//                           <td style="padding:5px;border:1px solid #ccc;">${i.mg}</td>
+//                           <td style="padding:5px;border:1px solid #ccc;">${i.quantity}</td>
+//                           <td style="padding:5px;border:1px solid #ccc;">$${i.price}</td>
+//                         </tr>`
+//                         )
+//                         .join("")}
+//                     </tbody>
+//                   </table>`;
+//               } else {
+//                 container.innerHTML = "<p>No items found for this order.</p>";
+//               }
+//             } catch (err) {
+//               container.innerHTML =
+//                 "<p style='color:red;'>Error fetching items.</p>";
+//             }
+//           } else {
+//             row.style.display = "none";
+//           }
+//         });
+//       });
+//     } catch (err) {
+//       console.error("Error fetching customer by email:", err);
+//       resultsDiv.innerHTML = `<p style="color:red;">⚠️ Failed to fetch data.</p>`;
+//     }
+//   });
+// });

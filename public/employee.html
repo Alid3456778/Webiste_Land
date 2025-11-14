@@ -1,2158 +1,932 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Employee Dashboard - McLand Pharma</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <style>
-    :root {
-      --sidebar-width: 280px;
-      --sidebar-collapsed: 70px;
-      --sidebar-bg: #1a2332;
-      --sidebar-hover: #233044;
-      --main-bg: #f5f7fa;
-      --card-bg: #ffffff;
-      --primary: #00a8e8;
-      --primary-dark: #0077b6;
-      --success: #00c48c;
-      --warning: #ffa826;
-      --danger: #ff6b6b;
-      --text-dark: #2c3e50;
-      --text-muted: #6c757d;
-      --border-color: #e1e8ed;
-      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
-      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--main-bg);
-      color: var(--text-dark);
-      overflow-x: hidden;
-    }
-
-    /* Sidebar */
-    .sidebar {
-      position: fixed;
-      left: 0;
-      top: 0;
-      width: var(--sidebar-width);
-      height: 100vh;
-      background: var(--sidebar-bg);
-      box-shadow: var(--shadow-lg);
-      z-index: 1000;
-      overflow-y: auto;
-      transition: width 0.3s ease;
-    }
-
-    .sidebar::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .sidebar::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 3px;
-    }
-
-    .sidebar-header {
-      padding: 1.5rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .sidebar-logo {
-      width: 40px;
-      height: 40px;
-      background: var(--primary);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 1.5rem;
-    }
-
-    .sidebar-title {
-      color: white;
-      font-size: 1.1rem;
-      font-weight: 600;
-    }
-
-    .sidebar-nav {
-      padding: 1rem 0;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      padding: 0.875rem 1.5rem;
-      color: rgba(255, 255, 255, 0.7);
-      text-decoration: none;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      border-left: 3px solid transparent;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .nav-item::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 0;
-      height: 100%;
-      background: linear-gradient(90deg, rgba(0, 168, 232, 0.2), transparent);
-      transition: width 0.3s ease;
-      z-index: 0;
-    }
-
-    .nav-item:hover::before {
-      width: 100%;
-    }
-
-    .nav-item:hover {
-      background: var(--sidebar-hover);
-      color: white;
-      border-left-color: var(--primary);
-    }
-
-    .nav-item.active {
-      background: linear-gradient(90deg, rgba(0, 168, 232, 0.15), rgba(0, 168, 232, 0.05));
-      color: #ffffff;
-      border-left-color: var(--primary);
-      border-left-width: 4px;
-      font-weight: 600;
-      box-shadow: inset 0 0 20px rgba(0, 168, 232, 0.1);
-    }
-
-    .nav-item.active i {
-      color: var(--primary);
-      filter: drop-shadow(0 0 8px rgba(0, 168, 232, 0.6));
-      transform: scale(1.1);
-    }
-
-    .nav-item.active::after {
-      content: '';
-      position: absolute;
-      right: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 8px;
-      height: 8px;
-      background: var(--primary);
-      border-radius: 50%;
-      animation: pulse 2s ease-in-out infinite;
-      box-shadow: 0 0 10px var(--primary);
-    }
-
-    @keyframes pulse {
-      0%, 100% {
-        opacity: 1;
-        transform: translateY(-50%) scale(1);
-      }
-      50% {
-        opacity: 0.6;
-        transform: translateY(-50%) scale(1.2);
-      }
-    }
-
-    .nav-item i {
-      width: 24px;
-      font-size: 1.1rem;
-      margin-right: 1rem;
-      transition: all 0.3s ease;
-      position: relative;
-      z-index: 1;
-    }
-
-    .nav-item span {
-      position: relative;
-      z-index: 1;
-    }
-
-    .nav-section-title {
-      padding: 1.5rem 1.5rem 0.5rem;
-      color: rgba(255, 255, 255, 0.4);
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-weight: 600;
-    }
-
-    /* Main Wrapper */
-    .main-wrapper {
-      margin-left: var(--sidebar-width);
-      min-height: 100vh;
-      transition: margin-left 0.3s ease;
-    }
-
-    /* Header */
-    header {
-      background: var(--card-bg);
-      border-bottom: 1px solid var(--border-color);
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .header-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: var(--text-dark);
-    }
-
-    .header-subtitle {
-      font-size: 0.875rem;
-      color: var(--text-muted);
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .search-box {
-      position: relative;
-      width: 350px;
-    }
-
-    .search-box input {
-      width: 100%;
-      padding: 0.625rem 1rem 0.625rem 2.5rem;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      font-size: 0.875rem;
-      transition: all 0.2s ease;
-    }
-
-    .search-box input:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(0, 168, 232, 0.1);
-    }
-
-    .search-box i {
-      position: absolute;
-      left: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-    }
-
-    .header-btn {
-      padding: 0.625rem 1.25rem;
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .header-btn:hover {
-      background: var(--primary-dark);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-md);
-    }
-
-    /* Container */
-    .container {
-      padding: 2rem;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    .content-main {
-      width: 100%;
-    }
-
-    /* Cards */
-    .card {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      box-shadow: var(--shadow-sm);
-      border: 1px solid var(--border-color);
-      transition: all 0.2s ease;
-    }
-
-    .card:hover {
-      box-shadow: var(--shadow-md);
-    }
-
-    .card h2 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 1.5rem;
-      color: var(--text-dark);
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .card h2 i {
-      color: var(--primary);
-    }
-
-    .card h3 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      color: var(--text-dark);
-    }
-
-    .card.hidden {
-      display: none;
-    }
-
-    /* Stats Grid */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.25rem;
-      margin-bottom: 2rem;
-    }
-
-    .stat-card {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 1.5rem;
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow-sm);
-      transition: all 0.2s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 4px;
-      height: 100%;
-      background: var(--primary);
-    }
-
-    .stat-card:nth-child(1)::before { background: var(--primary); }
-    .stat-card:nth-child(2)::before { background: var(--warning); }
-    .stat-card:nth-child(3)::before { background: var(--success); }
-    .stat-card:nth-child(4)::before { background: var(--danger); }
-
-    .stat-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-md);
-    }
-
-    .stat-card h3 {
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 0.75rem;
-    }
-
-    .stat-box {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .stat-number {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--text-dark);
-    }
-
-    .stat-card i {
-      font-size: 2rem;
-      opacity: 0.15;
-    }
-
-    .stat-card:nth-child(1) i { color: var(--primary); }
-    .stat-card:nth-child(2) i { color: var(--warning); }
-    .stat-card:nth-child(3) i { color: var(--success); }
-    .stat-card:nth-child(4) i { color: var(--danger); }
-
-    /* Forms */
-    .lookup,
-    .tracking-search,
-    .name-search {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    label {
-      display: block;
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--text-dark);
-      margin-bottom: 0.5rem;
-    }
-
-    input[type="text"],
-    input[type="number"],
-    input[type="email"],
-    input[type="tel"],
-    input[type="url"],
-    textarea,
-    select {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      font-size: 0.9rem;
-      font-family: inherit;
-      transition: all 0.2s ease;
-      background: var(--card-bg);
-      color: var(--text-dark);
-    }
-
-    input:focus,
-    textarea:focus,
-    select:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(0, 168, 232, 0.1);
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 100px;
-    }
-
-    button {
-      padding: 0.75rem 1.5rem;
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    button:hover {
-      background: var(--primary-dark);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    button.secondary {
-      background: #6c757d;
-    }
-
-    button.success {
-      background: var(--success);
-    }
-
-    button.danger {
-      background: var(--danger);
-    }
-
-    button.outline {
-      background: transparent;
-      border: 2px solid var(--primary);
-      color: var(--primary);
-    }
-
-    button.outline:hover {
-      background: var(--primary);
-      color: white;
-    }
-
-    /* Tables */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-
-    thead {
-      background: var(--main-bg);
-    }
-
-    thead th {
-      padding: 1rem;
-      text-align: left;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--text-dark);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border-bottom: 2px solid var(--border-color);
-    }
-
-    tbody tr {
-      border-bottom: 1px solid var(--border-color);
-      transition: background 0.2s ease;
-    }
-
-    tbody tr:hover {
-      background: var(--main-bg);
-    }
-
-    tbody td {
-      padding: 1rem;
-      color: var(--text-dark);
-    }
-
-    .product-table,
-    .info-table {
-      background: var(--card-bg);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    /* Modal */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(4px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-      animation: fadeIn 0.2s ease;
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .modal-container {
-      background: var(--card-bg);
-      border-radius: 12px;
-      max-width: 700px;
-      width: 90%;
-      max-height: 85vh;
-      overflow-y: auto;
-      box-shadow: var(--shadow-lg);
-      animation: slideUp 0.3s ease;
-    }
-
-    @keyframes slideUp {
-      from {
-        transform: translateY(30px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    .modal-header {
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-header h2 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin: 0;
-    }
-
-    .modal-close {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-size: 1.5rem;
-      cursor: pointer;
-      padding: 0.5rem;
-      border-radius: 8px;
-      transition: all 0.2s ease;
-      width: auto;
-    }
-
-    .modal-close:hover {
-      background: var(--main-bg);
-      color: var(--text-dark);
-      transform: none;
-      box-shadow: none;
-    }
-
-    .modal-body {
-      padding: 1.5rem;
-    }
-
-    /* Loading Spinner */
-    .loading-spinner {
-      display: flex;
-      justify-content: center;
-      padding: 3rem;
-    }
-
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid var(--border-color);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .sidebar {
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-      }
-
-      .sidebar.show {
-        transform: translateX(0);
-      }
-
-      .main-wrapper {
-        margin-left: 0;
-      }
-
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .search-box {
-        width: 100%;
-      }
-
-      header {
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .lookup,
-      .tracking-search {
-        grid-template-columns: 1fr;
-      }
-
-      .container {
-        padding: 1rem;
-      }
-    }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--main-bg);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--border-color);
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--text-muted);
-    }
-
-    /* Results Display */
-    #tracking-name-results,
-    #name-search-results {
-      margin-top: 1rem;
-    }
-
-    /* Status Dropdown Styles */
-    .status-dropdown {
-      position: relative;
-      display: inline-block;
-    }
-
-    .status-btn {
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.875rem;
-      font-weight: 500;
-      transition: all 0.2s ease;
-      min-width: 140px;
-      justify-content: space-between;
-    }
-
-    .status-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .status-btn .fa-chevron-down {
-      font-size: 0.75rem;
-      transition: transform 0.2s ease;
-    }
-
-    .status-dropdown.active .status-btn .fa-chevron-down {
-      transform: rotate(180deg);
-    }
-
-    .status-pending {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .status-paid {
-      background: #d1fae5;
-      color: #065f46;
-    }
-
-    .status-processing {
-      background: #dbeafe;
-      color: #1e40af;
-    }
-
-    .status-tracking {
-      background: #e0e7ff;
-      color: #3730a3;
-    }
-
-    .status-delivered {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .status-cancelled {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .status-menu {
-      position: absolute;
-      top: calc(100% + 4px);
-      left: 0;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      min-width: 180px;
-      z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(-10px);
-      transition: all 0.2s ease;
-    }
-
-    .status-dropdown.active .status-menu {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
-
-    .status-option {
-      padding: 0.75rem 1rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      transition: background 0.2s ease;
-      font-size: 0.875rem;
-    }
-
-    .status-option:first-child {
-      border-radius: 8px 8px 0 0;
-    }
-
-    .status-option:last-child {
-      border-radius: 0 0 8px 8px;
-    }
-
-    .status-option:hover {
-      background: var(--main-bg);
-    }
-
-    .status-option.current {
-      background: var(--main-bg);
-      font-weight: 600;
-    }
-
-    .status-option i {
-      width: 16px;
-    }
-
-    .status-option.pending { color: #92400e; }
-    .status-option.paid { color: #065f46; }
-    .status-option.process { color: #1e40af; }
-    .status-option.tracking { color: #3730a3; }
-    .status-option.delivered { color: #166534; }
-    .status-option.completed { color: #991b1b; }
-
-    /* Toast Notification */
-    .toast {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      background: white;
-      padding: 1rem 1.5rem;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      z-index: 10000;
-      animation: slideInRight 0.3s ease;
-    }
-
-    .toast.success {
-      border-left: 4px solid var(--success);
-    }
-
-    .toast.error {
-      border-left: 4px solid var(--danger);
-    }
-
-    .toast.hiding {
-      animation: slideOutRight 0.3s ease;
-    }
-
-    @keyframes slideInRight {
-      from {
-        transform: translateX(400px);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-
-    @keyframes slideOutRight {
-      from {
-        transform: translateX(0);
-        opacity: 1;
-      }
-      to {
-        transform: translateX(400px);
-        opacity: 0;
-      }
-    }
-
-    /* Order Card Styles */
-    .order-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .order-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-
-    .order-number {
-      font-weight: 600;
-      color: var(--text-dark);
-    }
-
-    .order-date {
-      font-size: 0.875rem;
-      color: var(--text-muted);
-    }
-
-    .order-total {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--primary);
-    }
-
-    /* Pagination Styles */
-    #pagination {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 0.5rem;
-      margin-top: 2rem;
-      flex-wrap: wrap;
-    }
-
-    .pagination-btn {
-      padding: 0.5rem 1rem;
-      border: 1px solid var(--border-color);
-      background: white;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-size: 0.875rem;
-      color: black;
-    }
-
-    .pagination-btn:hover:not(:disabled) {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-      transform: translateY(-1px);
-    }
-
-    .pagination-btn.active {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
-
-    .pagination-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .pagination-ellipsis {
-      padding: 0.5rem;
-      color: var(--text-muted);
-    }
-
-    /* Details Grid for Modal */
-    .details-grid {
-      display: grid;
-      gap: 1.5rem;
-    }
-
-    .detail-section {
-      background: var(--main-bg);
-      padding: 1rem;
-      border-radius: 8px;
-    }
-
-    .info-grid {
-      display: grid;
-      gap: 0.75rem;
-    }
-
-    .info-row {
-      display: grid;
-      grid-template-columns: 150px 1fr;
-      gap: 1rem;
-    }
-
-    .info-label {
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-
-    .info-value {
-      color: var(--text-dark);
-    }
-
-    .items-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-
-    .items-table th,
-    .items-table td {
-      padding: 0.75rem;
-      text-align: left;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .items-table th {
-      background: white;
-      font-weight: 600;
-      font-size: 0.875rem;
-    }
-
-    .price {
-      color: var(--primary);
-      font-weight: 600;
-    }
-    
-    .varient-design{
-      overflow-x: auto;
-
-    }
-  </style>
-</head>
-
-<body>
-  <!-- Sidebar -->
-  <nav class="sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <i class="fas fa-pills"></i>
-      </div>
-      <div class="sidebar-title">McLand Pharma</div>
-    </div>
-
-    <div class="sidebar-nav">
-      <div class="nav-section-title">Main</div>
-      <a href="#dashboard" class="nav-item active">
-        <i class="fas fa-chart-line"></i>
-        <span>Dashboard</span>
-      </a>
-      <a href="#existing-products" class="nav-item">
-        <i class="fas fa-search"></i>
-        <span>Search Products</span>
-      </a>
-      <a href="#customer-tracking" class="nav-item">
-        <i class="fas fa-user"></i>
-        <span>Customer Tracking</span>
-      </a>
-      
-      <div class="nav-section-title">Actions</div>
-      <a href="#manual-order" class="nav-item">
-        <i class="fas fa-plus-circle"></i>
-        <span>Manual Order</span>
-      </a>
-      <a href="#process-requests" class="nav-item">
-        <i class="fas fa-tasks"></i>
-        <span>Process Requests</span>
-      </a>
-      
-      <div class="nav-section-title">Management</div>
-      <a href="#manage-prices" class="nav-item">
-        <i class="fas fa-dollar-sign"></i>
-        <span>Product Pricing</span>
-      </a>
-      <a href="#product-form-section" class="nav-item">
-        <i class="fas fa-box"></i>
-        <span>Add Product</span>
-      </a>
-    </div>
-  </nav>
-
-  <!-- Main Wrapper -->
-  <div class="main-wrapper">
-    <!-- Header -->
-    <header>
-      <div class="header-left">
-        <div>
-          <div class="header-title">Employee Dashboard</div>
-          <div class="header-subtitle">Welcome back, manage your operations</div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Employee Dashboard - McLand Pharma</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="./assets/css/employee.css" />
+  </head>
+
+  <body>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="fas fa-pills"></i>
         </div>
+        <div class="sidebar-title">McLand Pharma</div>
       </div>
-      <div class="header-actions">
-        <!-- <div class="search-box">
+
+      <div class="sidebar-nav">
+        <div class="nav-section-title">Main</div>
+        <a href="#dashboard" class="nav-item active">
+          <i class="fas fa-chart-line"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#existing-products" class="nav-item">
+          <i class="fas fa-search"></i>
+          <span>Search Products</span>
+        </a>
+        <a href="#customer-tracking" class="nav-item">
+          <i class="fas fa-user"></i>
+          <span>Customer Tracking</span>
+        </a>
+
+        <div class="nav-section-title">Actions</div>
+        <a href="#manual-order" class="nav-item">
+          <i class="fas fa-plus-circle"></i>
+          <span>Manual Order</span>
+        </a>
+        <a href="#process-requests" class="nav-item">
+          <i class="fas fa-tasks"></i>
+          <span>Process Requests</span>
+        </a>
+
+        <div class="nav-section-title">Management</div>
+        <a href="#manage-prices" class="nav-item">
+          <i class="fas fa-dollar-sign"></i>
+          <span>Product Pricing</span>
+        </a>
+        <a href="#product-form-section" class="nav-item">
+          <i class="fas fa-box"></i>
+          <span>Add Product</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      <!-- Header -->
+      <header>
+        <div class="header-left">
+          <div>
+            <div class="header-title">Employee Dashboard</div>
+            <div class="header-subtitle">
+              Welcome back, manage your operations
+            </div>
+          </div>
+        </div>
+        <div class="header-actions">
+          <!-- <div class="search-box">
           <i class="fas fa-search"></i>
           <input type="text" placeholder="Search..." />
         </div> -->
-        <button id="logoutBtn" class="header-btn">
-          <i class="fas fa-sign-out-alt"></i>
-          Logout
-        </button>
-      </div>
-    </header>
+          <button id="logoutBtn" class="header-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+          </button>
+        </div>
+      </header>
 
-    <!-- Main Content -->
-    <div class="content-main">
-      <div class="container">
-        
-        <!-- Dashboard Section -->
-        <section id="dashboard" class="card">
-          <h2><i class="fas fa-chart-line"></i> Dashboard Overview</h2>
-          <div class="stats-grid">
-            <div class="stat-card">
-              <h3>Clients</h3>
-              <div class="stat-box">
-                <div class="stat-number" id="clientsHandled">0</div>
-                <i class="fas fa-users"></i>
-              </div>
-            </div>
-            <div class="stat-card">
-              <h3>Payment Pending</h3>
-              <div class="stat-box">
-                <div class="stat-number" id="paymentPending">0</div>
-                <i class="fas fa-clock"></i>
-              </div>
-            </div>
-            <div class="stat-card">
-              <h3>Payment Done</h3>
-              <div class="stat-box">
-                <div class="stat-number" id="paymentDone">0</div>
-                <i class="fas fa-check-circle"></i>
-              </div>
-            </div>
-            <div class="stat-card">
-              <h3>Pending Requests</h3>
-              <div class="stat-box">
-                <div class="stat-number" id="pendingRequests">0</div>
-                <i class="fas fa-tasks"></i>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Search Products Section -->
-        <section id="existing-products" class="card">
-          <h2><i class="fas fa-search"></i> Search Product by ID or Name</h2>
-          <form id="search-form">
-            <div class="lookup">
-              <div>
-                <label for="product_id">Product ID:</label>
-                <input type="number" id="product_id" name="product_id" placeholder="Enter Product ID" />
-              </div>
-              <div>
-                <label for="product_name_2">Product Name:</label>
-                <input type="text" id="product_name_2" name="product_name_2" placeholder="Enter Product Name" />
-              </div>
-              <div style="display: flex; align-items: flex-end;">
-                <button type="submit">
-                  <i class="fas fa-search"></i> Search
-                </button>
-              </div>
-            </div>
-          </form>
-
-          <div id="result" style="display: none; margin-top: 2rem;">
-            <h3>Product Details:</h3>
-            <table class="product-table">
-              <tbody>
-                <tr><td><strong>Product ID</strong></td><td id="product-id"></td></tr>
-                <tr><td><strong>Category ID</strong></td><td id="category-id"></td></tr>
-                <tr><td><strong>Product Name</strong></td><td id="product-name"></td></tr>
-                <tr><td><strong>Description</strong></td><td id="product-description"></td></tr>
-                <tr><td><strong>Trade Names</strong></td><td id="trade-names"></td></tr>
-                <tr><td><strong>Ingredients</strong></td><td id="ingreds"></td></tr>
-                <tr><td><strong>Manufacturer</strong></td><td id="manufacturer"></td></tr>
-                <tr><td><strong>Packaging</strong></td><td id="packaging"></td></tr>
-                <tr><td><strong>Usage Instructions</strong></td><td id="usage-instructions"></td></tr>
-                <tr><td><strong>Drug Interaction</strong></td><td id="drug-interaction"></td></tr>
-                <tr><td><strong>Side Effects</strong></td><td id="side-effects"></td></tr>
-                <tr><td><strong>Safety</strong></td><td id="safety"></td></tr>
-                <tr><td><strong>Withdrawal Symptoms</strong></td><td id="withdrawal-symptoms"></td></tr>
-                <tr><td><strong>Drug Abuse</strong></td><td id="drug-abuse"></td></tr>
-                <tr><td><strong>Storage</strong></td><td id="storage"></td></tr>
-                <tr><td><strong>Primary Image</strong></td><td id="image_url"></td></tr>
-                <tr><td><strong>Stock</strong></td><td id="stocks"></td></tr>
-              </tbody>
-            </table>
-            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-              <button id="edit-button"><i class="fas fa-edit"></i> Edit</button>
-              <button id="delete-button" class="danger"><i class="fas fa-trash"></i> Delete</button>
-            </div>
-          </div>
-
-          <div id="edit-section" style="display: none; margin-top: 2rem;">
-            <h3>Edit Product</h3>
-            <form id="edit-form">
-              <div id="editable-fields"></div>
-              <button type="submit" style="margin-top: 1rem;">
-                <i class="fas fa-save"></i> Submit Changes
-              </button>
-            </form>
-          </div>
-        </section>
-
-        <!-- Customer Tracking Section -->
-        <section id="customer-tracking" class="card">
-          <h2><i class="fas fa-user-check"></i> Customer Order Tracking</h2>
-          
-          <div class="tracking-search">
-            <div style="flex: 1;">
-              <label>Search by Name:</label>
-              <div style="display: flex; gap: 0.5rem;">
-                <input type="text" id="tracking-first-name" placeholder="First Name" />
-                <input type="text" id="tracking-last-name" placeholder="Last Name (optional)" />
-                <button id="search-tracking-name">
-                  <i class="fas fa-search"></i> Search
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div id="tracking-name-results"></div>
-
-          <div class="tracking-search" style="margin-top: 1rem;">
-            <div>
-              <label for="tracking-user-id">Customer ID:</label>
-              <input type="number" id="tracking-user-id" placeholder="Enter User ID" min="1" />
-            </div>
-            <div style="display: flex; align-items: flex-end;">
-              <button id="btn-track-customer">
-                <i class="fas fa-search"></i> Track Customer
-              </button>
-            </div>
-          </div>
-
-          <div id="tracking-results" style="display: none; margin-top: 2rem;">
-            <div class="card" style="background: var(--main-bg);">
-              <h3>Customer Information</h3>
-              <table class="info-table">
-                <tr><td><strong>Customer ID:</strong></td><td id="track-customer-id"></td></tr>
-                <tr><td><strong>Name:</strong></td><td id="track-customer-name"></td></tr>
-                <tr><td><strong>Email:</strong></td><td id="track-customer-email"></td></tr>
-                <tr><td><strong>Phone:</strong></td><td id="track-customer-phone"></td></tr>
-                <tr><td><strong>Company:</strong></td><td id="track-customer-company"></td></tr>
-                <tr><td><strong>Address:</strong></td><td id="track-customer-address"></td></tr>
-              </table>
-
-              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem;">
-                <div style="background: var(--card-bg); padding: 1rem; border-radius: 8px; text-align: center;">
-                  <h4 style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Total Orders</h4>
-                  <p id="track-total-orders" style="font-size: 1.5rem; font-weight: 700; color: var(--text-dark);">0</p>
+      <!-- Main Content -->
+      <div class="content-main">
+        <div class="container">
+          <!-- Dashboard Section -->
+          <section id="dashboard" class="card">
+            <h2><i class="fas fa-chart-line"></i> Dashboard Overview</h2>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <h3>Clients</h3>
+                <div class="stat-box">
+                  <div class="stat-number" id="clientsHandled">0</div>
+                  <i class="fas fa-users"></i>
                 </div>
-                <div style="background: var(--card-bg); padding: 1rem; border-radius: 8px; text-align: center;">
-                  <h4 style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Lifetime Value</h4>
-                  <p id="track-lifetime-value" style="font-size: 1.5rem; font-weight: 700; color: var(--text-dark);">$0.00</p>
+              </div>
+              <div class="stat-card">
+                <h3>Payment Pending</h3>
+                <div class="stat-box">
+                  <div class="stat-number" id="paymentPending">0</div>
+                  <i class="fas fa-clock"></i>
+                </div>
+              </div>
+              <div class="stat-card">
+                <h3>Payment Done</h3>
+                <div class="stat-box">
+                  <div class="stat-number" id="paymentDone">0</div>
+                  <i class="fas fa-check-circle"></i>
+                </div>
+              </div>
+              <div class="stat-card">
+                <h3>Pending Requests</h3>
+                <div class="stat-box">
+                  <div class="stat-number" id="pendingRequests">0</div>
+                  <i class="fas fa-tasks"></i>
                 </div>
               </div>
             </div>
+          </section>
 
-            <h3 style="margin-top: 1.5rem;">Order History</h3>
-            <div id="orders-list" style="max-height: 500px; overflow-y: auto;"></div>
-          </div>
-        </section>
-
-        <!-- Manual Order Section -->
-        <section id="manual-order" class="card">
-          <h2><i class="fas fa-plus-circle"></i> Manual Order</h2>
-
-          <div class="name-search">
-            <input type="text" id="manual-first-name" placeholder="First Name" />
-            <input type="text" id="manual-last-name" placeholder="Last Name (optional)" />
-            <button id="search-customer-name">
-              <i class="fas fa-search"></i> Search by Name
-            </button>
-          </div>
-
-          <div id="name-search-results"></div>
-
-          <div style="margin-top: 1rem;">
-            <label for="manual-user-id">Or Enter Customer ID:</label>
-            <div style="display: flex; gap: 0.5rem;">
-              <input type="number" id="manual-user-id" placeholder="Customer User ID" style="flex: 1;" />
-              <button id="fetch-customer">
-                <i class="fas fa-search"></i> Fetch Customer
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <!-- Manual Order Popup -->
-        <div id="manual-order-popup" class="modal-overlay">
-          <div class="modal-container">
-            <div class="modal-header">
-              <h2><i class="fas fa-file-invoice"></i> Manual Order Form</h2>
-              <button class="modal-close" id="close-popup">&times;</button>
-            </div>
-            <div class="modal-body">
-              <form id="manual-order-form">
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
-                  <div>
-                    <label for="firstName">First Name:</label>
-                    <input type="text" id="firstName" required />
-                  </div>
-                  <div>
-                    <label for="lastName">Last Name:</label>
-                    <input type="text" id="lastName" required />
-                  </div>
-                  <div>
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" required />
-                  </div>
-                  <div>
-                    <label for="phone">Phone:</label>
-                    <input type="tel" id="phone" required />
-                  </div>
-                  <div style="grid-column: 1 / -1;">
-                    <label for="billingStreetAddress">Address:</label>
-                    <input type="text" id="billingStreetAddress" required />
-                  </div>
-                  <div>
-                    <label for="billingCity">City:</label>
-                    <input type="text" id="billingCity" required />
-                  </div>
-                  <div>
-                    <label for="billingState">State:</label>
-                    <input type="text" id="billingState" required />
-                  </div>
-                  <div>
-                    <label for="billingZip">Zip:</label>
-                    <input type="text" id="billingZip" required />
-                  </div>
-                  <div>
-                    <label for="country">Country:</label>
-                    <input type="text" id="country" required />
-                  </div>
+          <!-- Search Products Section -->
+          <section id="existing-products" class="card">
+            <h2><i class="fas fa-search"></i> Search Product by ID or Name</h2>
+            <form id="search-form">
+              <div class="lookup">
+                <div>
+                  <label for="product_id">Product ID:</label>
+                  <input
+                    type="number"
+                    id="product_id"
+                    name="product_id"
+                    placeholder="Enter Product ID"
+                  />
                 </div>
-
-                <h3 style="margin-top: 2rem;">Medicines</h3>
-                <table id="medicine-table" class="product-table">
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>MG</th>
-                      <th>Qty</th>
-                      <th>Price</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
-                <button type="button" id="add-medicine" class="outline" style="margin-top: 1rem;">
-                  <i class="fas fa-plus"></i> Add Medicine
-                </button>
-
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 2rem;">
-                  <div>
-                    <label for="shippingCost">Shipping Cost:</label>
-                    <input type="number" id="shippingCost" step="0.01" value="0" />
-                  </div>
-                  <div>
-                    <label for="totalCost">Total Cost:</label>
-                    <input type="number" id="totalCost" step="0.01" required />
-                  </div>
+                <div>
+                  <label for="product_name_2">Product Name:</label>
+                  <input
+                    type="text"
+                    id="product_name_2"
+                    name="product_name_2"
+                    placeholder="Enter Product Name"
+                  />
                 </div>
-
-                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                  <button type="submit" class="success">
-                    <i class="fas fa-save"></i> Submit Manual Order
+                <div style="display: flex; align-items: flex-end">
+                  <button type="submit">
+                    <i class="fas fa-search"></i> Search
                   </button>
                 </div>
+              </div>
+            </form>
+
+            <div id="result" style="display: none; margin-top: 2rem">
+              <h3>Product Details:</h3>
+              <table class="product-table">
+                <tbody>
+                  <tr>
+                    <td><strong>Product ID</strong></td>
+                    <td id="product-id"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Category ID</strong></td>
+                    <td id="category-id"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Product Name</strong></td>
+                    <td id="product-name"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Description</strong></td>
+                    <td id="product-description"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Trade Names</strong></td>
+                    <td id="trade-names"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Ingredients</strong></td>
+                    <td id="ingreds"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Manufacturer</strong></td>
+                    <td id="manufacturer"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Packaging</strong></td>
+                    <td id="packaging"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Usage Instructions</strong></td>
+                    <td id="usage-instructions"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Drug Interaction</strong></td>
+                    <td id="drug-interaction"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Side Effects</strong></td>
+                    <td id="side-effects"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Safety</strong></td>
+                    <td id="safety"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Withdrawal Symptoms</strong></td>
+                    <td id="withdrawal-symptoms"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Drug Abuse</strong></td>
+                    <td id="drug-abuse"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Storage</strong></td>
+                    <td id="storage"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Primary Image</strong></td>
+                    <td id="image_url"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Stock</strong></td>
+                    <td id="stocks"></td>
+                  </tr>
+                </tbody>
+              </table>
+              <div style="display: flex; gap: 1rem; margin-top: 1.5rem">
+                <button id="edit-button">
+                  <i class="fas fa-edit"></i> Edit
+                </button>
+                <button id="delete-button" class="danger">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </div>
+            </div>
+
+            <div id="edit-section" style="display: none; margin-top: 2rem">
+              <h3>Edit Product</h3>
+              <form id="edit-form">
+                <div id="editable-fields"></div>
+                <button type="submit" style="margin-top: 1rem">
+                  <i class="fas fa-save"></i> Submit Changes
+                </button>
               </form>
             </div>
-          </div>
-        </div>
+          </section>
 
-        <!-- Process Requests Section -->
-        <section id="process-requests" class="card">
-          <h2><i class="fas fa-tasks"></i> Process Requests</h2>
-          <div id="existing-products-table">
+          <!-- Customer Tracking Section -->
+          <section id="customer-tracking" class="card">
+            <h2><i class="fas fa-user-check"></i> Customer Order Tracking</h2>
+
+            <div class="tracking-search">
+              <div style="flex: 1">
+                <label>Search by Name:</label>
+                <div style="display: flex; gap: 0.5rem">
+                  <input
+                    type="text"
+                    id="tracking-first-name"
+                    placeholder="First Name"
+                  />
+                  <input
+                    type="text"
+                    id="tracking-last-name"
+                    placeholder="Last Name (optional)"
+                  />
+                  <button id="search-tracking-name">
+                    <i class="fas fa-search"></i> Search
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div id="tracking-name-results"></div>
+
+            <div class="tracking-search" style="margin-top: 1rem">
+              <div>
+                <label for="tracking-user-id">Customer ID:</label>
+                <input
+                  type="number"
+                  id="tracking-user-id"
+                  placeholder="Enter User ID"
+                  min="1"
+                />
+              </div>
+              <div style="display: flex; align-items: flex-end">
+                <button id="btn-track-customer">
+                  <i class="fas fa-search"></i> Track Customer
+                </button>
+              </div>
+            </div>
+
+            <div id="tracking-results" style="display: none; margin-top: 2rem">
+              <div class="card" style="background: var(--main-bg)">
+                <h3>Customer Information</h3>
+                <table class="info-table">
+                  <tr>
+                    <td><strong>Customer ID:</strong></td>
+                    <td id="track-customer-id"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Name:</strong></td>
+                    <td id="track-customer-name"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Email:</strong></td>
+                    <td id="track-customer-email"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Phone:</strong></td>
+                    <td id="track-customer-phone"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Company:</strong></td>
+                    <td id="track-customer-company"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Address:</strong></td>
+                    <td id="track-customer-address"></td>
+                  </tr>
+                </table>
+
+                <div
+                  style="
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 1rem;
+                    margin-top: 1rem;
+                  "
+                >
+                  <div
+                    style="
+                      background: var(--card-bg);
+                      padding: 1rem;
+                      border-radius: 8px;
+                      text-align: center;
+                    "
+                  >
+                    <h4
+                      style="
+                        font-size: 0.875rem;
+                        color: var(--text-muted);
+                        margin-bottom: 0.5rem;
+                      "
+                    >
+                      Total Orders
+                    </h4>
+                    <p
+                      id="track-total-orders"
+                      style="
+                        font-size: 1.5rem;
+                        font-weight: 700;
+                        color: var(--text-dark);
+                      "
+                    >
+                      0
+                    </p>
+                  </div>
+                  <div
+                    style="
+                      background: var(--card-bg);
+                      padding: 1rem;
+                      border-radius: 8px;
+                      text-align: center;
+                    "
+                  >
+                    <h4
+                      style="
+                        font-size: 0.875rem;
+                        color: var(--text-muted);
+                        margin-bottom: 0.5rem;
+                      "
+                    >
+                      Lifetime Value
+                    </h4>
+                    <p
+                      id="track-lifetime-value"
+                      style="
+                        font-size: 1.5rem;
+                        font-weight: 700;
+                        color: var(--text-dark);
+                      "
+                    >
+                      $0.00
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <h3 style="margin-top: 1.5rem">Order History</h3>
+              <div
+                id="orders-list"
+                style="max-height: 500px; overflow-y: auto"
+              ></div>
+            </div>
+          </section>
+
+          <!-- this code is for customer search by email and related order info  -->
+          <!-- Search by Email -->
+          <!-- <div class="tracking-search" style="margin-top: 1rem">
+            <label for="tracking-email">Search by Email:</label>
+            <div style="display: flex; gap: 0.5rem">
+              <input
+                type="email"
+                id="tracking-email"
+                placeholder="Enter customer email"
+                style="flex: 1"
+              />
+              <button id="btn-track-email">
+                <i class="fas fa-search"></i> Search by Email
+              </button>
+            </div>
+          </div> -->
+
+          <div id="email-search-results" style="margin-top: 1.5rem"></div>
+
+          <script>
+            
+          </script>
+
+          <!-- Manual Order Section -->
+          <section id="manual-order" class="card">
+            <h2><i class="fas fa-plus-circle"></i> Manual Order</h2>
+
+            <div class="name-search">
+              <input
+                type="text"
+                id="manual-first-name"
+                placeholder="First Name"
+              />
+              <input
+                type="text"
+                id="manual-last-name"
+                placeholder="Last Name (optional)"
+              />
+              <button id="search-customer-name">
+                <i class="fas fa-search"></i> Search by Name
+              </button>
+            </div>
+
+            <div id="name-search-results"></div>
+
+            <div style="margin-top: 1rem">
+              <label for="manual-user-id">Or Enter Customer ID:</label>
+              <div style="display: flex; gap: 0.5rem">
+                <input
+                  type="number"
+                  id="manual-user-id"
+                  placeholder="Customer User ID"
+                  style="flex: 1"
+                />
+                <button id="fetch-customer">
+                  <i class="fas fa-search"></i> Fetch Customer
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Manual Order Popup -->
+          <div id="manual-order-popup" class="modal-overlay">
+            <div class="modal-container">
+              <div class="modal-header">
+                <h2><i class="fas fa-file-invoice"></i> Manual Order Form</h2>
+                <button class="modal-close" id="close-popup">&times;</button>
+              </div>
+              <div class="modal-body">
+                <form id="manual-order-form">
+                  <div
+                    style="
+                      display: grid;
+                      grid-template-columns: repeat(2, 1fr);
+                      gap: 1rem;
+                    "
+                  >
+                    <div>
+                      <label for="firstName">First Name:</label>
+                      <input type="text" id="firstName" required />
+                    </div>
+                    <div>
+                      <label for="lastName">Last Name:</label>
+                      <input type="text" id="lastName" required />
+                    </div>
+                    <div>
+                      <label for="email">Email:</label>
+                      <input type="email" id="email" required />
+                    </div>
+                    <div>
+                      <label for="phone">Phone:</label>
+                      <input type="tel" id="phone" required />
+                    </div>
+                    <div style="grid-column: 1 / -1">
+                      <label for="billingStreetAddress">Address:</label>
+                      <input type="text" id="billingStreetAddress" required />
+                    </div>
+                    <div>
+                      <label for="billingCity">City:</label>
+                      <input type="text" id="billingCity" required />
+                    </div>
+                    <div>
+                      <label for="billingState">State:</label>
+                      <input type="text" id="billingState" required />
+                    </div>
+                    <div>
+                      <label for="billingZip">Zip:</label>
+                      <input type="text" id="billingZip" required />
+                    </div>
+                    <div>
+                      <label for="country">Country:</label>
+                      <input type="text" id="country" required />
+                    </div>
+                  </div>
+
+                  <h3 style="margin-top: 2rem">Medicines</h3>
+                  <table id="medicine-table" class="product-table">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>MG</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                  <button
+                    type="button"
+                    id="add-medicine"
+                    class="outline"
+                    style="margin-top: 1rem"
+                  >
+                    <i class="fas fa-plus"></i> Add Medicine
+                  </button>
+
+                  <div
+                    style="
+                      display: grid;
+                      grid-template-columns: repeat(2, 1fr);
+                      gap: 1rem;
+                      margin-top: 2rem;
+                    "
+                  >
+                    <div>
+                      <label for="shippingCost">Shipping Cost:</label>
+                      <input
+                        type="number"
+                        id="shippingCost"
+                        step="0.01"
+                        value="0"
+                      />
+                    </div>
+                    <div>
+                      <label for="totalCost">Total Cost:</label>
+                      <input
+                        type="number"
+                        id="totalCost"
+                        step="0.01"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div style="display: flex; gap: 1rem; margin-top: 2rem">
+                    <button type="submit" class="success">
+                      <i class="fas fa-save"></i> Submit Manual Order
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Process Requests Section -->
+          <section id="process-requests" class="card">
+            <h2><i class="fas fa-tasks"></i> Process Requests</h2>
+            <div id="existing-products-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Serial No.</th>
+                    <th>Order No.</th>
+                    <th>User ID</th>
+                    <th>Cost</th>
+                    <th>Payment Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Order Details Section -->
+          <section id="order-details" class="card hidden">
+            <h2><i class="fas fa-box"></i> Order Details</h2>
             <table>
               <thead>
                 <tr>
-                  <th>Serial No.</th>
-                  <th>Order No.</th>
-                  <th>User ID</th>
-                  <th>Cost</th>
-                  <th>Payment Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- Order Details Section -->
-        <section id="order-details" class="card hidden">
-          <h2><i class="fas fa-box"></i> Order Details</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Item Name</th>
-                <th>Quantity</th>
-                <th>MG</th>
-                <th>Price</th>
-              </tr>
-            </thead>
-            <tbody id="order-details-body"></tbody>
-          </table>
-          <button id="close-details" style="margin-top: 1rem;">
-            <i class="fas fa-times"></i> Close
-          </button>
-        </section>
-
-        <!-- Customer Details Section -->
-        <section id="customer-details" class="card hidden">
-          <h2><i class="fas fa-user"></i> Customer Details</h2>
-          <div id="customer-details-body"></div>
-          <button id="close-customer-details" style="margin-top: 1rem;">
-            <i class="fas fa-times"></i> Close
-          </button>
-        </section>
-
-        <!-- Manage Prices Section -->
-        <section id="manage-prices" class="card">
-          <h2><i class="fas fa-dollar-sign"></i> Manage Product Pricing</h2>
-          <div class="lookup">
-            <div style="flex: 1;">
-              <label for="lookup-product-id">Product ID:</label>
-              <input type="number" id="lookup-product-id" min="1" placeholder="Enter Product ID" />
-            </div>
-            <div style="display: flex; align-items: flex-end;">
-              <button id="btn-load-variants">
-                <i class="fas fa-download"></i> Load Variants
-              </button>
-            </div>
-          </div>
-
-          <div class="varient-design">
-          <table id="variants-table"  border="1" style="display: none; margin-top: 1rem;">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Unit Type</th>
-                <th>Unit Value</th>
-                <th>QTY</th>
-                <th>Price / Pill</th>
-                <th>Price / Box</th>
-                <th>Delivery Time</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="variants-body"></tbody>
-          </table>
-          </div>
-
-          <button id="btn-add-new" class="outline" style="display: none; margin-top: 1rem;">
-            <i class="fas fa-plus"></i> Add New Variant
-          </button>
-        </section>
-
-        <!-- Add Product Section -->
-        <section id="product-form-section" class="card">
-          <h2><i class="fas fa-plus-circle"></i> Add New Product</h2>
-          <form id="product-form">
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
-              <div>
-                <label for="category_id">Category ID:</label>
-                <input type="number" id="category_id" name="category_id" required />
-              </div>
-              <div>
-                <label for="product_name">Product Name:</label>
-                <input type="text" id="product_name" name="product_name" required />
-              </div>
-            </div>
-            
-            <div style="margin-top: 1rem;">
-              <label for="product_description">Product Description:</label>
-              <textarea id="product_description" name="product_description" rows="3" required></textarea>
-            </div>
-
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem;">
-              <div>
-                <label for="trade_names">Trade Names:</label>
-                <input type="text" id="trade_names" name="trade_names" required />
-              </div>
-              <div>
-                <label for="manufactured_by">Manufactured By:</label>
-                <input type="text" id="manufactured_by" name="manufactured_by" required />
-              </div>
-            </div>
-
-            <div style="margin-top: 1rem;">
-              <label for="ingredients">Ingredients:</label>
-              <textarea id="ingredients" name="ingredients" rows="3" required></textarea>
-            </div>
-
-            <div style="margin-top: 1rem;">
-              <label for="packaging_details">Packaging Details:</label>
-              <textarea id="packaging_details" name="packaging_details" rows="3" required></textarea>
-            </div>
-
-            <div style="margin-top: 1rem;">
-              <label for="how_to_use">How To Use:</label>
-              <textarea id="how_to_use" name="how_to_use" rows="3" required></textarea>
-            </div>
-
-            <div style="margin-top: 1rem;">
-              <label for="drug_interaction">Drug Interaction:</label>
-              <textarea id="drug_interaction" name="drug_interaction" rows="3" required></textarea>
-            </div>
-
-            <div style="margin-top: 1rem;">
-              <label for="side_effects">Side Effects:</label>
-              <textarea id="side_effects" name="side_effects" rows="3" required></textarea>
-            </div>
-
-            <div style="margin-top: 1rem;">
-              <label for="warnings_precautions">Warnings/Precautions:</label>
-              <textarea id="warnings_precautions" name="warnings_precautions" rows="3" required></textarea>
-            </div>
-
-            <div style="margin-top: 1rem;">
-              <label for="withdrawal_symptoms">Withdrawal Symptoms:</label>
-              <textarea id="withdrawal_symptoms" name="withdrawal_symptoms" rows="3" required></textarea>
-            </div>
-
-            <div style="margin-top: 1rem;">
-              <label for="drug_abuse">Drug Abuse:</label>
-              <textarea id="drug_abuse" name="drug_abuse" rows="3" required></textarea>
-            </div>
-
-            <div style="margin-top: 1rem;">
-              <label for="storages">Storage:</label>
-              <textarea id="storages" name="storage" rows="3" required></textarea>
-            </div>
-
-            <div style="margin-top: 1rem;">
-              <label for="primary_img">Primary Image URL:</label>
-              <input type="text" id="primary_img" name="primary_img" required />
-            </div>
-
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem;">
-              <div>
-                <label for="addtional-img1">Additional Image 1:</label>
-                <input type="text" id="addtional-img1" name="additional_img1" />
-              </div>
-              <div>
-                <label for="addtional-img2">Additional Image 2:</label>
-                <input type="text" id="addtional-img2" name="additional_img2" />
-              </div>
-              <div>
-                <label for="additional_img3">Additional Image 3:</label>
-                <input type="text" id="addtional-img3" name="additional_img3" />
-              </div>
-              <div>
-                <label for="additional_img4">Additional Image 4:</label>
-                <input type="text" id="addtional-img4" name="additional_img4" />
-              </div>
-              <div>
-                <label for="additional_img5">Additional Image 5:</label>
-                <input type="text" id="addtional-img5" name="additional_img5" />
-              </div>
-              <div>
-                <label for="additional_img6">Additional Image 6:</label>
-                <input type="text" id="addtional-img6" name="additional_img6" />
-              </div>
-            </div>
-
-            <button type="submit" style="margin-top: 2rem;">
-              <i class="fas fa-save"></i> Submit Product
-            </button>
-          </form>
-        </section>
-
-        <!-- Details Modal -->
-        <div id="detailsModal" class="modal-overlay">
-          <div class="modal-container">
-            <div class="modal-header">
-              <h2><i class="fas fa-info-circle"></i> Order & Customer Details</h2>
-              <button class="modal-close" onclick="closeDetailsModal()">&times;</button>
-            </div>
-            <div class="modal-body" id="modalBodyContent">
-              <div class="loading-spinner">
-                <div class="spinner"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // ========================================
-    // CORE INITIALIZATION
-    // ========================================
-    
-    // Check if employee is logged in
-    document.addEventListener("DOMContentLoaded", () => {
-      const isLoggedIn = localStorage.getItem("employeeLoggedIn");
-      if (isLoggedIn !== "true") {
-        // Comment out for testing: window.location.href = "employee-login.html";
-        console.log('⚠️ Not logged in - redirecting to login page');
-        // return;
-      }
-    });
-
-    // Logout functionality
-    document.getElementById("logoutBtn")?.addEventListener("click", () => {
-      localStorage.removeItem("employeeLoggedIn");
-      localStorage.removeItem("employeeId");
-      window.location.href = "employee-login.html";
-    });
-
-    // ========================================
-    // NAVIGATION FUNCTIONALITY
-    // ========================================
-    
-    document.addEventListener('DOMContentLoaded', function() {
-      const navItems = document.querySelectorAll('.nav-item');
-      const sections = document.querySelectorAll('section[id]');
-      
-      document.documentElement.style.scrollBehavior = 'smooth';
-      
-      function getOptimalScrollPosition(element) {
-        const headerHeight = document.querySelector('header').offsetHeight;
-        const scrollOffset = 80;
-        const elementTop = element.offsetTop;
-        const scrollPosition = elementTop - headerHeight - scrollOffset;
-        return Math.max(0, scrollPosition);
-      }
-      
-      navItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-          e.preventDefault();
-          
-          navItems.forEach(nav => {
-            nav.classList.remove('active');
-            nav.setAttribute('aria-current', 'false');
-          });
-          
-          this.classList.add('active');
-          this.setAttribute('aria-current', 'page');
-          
-          const targetId = this.getAttribute('href');
-          
-          if (targetId && targetId.startsWith('#')) {
-            const targetSection = document.querySelector(targetId);
-            
-            if (targetSection) {
-              sections.forEach(s => s.classList.remove('active-section'));
-              
-              const scrollPosition = getOptimalScrollPosition(targetSection);
-              
-              window.scrollTo({
-                top: scrollPosition,
-                behavior: 'smooth'
-              });
-              
-              setTimeout(() => {
-                targetSection.classList.add('active-section');
-              }, 300);
-              
-              history.pushState(null, null, targetId);
-            }
-          }
-        });
-      });
-
-      // Handle initial hash
-      const hash = window.location.hash;
-      if (hash) {
-        setTimeout(() => {
-          const targetSection = document.querySelector(hash);
-          if (targetSection) {
-            const scrollPosition = getOptimalScrollPosition(targetSection);
-            window.scrollTo({
-              top: scrollPosition,
-              behavior: 'smooth'
-            });
-            
-            navItems.forEach(item => {
-              item.classList.remove('active');
-              if (item.getAttribute('href') === hash) {
-                item.classList.add('active');
-                item.setAttribute('aria-current', 'page');
-              }
-            });
-          }
-        }, 100);
-      }
-
-      // Mobile sidebar toggle
-      const sidebar = document.querySelector('.sidebar');
-      const mainWrapper = document.querySelector('.main-wrapper');
-      
-      if (window.innerWidth <= 768) {
-        const hamburgerBtn = document.createElement('button');
-        hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
-        hamburgerBtn.style.cssText = `
-          position: fixed;
-          top: 1rem;
-          left: 1rem;
-          width: 45px;
-          height: 45px;
-          border-radius: 8px;
-          background: var(--primary);
-          color: white;
-          border: none;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1001;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        `;
-        
-        document.body.appendChild(hamburgerBtn);
-        
-        hamburgerBtn.addEventListener('click', function() {
-          sidebar.classList.toggle('show');
-        });
-        
-        mainWrapper.addEventListener('click', function() {
-          if (sidebar.classList.contains('show')) {
-            sidebar.classList.remove('show');
-          }
-        });
-      }
-    });
-
-    // ========================================
-    // STATUS DROPDOWN FUNCTIONALITY
-    // ========================================
-    
-    // Only define if not already defined in empolyee.js
-    if (typeof STATUS_CONFIG === 'undefined') {
-      window.STATUS_CONFIG = {
-        pending: { label: "Pending", icon: "fa-clock", class: "status-pending" },
-        paid: { label: "Paid", icon: "fa-check-circle", class: "status-paid" },
-        process: { label: "Processing", icon: "fa-cog", class: "status-processing" },
-        tracking: { label: "In Transit", icon: "fa-shipping-fast", class: "status-tracking" },
-        delivered: { label: "Delivered", icon: "fa-box-open", class: "status-delivered" },
-        completed: { label: "Completed", icon: "fa-check-double", class: "status-cancelled" }
-      };
-    }
-
-    // Toggle dropdown visibility - only define if not already defined
-    if (typeof window.toggleStatusDropdown === 'undefined') {
-      window.toggleStatusDropdown = function(button) {
-        const dropdown = button.closest('.status-dropdown');
-        const allDropdowns = document.querySelectorAll('.status-dropdown');
-        
-        // Close all other dropdowns
-        allDropdowns.forEach(d => {
-          if (d !== dropdown) d.classList.remove('active');
-        });
-        
-        // Toggle current dropdown
-        dropdown.classList.toggle('active');
-      };
-    }
-
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.status-dropdown')) {
-        document.querySelectorAll('.status-dropdown').forEach(d => {
-          d.classList.remove('active');
-        });
-      }
-    });
-
-    // Update order status - only define if not already defined
-    if (typeof window.updateOrderStatus === 'undefined') {
-      window.updateOrderStatus = async function(orderId, newStatus, optionElement) {
-        const dropdown = optionElement.closest('.status-dropdown');
-        const statusBtn = dropdown.querySelector('.status-btn');
-        const currentStatus = dropdown.dataset.currentStatus;
-        
-        if (currentStatus === newStatus) {
-          dropdown.classList.remove('active');
-          return;
-        }
-        
-        statusBtn.disabled = true;
-        dropdown.classList.remove('active');
-        
-        try {
-          const response = await fetch(`/api/orders/${orderId}/status`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: newStatus, payment_status: newStatus })
-          });
-          
-          const result = await response.json();
-          
-          if (!response.ok || !result.success) {
-            throw new Error(result.message || 'Failed to update status');
-          }
-          
-          if (typeof updateStatusUI === 'function') {
-            updateStatusUI(dropdown, statusBtn, newStatus);
-          }
-          
-          if (typeof showToast === 'function') {
-            showToast(`Order #${orderId} status updated to ${(window.STATUS_CONFIG || STATUS_CONFIG)[newStatus].label}`, 'success');
-          }
-          
-          if (typeof loadDashboardData === 'function') {
-            loadDashboardData();
-          }
-        } catch (error) {
-          console.error('Error updating status:', error);
-          if (typeof showToast === 'function') {
-            showToast('Failed to update status: ' + error.message, 'error');
-          }
-        } finally {
-          statusBtn.disabled = false;
-        }
-      };
-    }
-
-    // Update status UI - only define if not already defined
-    if (typeof window.updateStatusUI === 'undefined') {
-      window.updateStatusUI = function(dropdown, statusBtn, newStatus) {
-        const STATUS_REF = window.STATUS_CONFIG || STATUS_CONFIG;
-        const config = STATUS_REF[newStatus];
-        statusBtn.className = `status-btn ${config.class}`;
-        statusBtn.querySelector('.status-text').textContent = config.label;
-        statusBtn.querySelector('i:first-child').className = `fas ${config.icon}`;
-        dropdown.dataset.currentStatus = newStatus;
-        
-        const menu = dropdown.querySelector('.status-menu');
-        menu.querySelectorAll('.status-option').forEach(option => {
-          option.classList.remove('current');
-        });
-        menu.querySelector(`.status-option.${newStatus}`)?.classList.add('current');
-      };
-    }
-
-    // Generate status dropdown HTML - only define if not already defined
-    if (typeof window.generateStatusDropdown === 'undefined') {
-      window.generateStatusDropdown = function(orderId, currentStatus = 'pending') {
-        const STATUS_REF = window.STATUS_CONFIG || STATUS_CONFIG;
-        const config = STATUS_REF[currentStatus] || STATUS_REF.pending;
-        
-        return `
-          <div class="status-dropdown" data-order-id="${orderId}" data-current-status="${currentStatus}">
-            <button class="status-btn ${config.class}" onclick="toggleStatusDropdown(this)">
-              <span>
-                <i class="fas ${config.icon}"></i>
-                <span class="status-text">${config.label}</span>
-              </span>
-              <i class="fas fa-chevron-down"></i>
-            </button>
-            <div class="status-menu">
-              ${Object.keys(STATUS_REF).map(status => `
-                <div class="status-option ${status} ${status === currentStatus ? 'current' : ''}" 
-                     onclick="updateOrderStatus(${orderId}, '${status}', this)">
-                  <i class="fas ${STATUS_REF[status].icon}"></i>
-                  <span>${STATUS_REF[status].label}</span>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `;
-      };
-    }
-
-    // ========================================
-    // TOAST NOTIFICATION
-    // ========================================
-    
-    // Only define if not already defined in empolyee.js
-    if (typeof window.showToast === 'undefined') {
-      window.showToast = function(message, type = 'success') {
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.innerHTML = `
-          <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-          <div>
-            <strong>${type === 'success' ? 'Success!' : 'Error'}</strong>
-            <p style="margin: 4px 0 0 0; font-size: 13px; color: #6c757d;">${message}</p>
-          </div>
-        `;
-        
-        document.body.appendChild(toast);
-        
-        setTimeout(() => {
-          toast.classList.add('hiding');
-          setTimeout(() => toast.remove(), 300);
-        }, 3000);
-      };
-    }
-
-    // ========================================
-    // MANUAL ORDER FUNCTIONALITY
-    // ========================================
-    
-    document.addEventListener('DOMContentLoaded', () => {
-      const manualPopup = document.getElementById('manual-order-popup');
-      const closePopupBtn = document.getElementById('close-popup');
-      const fetchCustomerBtn = document.getElementById('fetch-customer');
-      const addMedicineBtn = document.getElementById('add-medicine');
-      const manualOrderForm = document.getElementById('manual-order-form');
-      
-      let currentUserId = null;
-
-      // Close popup
-      closePopupBtn?.addEventListener('click', () => {
-        manualPopup.classList.remove('active');
-      });
-
-      // Close on background click
-      manualPopup?.addEventListener('click', (e) => {
-        if (e.target === manualPopup) {
-          manualPopup.classList.remove('active');
-        }
-      });
-
-      // Fetch customer
-      fetchCustomerBtn?.addEventListener('click', async () => {
-        const userId = document.getElementById('manual-user-id').value.trim();
-        
-        if (!userId) {
-          if (confirm('No Customer ID entered. Do you want to create a new customer?')) {
-            openManualOrderForm();
-          }
-          return;
-        }
-        
-        try {
-          const res = await fetch(`/api/customers/${userId}`);
-          if (!res.ok) {
-            if (confirm('No customer found with this ID. Do you want to create a new customer?')) {
-              openManualOrderForm();
-            }
-            return;
-          }
-          
-          const user = await res.json();
-          currentUserId = user.id;
-          openManualOrderForm(user);
-        } catch (err) {
-          showToast('Error fetching user: ' + err.message, 'error');
-        }
-      });
-
-      // Open manual order form
-      function openManualOrderForm(user = null) {
-        manualPopup.classList.add('active');
-        
-        document.getElementById('firstName').value = user ? user.first_name : '';
-        document.getElementById('lastName').value = user ? user.last_name : '';
-        document.getElementById('email').value = user ? user.email : '';
-        document.getElementById('phone').value = user ? user.phone : '';
-        document.getElementById('billingStreetAddress').value = user ? user.street_address : '';
-        document.getElementById('billingCity').value = user ? user.city : '';
-        document.getElementById('billingState').value = user ? user.state : '';
-        document.getElementById('billingZip').value = user ? user.zip_code : '';
-        document.getElementById('country').value = user ? user.country : '';
-        
-        const tbody = document.querySelector('#medicine-table tbody');
-        tbody.innerHTML = '';
-      }
-
-      // Add medicine row
-      addMedicineBtn?.addEventListener('click', () => {
-        const tbody = document.querySelector('#medicine-table tbody');
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td><input class="name" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px;" /></td>
-          <td><input class="mg" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px;" /></td>
-          <td><input class="qty" type="number" value="1" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px;" /></td>
-          <td><input class="price" type="number" step="0.01" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px;" /></td>
-          <td><button type="button" class="remove danger" style="padding: 0.5rem;">❌</button></td>
-        `;
-        row.querySelector('.remove').addEventListener('click', () => row.remove());
-        tbody.appendChild(row);
-      });
-
-      // Submit manual order
-      // manualOrderForm?.addEventListener('submit', async (e) => {
-      //   e.preventDefault();
-        
-      //   const tbody = document.querySelector('#medicine-table tbody');
-      //   const medicines = Array.from(tbody.querySelectorAll('tr')).map(row => ({
-      //     name: row.querySelector('.name').value,
-      //     mg: row.querySelector('.mg').value,
-      //     quantity: row.querySelector('.qty').value,
-      //     price: row.querySelector('.price').value
-      //   }));
-        
-      //   const data = {
-      //     userId: currentUserId,
-      //     firstName: document.getElementById('firstName').value,
-      //     lastName: document.getElementById('lastName').value,
-      //     email: document.getElementById('email').value,
-      //     phone: document.getElementById('phone').value,
-      //     billingStreetAddress: document.getElementById('billingStreetAddress').value,
-      //     billingCity: document.getElementById('billingCity').value,
-      //     billingState: document.getElementById('billingState').value,
-      //     billingZip: document.getElementById('billingZip').value,
-      //     country: document.getElementById('country').value,
-      //     shippingCost: parseFloat(document.getElementById('shippingCost').value || 0),
-      //     totalCost: parseFloat(document.getElementById('totalCost').value || 0),
-      //     cartItems: medicines
-      //   };
-        
-      //   try {
-      //     const res = await fetch('/api/manual-order', {
-      //       method: 'POST',
-      //       headers: { 'Content-Type': 'application/json' },
-      //       body: JSON.stringify(data)
-      //     });
-          
-      //     const result = await res.json();
-      //     if (result.success) {
-      //       showToast('Manual order created successfully!', 'success');
-      //       manualPopup.classList.remove('active');
-      //       manualOrderForm.reset();
-      //     } else {
-      //       showToast('Error: ' + result.message, 'error');
-      //     }
-      //   } catch (err) {
-      //     showToast('Error creating order: ' + err.message, 'error');
-      //   }
-      // });
-    });
-
-    // ========================================
-    // DETAILS MODAL FUNCTIONALITY
-    // ========================================
-    
-    function closeDetailsModal() {
-      document.getElementById("detailsModal").classList.remove("active");
-    }
-
-    window.openDetailsModal = async function(orderId, userId) {
-      const modal = document.getElementById('detailsModal');
-      const modalBody = document.getElementById('modalBodyContent');
-      modal.classList.add('active');
-      modalBody.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
-      
-      try {
-        const [orderItemsResponse, orderCustomerResponse] = await Promise.all([
-          fetch(`/api/order-items/${orderId}`),
-          fetch(`/api/order-customer/${orderId}`)
-        ]);
-        
-        if (!orderItemsResponse.ok || !orderCustomerResponse.ok) {
-          throw new Error('Failed to fetch data');
-        }
-        
-        const orderItems = await orderItemsResponse.json();
-        const customer = await orderCustomerResponse.json();
-        
-        renderDetailsContent(orderItems, customer, orderId);
-      } catch (error) {
-        console.error('Error fetching details:', error);
-        modalBody.innerHTML = '<div style="color: var(--danger); padding: 2rem; text-align: center;">Failed to load details. Please try again.</div>';
-      }
-    };
-
-    function renderDetailsContent(orderItems, customer, orderId) {
-      const modalBody = document.getElementById('modalBodyContent');
-      const total = orderItems.reduce((sum, item) => sum + parseFloat(item.price), 0);
-      
-      modalBody.innerHTML = `
-        <div class="details-grid">
-          <div class="detail-section">
-            <h3><i class="fas fa-user"></i> Customer Information</h3>
-            <div class="info-grid">
-              <div class="info-row">
-                <div class="info-label">Name:</div>
-                <div class="info-value">${customer.first_name} ${customer.last_name}</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">Email:</div>
-                <div class="info-value">${customer.email}</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">Phone:</div>
-                <div class="info-value">${customer.phone}</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">Company:</div>
-                <div class="info-value">${customer.company_name || 'N/A'}</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">Address:</div>
-                <div class="info-value">${customer.street_address}, ${customer.apartment ? customer.apartment + ', ' : ''}${customer.city}, ${customer.state}, ${customer.zip_code}, ${customer.country}</div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="detail-section">
-            <h3><i class="fas fa-clipboard-list"></i> Order Summary</h3>
-            <div class="info-grid">
-              <div class="info-row">
-                <div class="info-label">Order ID:</div>
-                <div class="info-value">#${orderId}</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">Total Items:</div>
-                <div class="info-value">${orderItems.length}</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">Total Amount:</div>
-                <div class="info-value price">${total.toFixed(2)}</div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="detail-section">
-            <h3><i class="fas fa-box-open"></i> Order Items</h3>
-            <table class="items-table">
-              <thead>
-                <tr>
-                  <th>Product Name</th>
-                  <th>Strength (mg)</th>
+                  <th>Item Name</th>
                   <th>Quantity</th>
+                  <th>MG</th>
                   <th>Price</th>
                 </tr>
               </thead>
-              <tbody>
-                ${orderItems.map(item => `
-                  <tr>
-                    <td>${item.name}</td>
-                    <td>${item.mg}</td>
-                    <td>${item.quantity}</td>
-                    <td class="price">${parseFloat(item.price).toFixed(2)}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
+              <tbody id="order-details-body"></tbody>
             </table>
+            <button id="close-details" style="margin-top: 1rem">
+              <i class="fas fa-times"></i> Close
+            </button>
+          </section>
+
+          <!-- Customer Details Section -->
+          <section id="customer-details" class="card hidden">
+            <h2><i class="fas fa-user"></i> Customer Details</h2>
+            <div id="customer-details-body"></div>
+            <button id="close-customer-details" style="margin-top: 1rem">
+              <i class="fas fa-times"></i> Close
+            </button>
+          </section>
+
+          <!-- Manage Prices Section -->
+          <section id="manage-prices" class="card">
+            <h2><i class="fas fa-dollar-sign"></i> Manage Product Pricing</h2>
+            <div class="lookup">
+              <div style="flex: 1">
+                <label for="lookup-product-id">Product ID:</label>
+                <input
+                  type="number"
+                  id="lookup-product-id"
+                  min="1"
+                  placeholder="Enter Product ID"
+                />
+              </div>
+              <div style="display: flex; align-items: flex-end">
+                <button id="btn-load-variants">
+                  <i class="fas fa-download"></i> Load Variants
+                </button>
+              </div>
+            </div>
+
+            <div class="varient-design">
+              <table
+                id="variants-table"
+                border="1"
+                style="display: none; margin-top: 1rem"
+              >
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Unit Type</th>
+                    <th>Unit Value</th>
+                    <th>QTY</th>
+                    <th>Price / Pill</th>
+                    <th>Price / Box</th>
+                    <th>Delivery Time</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="variants-body"></tbody>
+              </table>
+            </div>
+
+            <button
+              id="btn-add-new"
+              class="outline"
+              style="display: none; margin-top: 1rem"
+            >
+              <i class="fas fa-plus"></i> Add New Variant
+            </button>
+          </section>
+
+          <!-- Add Product Section -->
+          <section id="product-form-section" class="card">
+            <h2><i class="fas fa-plus-circle"></i> Add New Product</h2>
+            <form id="product-form">
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: repeat(2, 1fr);
+                  gap: 1rem;
+                "
+              >
+                <div>
+                  <label for="category_id">Category ID:</label>
+                  <input
+                    type="number"
+                    id="category_id"
+                    name="category_id"
+                    required
+                  />
+                </div>
+                <div>
+                  <label for="product_name">Product Name:</label>
+                  <input
+                    type="text"
+                    id="product_name"
+                    name="product_name"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div style="margin-top: 1rem">
+                <label for="product_description">Product Description:</label>
+                <textarea
+                  id="product_description"
+                  name="product_description"
+                  rows="3"
+                  required
+                ></textarea>
+              </div>
+
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: repeat(2, 1fr);
+                  gap: 1rem;
+                  margin-top: 1rem;
+                "
+              >
+                <div>
+                  <label for="trade_names">Trade Names:</label>
+                  <input
+                    type="text"
+                    id="trade_names"
+                    name="trade_names"
+                    required
+                  />
+                </div>
+                <div>
+                  <label for="manufactured_by">Manufactured By:</label>
+                  <input
+                    type="text"
+                    id="manufactured_by"
+                    name="manufactured_by"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div style="margin-top: 1rem">
+                <label for="ingredients">Ingredients:</label>
+                <textarea
+                  id="ingredients"
+                  name="ingredients"
+                  rows="3"
+                  required
+                ></textarea>
+              </div>
+
+              <div style="margin-top: 1rem">
+                <label for="packaging_details">Packaging Details:</label>
+                <textarea
+                  id="packaging_details"
+                  name="packaging_details"
+                  rows="3"
+                  required
+                ></textarea>
+              </div>
+
+              <div style="margin-top: 1rem">
+                <label for="how_to_use">How To Use:</label>
+                <textarea
+                  id="how_to_use"
+                  name="how_to_use"
+                  rows="3"
+                  required
+                ></textarea>
+              </div>
+
+              <div style="margin-top: 1rem">
+                <label for="drug_interaction">Drug Interaction:</label>
+                <textarea
+                  id="drug_interaction"
+                  name="drug_interaction"
+                  rows="3"
+                  required
+                ></textarea>
+              </div>
+
+              <div style="margin-top: 1rem">
+                <label for="side_effects">Side Effects:</label>
+                <textarea
+                  id="side_effects"
+                  name="side_effects"
+                  rows="3"
+                  required
+                ></textarea>
+              </div>
+
+              <div style="margin-top: 1rem">
+                <label for="warnings_precautions">Warnings/Precautions:</label>
+                <textarea
+                  id="warnings_precautions"
+                  name="warnings_precautions"
+                  rows="3"
+                  required
+                ></textarea>
+              </div>
+
+              <div style="margin-top: 1rem">
+                <label for="withdrawal_symptoms">Withdrawal Symptoms:</label>
+                <textarea
+                  id="withdrawal_symptoms"
+                  name="withdrawal_symptoms"
+                  rows="3"
+                  required
+                ></textarea>
+              </div>
+
+              <div style="margin-top: 1rem">
+                <label for="drug_abuse">Drug Abuse:</label>
+                <textarea
+                  id="drug_abuse"
+                  name="drug_abuse"
+                  rows="3"
+                  required
+                ></textarea>
+              </div>
+
+              <div style="margin-top: 1rem">
+                <label for="storages">Storage:</label>
+                <textarea
+                  id="storages"
+                  name="storage"
+                  rows="3"
+                  required
+                ></textarea>
+              </div>
+
+              <div style="margin-top: 1rem">
+                <label for="primary_img">Primary Image URL:</label>
+                <input
+                  type="text"
+                  id="primary_img"
+                  name="primary_img"
+                  required
+                />
+              </div>
+
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: repeat(3, 1fr);
+                  gap: 1rem;
+                  margin-top: 1rem;
+                "
+              >
+                <div>
+                  <label for="addtional-img1">Additional Image 1:</label>
+                  <input
+                    type="text"
+                    id="addtional-img1"
+                    name="additional_img1"
+                  />
+                </div>
+                <div>
+                  <label for="addtional-img2">Additional Image 2:</label>
+                  <input
+                    type="text"
+                    id="addtional-img2"
+                    name="additional_img2"
+                  />
+                </div>
+                <div>
+                  <label for="addtional-img3">Additional Image 3:</label>
+                  <input
+                    type="text"
+                    id="addtional-img3"
+                    name="additional_img3"
+                  />
+                </div>
+                <div>
+                  <label for="addtional-img4">Additional Image 4:</label>
+                  <input
+                    type="text"
+                    id="addtional-img4"
+                    name="additional_img4"
+                  />
+                </div>
+                <div>
+                  <label for="addtional-img5">Additional Image 5:</label>
+                  <input
+                    type="text"
+                    id="addtional-img5"
+                    name="additional_img5"
+                  />
+                </div>
+                <div>
+                  <label for="addtional-img6">Additional Image 6:</label>
+                  <input
+                    type="text"
+                    id="addtional-img6"
+                    name="additional_img6"
+                  />
+                </div>
+              </div>
+
+              <button type="submit" style="margin-top: 2rem">
+                <i class="fas fa-save"></i> Submit Product
+              </button>
+            </form>
+          </section>
+
+          <!-- Details Modal -->
+          <div id="detailsModal" class="modal-overlay">
+            <div class="modal-container">
+              <div class="modal-header">
+                <h2>
+                  <i class="fas fa-info-circle"></i> Order & Customer Details
+                </h2>
+                <button class="modal-close" onclick="closeDetailsModal()">
+                  &times;
+                </button>
+              </div>
+              <div class="modal-body" id="modalBodyContent">
+                <div class="loading-spinner">
+                  <div class="spinner"></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      `;
-    }
-
-    // Close modal on background click
-    document.getElementById('detailsModal')?.addEventListener('click', function(e) {
-      if (e.target === this) closeDetailsModal();
-    });
-
-    // Close modal on ESC key
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        closeDetailsModal();
-        document.getElementById('manual-order-popup')?.classList.remove('active');
-      }
-    });
-
-    // Add console message
-    console.log('✅ Employee Dashboard initialized successfully');
-    console.log('✅ Status dropdown functionality loaded');
-    console.log('✅ Manual order functionality loaded');
-    console.log('ℹ️  Include empolyee.js for additional features (dashboard data, customer tracking, etc.)');
-  </script>
-  <script src="./assets/js/empolyee.js"></script>
-</body>
+      </div>
+    </div>
+    <script src="./assets/js/empolyee.js"></script>
+  </body>
 </html>
