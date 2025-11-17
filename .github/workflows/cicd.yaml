@@ -1,10 +1,14 @@
-name: CI Pipeline
+name: CI + Deploy Pipeline
 
 on:
   push:
     branches: ["main"]
 
 jobs:
+
+  # ============================
+  # 1) CI JOB — CHECK DATABASE_URL
+  # ============================
   verify-db-url:
     runs-on: ubuntu-latest
 
@@ -34,7 +38,6 @@ jobs:
       - name: Compare with expected database URL
         run: |
           EXPECTED_URL="postgres://postgres:postsql@localhost:5432/datamc"
-
           echo "Expected URL: $EXPECTED_URL"
           echo "Found URL:    ${{ steps.dburl.outputs.database_url_read }}"
 
@@ -44,3 +47,25 @@ jobs:
           else
             echo "✅ DATABASE_URL matches successfully!"
           fi
+
+  # ============================
+  # 2) DEPLOYMENT JOB — RUNS AFTER CI SUCCESS
+  # ============================
+  deploy:
+    needs: verify-db-url   # ← CI must pass first
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 147.93.105.151
+          username: mclanduser
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd apps/Webiste_Land
+            git pull origin main
+            pm2 restart website_land
