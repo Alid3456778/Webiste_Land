@@ -1,4 +1,4 @@
-name: Check Database URL
+name: CI Pipeline
 
 on:
   push:

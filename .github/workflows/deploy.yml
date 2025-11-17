@@ -1,4 +1,4 @@
-name: Deploy to VPS
+name: Deploy Application
 
 on:
   push:
@@ -21,3 +21,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd apps/Webiste_Land
+            git pull origin main
+            pm2 restart website_land
