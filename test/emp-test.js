@@ -1,124 +1,72 @@
-// // employee-test.js
-// import fetch from "node-fetch";
+// test-all-get-routes.js
+const app = require("./server");
 
-// const BASE_URL = "http://localhost:3000"; // Change if running remotely
-// let passed = 0, failed = 0;
+const server = app.listen(0, async () => {
+  const port = server.address().port;
 
-// async function testAPI(name, endpoint, options = {}) {
-//   process.stdout.write(`🧪 Testing ${name} ... `);
-//   try {
-//     const res = await fetch(`${BASE_URL}${endpoint}`, options);
-//     const text = await res.text();
-//     let data;
-//     try { data = JSON.parse(text); } catch { data = text; }
+  console.log("🔍 Running GET route tests...\n");
 
-//     if (res.ok) {
-//       console.log("✅ PASS");
-//       passed++;
-//     } else {
-//       console.log("❌ FAIL");
-//       console.error(`   → Status: ${res.status} ${res.statusText}`);
-//       console.error(`   → Response:`, data);
-//       failed++;
-//     }
-//   } catch (err) {
-//     console.log("❌ FAIL");
-//     console.error(`   → Error: ${err.message}`);
-//     failed++;
-//   }
-// }
+  // Helper to test a GET route
+  async function testRoute(name, url) {
+    try {
+      const res = await fetch(`http://localhost:${port}${url}`);
+      const contentType = res.headers.get("content-type") || "";
 
-// (async () => {
-//   console.log("🚀 Starting Employee API Test Suite\n");
+      console.log(`➡ GET ${url}`);
 
-//   await testAPI("GET /api/requests", "/api/requests");
+      console.log(`   Status: ${res.status}`);
 
-//   await testAPI("POST /api/products/search", "/api/products/search", {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify({ id: 1, name: "Test Product" }),
-//   });
+      if (contentType.includes("application/json")) {
+        const data = await res.json();
+        console.log("   JSON ✔");
+        console.log("   Keys:", Object.keys(data));
+      } else {
+        console.log("   Non-JSON ✔ (HTML or File)");
+      }
 
-//   await testAPI("PUT /api/products/update/:id", "/api/products/update/1", {
-//     method: "PUT",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify({ product_description: "Updated by test script" }),
-//   });
-
-//   await testAPI("DELETE /api/products/delete/:id", "/api/products/delete/1", {
-//     method: "DELETE",
-//   });
-
-//   await testAPI("GET /api/customers/search", "/api/customers/search?firstName=John");
-
-//   await testAPI("POST /api/manual-order", "/api/manual-order", {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify({
-//       firstName: "Test",
-//       lastName: "Customer",
-//       email: "test@example.com",
-//       phone: "1234567890",
-//       billingStreetAddress: "123 Test Street",
-//       billingCity: "TestCity",
-//       billingState: "TS",
-//       billingZip: "12345",
-//       country: "Testland",
-//       shippingCost: 5,
-//       totalCost: 50,
-//       cartItems: [{ name: "Test Medicine", mg: "50mg", quantity: 2, price: 25 }],
-//     }),
-//   });
-
-//   await testAPI("GET /api/order-customer/:id", "/api/order-customer/1");
-//   await testAPI("GET /api/invoice/:id", "/api/invoice/1");
-
-//   console.log("\n🧾 Summary:");
-//   console.log(`✅ Passed: ${passed}`);
-//   console.log(`❌ Failed: ${failed}`);
-//   console.log(`🔍 Total: ${passed + failed}`);
-//   console.log("\n✨ API test completed.\n");
-// })();
-
-
-// test_employee_routes.js
-import fetch from "node-fetch"; // If using Node 18+, native fetch works — remove this line
-const BASE_URL = "http://localhost:3000"; // change to your deployed URL if needed
-
-// ✅ Only GET routes (safe to test)
-const routes = [
-  "/api/requests",                     // Dashboard data
-  "/api/products",                     // Product listing (if exists)
-  "/api/cart/count",                   // Cart count check
-  "/api/cart",                         // Fetch cart
-  "/api/order-customer/1",             // Test one order (replace 1 with a valid ID if you have)
-  "/api/invoice/1",                    // Invoice route (replace 1 with a valid orderId)
-  "/api/customers/search?firstName=John&lastName=Doe", // Customer search test
-  "/products",                         // Product overview route
-  "/"                                  // Root route (home)
-];
-
-// Helper to test each route
-async function testRoute(route) {
-  try {
-    const res = await fetch(`${BASE_URL}${route}`);
-    const status = res.status;
-    const ok = res.ok;
-    console.log(`✅ [${status}] GET ${route} ${ok ? "→ OK" : "→ FAIL"}`);
-    if (!ok) {
-      const text = await res.text();
-      console.log(`Response: ${text.slice(0, 150)}...`);
+      console.log("");
+    } catch (err) {
+      console.log(`   ❌ Error testing ${url}:`, err.message, "\n");
     }
-  } catch (err) {
-    console.log(`❌ Error testing ${route}: ${err.message}`);
   }
-}
 
-// Run all tests sequentially
-(async () => {
-  console.log("🔍 Testing Employee Page GET Routes...\n");
-  for (const route of routes) {
-    await testRoute(route);
+  // All testable GET routes
+  const tests = [
+    { name: "Requests", url: "/api/requests" },
+
+    // Customers
+    { name: "Customer Search", url: "/api/customers/search" },
+    // { name: "Customer By ID", url: "/api/customers/1" },
+    { name: "Customer Tracking", url: "/api/customer-tracking/1" },
+
+    // Orders
+    { name: "Order Items", url: "/api/order-items_email/1" },
+    
+
+    // Product related
+    { name: "Product", url: "/api/product?product_ID=1" },
+    { name: "Variants", url: "/api/variants/1" },
+
+    // Reviews
+    { name: "Reviews By Product", url: "/api/reviews/1" },
+    { name: "Recent Reviews", url: "/api/reviews" },
+
+    // Cart count
+    { name: "Cart Count", url: "/api/cart/count" },
+
+    // Backup (may show 403 if wrong secret — that's OK)
+    { name: "Backup Info", url: "/api/backup/info" },
+
+    // HTML Page routes
+    { name: "Employee Page", url: "/employee" },
+    { name: "Cart Page", url: "/cart" },
+    { name: "Product Overview", url: "/product_overview" },
+  ];
+
+  // Run routes one by one
+  for (const t of tests) {
+    await testRoute(t.name, t.url);
   }
-  console.log("\n✅ Route testing completed.");
-})();
+
+  server.close(() => console.log("🛑 Tests finished. Server closed."));
+});

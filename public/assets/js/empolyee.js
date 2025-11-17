@@ -1432,8 +1432,8 @@ document.addEventListener("DOMContentLoaded", () => {
                   request.order_id
                 }" placeholder="Tracking No" style="margin-top:5px; width:120px;" />
                 <button onclick="sendTrackingEmail(${request.order_id}, ${
-        request.user_id
-      })" 
+                 request.user_id
+                })" 
                         style="background: linear-gradient(135deg, #3b82f6, #2563eb); margin-top:5px;">
                     <i class="fas fa-envelope"></i> Send Tracking
                 </button>
