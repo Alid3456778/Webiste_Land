@@ -356,3 +356,43 @@ document.addEventListener("DOMContentLoaded", async () => {
       "<p>Failed to load reviews. Please try again later.</p>";
   }
 });
+
+// Your banner images
+const heroImages = [
+  // "https://i.pinimg.com/1200x/4f/8c/00/4f8c003679d45caa8bb843932ba8668b.jpg",
+  // "banner2.jpg",
+  // "banner3.jpg",
+];
+
+if (heroImages.length === 0) {
+  console.error("Showing error for now , after remove this and give some other updates");
+} else {
+  let currentIndex = 0;
+  // Set styles for hero-section class
+  const heropartSection = document.querySelector(".hero-container");
+  heropartSection.style.maxWidth = "800px";
+  heropartSection.style.margin = "0 auto";
+  heropartSection.style.color = "black";
+  heropartSection.style.position = "relative";
+  heropartSection.style.zIndex = "1";
+  heropartSection.style.animation = "fadeInDown 0.8s ease-out";
+  // heropartSection.style.ease - out;
+
+  // Select the hero section
+  const heroSection = document.querySelector(".hero");
+  // Smooth fade animation
+  heroSection.style.transition = "background-image 1.5s ease-in-out";
+
+  function changeHeroImage() {
+    currentIndex = (currentIndex + 1) % heroImages.length;
+    heroSection.style.backgroundImage = `url(${heroImages[currentIndex]})`;
+    heroSection.style.backgroundSize = "cover";
+    heroSection.style.backgroundPosition = "center";
+  }
+
+  // Set first image immediately
+  heroSection.style.backgroundImage = `url(${heroImages[0]})`;
+
+  // Change image every 5 seconds
+  setInterval(changeHeroImage, 5000);
+}
