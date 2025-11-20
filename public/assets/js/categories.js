@@ -43,8 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const response = await fetch(`/products?categoryID=${categoryID}`);
       const products = await response.json();
 
-      const pricesResponse = await fetch("/product-prices");
-      const prices = await pricesResponse.json();
+      // const pricesResponse = await fetch("/product-prices");
+      // const prices = await pricesResponse.json();
 
       if (products.length === 0) {
         tableBody.innerHTML = `<p>No products found for the selected category.</p>`;
@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       tableBody.innerHTML = "";
-      displayBatch(products, prices, 0, products.length, tableBody);
+      displayBatch(products,  0, products.length, tableBody);
       if (loadingMessage) {
         loadingMessage.style.display = "none";
       }
@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Function to display a batch of products
-  function displayBatch(products, prices, start, end, tableBody) {
+  function displayBatch(products,  start, end, tableBody) {
     const batch = products.slice(start, end);
     batch.forEach((product) => {
       const productID = product.id;

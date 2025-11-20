@@ -256,10 +256,57 @@ async function fetchProductDetails() {
 
     buildProductSearch();
     updateProductUI(product, variants);
+    
+    updateMetaTags(product);
   } catch (error) {
     console.error("Error fetching product details:", error);
     showError("Failed to load product details. Please try again later.");
   }
+}
+
+function updateMetaTags(product) {
+    if (!product || !product.product_name || !product.product_description) {
+        console.error("Product data is missing required fields (name, short_description).");
+        return;
+    }
+
+    const brandName = "MCland Pharma"; // Use a default if brand is missing
+    
+    // --- 1. Construct the content ---
+
+    // Optimized Title: Product Name | Benefit/Category - Brand
+    const pageTitle = `${product.product_name} | Order Online - ${brandName}`;
+
+    // Optimized Description: Use the short_description, ensuring it includes key terms and brand
+    const pageDescription = `Buy ${product.product_name} from ${brandName}. ${product.product_description} Get secure delivery for genuine medications.`;
+    
+    // --- 2. Update/Create the <title> tag ---
+    
+    document.title = pageTitle;
+    
+    // --- 3. Update/Create the <meta description> tag ---
+    
+    // Try to find the existing meta description tag
+    let metaDescriptionTag = document.head.querySelector('meta[name="description"]');
+
+    if (!metaDescriptionTag) {
+        // If it doesn't exist, create a new one
+        metaDescriptionTag = document.createElement('meta');
+        metaDescriptionTag.name = "description";
+        document.head.appendChild(metaDescriptionTag);
+    }
+    
+    // Set the content
+    metaDescriptionTag.content = pageDescription;
+    
+    // --- OPTIONAL: Add Meta Author (If needed) ---
+    let metaAuthorTag = document.head.querySelector('meta[name="author"]');
+    if (!metaAuthorTag) {
+        metaAuthorTag = document.createElement('meta');
+        metaAuthorTag.name = "author";
+        document.head.appendChild(metaAuthorTag);
+    }
+    metaAuthorTag.content = brandName;
 }
 
 // Build search options for the datalist
