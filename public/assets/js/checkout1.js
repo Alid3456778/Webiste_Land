@@ -365,7 +365,7 @@ async function loadCartItems() {
 
       if (cartData.length === 0) {
         loadingElement.innerHTML =
-          '<p style="color: #666;">Your cart is empty. <a href="./products.html" style="color: #007cba;">Continue shopping</a></p>';
+          '<p style="color: #666;">Your cart is empty. <a href="./categories.html" style="color: #007cba;">Continue shopping</a></p>';
         placeOrderBtn.disabled = true;
         placeOrderBtn.textContent = "Cart is Empty";
         return;
