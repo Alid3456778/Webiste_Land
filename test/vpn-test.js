@@ -7,7 +7,7 @@
 const axios = require('axios');
 
 // Configuration
-const BASE_URL = 'http://localhost:3000'; // Change if your server runs on a different port
+const BASE_URL = 'http://mclandpharma.com'; // Change if your server runs on a different port
 const TEST_RESULTS = [];
 
 // ====================================
@@ -83,7 +83,7 @@ class VPNBlockingTester {
           'X-Forwarded-For': testIP,
         },
       });
-
+      console.log(`Received status: ${response.status}`);
       if (response.status === 403 || response.data.includes('Not allowed')) {
         console.log('✅ PASS: VPN user was blocked');
         console.log(`   Status: ${response.status}`);
