@@ -382,9 +382,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // Your banner images
 const heroImages = [
-  // "https://i.pinimg.com/1200x/4f/8c/00/4f8c003679d45caa8bb843932ba8668b.jpg",
-  // "banner2.jpg",
-  // "banner3.jpg",
+  // "assets/image2/Blackfriday.jpeg",
+  // "assets/image2/thanksgiving.jpeg"
 ];
 
 if (heroImages.length === 0) {
