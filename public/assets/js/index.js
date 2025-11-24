@@ -382,8 +382,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // Your banner images
 const heroImages = [
-  // "assets/image2/Blackfriday.jpeg",
-  // "assets/image2/thanksgiving.jpeg"
+  "assets/image2/Blackfriday.jpeg",
+  "assets/image2/thanksgiving.jpeg"
 ];
 
 if (heroImages.length === 0) {
