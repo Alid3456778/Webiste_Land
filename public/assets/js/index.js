@@ -13,12 +13,23 @@ document.addEventListener("DOMContentLoaded", async () => {
   const cartCountSpan = document.querySelector(".cart-badge");
 
   try {
+    // Check if cart count exists in local storage
+    const storedCartCount = localStorage.getItem("cartCount");
+
+    if (storedCartCount !== null) {
+      cartCountSpan.textContent = storedCartCount;
+      cartCountSpan.style.display = "inline-block";
+      return;
+    }
+
     // Fetch the cart count for the logged-in user
     const response = await fetch("/api/cart/count");
     const result = await response.json();
 
     if (result.success) {
       const cartCount = result.count;
+      // Store cart count in local storage
+      localStorage.setItem("cartCount", parseInt(cartCount));
       if (cartCount > 0) {
         cartCountSpan.textContent = cartCount;
         cartCountSpan.style.display = "inline-block";
@@ -37,102 +48,114 @@ document.addEventListener("DOMContentLoaded", function () {
   buildProductSearch();
 });
 
-function initHeroSearch() {
-  fetch("/products")
-    .then((res) => res.json())
-    .then((products) => {
-      const heroSearchInput = document.querySelector(".search-input");
-      const heroSearchButton = document.querySelector(".search-submit");
-      const heroSuggestionBox = document.getElementById("hero-suggestions");
+// Get product data (from Local Storage or API)
+async function getProducts() {
+  const cached = localStorage.getItem("SearchProducts");
 
-      if (!heroSearchInput || !heroSearchButton) return;
+  if (cached) {
+    return JSON.parse(cached); // Use localStorage data
+  }
 
-      // Real-time suggestions for hero search
-      heroSearchInput.addEventListener("input", () => {
-        const query = heroSearchInput.value.trim().toLowerCase();
-        heroSuggestionBox.innerHTML = "";
+  const response = await fetch("/products");
+  const products = await response.json();
 
-        if (!query) {
-          heroSuggestionBox.style.display = "none";
-          return;
-        }
+  localStorage.setItem("SearchProducts", JSON.stringify(products)); // Save data
+  return products;
+}
 
-        const matches = products.filter((product) =>
-          product.product_name.toLowerCase().includes(query)
-        );
+async function initHeroSearch() {
+  try {
+    const products = await getProducts();
 
-        if (matches.length > 0) {
-          matches.forEach((product) => {
-            const li = document.createElement("li");
+    const heroSearchInput = document.querySelector(".search-input");
+    const heroSearchButton = document.querySelector(".search-submit");
+    const heroSuggestionBox = document.getElementById("hero-suggestions");
 
-            const img = document.createElement("img");
-            img.src = product.image_url || "assets/image/default.png";
-            img.alt = product.product_name;
-            img.style.width = "50px";
-            img.style.height = "50px";
-            img.style.objectFit = "cover";
-            img.style.marginRight = "10px";
-            img.style.borderRadius = "5px";
+    if (!heroSearchInput || !heroSearchButton) return;
 
-            const span = document.createElement("span");
-            span.textContent = product.product_name;
+    // Real-time suggestions for hero search
+    heroSearchInput.addEventListener("input", () => {
+      const query = heroSearchInput.value.trim().toLowerCase();
+      heroSuggestionBox.innerHTML = "";
 
-            li.appendChild(img);
-            li.appendChild(span);
-
-            li.onclick = () => {
-              window.location.href = `product_overview.html?product_ID=${product.product_id}`;
-            };
-
-            heroSuggestionBox.appendChild(li);
-          });
-          heroSuggestionBox.style.display = "block";
-        } else {
-          heroSuggestionBox.style.display = "none";
-        }
-      });
-
-      // Hide suggestions when clicking outside
-      document.addEventListener("click", (e) => {
-        if (!e.target.closest(".search-container")) {
-          heroSuggestionBox.style.display = "none";
-        }
-      });
-
-      // Handle search
-      function handleHeroSearch() {
-        const query = heroSearchInput.value.trim();
-        const matchingProduct = products.find(
-          (product) =>
-            product.product_name.toLowerCase() === query.toLowerCase()
-        );
-
-        if (matchingProduct) {
-          window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
-        } else if (query) {
-          alert("No exact matching product found.");
-        }
+      if (!query) {
+        heroSuggestionBox.style.display = "none";
+        return;
       }
 
-      // Button click and Enter key handling
-      heroSearchButton.addEventListener("click", handleHeroSearch);
-      heroSearchInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          handleHeroSearch();
-        }
-      });
-    })
-    .catch((error) => {
-      console.error("Error fetching products for hero search:", error);
+      const matches = products.filter((product) =>
+        product.product_name.toLowerCase().includes(query)
+      );
+
+      if (matches.length > 0) {
+        matches.forEach((product) => {
+          const li = document.createElement("li");
+
+          const img = document.createElement("img");
+          img.src = product.image_url || "assets/image/default.png";
+          img.alt = product.product_name;
+          img.style.width = "50px";
+          img.style.height = "50px";
+          img.style.objectFit = "cover";
+          img.style.marginRight = "10px";
+          img.style.borderRadius = "5px";
+
+          const span = document.createElement("span");
+          span.textContent = product.product_name;
+
+          li.appendChild(img);
+          li.appendChild(span);
+
+          li.onclick = () => {
+            window.location.href = `product_overview.html?product_ID=${product.product_id}`;
+          };
+
+          heroSuggestionBox.appendChild(li);
+        });
+        heroSuggestionBox.style.display = "block";
+      } else {
+        heroSuggestionBox.style.display = "none";
+      }
     });
+
+    // Hide suggestions when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".search-container")) {
+        heroSuggestionBox.style.display = "none";
+      }
+    });
+
+    // Handle search
+    function handleHeroSearch() {
+      const query = heroSearchInput.value.trim();
+      const matchingProduct = products.find(
+        (product) => product.product_name.toLowerCase() === query.toLowerCase()
+      );
+
+      if (matchingProduct) {
+        window.location.href = `product_overview.html?product_ID=${matchingProduct.product_id}`;
+      } else if (query) {
+        alert("No exact matching product found.");
+      }
+    }
+
+    // Button click and Enter key handling
+    heroSearchButton.addEventListener("click", handleHeroSearch);
+    heroSearchInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        handleHeroSearch();
+      }
+    });
+  } catch (err) {
+    console.log("Error loading Hero Search:", err);
+  }
 }
 
 // Header search functionality
 async function buildProductSearch() {
   try {
-    const response = await fetch(`/products`);
-    const products = await response.json();
+    const products = await getProducts();
 
     const searchInput = document.getElementById("search-input");
     const searchButton = document.querySelector(".search-btn");
@@ -365,7 +388,7 @@ const heroImages = [
 ];
 
 if (heroImages.length === 0) {
-  console.error("Showing error for now , after remove this and give some other updates");
+  console.log("No hero images available.");
 } else {
   let currentIndex = 0;
   // Set styles for hero-section class

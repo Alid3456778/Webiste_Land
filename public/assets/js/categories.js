@@ -11,6 +11,14 @@ window.CRISP_WEBSITE_ID = "68987257-808e-403d-a06c-35b3ec18c3ef";
 //count cart items and show in navbar
 document.addEventListener("DOMContentLoaded", async () => {
   const cartCountSpan = document.getElementById("cart-count");
+  // Check if cart count exists in local storage
+  const storedCartCount = localStorage.getItem("cartCount");
+
+  if (storedCartCount !== null) {
+    cartCountSpan.textContent = storedCartCount;
+    cartCountSpan.style.display = "inline-block";
+    return;
+  }
 
   try {
     const response = await fetch("/api/cart/count");
@@ -18,6 +26,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (result.success) {
       const cartCount = result.count;
+      // Store cart count in local storage
+      localStorage.setItem("cartCount", cartCount);
       if (cartCount > 0) {
         cartCountSpan.textContent = cartCount;
         cartCountSpan.style.display = "inline-block";
@@ -55,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       tableBody.innerHTML = "";
-      displayBatch(products,  0, products.length, tableBody);
+      displayBatch(products, 0, products.length, tableBody);
       if (loadingMessage) {
         loadingMessage.style.display = "none";
       }
@@ -68,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Function to display a batch of products
-  function displayBatch(products,  start, end, tableBody) {
+  function displayBatch(products, start, end, tableBody) {
     const batch = products.slice(start, end);
     batch.forEach((product) => {
       const productID = product.id;
@@ -120,11 +130,25 @@ document.addEventListener("DOMContentLoaded", () => {
   loadProductData(initialCategoryID);
 });
 
+// Function to get products with localStorage caching
+async function getProducts() {
+  const cached = localStorage.getItem("SearchProducts");
+
+  if (cached) {
+    return JSON.parse(cached); // Use localStorage data
+  }
+
+  const response = await fetch("/products");
+  const products = await response.json();
+
+  localStorage.setItem("SearchProducts", JSON.stringify(products)); // Save data
+  return products;
+}
+
 // Product search functionality
 async function buildProductSearch() {
   try {
-    const response = await fetch(`/products`);
-    const products = await response.json();
+    const products = await getProducts();
 
     const searchInput = document.getElementById("search-input");
     const searchButton = document.getElementById("search-button");

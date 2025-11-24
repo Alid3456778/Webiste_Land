@@ -11,12 +11,20 @@ window.CRISP_WEBSITE_ID = "68987257-808e-403d-a06c-35b3ec18c3ef";
 //cart count script
 document.addEventListener("DOMContentLoaded", async () => {
   const cartCountSpan = document.getElementById("cart-count");
+  // Check if cart count exists in local storage
+  const storedCartCount = localStorage.getItem("cartCount");
 
+  if (storedCartCount !== null) {
+    cartCountSpan.textContent = storedCartCount;
+    cartCountSpan.style.display = "inline-block";
+    return;
+  }
   try {
     // Fetch the cart count for the logged-in user
     const response = await fetch("/api/cart/count"); // Adjust endpoint as needed
     const result = await response.json();
-
+    // Store cart count in local storage
+    localStorage.setItem("cartCount", cartCount);
     if (result.success) {
       const cartCount = result.count; // Get the count from the response
       if (cartCount > 0) {
@@ -256,7 +264,7 @@ async function fetchProductDetails() {
 
     buildProductSearch();
     updateProductUI(product, variants);
-    
+
     updateMetaTags(product);
   } catch (error) {
     console.error("Error fetching product details:", error);
@@ -265,55 +273,73 @@ async function fetchProductDetails() {
 }
 
 function updateMetaTags(product) {
-    if (!product || !product.product_name || !product.product_description) {
-        console.error("Product data is missing required fields (name, short_description).");
-        return;
-    }
+  if (!product || !product.product_name || !product.product_description) {
+    console.error(
+      "Product data is missing required fields (name, short_description)."
+    );
+    return;
+  }
 
-    const brandName = "MCland Pharma"; // Use a default if brand is missing
-    
-    // --- 1. Construct the content ---
+  const brandName = "MCland Pharma"; // Use a default if brand is missing
 
-    // Optimized Title: Product Name | Benefit/Category - Brand
-    const pageTitle = `${product.product_name} | Order Online - ${brandName}`;
+  // --- 1. Construct the content ---
 
-    // Optimized Description: Use the short_description, ensuring it includes key terms and brand
-    const pageDescription = `Buy ${product.product_name} from ${brandName}. ${product.product_description} Get secure delivery for genuine medications.`;
-    
-    // --- 2. Update/Create the <title> tag ---
-    
-    document.title = pageTitle;
-    
-    // --- 3. Update/Create the <meta description> tag ---
-    
-    // Try to find the existing meta description tag
-    let metaDescriptionTag = document.head.querySelector('meta[name="description"]');
+  // Optimized Title: Product Name | Benefit/Category - Brand
+  const pageTitle = `${product.product_name} | Order Online - ${brandName}`;
 
-    if (!metaDescriptionTag) {
-        // If it doesn't exist, create a new one
-        metaDescriptionTag = document.createElement('meta');
-        metaDescriptionTag.name = "description";
-        document.head.appendChild(metaDescriptionTag);
-    }
-    
-    // Set the content
-    metaDescriptionTag.content = pageDescription;
-    
-    // --- OPTIONAL: Add Meta Author (If needed) ---
-    let metaAuthorTag = document.head.querySelector('meta[name="author"]');
-    if (!metaAuthorTag) {
-        metaAuthorTag = document.createElement('meta');
-        metaAuthorTag.name = "author";
-        document.head.appendChild(metaAuthorTag);
-    }
-    metaAuthorTag.content = brandName;
+  // Optimized Description: Use the short_description, ensuring it includes key terms and brand
+  const pageDescription = `Buy ${product.product_name} from ${brandName}. ${product.product_description} Get secure delivery for genuine medications.`;
+
+  // --- 2. Update/Create the <title> tag ---
+
+  document.title = pageTitle;
+
+  // --- 3. Update/Create the <meta description> tag ---
+
+  // Try to find the existing meta description tag
+  let metaDescriptionTag = document.head.querySelector(
+    'meta[name="description"]'
+  );
+
+  if (!metaDescriptionTag) {
+    // If it doesn't exist, create a new one
+    metaDescriptionTag = document.createElement("meta");
+    metaDescriptionTag.name = "description";
+    document.head.appendChild(metaDescriptionTag);
+  }
+
+  // Set the content
+  metaDescriptionTag.content = pageDescription;
+
+  // --- OPTIONAL: Add Meta Author (If needed) ---
+  let metaAuthorTag = document.head.querySelector('meta[name="author"]');
+  if (!metaAuthorTag) {
+    metaAuthorTag = document.createElement("meta");
+    metaAuthorTag.name = "author";
+    document.head.appendChild(metaAuthorTag);
+  }
+  metaAuthorTag.content = brandName;
+}
+
+async function getProducts() {
+  const cached = localStorage.getItem("SearchProducts");
+
+  if (cached) {
+    return JSON.parse(cached); // Use localStorage data
+  }
+
+  const response = await fetch("/products");
+  const products = await response.json();
+
+  localStorage.setItem("SearchProducts", JSON.stringify(products)); // Save data
+  return products;
 }
 
 // Build search options for the datalist
 async function buildProductSearch() {
   try {
-    const response = await fetch(`/products`);
-    const products = await response.json();
+    
+    const products =  await getProducts();;
 
     const searchInput = document.getElementById("search-input");
     const searchButton = document.getElementById("search-button");
@@ -404,7 +430,11 @@ async function buildProductSearch() {
   }
 }
 
-buildProductSearch();
+// buildProductSearch();
+document.addEventListener("DOMContentLoaded", () => {
+  buildProductSearch();
+});
+
 // Update the UI with product details and variants
 function updateProductUI(product, variants) {
   name_dabba = product.product_name;
@@ -657,6 +687,10 @@ function refreshPage() {
 function setupAddToCartButtons() {
   document.querySelectorAll(".btn--add").forEach((button) => {
     button.addEventListener("click", function () {
+      const cartCountSpan = localStorage.getItem("cartCount") 
+      
+      localStorage.setItem("cartCount", parseInt( cartCountSpan) + 1);
+
       const variantId = this.getAttribute("data-variant-id");
 
       const quantity = this.getAttribute("data-quantity") || 1;
