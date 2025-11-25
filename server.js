@@ -2684,7 +2684,7 @@ async function blockVPN(req, res, next) {
     // If already blocked → deny immediately
     if (req.cookies.vpn_blocked === "true") {
       logVPNBlock(req, 'cookie', 'Blocked by vpn_blocked cookie');
-      return res.status(403).send("Not allowed (VPN detected)");
+      return res.sendFile(path.join(__dirname, "public", "restricted.html"));
     }
 
     // If already validated → allow immediately
@@ -2724,7 +2724,8 @@ async function blockVPN(req, res, next) {
       if (isVpn) {
         logVPNBlock(req, 'vpn-detected', `Proxy: ${data.proxy}, Hosting: ${data.hosting}`);
         res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
-        return res.status(403).send("Not allowed (VPN detected)");
+        // return res.status(403).send("Not allowed (VPN detected)");
+        return res.sendFile(path.join(__dirname, "public", "restricted.html"));
       }
 
       // Valid user
