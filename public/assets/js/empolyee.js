@@ -1100,25 +1100,72 @@ document.addEventListener("DOMContentLoaded", () => {
               .join("")}</tbody></table>`;
           }
 
+          // orderCard.innerHTML = `
+          //         <div class="order-header">
+          //           <div>
+          //             <div class="order-number">Order #${order.order_id}</div>
+          //             <div class="order-date"><strong>Date</strong> : ${formattedDate}</div>
+          //           </div>
+          //           <div class="order-total"><strong>Price</strong> : ${parseFloat(
+          //             order.total_amount
+          //           ).toFixed(2)}</div>
+          //         </div>
+          //         ${itemsHtml}
+          //         <div style="margin-top: 10px; font-size: 13px; color: #666;">
+          //           <strong>Shipping:</strong> ${parseFloat(
+          //             order.shipping
+          //           ).toFixed(2)} |
+          //           <strong>Items:</strong> ${order.itemCount} |
+          //           <strong>Payment:</strong> ${order.payment_status}
+          //         </div>
+          //         <button onclick="deleteRequest(${order.order_id})"
+          //               style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+          //           <i class="fas fa-trash"></i> Delete
+          //       </button>
+
+          //       `;
+
+          // inside your orders.forEach((order) => { ... })
           orderCard.innerHTML = `
-                  <div class="order-header">
-                    <div>
-                      <div class="order-number">Order #${order.order_id}</div>
-                      <div class="order-date"><strong>Date</strong> : ${formattedDate}</div>
-                    </div>
-                    <div class="order-total"><strong>Price</strong> : ${parseFloat(
-                      order.total_amount
-                    ).toFixed(2)}</div>
-                  </div>
-                  ${itemsHtml}
-                  <div style="margin-top: 10px; font-size: 13px; color: #666;">
-                    <strong>Shipping:</strong> ${parseFloat(
-                      order.shipping
-                    ).toFixed(2)} | 
-                    <strong>Items:</strong> ${order.itemCount} |
-                    <strong>Payment:</strong> ${order.payment_status}
-                  </div>
-                `;
+            <div class="order-header">
+              <div>
+                <div class="order-number">Order #${order.order_id}</div>
+                <div class="order-date"><strong>Date</strong> : ${formattedDate}</div>
+              </div>
+              <div class="order-total"><strong>Price</strong> : ${parseFloat(
+                order.total_amount
+              ).toFixed(2)}</div>
+            </div>
+            ${itemsHtml}
+            <div style="margin-top: 10px; font-size: 13px; color: #666;">
+              <strong>Shipping:</strong> ${parseFloat(order.shipping).toFixed(2)} |
+              <strong>Items:</strong> ${order.itemCount} |
+              <strong>Payment:</strong> ${generateStatusDropdown(
+                order.order_id,
+                order.payment_status || "pending"
+              )}
+            </div>
+            <!-- Tracking Input + Send Button -->
+            <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+              <input 
+                type="text" 
+                id="track-ct-${order.order_id}"
+                placeholder="Tracking Number" 
+                style="padding:6px; border:1px solid #ccc; border-radius:5px; width:160px;"
+              />
+              <button 
+                onclick="sendTrackingEmail(${order.order_id}, ${customer.id}, 'track-ct-${order.order_id}')"
+                style="background:#2563eb; color:white; padding:6px 12px; border-radius:5px; border:none; cursor:pointer;">
+                Send Tracking
+              </button>
+            </div>
+            <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
+              <button onclick="deleteRequest(${order.order_id})"
+                      style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </div>
+          `;  
           ordersListDiv.appendChild(orderCard);
         });
       }
@@ -1411,7 +1458,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // <button onclick="deleteRequest(${request.order_id})"
       //                   style="background: linear-gradient(135deg, #ef4444, #dc2626);">
       //               <i class="fas fa-trash"></i> Delete
-      //           </button>
+      // </button>
 
       row.innerHTML = `
             <td>${request.serial}</td>
@@ -1432,9 +1479,9 @@ document.addEventListener("DOMContentLoaded", () => {
                   request.order_id
                 }" placeholder="Tracking No" style="margin-top:5px; width:120px;" />
                 <button onclick="sendTrackingEmail(${request.order_id}, ${
-                 request.user_id
-                })" 
-                        style="background: linear-gradient(135deg, #3b82f6, #2563eb); margin-top:5px;">
+                    request.user_id
+                  })" 
+                    style="background: linear-gradient(135deg, #3b82f6, #2563eb); margin-top:5px;">
                     <i class="fas fa-envelope"></i> Send Tracking
                 </button>
                 <button onclick="deleteRequest(${request.order_id})"
@@ -1549,8 +1596,8 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Send tracking email
-  window.sendTrackingEmail = async (orderId, userId) => {
-    const input = document.getElementById(`track-${orderId}`);
+  window.sendTrackingEmail = async (orderId, userId, inputId = `track-${orderId}`) => {
+  const input = document.getElementById(inputId);
     const trackingNumber = input.value.trim();
     if (!trackingNumber) {
       alert("⚠️ Please enter a tracking number first.");
@@ -2258,7 +2305,7 @@ console.log(
   "ℹ️  Include empolyee.js for additional features (dashboard data, customer tracking, etc.)"
 );
 
-// The following code for searching customer by email 
+// The following code for searching customer by email
 // // 🔍 Search customer by email and view their info + orders
 // document.addEventListener("DOMContentLoaded", () => {
 //   const searchBtn = document.getElementById("btn-track-email");

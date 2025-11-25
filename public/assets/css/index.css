@@ -434,6 +434,8 @@
       position: absolute;
       right: 0.5rem;
       top: 25px;
+      display: flex;
+      align-items: center;
       transform: translateY(-50%);
       background: var(--primary);
       border: none;

@@ -7,7 +7,7 @@
 const axios = require('axios');
 
 // Configuration
-const BASE_URL = 'http://mclandpharma.com'; // Change if your server runs on a different port
+const BASE_URL = 'http://localhost:3000'; // Change if your server runs on a different port
 const TEST_RESULTS = [];
 
 // ====================================
