@@ -1687,7 +1687,7 @@ ${htmlBody}
     };
 
     const connection = await Imap.connect(imapConfig);
-    await connection.append(rawEmail, { mailbox: "INBOX.Sent" });
+    // await connection.append(rawEmail, { mailbox: "INBOX.Sent" });
     
 
     await connection.append(rawEmail, {
