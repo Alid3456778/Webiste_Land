@@ -70,3 +70,27 @@ jobs:
             git pull origin main
             npm install
             pm2 restart website_land
+  
+  run-tests:
+    needs: deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Axios (test dependency)
+        run: npm install axios
+
+      - name: Set BASE_URL to live site
+        run: |
+          sed -i 's|http://localhost:3000|https://mclandpharma.com|g' test/vpn-test.js
+
+      - name: Run VPN Tests
+        run: |
+          echo "Running VPN Test Suite..."
+          node test/vpn-test.js
