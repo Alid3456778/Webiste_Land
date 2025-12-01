@@ -1623,27 +1623,83 @@ app.post("/api/orders/:orderId/send-tracking", async (req, res) => {
 
     // 2️⃣ Create HTML email content
     const htmlBody = `
-      <div style="font-family:Arial, sans-serif; padding:20px; background:#f5f6f7;">
-        <div style="max-width:600px; margin:auto; background:#ffffff; padding:25px; border-radius:10px;">
-          
-          <h2 style="color:#028C7E; text-align:center;">Your Order Has Shipped</h2>
+      <!DOCTYPE html>
+<html lang="en" style="margin:0;padding:0;">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <title>Order Confirmation</title>
+  </head>
 
-          <p style="font-size:16px;">Hello <b>${name}</b>,</p>
+  <body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial, sans-serif;">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" 
+           style="background-color:#f4f4f4;padding:20px 0;">
+      <tr>
+        <td align="center">
 
-          <p style="font-size:16px;">
-            We're excited to let you know that your order <b>#${orderId}</b> has been shipped.
-          </p>
+          <!-- Main Card -->
+          <table width="600" border="0" cellspacing="0" cellpadding="0" 
+                 style="background:#ffffff;border-radius:8px;overflow:hidden;">
 
-          <p style="font-size:16px; margin-top:20px;">
-            📦 <b>Tracking Number:</b> ${trackingNumber}
-          </p>
+            <!-- Header -->
+            <tr>
+              <td align="center" 
+                  style="background-color:#028c7e;padding:20px 0;color:#ffffff;font-size:24px;font-weight:bold;">
+                Order Confirmation
+              </td>
+            </tr>
 
-          <p style="font-size:15px; margin-top:25px;">
-            Thank you for choosing <b>Mcland Pharma</b>.  
-            We appreciate your trust in our service.
-          </p>
-        </div>
-      </div>
+            <!-- Message Body -->
+            <tr>
+              <td style="padding:25px 30px;color:#333333;font-size:15px;line-height:22px;">
+                <p style="margin:0 0 15px;">
+                  Hi <strong>${name}</strong>,  
+                </p>
+
+                <p style="margin:0 0 15px;">
+                  Thank you for placing an order with <strong>McLand Pharma</strong>.  
+                  Below are your order details:
+                </p>
+
+                <!-- Order Box -->
+                <table width="100%" border="0" cellspacing="0" cellpadding="0"
+                       style="margin-top:20px;background:#f8f8f8;border-radius:6px;padding:15px;">
+                  <tr>
+                    <td style="font-size:14px;color:#333;">
+                      <strong>Order ID:</strong> ${orderId}<br>
+                      <strong>Tracking ID :</strong> ${trackingNumber}
+                    </td>
+                  </tr>
+                </table>
+
+                <p style="margin:20px 0 10px;">
+                  Our support team will contact you shortly for confirmation.
+                </p>
+
+                <p style="margin:0;">
+                  Thank you!  
+                  <br><strong>McLand Pharma</strong>
+                </p>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td align="center" 
+                  style="background:#fafafa;padding:18px;color:#777;font-size:12px;line-height:18px;">
+                This is an automated email. Please do not reply.<br>
+                © 2025 McLand Pharma. All rights reserved.
+              </td>
+            </tr>
+
+          </table>
+
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
     `;
 
     // 3️⃣ Nodemailer SMTP (Hostinger)
