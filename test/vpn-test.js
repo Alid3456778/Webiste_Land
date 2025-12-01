@@ -7,7 +7,8 @@
 const axios = require('axios');
 
 // Configuration
-const BASE_URL = 'http://localhost:3000'; // Change if your server runs on a different port
+ const BASE_URL = 'http://localhost:3000'; // Change if your server runs on a different port
+//const BASE_URL = 'https://mclandpharma.com'; 
 const TEST_RESULTS = [];
 
 // ====================================
@@ -62,46 +63,90 @@ class VPNBlockingTester {
   /**
    * Test 2: VPN user is blocked (using ip-api detection)
    */
-  async testVPNUserBlocked() {
-    console.log('\n🧪 TEST 2: VPN User Blocking');
-    console.log('─'.repeat(50));
+  // async testVPNUserBlocked() {
+  //   console.log('\n🧪 TEST 2: VPN User Blocking');
+  //   console.log('─'.repeat(50));
     
-    try {
-      // Simulate a VPN IP by using an IP that ip-api identifies as proxy/hosting
-      const vpnIPs = [
-        '45.33.32.156',   // Linode (hosting)
-        '138.199.37.1',   // Common VPN provider
-        '89.163.128.29',  // Proxy server
-      ];
+  //   try {
+  //     // Simulate a VPN IP by using an IP that ip-api identifies as proxy/hosting
+  //     const vpnIPs = [
+  //       '45.33.32.156',   // Linode (hosting)
+  //       '138.199.37.1',   // Common VPN provider
+  //       '89.163.128.29',  // Proxy server
+  //     ];
 
-      const testIP = vpnIPs[0];
+  //     const testIP = vpnIPs[0];
       
-      console.log(`Testing with IP: ${testIP} (known VPN/proxy)`);
+  //     console.log(`Testing with IP: ${testIP} (known VPN/proxy)`);
       
-      const response = await this.client.get('/', {
-        headers: {
-          'X-Forwarded-For': testIP,
-        },
-      });
-      console.log(`Received status: ${response.data}`);
-      if (response.status === 403 || response.data.includes('Not allowed')) {
-        console.log('✅ PASS: VPN user was blocked');
-        console.log(`   Status: ${response.status}`);
-        console.log(`   Response includes "Not allowed": ${response.data.includes('Not allowed')}`);
-        this.testsPassed++;
-        return true;
-      } else {
-        console.log('⚠️ WARNING: VPN user was not blocked');
-        console.log(`   Status: ${response.status}`);
-        console.log(`   This might indicate the IP-API call failed (acceptable)`);
-        return true; // Don't fail this as API can be rate limited
-      }
-    } catch (err) {
-      console.log('⚠️ API ERROR (acceptable):', err.message);
-      console.log('   This might indicate the ip-api call failed or is rate limited');
+  //     const response = await this.client.get('/', {
+  //       headers: {
+  //         'X-Forwarded-For': testIP,
+  //       },
+  //     });
+  //     // console.log(`Received status: ${response.data}`);
+  //     if (response.status === 403 || response.data.includes('Not allowed')) {
+  //       console.log('✅ PASS: VPN user was blocked');
+  //       console.log(`   Status: ${response.status}`);
+  //       console.log(`   Response includes "Not allowed": ${response.data.includes('Not allowed')}`);
+  //       this.testsPassed++;
+  //       return true;
+  //     } else {
+  //       console.log('⚠️ WARNING: VPN user was not blocked');
+  //       console.log(`   Status: ${response.status}`);
+  //       console.log(`   This might indicate the IP-API call failed (acceptable)`);
+  //       return true; // Don't fail this as API can be rate limited
+  //     }
+  //   } catch (err) {
+  //     console.log('⚠️ API ERROR (acceptable):', err.message);
+  //     console.log('   This might indicate the ip-api call failed or is rate limited');
+  //     return true;
+  //   }
+  // }
+  /**
+ * Test 2: VPN user is blocked (using ip-api detection)
+ */
+async testVPNUserBlocked() {
+  console.log('\n🧪 TEST 2: VPN User Blocking');
+  console.log('─'.repeat(50));
+  
+  try {
+    // Simulate a VPN IP by using an IP that ip-api identifies as proxy/hosting
+    const vpnIPs = [
+      '217.148.141.47'  // Proxy server
+    ];
+    const testIP = vpnIPs[0];
+    
+    // ✅ FIXED: Use backticks for template literals
+    console.log(`Testing with IP: ${testIP} (known VPN/proxy)`);
+    
+    const response = await this.client.get('/', {
+      headers: {
+        'X-Forwarded-For': testIP,
+      },
+    });
+    
+    // ✅ FIXED: Use backticks for template literals
+    console.log(`Received status: ${response.status}`);
+    
+    if (response.status === 403 || response.data.includes('Not allowed')) {
+      console.log('✅ PASS: VPN user was blocked');
+      console.log(`   Status: ${response.status}`);
+      console.log(`   Response includes "Not allowed": ${response.data.includes('Not allowed')}`);
+      this.testsPassed++;
       return true;
+    } else {
+      console.log('⚠️ WARNING: VPN user was not blocked');
+      console.log(`   Status: ${response.status}`);
+      console.log(`   This might indicate the IP-API call failed (acceptable)`);
+      return true; // Don't fail this as API can be rate limited
     }
+  } catch (err) {
+    console.log('⚠️ API ERROR (acceptable):', err.message);
+    console.log('   This might indicate the ip-api call failed or is rate limited');
+    return true;
   }
+}
 
   /**
    * Test 3: Cookie is set for valid users
