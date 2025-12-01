@@ -1,12 +1,12 @@
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.zoho.in',
+  host: 'smtp.hostinger.com',
   port: 465,
   secure: true,
   auth: {
     user: 'orderconfirmation@mclandpharma.com',
-    pass: 'YFc3HfTpMu5S',
+    pass: 'Order$123mcland',
   },
 });
 

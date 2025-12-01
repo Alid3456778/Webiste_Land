@@ -14,13 +14,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     // Check if cart count exists in local storage
-    const storedCartCount = localStorage.getItem("cartCount");
+    // const storedCartCount = localStorage.getItem("cartCount");
 
-    if (storedCartCount !== null) {
-      cartCountSpan.textContent = storedCartCount;
-      cartCountSpan.style.display = "inline-block";
-      return;
-    }
+    // if (storedCartCount !== null) {
+    //   cartCountSpan.textContent = storedCartCount;
+    //   cartCountSpan.style.display = "inline-block";
+    //   return;
+    // }
 
     // Fetch the cart count for the logged-in user
     const response = await fetch("/api/cart/count");
@@ -58,7 +58,12 @@ async function getProducts() {
 
   const response = await fetch("/products");
   const products = await response.json();
-
+  if (!products || !Array.isArray(products)) {
+    throw new Error("Invalid product data");
+  }
+  else{
+    console.log("Fetched products from API:", products);
+  }
   localStorage.setItem("SearchProducts", JSON.stringify(products)); // Save data
   return products;
 }
@@ -66,6 +71,7 @@ async function getProducts() {
 async function initHeroSearch() {
   try {
     const products = await getProducts();
+    // console.log("Hero Search Products:", products);
 
     const heroSearchInput = document.querySelector(".search-input");
     const heroSearchButton = document.querySelector(".search-submit");
@@ -343,7 +349,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       container.innerHTML = "<p>No customer reviews yet.</p>";
       return;
     }
-
+ 
     // Filter verified reviews only
     const verifiedReviews = data.reviews.filter((r) => r.verified);
 

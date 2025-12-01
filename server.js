@@ -9,6 +9,8 @@ const bcrypt = require("bcrypt"); // For password hashing comparison
 const jwt = require("jsonwebtoken"); // For generating authentication tokens
 require("dotenv").config();
 const nodemailer = require("nodemailer");
+const Imap = require("imap-simple");
+const { simpleParser } = require("mailparser");
 // const fetch = require("node-fetch");
 const axios = require("axios");
  
@@ -257,87 +259,87 @@ app.post("/api/checkout", async (req, res) => {
     // Send email
     try {
       const transporter = nodemailer.createTransport({
-        host: "smtp.zoho.in",
+        host: "smtp.hostinger.com",
         port: 465,
         secure: true,
         auth: {
           user: "orderconfirmation@mclandpharma.com",
-          pass: "YFc3HfTpMu5S",
+          pass: "Order$123mcland",
         },
       });
 
       const mailOptions = {
-        from: '"Mcland Pharma" <orderconfirmation@mclandpharma.com>',
+        from: '"McLand Pharma" <orderconfirmation@mclandpharma.com>',
         to: email,
         subject: "Order Confirmation - Mcland Pharma",
         html: `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Order Confirmation</title>
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; }
-        .header { background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 5px; }
-        .content { padding: 20px; }
-        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .total { font-weight: bold; font-size: 16px; }
-        .footer { background-color: #f8f9fa; padding: 15px; margin-top: 20px; border-radius: 5px; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>Order Confirmation - Mcland Pharma</h1>
-        <p>Thank you for your order, ${firstName} ${lastName}!</p>
-    </div>
-    <div class="content">
-        <p>Your order has been successfully placed and is being processed.</p>
-        <h2>Customer Information</h2>
-        <table>
-            <tr><td><strong>Name:</strong></td><td>${firstName} ${lastName}</td></tr>
-            <tr><td><strong>Phone:</strong></td><td>${phone}</td></tr>
-            <tr><td><strong>Email:</strong></td><td>${email}</td></tr>
-            <tr><td><strong>Address:</strong></td><td>${billingStreetAddress}, ${billingCity}, ${billingState}, ${billingZip}, ${country}</td></tr>
-            
-        </table>
-        <h2>Order Summary</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Product Name</th>
-                    <th>Strength (mg)</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${cartItems.map(item => `
-                    <tr>
-                        <td>${item.name}</td>
-                        <td>${item.mg}</td>
-                        <td>${item.quantity}</td>
-                        <td>$${parseFloat(item.price).toFixed(2)}</td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        </table>
-        <div class="total">
-            <p>Shipping Cost: $${parseFloat(shippingCost).toFixed(2)}</p>
-            <p>Total Amount: $${parseFloat(totalCost).toFixed(2)}</p>
-        </div>
-    </div>
-    <div class="footer">
-        <h3>Contact Information</h3>
-        <p><strong>Phone:</strong> +1 209 593 7171</p>
-        <p><strong>WhatsApp:</strong> +91 887 920 1044</p>
-        <p><strong>Email:</strong> customerinfo2024@gmail.com</p>
-        <p><em>This is an automated confirmation email.</em></p>
-        <p>© ${new Date().getFullYear()} Mcland Pharma. All rights reserved.</p>
-    </div>
-</body>
-</html>
+              <!DOCTYPE html>
+              <html lang="en">
+              <head>
+                  <meta charset="UTF-8">
+                  <title>Order Confirmation</title>
+                  <style>
+                      body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; }
+                      .header { background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 5px; }
+                      .content { padding: 20px; }
+                      table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+                      th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                      th { background-color: #f2f2f2; }
+                      .total { font-weight: bold; font-size: 16px; }
+                      .footer { background-color: #f8f9fa; padding: 15px; margin-top: 20px; border-radius: 5px; }
+                  </style>
+              </head>
+              <body>
+                  <div class="header">
+                      <h1>Order Confirmation - Mcland Pharma</h1>
+                      <p>Thank you for your order, ${firstName} ${lastName}!</p>
+                  </div>
+                  <div class="content">
+                      <p>Your order has been successfully placed and is being processed.</p>
+                      <h2>Customer Information</h2>
+                      <table>
+                          <tr><td><strong>Name:</strong></td><td>${firstName} ${lastName}</td></tr>
+                          <tr><td><strong>Phone:</strong></td><td>${phone}</td></tr>
+                          <tr><td><strong>Email:</strong></td><td>${email}</td></tr>
+                          <tr><td><strong>Address:</strong></td><td>${billingStreetAddress}, ${billingCity}, ${billingState}, ${billingZip}, ${country}</td></tr>
+                          
+                      </table>
+                      <h2>Order Summary</h2>
+                      <table>
+                          <thead>
+                              <tr>
+                                  <th>Product Name</th>
+                                  <th>Strength (mg)</th>
+                                  <th>Quantity</th>
+                                  <th>Price</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              ${cartItems.map(item => `
+                                  <tr>
+                                      <td>${item.name}</td>
+                                      <td>${item.mg}</td>
+                                      <td>${item.quantity}</td>
+                                      <td>$${parseFloat(item.price).toFixed(2)}</td>
+                                  </tr>
+                              `).join('')}
+                          </tbody>
+                      </table>
+                      <div class="total">
+                          <p>Shipping Cost: $${parseFloat(shippingCost).toFixed(2)}</p>
+                          <p>Total Amount: $${parseFloat(totalCost).toFixed(2)}</p>
+                      </div>
+                  </div>
+                  <div class="footer">
+                      <h3>Contact Information</h3>
+                      <p><strong>Phone:</strong> +1 209 593 7171</p>
+                      <p><strong>WhatsApp:</strong> +91 887 920 1044</p>
+                      <p><strong>Email:</strong> customerinfo2024@gmail.com</p>
+                      <p><em>This is an automated confirmation email.</em></p>
+                      <p>© ${new Date().getFullYear()} Mcland Pharma. All rights reserved.</p>
+                  </div>
+              </body>
+              </html>
         `,
       };
 
@@ -569,12 +571,12 @@ app.post("/api/manual-order", async (req, res) => {
     // ✅ STEP 4: Send confirmation email
     try {
       const transporter = nodemailer.createTransport({
-        host: "smtp.zoho.in",
+        host: "smtp.hostinger.com",
         port: 465,
         secure: true,
-        auth: { 
-          user: "orderconfirmation@mclandpharma.com", 
-          pass: "YFc3HfTpMu5S" 
+        auth: {
+          user: "orderconfirmation@mclandpharma.com",
+          pass: "Order$123mcland",
         },
       });
 
@@ -1387,12 +1389,7 @@ app.get("/api/customers/:id", async (req, res) => {
   }
 });
 
-// 🚨 Retry route → clears cookie and re-checks
-app.post("/retry", (req, res) => {
-  res.clearCookie("vpn_blocked");
-  // console.log("User requested retry → cookie cleared");
-  res.redirect("/"); // Send back to homepage (or any safe route)
-});
+
 
 // Add this endpoint to your server.js file (before the "Start server" section)
 
@@ -1558,13 +1555,61 @@ app.get("/api/orders/:orderId/payment-status", async (req, res) => {
 
  
 
+// app.post("/api/orders/:orderId/send-tracking", async (req, res) => {
+//   const { orderId } = req.params;
+//   const { trackingNumber, userId } = req.body;
+
+//   try {
+
+//    // Fetch customer email from Postgres
+//     const result = await pool.query(
+//       "SELECT email, first_name FROM customers WHERE id = $1",
+//       [userId]
+//     );
+
+//     if (result.rows.length === 0) {
+//       return res.status(404).json({ success: false, message: "Customer not found" });
+//     }
+
+//     const customer = result.rows[0];
+//     const email = customer.email;
+//     const name = customer.first_name;
+
+//     // Email Setup for Zoho Mail
+//     const transporter = nodemailer.createTransport({
+//         host: "smtp.hostinger.com",
+//         port: 465,
+//         secure: true,
+//         auth: {
+//           user: "orderconfirmation@mclandpharma.com",
+//           pass: "Order$123mcland",
+//       },
+//     });
+
+//     //want to update
+//     // Send email
+//     await transporter.sendMail({
+//       from: '"Mcland Pharma" <orderconfirmation@mclandpharma.com>',
+//       to: email,
+//       subject: "Your Order has been Shipped",
+//       text: `Hello ${name},\n\nYour order #${orderId} has been shipped.\nTracking Number: ${trackingNumber}\n\nThank you for shopping with us!`,
+//     });
+
+//     res.json({ success: true, message: "Tracking email sent successfully" });
+//   } catch (err) {
+//     console.error("Error sending tracking email:", err);
+//     res.status(500).json({ success: false, message: "Error sending email" });
+//   }
+// });
+
+
+
 app.post("/api/orders/:orderId/send-tracking", async (req, res) => {
   const { orderId } = req.params;
   const { trackingNumber, userId } = req.body;
 
   try {
-
-   // Fetch customer email from Postgres
+    // 1️⃣ Fetch customer email
     const result = await pool.query(
       "SELECT email, first_name FROM customers WHERE id = $1",
       [userId]
@@ -1574,33 +1619,94 @@ app.post("/api/orders/:orderId/send-tracking", async (req, res) => {
       return res.status(404).json({ success: false, message: "Customer not found" });
     }
 
-    const customer = result.rows[0];
-    const email = customer.email;
-    const name = customer.first_name;
+    const { email, first_name: name } = result.rows[0];
 
-    // Email Setup for Zoho Mail
+    // 2️⃣ Create HTML email content
+    const htmlBody = `
+      <div style="font-family:Arial, sans-serif; padding:20px; background:#f5f6f7;">
+        <div style="max-width:600px; margin:auto; background:#ffffff; padding:25px; border-radius:10px;">
+          
+          <h2 style="color:#028C7E; text-align:center;">Your Order Has Shipped</h2>
+
+          <p style="font-size:16px;">Hello <b>${name}</b>,</p>
+
+          <p style="font-size:16px;">
+            We're excited to let you know that your order <b>#${orderId}</b> has been shipped.
+          </p>
+
+          <p style="font-size:16px; margin-top:20px;">
+            📦 <b>Tracking Number:</b> ${trackingNumber}
+          </p>
+
+          <p style="font-size:15px; margin-top:25px;">
+            Thank you for choosing <b>Mcland Pharma</b>.  
+            We appreciate your trust in our service.
+          </p>
+        </div>
+      </div>
+    `;
+
+    // 3️⃣ Nodemailer SMTP (Hostinger)
     const transporter = nodemailer.createTransport({
-      host: "smtp.zoho.in",
+      host: "smtp.hostinger.com",
       port: 465,
       secure: true,
       auth: {
         user: "orderconfirmation@mclandpharma.com",
-        pass: "YFc3HfTpMu5S",
+        pass: "Order$123mcland",
       },
     });
 
-    // Send email
+    // 4️⃣ Send Email
     await transporter.sendMail({
       from: '"Mcland Pharma" <orderconfirmation@mclandpharma.com>',
       to: email,
-      subject: "Your Order has been Shipped",
-      text: `Hello ${name},\n\nYour order #${orderId} has been shipped.\nTracking Number: ${trackingNumber}\n\nThank you for shopping with us!`,
+      subject: "Your Order Has Been Shipped",
+      html: htmlBody,
     });
 
-    res.json({ success: true, message: "Tracking email sent successfully" });
+    // 5️⃣ SAVE EMAIL INTO “Sent” FOLDER using IMAP
+    const rawEmail = 
+`From: "Mcland Pharma" <orderconfirmation@mclandpharma.com>
+To: ${email}
+Subject: Your Order Has Been Shipped
+Content-Type: text/html; charset=UTF-8
+
+${htmlBody}
+`;
+
+    const imapConfig = {
+      imap: {
+        user: "orderconfirmation@mclandpharma.com",
+        password: "Order$123mcland",
+        host: "imap.hostinger.com",
+        port: 993,
+        tls: true,
+        authTimeout: 5000,
+      },
+    };
+
+    const connection = await Imap.connect(imapConfig);
+    await connection.append(rawEmail, { mailbox: "INBOX.Sent" });
+    
+
+    await connection.append(rawEmail, {
+  mailbox: "INBOX.Sent",  // ✅ FIXED
+});
+
+    // 6️⃣ Response
+    res.json({
+      success: true,
+      message: "Tracking email sent successfully and saved to Sent folder",
+    });
+    await connection.end();
+
   } catch (err) {
     console.error("Error sending tracking email:", err);
-    res.status(500).json({ success: false, message: "Error sending email" });
+    res.status(500).json({
+      success: false,
+      message: "Error sending tracking email",
+    });
   }
 });
 
@@ -1656,45 +1762,7 @@ app.put("/api/orders/:orderId/status", async (req, res) => {
   }
 });
 
-// ============================
-// REVIEWS API ENDPOINTS
-// ============================
 
-// POST: Add a review
-// app.post("/api/reviews", async (req, res) => {
-//   const { product_id, name, email, rating, review_text } = req.body;
-
-//   if (!product_id || !name || !email || !rating || !review_text) {
-//     return res.status(400).json({ success: false, message: "All fields required" });
-//   }
-
-//   try {
-//     await pool.query(
-//       `INSERT INTO reviews (product_id, name, email, rating, review_text)
-//        VALUES ($1, $2, $3, $4, $5)`,
-//       [product_id, name, email, rating, review_text]
-//     );
-//     res.json({ success: true, message: "Review submitted successfully" });
-//   } catch (err) {
-//     console.error("Error inserting review:", err);
-//     res.status(500).json({ success: false, message: "Internal server error" });
-//   }
-// });
-
-// // GET: Fetch reviews for a product
-// app.get("/api/reviews/:productId", async (req, res) => {
-//   const { productId } = req.params;
-//   try {
-//     const result = await pool.query(
-//       `SELECT * FROM reviews WHERE product_id = $1 ORDER BY created_at DESC`,
-//       [productId]
-//     );
-//     res.json({ success: true, reviews: result.rows });
-//   } catch (err) {
-//     console.error("Error fetching reviews:", err);
-//     res.status(500).json({ success: false, message: "Failed to fetch reviews" });
-//   }
-// });
 
 // ✅ POST: Add a review (with verified purchase check)
 app.post("/api/reviews", async (req, res) => {
@@ -1766,6 +1834,7 @@ app.get("/api/reviews", async (req, res) => {
     const result = await pool.query(
       `SELECT name, rating, review_text, verified
        FROM reviews
+       WHERE rating > 3
        ORDER BY created_at DESC
        LIMIT 10`
     );
@@ -2553,7 +2622,9 @@ async function blockVPN(req, res, next) {
     // ✅ If cookie already says blocked → deny immediately
     if (req.cookies.vpn_blocked === "true") {
       console.log(`🚫 Blocked user (cookie): ${clientIp}`);
-      return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+      // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+      return res.status(403)
+          .sendFile(path.join(__dirname, "public", "restricted.html"));
     }
 
     // ✅ If cookie already says valid user → allow immediately (skip API check)
@@ -2577,7 +2648,9 @@ async function blockVPN(req, res, next) {
         if (cached.isVpn) {
           console.log(`🚫 VPN/Proxy detected (cached): ${clientIp}`);
           res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
-          return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+          // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+          return res.status(403)
+          .sendFile(path.join(__dirname, "public", "restricted.html"));
         } else {
           console.log(`✅ Valid user (cached): ${clientIp}`);
           res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
@@ -2635,7 +2708,9 @@ async function blockVPN(req, res, next) {
     if (isVpn) {
       console.log(`🚫 VPN/Proxy detected: ${clientIp}`);
       res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
-      return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+      // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+      return res.status(403)
+          .sendFile(path.join(__dirname, "public", "restricted.html"));
     }
 
     // ✅ Valid user

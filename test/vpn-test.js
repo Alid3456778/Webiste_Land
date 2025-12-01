@@ -83,7 +83,7 @@ class VPNBlockingTester {
           'X-Forwarded-For': testIP,
         },
       });
-      console.log(`Received status: ${response.status}`);
+      console.log(`Received status: ${response.data}`);
       if (response.status === 403 || response.data.includes('Not allowed')) {
         console.log('✅ PASS: VPN user was blocked');
         console.log(`   Status: ${response.status}`);
@@ -328,8 +328,7 @@ class VPNBlockingTester {
       );
       const clearsValidUser = setCookie?.some(c => 
         c.includes('valid_user') && c.includes('Max-Age=0')
-      );
-
+      );  
       if (clearsVpnBlocked || clearsValidUser) {
         console.log('✅ PASS: Retry endpoint clears VPN/validation cookies');
         console.log(`   Clears vpn_blocked: ${clearsVpnBlocked}`);

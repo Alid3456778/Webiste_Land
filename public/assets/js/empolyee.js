@@ -1138,7 +1138,9 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
             ${itemsHtml}
             <div style="margin-top: 10px; font-size: 13px; color: #666;">
-              <strong>Shipping:</strong> ${parseFloat(order.shipping).toFixed(2)} |
+              <strong>Shipping:</strong> ${parseFloat(order.shipping).toFixed(
+                2
+              )} |
               <strong>Items:</strong> ${order.itemCount} |
               <strong>Payment:</strong> ${generateStatusDropdown(
                 order.order_id,
@@ -1154,7 +1156,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 style="padding:6px; border:1px solid #ccc; border-radius:5px; width:160px;"
               />
               <button 
-                onclick="sendTrackingEmail(${order.order_id}, ${customer.id}, 'track-ct-${order.order_id}')"
+                onclick="sendTrackingEmail(${order.order_id}, ${
+            customer.id
+          }, 'track-ct-${order.order_id}')"
                 style="background:#2563eb; color:white; padding:6px 12px; border-radius:5px; border:none; cursor:pointer;">
                 Send Tracking
               </button>
@@ -1165,7 +1169,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <i class="fas fa-trash"></i> Delete
               </button>
             </div>
-          `;  
+          `;
           ordersListDiv.appendChild(orderCard);
         });
       }
@@ -1479,8 +1483,8 @@ document.addEventListener("DOMContentLoaded", () => {
                   request.order_id
                 }" placeholder="Tracking No" style="margin-top:5px; width:120px;" />
                 <button onclick="sendTrackingEmail(${request.order_id}, ${
-                    request.user_id
-                  })" 
+        request.user_id
+      })" 
                     style="background: linear-gradient(135deg, #3b82f6, #2563eb); margin-top:5px;">
                     <i class="fas fa-envelope"></i> Send Tracking
                 </button>
@@ -1596,8 +1600,12 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Send tracking email
-  window.sendTrackingEmail = async (orderId, userId, inputId = `track-${orderId}`) => {
-  const input = document.getElementById(inputId);
+  window.sendTrackingEmail = async (
+    orderId,
+    userId,
+    inputId = `track-${orderId}`
+  ) => {
+    const input = document.getElementById(inputId);
     const trackingNumber = input.value.trim();
     if (!trackingNumber) {
       alert("⚠️ Please enter a tracking number first.");
@@ -1610,7 +1618,7 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({ trackingNumber, userId }),
       });
       const result = await response.json();
-
+      console.log("Here is yuo result ",result);
       if (!response.ok || !result.success)
         throw new Error(result.message || "Failed to send tracking email");
       alert("📧 Tracking email sent successfully!");
