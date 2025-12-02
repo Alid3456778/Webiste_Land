@@ -268,11 +268,7 @@ app.post("/api/checkout", async (req, res) => {
         },
       });
 
-      const mailOptions = {
-        from: '"McLand Pharma" <orderconfirmation@mclandpharma.com>',
-        to: email,
-        subject: "Order Confirmation - Mcland Pharma",
-        html: `
+      const htmlBody = `
               <!DOCTYPE html>
               <html lang="en">
               <head>
@@ -340,10 +336,44 @@ app.post("/api/checkout", async (req, res) => {
                   </div>
               </body>
               </html>
-        `,
+        `;
+      const mailOptions = {
+        from: '"McLand Pharma" <orderconfirmation@mclandpharma.com>',
+        to: email,
+        subject: "Order Confirmation - Mcland Pharma",
+        html: htmlBody,
       };
 
       await transporter.sendMail(mailOptions);
+       // 5️⃣ SAVE EMAIL INTO “Sent” FOLDER using IMAP
+    const rawEmail = 
+`From: "Mcland Pharma" <orderconfirmation@mclandpharma.com>
+To: ${email}
+Subject: Your Order Has Been Shipped
+Content-Type: text/html; charset=UTF-8
+
+${htmlBody}
+`;
+
+    const imapConfig = {
+      imap: {
+        user: "orderconfirmation@mclandpharma.com",
+        password: "Order$123mcland",
+        host: "imap.hostinger.com",
+        port: 993,
+        tls: true,
+        authTimeout: 5000,
+      },
+    };
+
+    const connection = await Imap.connect(imapConfig);
+    // await connection.append(rawEmail, { mailbox: "INBOX.Sent" });
+    
+
+    await connection.append(rawEmail, {
+  mailbox: "INBOX.Sent",  // ✅ FIXED
+});
+
       res.json({
         success: true,
         message: "Order placed and email sent successfully!",
@@ -580,11 +610,7 @@ app.post("/api/manual-order", async (req, res) => {
         },
       });
 
-      const mailOptions = {
-        from: '"Mcland Pharma" <orderconfirmation@mclandpharma.com>',
-        to: email,
-        subject: "Order Confirmation - Mcland Pharma",
-        html: `
+      const htmlBody = `
             <!DOCTYPE html>
             <html lang="en">
             <head>
@@ -651,10 +677,44 @@ app.post("/api/manual-order", async (req, res) => {
                 </div>
             </body>
             </html>
-        `,
+        `;
+      const mailOptions = {
+        from: '"Mcland Pharma" <orderconfirmation@mclandpharma.com>',
+        to: email,
+        subject: "Order Confirmation - Mcland Pharma",
+        html: htmlBody,
       };
 
       await transporter.sendMail(mailOptions);
+
+       // 5️⃣ SAVE EMAIL INTO “Sent” FOLDER using IMAP
+    const rawEmail = 
+`From: "Mcland Pharma" <orderconfirmation@mclandpharma.com>
+To: ${email}
+Subject: Your Order Has Been Shipped
+Content-Type: text/html; charset=UTF-8
+
+${htmlBody}
+`;
+
+    const imapConfig = {
+      imap: {
+        user: "orderconfirmation@mclandpharma.com",
+        password: "Order$123mcland",
+        host: "imap.hostinger.com",
+        port: 993,
+        tls: true,
+        authTimeout: 5000,
+      },
+    };
+
+    const connection = await Imap.connect(imapConfig);
+    // await connection.append(rawEmail, { mailbox: "INBOX.Sent" });
+    
+
+    await connection.append(rawEmail, {
+  mailbox: "INBOX.Sent",  // ✅ FIXED
+});
       
       res.json({
         success: true,
@@ -2813,378 +2873,6 @@ app.post("/retry", (req, res) => {
 });
 
 
-// app.get("/clear-all-data", (req, res) => {
-//   const clientIp = (
-//     req.headers["x-forwarded-for"]?.split(",")[0] || 
-//     req.socket.remoteAddress || 
-//     req.connection.remoteAddress
-//   ).trim();
-
-//   // Get all cookies from the request
-//   const existingCookies = req.cookies;
-  
-//   console.log(`🧹 Clearing all data for IP: ${clientIp}`);
-//   console.log(`📦 Cookies found:`, Object.keys(existingCookies));
-
-//   // Clear all identified cookies from your application
-//   const cookiesToClear = [
-//     'sessionId',           // Shopping cart session
-//     'vpn_blocked',         // VPN blocking system
-//     'valid_user',          // User validation
-//     'authToken',           // If you add authentication
-//     'userId',              // If you track user ID
-//     'cartId',              // If you use separate cart ID
-//     'employeeToken'        // If you add employee sessions
-//   ];
-
-//   // Clear each cookie
-//   cookiesToClear.forEach(cookieName => {
-//     res.clearCookie(cookieName, {
-//       path: '/',
-//       httpOnly: true,
-//       secure: process.env.NODE_ENV === 'production',
-//       sameSite: 'lax'
-//     });
-//   });
-
-//   // Also clear any cookies that exist in the request but not in our list
-//   Object.keys(existingCookies).forEach(cookieName => {
-//     if (!cookiesToClear.includes(cookieName)) {
-//       res.clearCookie(cookieName, {
-//         path: '/',
-//         httpOnly: true,
-//         secure: process.env.NODE_ENV === 'production',
-//         sameSite: 'lax'
-//       });
-//     }
-//   });
-
-//   // Clear IP from cache if VPN blocking is enabled
-//   if (typeof ipCache !== 'undefined') {
-//     ipCache.delete(clientIp);
-//     console.log(`🗑️  Cleared IP cache for: ${clientIp}`);
-//   }
-
-//   // Send HTML response with localStorage clearing script
-//   res.send(`
-//     <!DOCTYPE html>
-//     <html lang="en">
-//     <head>
-//         <meta charset="UTF-8">
-//         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-//         <title>Data Cleared - McLand Pharma</title>
-//         <style>
-//             * {
-//                 margin: 0;
-//                 padding: 0;
-//                 box-sizing: border-box;
-//             }
-            
-//             body {
-//                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-//                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-//                 min-height: 100vh;
-//                 display: flex;
-//                 justify-content: center;
-//                 align-items: center;
-//                 padding: 20px;
-//             }
-            
-//             .container {
-//                 background: white;
-//                 border-radius: 20px;
-//                 padding: 40px;
-//                 max-width: 600px;
-//                 width: 100%;
-//                 box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-//                 animation: slideIn 0.5s ease-out;
-//             }
-            
-//             @keyframes slideIn {
-//                 from {
-//                     opacity: 0;
-//                     transform: translateY(-30px);
-//                 }
-//                 to {
-//                     opacity: 1;
-//                     transform: translateY(0);
-//                 }
-//             }
-            
-//             .icon {
-//                 width: 80px;
-//                 height: 80px;
-//                 margin: 0 auto 20px;
-//                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-//                 border-radius: 50%;
-//                 display: flex;
-//                 justify-content: center;
-//                 align-items: center;
-//                 font-size: 40px;
-//                 animation: bounce 1s ease-in-out;
-//             }
-            
-//             @keyframes bounce {
-//                 0%, 100% { transform: scale(1); }
-//                 50% { transform: scale(1.1); }
-//             }
-            
-//             h1 {
-//                 color: #333;
-//                 text-align: center;
-//                 margin-bottom: 20px;
-//                 font-size: 28px;
-//             }
-            
-//             .success-message {
-//                 background: #d4edda;
-//                 border: 2px solid #28a745;
-//                 border-radius: 10px;
-//                 padding: 20px;
-//                 margin: 20px 0;
-//                 color: #155724;
-//             }
-            
-//             .success-message h3 {
-//                 margin-bottom: 10px;
-//                 font-size: 18px;
-//             }
-            
-//             .info-box {
-//                 background: #e3f2fd;
-//                 border-left: 4px solid #2196f3;
-//                 padding: 15px;
-//                 margin: 15px 0;
-//                 border-radius: 5px;
-//             }
-            
-//             .info-box h4 {
-//                 color: #1976d2;
-//                 margin-bottom: 10px;
-//                 font-size: 16px;
-//             }
-            
-//             .info-box ul {
-//                 margin-left: 20px;
-//                 color: #0d47a1;
-//             }
-            
-//             .info-box li {
-//                 margin: 5px 0;
-//             }
-            
-//             .button-group {
-//                 display: flex;
-//                 gap: 15px;
-//                 margin-top: 30px;
-//                 flex-wrap: wrap;
-//             }
-            
-//             .btn {
-//                 flex: 1;
-//                 min-width: 150px;
-//                 padding: 15px 30px;
-//                 border: none;
-//                 border-radius: 10px;
-//                 font-size: 16px;
-//                 font-weight: 600;
-//                 cursor: pointer;
-//                 transition: all 0.3s ease;
-//                 text-decoration: none;
-//                 text-align: center;
-//                 display: inline-block;
-//             }
-            
-//             .btn-primary {
-//                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-//                 color: white;
-//             }
-            
-//             .btn-primary:hover {
-//                 transform: translateY(-2px);
-//                 box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-//             }
-            
-//             .btn-secondary {
-//                 background: #f5f5f5;
-//                 color: #333;
-//                 border: 2px solid #ddd;
-//             }
-            
-//             .btn-secondary:hover {
-//                 background: #e0e0e0;
-//             }
-            
-//             .warning {
-//                 background: #fff3cd;
-//                 border-left: 4px solid #ffc107;
-//                 padding: 15px;
-//                 margin: 15px 0;
-//                 border-radius: 5px;
-//                 color: #856404;
-//             }
-            
-//             code {
-//                 background: #f5f5f5;
-//                 padding: 2px 6px;
-//                 border-radius: 3px;
-//                 font-family: 'Courier New', monospace;
-//                 color: #d63384;
-//             }
-            
-//             @media (max-width: 600px) {
-//                 .container {
-//                     padding: 30px 20px;
-//                 }
-                
-//                 h1 {
-//                     font-size: 24px;
-//                 }
-                
-//                 .button-group {
-//                     flex-direction: column;
-//                 }
-                
-//                 .btn {
-//                     width: 100%;
-//                 }
-//             }
-//         </style>
-//     </head>
-//     <body>
-//         <div class="container">
-//             <div class="icon">🧹</div>
-//             <h1>All Data Cleared Successfully!</h1>
-            
-//             <div class="success-message">
-//                 <h3>✅ Cookies Cleared</h3>
-//                 <p>All server-side cookies have been cleared from your browser.</p>
-//             </div>
-            
-//             <div class="info-box">
-//                 <h4>📋 Cleared Cookies:</h4>
-//                 <ul>
-//                     <li><code>sessionId</code> - Shopping cart session</li>
-//                     <li><code>vpn_blocked</code> - VPN detection flag</li>
-//                     <li><code>valid_user</code> - User validation token</li>
-//                     <li><code>authToken</code> - Authentication token</li>
-//                     <li>+ Any other application cookies</li>
-//                 </ul>
-//             </div>
-            
-//             <div class="info-box">
-//                 <h4>💾 LocalStorage Status:</h4>
-//                 <p id="localStorage-status">Checking localStorage...</p>
-//                 <ul id="localStorage-items"></ul>
-//             </div>
-            
-//             <div class="warning">
-//                 <strong>⚠️ Note:</strong> Your shopping cart has been cleared. Any unsaved data has been removed.
-//             </div>
-            
-//             <div class="button-group">
-//                 <a href="/" class="btn btn-primary">Return to Homepage</a>
-//                 <button onclick="location.reload()" class="btn btn-secondary">Refresh Page</button>
-//             </div>
-//         </div>
-        
-//         <script>
-//             // Clear localStorage
-//             const localStorageCount = localStorage.length;
-//             const localStorageKeys = [];
-            
-//             // Get all localStorage keys before clearing
-//             for (let i = 0; i < localStorage.length; i++) {
-//                 localStorageKeys.push(localStorage.key(i));
-//             }
-            
-//             // Clear localStorage
-//             localStorage.clear();
-            
-//             // Clear sessionStorage too
-//             sessionStorage.clear();
-            
-//             // Update UI
-//             const statusElement = document.getElementById('localStorage-status');
-//             const itemsElement = document.getElementById('localStorage-items');
-            
-//             if (localStorageCount > 0) {
-//                 statusElement.innerHTML = '✅ <strong>LocalStorage cleared!</strong> (' + localStorageCount + ' items removed)';
-//                 statusElement.style.color = '#155724';
-                
-//                 localStorageKeys.forEach(key => {
-//                     const li = document.createElement('li');
-//                     li.innerHTML = '<code>' + key + '</code>';
-//                     itemsElement.appendChild(li);
-//                 });
-//             } else {
-//                 statusElement.innerHTML = 'ℹ️ LocalStorage was already empty';
-//                 statusElement.style.color = '#004085';
-//             }
-            
-//             // Log to console
-//             console.log('🧹 Data Clearing Summary:');
-//             console.log('- Cookies cleared: ✅');
-//             console.log('- LocalStorage cleared: ✅ (' + localStorageCount + ' items)');
-//             console.log('- SessionStorage cleared: ✅');
-//             console.log('- IP cache cleared: ✅');
-//             console.log('');
-//             console.log('Cleared localStorage keys:', localStorageKeys);
-//         </script>
-//     </body>
-//     </html>
-//   `);
-
-//   console.log('✅ All data cleared successfully');
-// });
-
-// app.post("/api/clear-all-data", (req, res) => {
-//   const clientIp = (
-//     req.headers["x-forwarded-for"]?.split(",")[0] || 
-//     req.socket.remoteAddress
-//   ).trim();
-
-//   // Clear all cookies
-//   const cookiesToClear = [
-//     'sessionId',
-//     'vpn_blocked',
-//     'valid_user',
-//     'authToken',
-//     'userId',
-//     'cartId',
-//     'employeeToken'
-//   ];
-
-//   cookiesToClear.forEach(cookieName => {
-//     res.clearCookie(cookieName, {
-//       path: '/',
-//       httpOnly: true,
-//       secure: process.env.NODE_ENV === 'production',
-//       sameSite: 'lax'
-//     });
-//   });
-
-//   // Clear IP cache
-//   if (typeof ipCache !== 'undefined') {
-//     ipCache.delete(clientIp);
-//   }
-
-//   res.json({
-//     success: true,
-//     message: 'All cookies cleared successfully',
-//     cleared: {
-//       cookies: cookiesToClear,
-//       ipCache: true
-//     },
-//     instructions: {
-//       localStorage: 'Clear localStorage using: localStorage.clear()',
-//       sessionStorage: 'Clear sessionStorage using: sessionStorage.clear()'
-//     }
-//   });
-// });
-
-
-// Static files
 app.use(express.static(path.join(__dirname, "public")));
 
 // Page routes
