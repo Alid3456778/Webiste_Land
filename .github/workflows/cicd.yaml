@@ -91,7 +91,7 @@ jobs:
 
       - name: Set BASE_URL to live site
         run: |
-          sed -i 's|https://mclandpharma.com|g' test/vpn-test.js
+          sed -i 's|http://localhost:3000|https://mclandpharma.com|g' test/vpn-test.js
 
       - name: Run VPN Tests
         run: |
