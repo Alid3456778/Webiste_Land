@@ -1,4 +1,4 @@
-name: CI + Deploy Pipeline
+name: CI CD Pipeline
 
 on:
   push:
@@ -70,7 +70,10 @@ jobs:
             git pull origin main
             npm install
             pm2 restart website_land
-  
+
+  # ============================
+  # 3) VPN Check — RUNS AFTER Deploye and see the vpn is rinning or not
+  # ============================
   run-tests:
     needs: deploy
     runs-on: ubuntu-latest
