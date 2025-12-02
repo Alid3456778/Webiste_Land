@@ -349,7 +349,7 @@ app.post("/api/checkout", async (req, res) => {
     const rawEmail = 
 `From: "Mcland Pharma" <orderconfirmation@mclandpharma.com>
 To: ${email}
-Subject: Your Order Has Been Shipped
+Subject: Order Confermation
 Content-Type: text/html; charset=UTF-8
 
 ${htmlBody}
@@ -691,7 +691,7 @@ app.post("/api/manual-order", async (req, res) => {
     const rawEmail = 
 `From: "Mcland Pharma" <orderconfirmation@mclandpharma.com>
 To: ${email}
-Subject: Your Order Has Been Shipped
+Subject: Order Confermation
 Content-Type: text/html; charset=UTF-8
 
 ${htmlBody}
