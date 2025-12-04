@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const batch = products.slice(start, end);
     batch.forEach((product) => {
       const productID = product.id;
-
+      
       const stockOverlay =
         product.stocks === 0
           ? `<div class="stock-overlay">
@@ -95,6 +95,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 product.category_id || "all"
               }" data-product-id="${productID}">
                 ${stockOverlay}
+                 ${
+                    product.offer_price != null ?`<p  > <img src="./assets/image2/off-image.png" class="Offer-avail" ></img></p>` : ``
+                  }
                 <img src="${
                   product.image_url || ""
                 }" alt="Product Image" loading="lazy"

@@ -906,6 +906,7 @@ document.addEventListener("DOMContentLoaded", () => {
     tr.appendChild(makeCell(variant.qty, "qty"));
     tr.appendChild(makeCell(variant.price_per_pill, "price_per_pill"));
     tr.appendChild(makeCell(variant.price_per_box, "price_per_box"));
+    tr.appendChild(makeCell(variant.offer_price, "offer_price"));
     tr.appendChild(makeCell(variant.delivery_time, "delivery_time"));
 
     const actTd = document.createElement("td");
@@ -989,6 +990,7 @@ document.addEventListener("DOMContentLoaded", () => {
       qty: "",
       price_per_pill: "",
       price_per_box: "",
+      offer_price : "",
       delivery_time: "",
     };
     const newRow = renderRow(empty);

@@ -13,7 +13,6 @@ const Imap = require("imap-simple");
 const { simpleParser } = require("mailparser");
 // const fetch = require("node-fetch");
 const axios = require("axios");
- 
 
 const app = express();
 
@@ -31,7 +30,6 @@ const pool = new Pool({
 });
 
 const JWT_SECRET2 = process.env.JWT_SECRET;
-
 
 // Middleware to assign session cookie
 app.use((req, res, next) => {
@@ -155,7 +153,7 @@ app.post("/api/checkout", async (req, res) => {
     shippingCost,
     totalCost,
   } = req.body;
-  
+
   console.log("Checkout data received:", req.body);
 
   const client = await pool.connect();
@@ -311,19 +309,29 @@ app.post("/api/checkout", async (req, res) => {
                               </tr>
                           </thead>
                           <tbody>
-                              ${cartItems.map(item => `
+                              ${cartItems
+                                .map(
+                                  (item) => `
                                   <tr>
                                       <td>${item.name}</td>
                                       <td>${item.mg}</td>
                                       <td>${item.quantity}</td>
-                                      <td>$${parseFloat(item.price).toFixed(2)}</td>
+                                      <td>$${parseFloat(item.price).toFixed(
+                                        2
+                                      )}</td>
                                   </tr>
-                              `).join('')}
+                              `
+                                )
+                                .join("")}
                           </tbody>
                       </table>
                       <div class="total">
-                          <p>Shipping Cost: $${parseFloat(shippingCost).toFixed(2)}</p>
-                          <p>Total Amount: $${parseFloat(totalCost).toFixed(2)}</p>
+                          <p>Shipping Cost: $${parseFloat(shippingCost).toFixed(
+                            2
+                          )}</p>
+                          <p>Total Amount: $${parseFloat(totalCost).toFixed(
+                            2
+                          )}</p>
                       </div>
                   </div>
                   <div class="footer">
@@ -345,9 +353,8 @@ app.post("/api/checkout", async (req, res) => {
       };
 
       await transporter.sendMail(mailOptions);
-       // 5️⃣ SAVE EMAIL INTO “Sent” FOLDER using IMAP
-    const rawEmail = 
-`From: "Mcland Pharma" <orderconfirmation@mclandpharma.com>
+      // 5️⃣ SAVE EMAIL INTO “Sent” FOLDER using IMAP
+      const rawEmail = `From: "Mcland Pharma" <orderconfirmation@mclandpharma.com>
 To: ${email}
 Subject: Order Confermation
 Content-Type: text/html; charset=UTF-8
@@ -355,30 +362,29 @@ Content-Type: text/html; charset=UTF-8
 ${htmlBody}
 `;
 
-    const imapConfig = {
-      imap: {
-        user: "orderconfirmation@mclandpharma.com",
-        password: "Order$123mcland",
-        host: "imap.hostinger.com",
-        port: 993,
-        tls: true,
-        authTimeout: 5000,
-      },
-    };
+      const imapConfig = {
+        imap: {
+          user: "orderconfirmation@mclandpharma.com",
+          password: "Order$123mcland",
+          host: "imap.hostinger.com",
+          port: 993,
+          tls: true,
+          authTimeout: 5000,
+        },
+      };
 
-    const connection = await Imap.connect(imapConfig);
-    // await connection.append(rawEmail, { mailbox: "INBOX.Sent" });
-    
+      const connection = await Imap.connect(imapConfig);
+      // await connection.append(rawEmail, { mailbox: "INBOX.Sent" });
 
-    await connection.append(rawEmail, {
-  mailbox: "INBOX.Sent",  // ✅ FIXED
-});
+      await connection.append(rawEmail, {
+        mailbox: "INBOX.Sent", // ✅ FIXED
+      });
 
       res.json({
         success: true,
         message: "Order placed and email sent successfully!",
         orderId: orderId,
-        userId: userId
+        userId: userId,
       });
     } catch (emailError) {
       console.error("Error sending email:", emailError);
@@ -386,17 +392,16 @@ ${htmlBody}
         success: true,
         message: "Order placed successfully, but email notification failed.",
         orderId: orderId,
-        userId: userId
+        userId: userId,
       });
     }
-
   } catch (error) {
     await client.query("ROLLBACK");
     console.error("Checkout error:", error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       error: "Server error during checkout",
-      details: error.message 
+      details: error.message,
     });
   } finally {
     client.release();
@@ -409,7 +414,7 @@ ${htmlBody}
 
 app.get("/api/order-customer/:orderId", async (req, res) => {
   const { orderId } = req.params;
-  
+
   try {
     // First, try to get customer data from order snapshot columns
     const orderResult = await pool.query(
@@ -431,7 +436,7 @@ app.get("/api/order-customer/:orderId", async (req, res) => {
       WHERE order_id = $1`,
       [orderId]
     );
-    
+
     if (orderResult.rows.length === 0) {
       return res.status(404).json({ error: "Order not found" });
     }
@@ -456,12 +461,14 @@ app.get("/api/order-customer/:orderId", async (req, res) => {
         city: order.customer_city,
         state: order.customer_state,
         zip_code: order.customer_zip_code,
-        data_source: 'snapshot'  // For debugging
+        data_source: "snapshot", // For debugging
       });
     } else {
       // ✅ No snapshot data - fallback to customers table
-      console.log(`Order ${orderId}: No snapshot found, using customers table (user_id: ${order.user_id})`);
-      
+      console.log(
+        `Order ${orderId}: No snapshot found, using customers table (user_id: ${order.user_id})`
+      );
+
       const customerResult = await pool.query(
         `SELECT * FROM customers WHERE id = $1`,
         [order.user_id]
@@ -472,7 +479,7 @@ app.get("/api/order-customer/:orderId", async (req, res) => {
       }
 
       const customer = customerResult.rows[0];
-      
+
       return res.json({
         order_id: order.order_id,
         user_id: order.user_id,
@@ -487,10 +494,9 @@ app.get("/api/order-customer/:orderId", async (req, res) => {
         city: customer.city,
         state: customer.state,
         zip_code: customer.zip_code,
-        data_source: 'customers_table'  // For debugging
+        data_source: "customers_table", // For debugging
       });
     }
-    
   } catch (err) {
     console.error("Error fetching order customer data:", err);
     res.status(500).json({ error: "Server error", details: err.message });
@@ -521,7 +527,7 @@ app.post("/api/manual-order", async (req, res) => {
     country,
     shippingCost,
     totalCost,
-    cartItems
+    cartItems,
   } = req.body;
 
   const client = await pool.connect();
@@ -539,36 +545,63 @@ app.post("/api/manual-order", async (req, res) => {
     if (emailCheckResult.rows.length > 0) {
       // ✅ Email exists - use that customer ID and update their info
       finalUserId = emailCheckResult.rows[0].id;
-      console.log(`✅ Found existing customer with email ${email}, ID: ${finalUserId}`);
-      
+      console.log(
+        `✅ Found existing customer with email ${email}, ID: ${finalUserId}`
+      );
+
       // Update existing customer info with latest data
       await client.query(
         `UPDATE customers SET 
           first_name=$1, last_name=$2, phone=$3, company_name=$4,
           street_address=$5, apartment=$6, city=$7, state=$8, zip_code=$9, country=$10
          WHERE id=$11`,
-        [firstName, lastName, phone, companyName || null, 
-         billingStreetAddress, apartment || null, billingCity, billingState, 
-         billingZip, country, finalUserId]
+        [
+          firstName,
+          lastName,
+          phone,
+          companyName || null,
+          billingStreetAddress,
+          apartment || null,
+          billingCity,
+          billingState,
+          billingZip,
+          country,
+          finalUserId,
+        ]
       );
     } else {
       // ✅ Email doesn't exist - create new customer
       if (userId && !isNaN(userId)) {
         // User provided an ID but email doesn't match - still create new customer
-        console.log(`⚠️ User ID ${userId} provided but email ${email} not found. Creating new customer.`);
+        console.log(
+          `⚠️ User ID ${userId} provided but email ${email} not found. Creating new customer.`
+        );
       }
-      
+
       const newCustomer = await client.query(
         `INSERT INTO customers 
          (first_name, last_name, email, phone, company_name, country,
           street_address, apartment, city, state, zip_code)
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
          RETURNING id`,
-        [firstName, lastName, email, phone, companyName || null, country,
-         billingStreetAddress, apartment || null, billingCity, billingState, billingZip]
+        [
+          firstName,
+          lastName,
+          email,
+          phone,
+          companyName || null,
+          country,
+          billingStreetAddress,
+          apartment || null,
+          billingCity,
+          billingState,
+          billingZip,
+        ]
       );
       finalUserId = newCustomer.rows[0].id;
-      console.log(`✅ Created new customer with email ${email}, ID: ${finalUserId}`);
+      console.log(
+        `✅ Created new customer with email ${email}, ID: ${finalUserId}`
+      );
     }
 
     // ✅ STEP 2: Create the order with customer snapshot
@@ -580,9 +613,22 @@ app.post("/api/manual-order", async (req, res) => {
         customer_apartment, customer_city, customer_state, customer_zip_code
       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
       RETURNING order_id`,
-      [finalUserId, totalCost, shippingCost, 
-       firstName, lastName, email, phone, companyName || null, country,
-       billingStreetAddress, apartment || null, billingCity, billingState, billingZip]
+      [
+        finalUserId,
+        totalCost,
+        shippingCost,
+        firstName,
+        lastName,
+        email,
+        phone,
+        companyName || null,
+        country,
+        billingStreetAddress,
+        apartment || null,
+        billingCity,
+        billingState,
+        billingZip,
+      ]
     );
 
     const orderId = orderRes.rows[0].order_id;
@@ -652,19 +698,29 @@ app.post("/api/manual-order", async (req, res) => {
                             </tr>
                         </thead>
                         <tbody>
-                            ${cartItems.map(item => `
+                            ${cartItems
+                              .map(
+                                (item) => `
                                 <tr>
                                     <td>${item.name}</td>
                                     <td>${item.mg}</td>
                                     <td>${item.quantity}</td>
-                                    <td>$${parseFloat(item.price).toFixed(2)}</td>
+                                    <td>$${parseFloat(item.price).toFixed(
+                                      2
+                                    )}</td>
                                 </tr>
-                            `).join('')}
+                            `
+                              )
+                              .join("")}
                         </tbody>
                     </table>
                     <div class="total">
-                        <p>Shipping Cost: $${parseFloat(shippingCost).toFixed(2)}</p>
-                        <p>Total Amount: $${parseFloat(totalCost).toFixed(2)}</p>
+                        <p>Shipping Cost: $${parseFloat(shippingCost).toFixed(
+                          2
+                        )}</p>
+                        <p>Total Amount: $${parseFloat(totalCost).toFixed(
+                          2
+                        )}</p>
                     </div>
                 </div>
                 <div class="footer">
@@ -687,9 +743,8 @@ app.post("/api/manual-order", async (req, res) => {
 
       await transporter.sendMail(mailOptions);
 
-       // 5️⃣ SAVE EMAIL INTO “Sent” FOLDER using IMAP
-    const rawEmail = 
-`From: "Mcland Pharma" <orderconfirmation@mclandpharma.com>
+      // 5️⃣ SAVE EMAIL INTO “Sent” FOLDER using IMAP
+      const rawEmail = `From: "Mcland Pharma" <orderconfirmation@mclandpharma.com>
 To: ${email}
 Subject: Order Confermation
 Content-Type: text/html; charset=UTF-8
@@ -697,54 +752,54 @@ Content-Type: text/html; charset=UTF-8
 ${htmlBody}
 `;
 
-    const imapConfig = {
-      imap: {
-        user: "orderconfirmation@mclandpharma.com",
-        password: "Order$123mcland",
-        host: "imap.hostinger.com",
-        port: 993,
-        tls: true,
-        authTimeout: 5000,
-      },
-    };
+      const imapConfig = {
+        imap: {
+          user: "orderconfirmation@mclandpharma.com",
+          password: "Order$123mcland",
+          host: "imap.hostinger.com",
+          port: 993,
+          tls: true,
+          authTimeout: 5000,
+        },
+      };
 
-    const connection = await Imap.connect(imapConfig);
-    // await connection.append(rawEmail, { mailbox: "INBOX.Sent" });
-    
+      const connection = await Imap.connect(imapConfig);
+      // await connection.append(rawEmail, { mailbox: "INBOX.Sent" });
 
-    await connection.append(rawEmail, {
-  mailbox: "INBOX.Sent",  // ✅ FIXED
-});
-      
+      await connection.append(rawEmail, {
+        mailbox: "INBOX.Sent", // ✅ FIXED
+      });
+
       res.json({
         success: true,
-        message: emailCheckResult.rows.length > 0 
-          ? "Order placed for existing customer! Email sent successfully!" 
-          : "New customer created and order placed! Email sent successfully!",
+        message:
+          emailCheckResult.rows.length > 0
+            ? "Order placed for existing customer! Email sent successfully!"
+            : "New customer created and order placed! Email sent successfully!",
         orderId: orderId,
         userId: finalUserId,
-        isNewCustomer: emailCheckResult.rows.length === 0
+        isNewCustomer: emailCheckResult.rows.length === 0,
       });
     } catch (emailError) {
       console.error("Error sending email:", emailError);
       res.json({
         success: true,
-        message: emailCheckResult.rows.length > 0
-          ? "Order placed for existing customer, but email notification failed."
-          : "New customer created and order placed, but email notification failed.",
+        message:
+          emailCheckResult.rows.length > 0
+            ? "Order placed for existing customer, but email notification failed."
+            : "New customer created and order placed, but email notification failed.",
         orderId: orderId,
         userId: finalUserId,
-        isNewCustomer: emailCheckResult.rows.length === 0
+        isNewCustomer: emailCheckResult.rows.length === 0,
       });
     }
-
   } catch (err) {
     await client.query("ROLLBACK");
     console.error("Manual order error:", err);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: "Error creating manual order",
-      error: err.message 
+      error: err.message,
     });
   } finally {
     client.release();
@@ -764,7 +819,9 @@ app.get("/api/customers/email/:email", async (req, res) => {
     );
 
     if (customerResult.rows.length === 0) {
-      return res.status(404).json({ success: false, message: "Customer not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Customer not found" });
     }
 
     const customer = customerResult.rows[0];
@@ -786,7 +843,6 @@ app.get("/api/customers/email/:email", async (req, res) => {
   }
 });
 
-
 // ========================================
 // 2️⃣ Get order items for a specific order
 // ========================================
@@ -805,8 +861,6 @@ app.get("/api/order-items_email/:orderId", async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
-
-
 
 // Endpoint to get invoice data by order ID
 app.get("/api/invoice/:orderId", async (req, res) => {
@@ -845,11 +899,9 @@ app.get("/api/invoice/:orderId", async (req, res) => {
 });
 
 const JWT_SECRET = JWT_SECRET2;
-;
-
 app.get("/api/order-customer/:orderId", async (req, res) => {
   const { orderId } = req.params;
-  
+
   try {
     const result = await pool.query(
       `SELECT 
@@ -870,11 +922,11 @@ app.get("/api/order-customer/:orderId", async (req, res) => {
       WHERE order_id = $1`,
       [orderId]
     );
-    
+
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Order not found" });
     }
-    
+
     res.json(result.rows[0]);
   } catch (err) {
     console.error("Error fetching order customer data:", err);
@@ -994,18 +1046,21 @@ app.put("/api/variants/:id", async (req, res) => {
     qty,
     price_per_pill,
     price_per_box,
+    offer_price,
     delivery_time,
   } = req.body;
   await pool.query(
     `UPDATE product_variants
-     SET unit_type=$1, unit_value=$2, qty=$3, price_per_pill=$4, price_per_box=$5, delivery_time=$6
-     WHERE variation_id=$7`,
+     SET unit_type=$1, unit_value=$2, qty=$3, price_per_pill=$4, price_per_box=$5,
+    offer_price=$6, delivery_time=$7
+     WHERE variation_id=$8`,
     [
       unit_type,
       unit_value,
       qty,
       price_per_pill,
       price_per_box,
+      offer_price || null,
       delivery_time,
       id,
     ]
@@ -1022,12 +1077,13 @@ app.post("/api/variants", async (req, res) => {
     qty,
     price_per_pill,
     price_per_box,
+    offer_price ,
     delivery_time,
   } = req.body;
   const { rows } = await pool.query(
     `INSERT INTO product_variants
-      (product_id, unit_type, unit_value, qty, price_per_pill, price_per_box, delivery_time)
-     VALUES ($1,$2,$3,$4,$5,$6,$7)
+(product_id, unit_type, unit_value, qty, price_per_pill, price_per_box, offer_price, delivery_time)
+VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
      RETURNING *`,
     [
       product_id,
@@ -1036,6 +1092,7 @@ app.post("/api/variants", async (req, res) => {
       qty,
       price_per_pill,
       price_per_box,
+      offer_price || null, 
       delivery_time,
     ]
   );
@@ -1243,7 +1300,7 @@ app.get("/products", async (req, res) => {
       query = "SELECT * FROM products ORDER BY product_name";
     } else {
       query =
-        "SELECT * FROM products WHERE category_id = $1 ORDER BY product_name";
+        "SELECT p.*, min_price.min_offer_price AS offer_price FROM products p JOIN ( SELECT product_id, MIN(offer_price) AS min_offer_price FROM product_variants GROUP BY product_id) AS min_price ON p.product_id = min_price.product_id WHERE p.category_id = $1 ORDER BY p.product_name;";
       params = [categoryID];
     }
 
@@ -1266,8 +1323,6 @@ app.get("/product-prices", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-
 
 app.get("/api/requests", async (req, res) => {
   try {
@@ -1332,7 +1387,12 @@ app.get("/api/customers/search", async (req, res) => {
   const lastNameRaw = (req.query.lastName || "").trim();
 
   if (!firstNameRaw && !lastNameRaw) {
-    return res.status(400).json({ success: false, message: "Provide firstName or lastName (or both)" });
+    return res
+      .status(400)
+      .json({
+        success: false,
+        message: "Provide firstName or lastName (or both)",
+      });
   }
 
   try {
@@ -1342,15 +1402,30 @@ app.get("/api/customers/search", async (req, res) => {
 
     if (firstNameRaw && lastNameRaw) {
       orderParams.push(`%${firstNameRaw} ${lastNameRaw}%`);
-      orderWhereClauses.push("(COALESCE(customer_first_name,'') || ' ' || COALESCE(customer_last_name,'')) ILIKE $" + orderParams.length);
+      orderWhereClauses.push(
+        "(COALESCE(customer_first_name,'') || ' ' || COALESCE(customer_last_name,'')) ILIKE $" +
+          orderParams.length
+      );
     }
     if (firstNameRaw) {
       orderParams.push(`%${firstNameRaw}%`);
-      orderWhereClauses.push("(COALESCE(customer_first_name,'') ILIKE $" + orderParams.length + " OR COALESCE(customer_last_name,'') ILIKE $" + orderParams.length + ")");
+      orderWhereClauses.push(
+        "(COALESCE(customer_first_name,'') ILIKE $" +
+          orderParams.length +
+          " OR COALESCE(customer_last_name,'') ILIKE $" +
+          orderParams.length +
+          ")"
+      );
     }
     if (lastNameRaw) {
       orderParams.push(`%${lastNameRaw}%`);
-      orderWhereClauses.push("(COALESCE(customer_first_name,'') ILIKE $" + orderParams.length + " OR COALESCE(customer_last_name,'') ILIKE $" + orderParams.length + ")");
+      orderWhereClauses.push(
+        "(COALESCE(customer_first_name,'') ILIKE $" +
+          orderParams.length +
+          " OR COALESCE(customer_last_name,'') ILIKE $" +
+          orderParams.length +
+          ")"
+      );
     }
 
     const orderQuery = `
@@ -1374,15 +1449,30 @@ app.get("/api/customers/search", async (req, res) => {
 
     if (firstNameRaw && lastNameRaw) {
       custParams.push(`%${firstNameRaw} ${lastNameRaw}%`);
-      custWhereClauses.push("(COALESCE(first_name,'') || ' ' || COALESCE(last_name,'')) ILIKE $" + custParams.length);
+      custWhereClauses.push(
+        "(COALESCE(first_name,'') || ' ' || COALESCE(last_name,'')) ILIKE $" +
+          custParams.length
+      );
     }
     if (firstNameRaw) {
       custParams.push(`%${firstNameRaw}%`);
-      custWhereClauses.push("(COALESCE(first_name,'') ILIKE $" + custParams.length + " OR COALESCE(last_name,'') ILIKE $" + custParams.length + ")");
+      custWhereClauses.push(
+        "(COALESCE(first_name,'') ILIKE $" +
+          custParams.length +
+          " OR COALESCE(last_name,'') ILIKE $" +
+          custParams.length +
+          ")"
+      );
     }
     if (lastNameRaw) {
       custParams.push(`%${lastNameRaw}%`);
-      custWhereClauses.push("(COALESCE(first_name,'') ILIKE $" + custParams.length + " OR COALESCE(last_name,'') ILIKE $" + custParams.length + ")");
+      custWhereClauses.push(
+        "(COALESCE(first_name,'') ILIKE $" +
+          custParams.length +
+          " OR COALESCE(last_name,'') ILIKE $" +
+          custParams.length +
+          ")"
+      );
     }
 
     const custQuery = `
@@ -1406,7 +1496,8 @@ app.get("/api/customers/search", async (req, res) => {
     combined.forEach((r) => {
       const fname = (r.first_name || "").trim();
       const lname = (r.last_name || "").trim();
-      const id = r.user_id === null || r.user_id === undefined ? "" : String(r.user_id);
+      const id =
+        r.user_id === null || r.user_id === undefined ? "" : String(r.user_id);
       const orderId = r.order_id;
       const key = `${fname} ${lname}-${id}`.trim();
 
@@ -1419,7 +1510,12 @@ app.get("/api/customers/search", async (req, res) => {
           email: r.email || null,
           phone: r.phone || null,
           order_id: orderId || null,
-          source: r.user_id && r.email ? "orders/customers" : (r.email ? "customers" : "orders") // advisory
+          source:
+            r.user_id && r.email
+              ? "orders/customers"
+              : r.email
+              ? "customers"
+              : "orders", // advisory
         });
       }
     });
@@ -1427,7 +1523,9 @@ app.get("/api/customers/search", async (req, res) => {
     return res.json({ success: true, count: unique.length, data: unique });
   } catch (err) {
     console.error("Error in /api/customers/search:", err.stack || err);
-    return res.status(500).json({ success: false, message: "Server error", details: err.message });
+    return res
+      .status(500)
+      .json({ success: false, message: "Server error", details: err.message });
   }
 });
 
@@ -1449,8 +1547,6 @@ app.get("/api/customers/:id", async (req, res) => {
   }
 });
 
-
-
 // Add this endpoint to your server.js file (before the "Start server" section)
 
 // GET: Customer Order Tracking - Complete customer data with all orders
@@ -1465,9 +1561,9 @@ app.get("/api/customer-tracking/:userId", async (req, res) => {
     );
 
     if (customerResult.rows.length === 0) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Customer not found" 
+      return res.status(404).json({
+        success: false,
+        message: "Customer not found",
       });
     }
 
@@ -1520,37 +1616,35 @@ app.get("/api/customer-tracking/:userId", async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching customer tracking data:", error);
-    res.status(500).json({ 
-      success: false, 
-      message: "Server error", 
-      error: error.message 
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
     });
   }
 });
-
-
-
 
 // PUT: Update payment status for an order
 app.put("/api/orders/:orderId/payment-status", async (req, res) => {
   const { orderId } = req.params;
   const { status } = req.body;
 
-  const validStatuses = ['pending', 'completed', 'failed', 'refunded'];
+  const validStatuses = ["pending", "completed", "failed", "refunded"];
   if (!status || !validStatuses.includes(status)) {
-    return res.status(400).json({ 
-      success: false, 
-      message: "Invalid payment status" 
+    return res.status(400).json({
+      success: false,
+      message: "Invalid payment status",
     });
   }
 
   try {
-    const query = status === 'completed'
-      ? `UPDATE orders 
+    const query =
+      status === "completed"
+        ? `UPDATE orders 
          SET payment_status = $1, payment_date = CURRENT_TIMESTAMP 
          WHERE order_id = $2 
          RETURNING *`
-      : `UPDATE orders 
+        : `UPDATE orders 
          SET payment_status = $1 
          WHERE order_id = $2 
          RETURNING *`;
@@ -1558,23 +1652,23 @@ app.put("/api/orders/:orderId/payment-status", async (req, res) => {
     const result = await pool.query(query, [status, orderId]);
 
     if (result.rowCount === 0) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Order not found" 
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
       });
     }
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: `Payment status updated to '${status}'`,
-      order: result.rows[0]
+      order: result.rows[0],
     });
   } catch (error) {
     console.error("Error updating payment status:", error);
-    res.status(500).json({ 
-      success: false, 
-      message: "Server error", 
-      error: error.message 
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
     });
   }
 });
@@ -1592,28 +1686,25 @@ app.get("/api/orders/:orderId/payment-status", async (req, res) => {
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Order not found" 
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
       });
     }
 
-    res.json({ 
-      success: true, 
-      data: result.rows[0]
+    res.json({
+      success: true,
+      data: result.rows[0],
     });
   } catch (error) {
     console.error("Error fetching payment status:", error);
-    res.status(500).json({ 
-      success: false, 
-      message: "Server error", 
-      error: error.message 
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
     });
   }
 });
-
-
- 
 
 // app.post("/api/orders/:orderId/send-tracking", async (req, res) => {
 //   const { orderId } = req.params;
@@ -1662,8 +1753,6 @@ app.get("/api/orders/:orderId/payment-status", async (req, res) => {
 //   }
 // });
 
-
-
 app.post("/api/orders/:orderId/send-tracking", async (req, res) => {
   const { orderId } = req.params;
   const { trackingNumber, userId } = req.body;
@@ -1676,7 +1765,9 @@ app.post("/api/orders/:orderId/send-tracking", async (req, res) => {
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ success: false, message: "Customer not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Customer not found" });
     }
 
     const { email, first_name: name } = result.rows[0];
@@ -1782,8 +1873,7 @@ app.post("/api/orders/:orderId/send-tracking", async (req, res) => {
     });
 
     // 5️⃣ SAVE EMAIL INTO “Sent” FOLDER using IMAP
-    const rawEmail = 
-`From: "Mcland Pharma" <orderconfirmation@mclandpharma.com>
+    const rawEmail = `From: "Mcland Pharma" <orderconfirmation@mclandpharma.com>
 To: ${email}
 Subject: Your Order Has Been Shipped
 Content-Type: text/html; charset=UTF-8
@@ -1804,11 +1894,10 @@ ${htmlBody}
 
     const connection = await Imap.connect(imapConfig);
     // await connection.append(rawEmail, { mailbox: "INBOX.Sent" });
-    
 
     await connection.append(rawEmail, {
-  mailbox: "INBOX.Sent",  // ✅ FIXED
-});
+      mailbox: "INBOX.Sent", // ✅ FIXED
+    });
 
     // 6️⃣ Response
     res.json({
@@ -1816,7 +1905,6 @@ ${htmlBody}
       message: "Tracking email sent successfully and saved to Sent folder",
     });
     await connection.end();
-
   } catch (err) {
     console.error("Error sending tracking email:", err);
     res.status(500).json({
@@ -1826,22 +1914,27 @@ ${htmlBody}
   }
 });
 
-
-
 // PUT /api/orders/:orderId/status - Update order status
 app.put("/api/orders/:orderId/status", async (req, res) => {
   const { orderId } = req.params;
   const { status, payment_status } = req.body;
-  
+
   // Use either status or payment_status (for backward compatibility)
   const newStatus = status || payment_status;
-  
+
   // Validate status
-  const validStatuses = ['pending', 'paid', 'process', 'tracking', 'delivered', 'completed'];
+  const validStatuses = [
+    "pending",
+    "paid",
+    "process",
+    "tracking",
+    "delivered",
+    "completed",
+  ];
   if (!validStatuses.includes(newStatus)) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Invalid status. Must be one of: ' + validStatuses.join(', ') 
+    return res.status(400).json({
+      success: false,
+      message: "Invalid status. Must be one of: " + validStatuses.join(", "),
     });
   }
 
@@ -1855,30 +1948,28 @@ app.put("/api/orders/:orderId/status", async (req, res) => {
     );
 
     if (result.rowCount === 0) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Order not found' 
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
       });
     }
 
     console.log(`✅ Order #${orderId} status updated to: ${newStatus}`);
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: `Order status updated to ${newStatus}`,
-      order: result.rows[0]
+      order: result.rows[0],
     });
   } catch (err) {
-    console.error('Error updating order status:', err);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Failed to update order status',
-      error: err.message 
+    console.error("Error updating order status:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update order status",
+      error: err.message,
     });
   }
 });
-
-
 
 // ✅ POST: Add a review (with verified purchase check)
 app.post("/api/reviews", async (req, res) => {
@@ -1920,9 +2011,7 @@ app.post("/api/reviews", async (req, res) => {
     });
   } catch (err) {
     console.error("Error inserting review:", err);
-    res
-      .status(500)
-      .json({ success: false, message: "Internal server error" });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
 
@@ -1957,7 +2046,9 @@ app.get("/api/reviews", async (req, res) => {
     res.json({ success: true, reviews: result.rows });
   } catch (err) {
     console.error("Error fetching reviews:", err);
-    res.status(500).json({ success: false, message: "Failed to fetch reviews" });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch reviews" });
   }
 });
 
@@ -1969,12 +2060,12 @@ app.get("/api/reviews", async (req, res) => {
 // const archiver = require('archiver');
 // const { format } = require('date-fns');
 
-const archiver = require('archiver');
+const archiver = require("archiver");
 
 // Helper function to format date for filenames
 function getBackupTimestamp() {
   const now = new Date();
-  return now.toISOString().replace(/[:.]/g, '-').slice(0, -5);
+  return now.toISOString().replace(/[:.]/g, "-").slice(0, -5);
 }
 
 // ============================
@@ -1984,61 +2075,66 @@ app.get("/api/backup/full/:Prop", async (req, res) => {
   const timestamp = getBackupTimestamp();
   // console.log('Backup Prop:', req.params.Prop);
   const Prop = req.params.Prop;
-  if(Prop !== process.env.BACKUP){
-    return res.status(403).json({ 
-      success: false, 
-      error: 'Unauthorized access' 
+  if (Prop !== process.env.BACKUP) {
+    return res.status(403).json({
+      success: false,
+      error: "Unauthorized access",
     });
-  }
-  else{
-  try {
-    console.log('🔄 Starting full database backup...');
-    
-    // Set response headers for zip download
-    res.setHeader('Content-Type', 'application/zip');
-    res.setHeader('Content-Disposition', `attachment; filename=mcland_pharma_backup_${timestamp}.zip`);
-    
-    // Create zip archive
-    const archive = archiver('zip', { zlib: { level: 9 } });
-    
-    // Handle archive errors
-    archive.on('error', (err) => {
-      console.error('❌ Archive error:', err);
-      throw err;
-    });
-    
-    // Pipe archive to response
-    archive.pipe(res);
-    
-    // === 1. Generate SQL Dump ===
-    const sqlDump = await generateSQLDump();
-    archive.append(sqlDump, { name: `backup_${timestamp}.sql` });
-    
-    // === 2. Generate JSON Backup ===
-    const jsonBackup = await generateJSONBackup();
-    archive.append(JSON.stringify(jsonBackup, null, 2), { name: `backup_${timestamp}.json` });
-    
-    // === 3. Generate CSV Files ===
-    const csvData = await generateCSVBackup();
-    Object.keys(csvData).forEach(tableName => {
-      archive.append(csvData[tableName], { name: `csv/${tableName}_${timestamp}.csv` });
-    });
-    
-    // Finalize the archive
-    await archive.finalize();
-    
-    console.log('✅ Full backup completed successfully');
-    
-  } catch (error) {
-    console.error('❌ Backup error:', error);
-    if (!res.headersSent) {
-      res.status(500).json({ 
-        success: false, 
-        error: 'Backup failed', 
-        details: error.message 
+  } else {
+    try {
+      console.log("🔄 Starting full database backup...");
+
+      // Set response headers for zip download
+      res.setHeader("Content-Type", "application/zip");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename=mcland_pharma_backup_${timestamp}.zip`
+      );
+
+      // Create zip archive
+      const archive = archiver("zip", { zlib: { level: 9 } });
+
+      // Handle archive errors
+      archive.on("error", (err) => {
+        console.error("❌ Archive error:", err);
+        throw err;
       });
+
+      // Pipe archive to response
+      archive.pipe(res);
+
+      // === 1. Generate SQL Dump ===
+      const sqlDump = await generateSQLDump();
+      archive.append(sqlDump, { name: `backup_${timestamp}.sql` });
+
+      // === 2. Generate JSON Backup ===
+      const jsonBackup = await generateJSONBackup();
+      archive.append(JSON.stringify(jsonBackup, null, 2), {
+        name: `backup_${timestamp}.json`,
+      });
+
+      // === 3. Generate CSV Files ===
+      const csvData = await generateCSVBackup();
+      Object.keys(csvData).forEach((tableName) => {
+        archive.append(csvData[tableName], {
+          name: `csv/${tableName}_${timestamp}.csv`,
+        });
+      });
+
+      // Finalize the archive
+      await archive.finalize();
+
+      console.log("✅ Full backup completed successfully");
+    } catch (error) {
+      console.error("❌ Backup error:", error);
+      if (!res.headersSent) {
+        res.status(500).json({
+          success: false,
+          error: "Backup failed",
+          details: error.message,
+        });
+      }
     }
-  }
   }
 });
 
@@ -2047,24 +2143,26 @@ app.get("/api/backup/full/:Prop", async (req, res) => {
 // ============================
 app.get("/api/backup/sql", async (req, res) => {
   const timestamp = getBackupTimestamp();
-  
+
   try {
-    console.log('🔄 Generating SQL backup...');
-    
+    console.log("🔄 Generating SQL backup...");
+
     const sqlDump = await generateSQLDump();
-    
-    res.setHeader('Content-Type', 'application/sql');
-    res.setHeader('Content-Disposition', `attachment; filename=backup_${timestamp}.sql`);
+
+    res.setHeader("Content-Type", "application/sql");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=backup_${timestamp}.sql`
+    );
     res.send(sqlDump);
-    
-    console.log('✅ SQL backup completed');
-    
+
+    console.log("✅ SQL backup completed");
   } catch (error) {
-    console.error('❌ SQL backup error:', error);
-    res.status(500).json({ 
-      success: false, 
-      error: 'SQL backup failed', 
-      details: error.message 
+    console.error("❌ SQL backup error:", error);
+    res.status(500).json({
+      success: false,
+      error: "SQL backup failed",
+      details: error.message,
     });
   }
 });
@@ -2074,24 +2172,26 @@ app.get("/api/backup/sql", async (req, res) => {
 // ============================
 app.get("/api/backup/json", async (req, res) => {
   const timestamp = getBackupTimestamp();
-  
+
   try {
-    console.log('🔄 Generating JSON backup...');
-    
+    console.log("🔄 Generating JSON backup...");
+
     const jsonBackup = await generateJSONBackup();
-    
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Content-Disposition', `attachment; filename=backup_${timestamp}.json`);
+
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=backup_${timestamp}.json`
+    );
     res.json(jsonBackup);
-    
-    console.log('✅ JSON backup completed');
-    
+
+    console.log("✅ JSON backup completed");
   } catch (error) {
-    console.error('❌ JSON backup error:', error);
-    res.status(500).json({ 
-      success: false, 
-      error: 'JSON backup failed', 
-      details: error.message 
+    console.error("❌ JSON backup error:", error);
+    res.status(500).json({
+      success: false,
+      error: "JSON backup failed",
+      details: error.message,
     });
   }
 });
@@ -2101,33 +2201,37 @@ app.get("/api/backup/json", async (req, res) => {
 // ============================
 app.get("/api/backup/csv", async (req, res) => {
   const timestamp = getBackupTimestamp();
-  
+
   try {
-    console.log('🔄 Generating CSV backup...');
-    
-    res.setHeader('Content-Type', 'application/zip');
-    res.setHeader('Content-Disposition', `attachment; filename=csv_backup_${timestamp}.zip`);
-    
-    const archive = archiver('zip', { zlib: { level: 9 } });
-    archive.on('error', (err) => { throw err; });
+    console.log("🔄 Generating CSV backup...");
+
+    res.setHeader("Content-Type", "application/zip");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=csv_backup_${timestamp}.zip`
+    );
+
+    const archive = archiver("zip", { zlib: { level: 9 } });
+    archive.on("error", (err) => {
+      throw err;
+    });
     archive.pipe(res);
-    
+
     const csvData = await generateCSVBackup();
-    Object.keys(csvData).forEach(tableName => {
+    Object.keys(csvData).forEach((tableName) => {
       archive.append(csvData[tableName], { name: `${tableName}.csv` });
     });
-    
+
     await archive.finalize();
-    
-    console.log('✅ CSV backup completed');
-    
+
+    console.log("✅ CSV backup completed");
   } catch (error) {
-    console.error('❌ CSV backup error:', error);
+    console.error("❌ CSV backup error:", error);
     if (!res.headersSent) {
-      res.status(500).json({ 
-        success: false, 
-        error: 'CSV backup failed', 
-        details: error.message 
+      res.status(500).json({
+        success: false,
+        error: "CSV backup failed",
+        details: error.message,
       });
     }
   }
@@ -2140,43 +2244,44 @@ app.get("/api/backup/csv", async (req, res) => {
 // Generate SQL dump
 async function generateSQLDump() {
   const tables = [
-    'customers',
-    'orders', 
-    'order_items',
-    'products',
-    'product_variants',
-    'carts',
-    'reviews',
-    'employee_login'
+    "customers",
+    "orders",
+    "order_items",
+    "products",
+    "product_variants",
+    "carts",
+    "reviews",
+    "employee_login",
   ];
-  
+
   let sqlDump = `-- ====================================================\n`;
   sqlDump += `-- McLand Pharma Database Backup\n`;
   sqlDump += `-- Generated: ${new Date().toISOString()}\n`;
   sqlDump += `-- Compatible with: PostgreSQL, MySQL, SQLite, SQL Server\n`;
   sqlDump += `-- Total Tables: ${tables.length}\n`;
   sqlDump += `-- ====================================================\n\n`;
-  
+
   sqlDump += `-- Disable foreign key checks for import\n`;
   sqlDump += `-- PostgreSQL: (no command needed)\n`;
   sqlDump += `-- MySQL: SET FOREIGN_KEY_CHECKS=0;\n`;
   sqlDump += `-- SQLite: PRAGMA foreign_keys = OFF;\n\n`;
-  
+
   // Store all constraints to add at the end
   let allIndexes = [];
   let allForeignKeys = [];
-  
+
   for (const table of tables) {
     try {
       sqlDump += `\n-- ============================\n`;
       sqlDump += `-- Table: ${table}\n`;
       sqlDump += `-- ============================\n\n`;
-      
+
       // Drop table (compatible with all databases)
       sqlDump += `DROP TABLE IF EXISTS ${table};\n\n`;
-      
+
       // Get table structure
-      const structureResult = await pool.query(`
+      const structureResult = await pool.query(
+        `
         SELECT 
           column_name,
           data_type,
@@ -2189,15 +2294,18 @@ async function generateSQLDump() {
         FROM information_schema.columns
         WHERE table_name = $1
         ORDER BY ordinal_position;
-      `, [table]);
-      
+      `,
+        [table]
+      );
+
       if (structureResult.rows.length === 0) {
         sqlDump += `-- Warning: No structure found for table ${table}\n\n`;
         continue;
       }
-      
+
       // Get primary key info first
-      const pkResult = await pool.query(`
+      const pkResult = await pool.query(
+        `
         SELECT kcu.column_name
         FROM information_schema.table_constraints tc
         JOIN information_schema.key_column_usage kcu 
@@ -2206,161 +2314,191 @@ async function generateSQLDump() {
         WHERE tc.table_name = $1 
           AND tc.constraint_type = 'PRIMARY KEY'
         ORDER BY kcu.ordinal_position;
-      `, [table]);
-      
-      const primaryKeyColumns = pkResult.rows.map(r => r.column_name);
-      
+      `,
+        [table]
+      );
+
+      const primaryKeyColumns = pkResult.rows.map((r) => r.column_name);
+
       // Build CREATE TABLE statement with universal SQL types
       sqlDump += `CREATE TABLE ${table} (\n`;
-      
+
       const columnDefs = structureResult.rows.map((col) => {
         let def = `  ${col.column_name} `;
-        
+
         // Convert to universal SQL data types
         let dataType = col.data_type;
-        let universalType = '';
-        
+        let universalType = "";
+
         // Map PostgreSQL types to universal SQL types
-        if (col.udt_name === 'int4' || dataType === 'integer') {
-          universalType = 'INTEGER';
-        } else if (col.udt_name === 'int8' || dataType === 'bigint') {
-          universalType = 'BIGINT';
-        } else if (col.udt_name === 'varchar' || dataType === 'character varying') {
+        if (col.udt_name === "int4" || dataType === "integer") {
+          universalType = "INTEGER";
+        } else if (col.udt_name === "int8" || dataType === "bigint") {
+          universalType = "BIGINT";
+        } else if (
+          col.udt_name === "varchar" ||
+          dataType === "character varying"
+        ) {
           if (col.character_maximum_length) {
             universalType = `VARCHAR(${col.character_maximum_length})`;
           } else {
-            universalType = 'TEXT';
+            universalType = "TEXT";
           }
-        } else if (col.udt_name === 'text' || dataType === 'text') {
-          universalType = 'TEXT';
-        } else if (col.udt_name === 'timestamp' || col.udt_name === 'timestamptz') {
-          universalType = 'TIMESTAMP';
-        } else if (col.udt_name === 'date') {
-          universalType = 'DATE';
-        } else if (col.udt_name === 'numeric' || dataType === 'numeric') {
+        } else if (col.udt_name === "text" || dataType === "text") {
+          universalType = "TEXT";
+        } else if (
+          col.udt_name === "timestamp" ||
+          col.udt_name === "timestamptz"
+        ) {
+          universalType = "TIMESTAMP";
+        } else if (col.udt_name === "date") {
+          universalType = "DATE";
+        } else if (col.udt_name === "numeric" || dataType === "numeric") {
           if (col.numeric_precision && col.numeric_scale) {
             universalType = `DECIMAL(${col.numeric_precision},${col.numeric_scale})`;
           } else if (col.numeric_precision) {
             universalType = `DECIMAL(${col.numeric_precision})`;
           } else {
-            universalType = 'DECIMAL(10,2)';
+            universalType = "DECIMAL(10,2)";
           }
-        } else if (col.udt_name === 'bool' || dataType === 'boolean') {
-          universalType = 'BOOLEAN';
-        } else if (col.udt_name === 'float4' || dataType === 'real') {
-          universalType = 'REAL';
-        } else if (col.udt_name === 'float8' || dataType === 'double precision') {
-          universalType = 'DOUBLE PRECISION';
+        } else if (col.udt_name === "bool" || dataType === "boolean") {
+          universalType = "BOOLEAN";
+        } else if (col.udt_name === "float4" || dataType === "real") {
+          universalType = "REAL";
+        } else if (
+          col.udt_name === "float8" ||
+          dataType === "double precision"
+        ) {
+          universalType = "DOUBLE PRECISION";
         } else {
           // Default fallback
           universalType = dataType.toUpperCase();
         }
-        
+
         def += universalType;
-        
+
         // Handle auto-increment / serial columns (primary keys)
-        if (primaryKeyColumns.includes(col.column_name) && 
-            col.column_default && 
-            col.column_default.includes('nextval')) {
+        if (
+          primaryKeyColumns.includes(col.column_name) &&
+          col.column_default &&
+          col.column_default.includes("nextval")
+        ) {
           // AUTO_INCREMENT for MySQL, AUTOINCREMENT for SQLite, IDENTITY for SQL Server
           // PostgreSQL uses SERIAL
-          def += ' PRIMARY KEY'; // This makes it auto-increment in most databases
+          def += " PRIMARY KEY"; // This makes it auto-increment in most databases
         }
-        
+
         // NOT NULL constraint
-        if (col.is_nullable === 'NO' && !primaryKeyColumns.includes(col.column_name)) {
-          def += ' NOT NULL';
+        if (
+          col.is_nullable === "NO" &&
+          !primaryKeyColumns.includes(col.column_name)
+        ) {
+          def += " NOT NULL";
         }
-        
+
         // Default value (skip for auto-increment columns)
-        if (col.column_default && !col.column_default.includes('nextval')) {
+        if (col.column_default && !col.column_default.includes("nextval")) {
           let defaultVal = col.column_default;
-          
+
           // Clean up PostgreSQL-specific syntax
-          defaultVal = defaultVal.replace(/::[\w\s]+/g, ''); // Remove type casts
+          defaultVal = defaultVal.replace(/::[\w\s]+/g, ""); // Remove type casts
           defaultVal = defaultVal.replace(/'/g, "'"); // Normalize quotes
-          
+
           // Handle common defaults
-          if (defaultVal.toUpperCase().includes('NOW()') || 
-              defaultVal.toUpperCase().includes('CURRENT_TIMESTAMP')) {
-            def += ' DEFAULT CURRENT_TIMESTAMP';
-          } else if (defaultVal.toUpperCase() === 'TRUE' || defaultVal === 'true') {
-            def += ' DEFAULT 1'; // Compatible with MySQL/SQLite
-          } else if (defaultVal.toUpperCase() === 'FALSE' || defaultVal === 'false') {
-            def += ' DEFAULT 0';
+          if (
+            defaultVal.toUpperCase().includes("NOW()") ||
+            defaultVal.toUpperCase().includes("CURRENT_TIMESTAMP")
+          ) {
+            def += " DEFAULT CURRENT_TIMESTAMP";
+          } else if (
+            defaultVal.toUpperCase() === "TRUE" ||
+            defaultVal === "true"
+          ) {
+            def += " DEFAULT 1"; // Compatible with MySQL/SQLite
+          } else if (
+            defaultVal.toUpperCase() === "FALSE" ||
+            defaultVal === "false"
+          ) {
+            def += " DEFAULT 0";
           } else if (!isNaN(defaultVal)) {
             def += ` DEFAULT ${defaultVal}`;
-          } else if (defaultVal !== '') {
+          } else if (defaultVal !== "") {
             def += ` DEFAULT ${defaultVal}`;
           }
         }
-        
+
         return def;
       });
-      
-      sqlDump += columnDefs.join(',\n');
-      
+
+      sqlDump += columnDefs.join(",\n");
+
       // Add composite primary key if not already added
       if (primaryKeyColumns.length > 1) {
-        sqlDump += `,\n  PRIMARY KEY (${primaryKeyColumns.join(', ')})`;
+        sqlDump += `,\n  PRIMARY KEY (${primaryKeyColumns.join(", ")})`;
       }
-      
+
       sqlDump += `\n);\n\n`;
-      
+
       // Get all data from table
       const dataResult = await pool.query(`SELECT * FROM ${table}`);
-      
+
       if (dataResult.rows.length > 0) {
         const columns = Object.keys(dataResult.rows[0]);
-        
+
         sqlDump += `-- Data for ${table} (${dataResult.rows.length} rows)\n`;
-        
+
         // Use standard INSERT statements (compatible with all databases)
-        dataResult.rows.forEach(row => {
-          const values = columns.map(col => {
+        dataResult.rows.forEach((row) => {
+          const values = columns.map((col) => {
             const val = row[col];
-            
+
             if (val === null) {
-              return 'NULL';
+              return "NULL";
             }
-            
-            if (typeof val === 'boolean') {
-              return val ? '1' : '0'; // Universal boolean (1/0)
+
+            if (typeof val === "boolean") {
+              return val ? "1" : "0"; // Universal boolean (1/0)
             }
-            
-            if (typeof val === 'number') {
+
+            if (typeof val === "number") {
               return val;
             }
-            
+
             if (val instanceof Date) {
-              return `'${val.toISOString().replace('T', ' ').substring(0, 19)}'`;
+              return `'${val
+                .toISOString()
+                .replace("T", " ")
+                .substring(0, 19)}'`;
             }
-            
-            if (typeof val === 'string') {
+
+            if (typeof val === "string") {
               // Escape single quotes for all SQL databases
               const escaped = val.replace(/'/g, "''");
               return `'${escaped}'`;
             }
-            
-            if (typeof val === 'object') {
+
+            if (typeof val === "object") {
               // Convert objects to JSON string
               const jsonStr = JSON.stringify(val).replace(/'/g, "''");
               return `'${jsonStr}'`;
             }
-            
+
             return `'${val}'`;
           });
-          
-          sqlDump += `INSERT INTO ${table} (${columns.join(', ')}) VALUES (${values.join(', ')});\n`;
+
+          sqlDump += `INSERT INTO ${table} (${columns.join(
+            ", "
+          )}) VALUES (${values.join(", ")});\n`;
         });
-        
+
         sqlDump += `\n`;
       } else {
         sqlDump += `-- No data in ${table}\n\n`;
       }
-      
+
       // Get indexes (store for later, excluding primary key)
-      const indexResult = await pool.query(`
+      const indexResult = await pool.query(
+        `
         SELECT 
           indexname,
           indexdef
@@ -2369,33 +2507,38 @@ async function generateSQLDump() {
           AND indexname NOT LIKE '%_pkey'
           AND schemaname = 'public'
         ORDER BY indexname;
-      `, [table]);
-      
+      `,
+        [table]
+      );
+
       if (indexResult.rows.length > 0) {
-        indexResult.rows.forEach(idx => {
+        indexResult.rows.forEach((idx) => {
           // Convert PostgreSQL index to universal SQL
           let indexDef = idx.indexdef;
-          
+
           // Extract index name, table, and columns
-          const match = indexDef.match(/CREATE (?:UNIQUE )?INDEX (\w+) ON \w+\.?(\w+) USING \w+ \(([^)]+)\)/i);
+          const match = indexDef.match(
+            /CREATE (?:UNIQUE )?INDEX (\w+) ON \w+\.?(\w+) USING \w+ \(([^)]+)\)/i
+          );
           if (match) {
-            const isUnique = indexDef.includes('UNIQUE');
+            const isUnique = indexDef.includes("UNIQUE");
             const indexName = match[1];
             const columns = match[3];
-            
+
             allIndexes.push({
               table: table,
               name: indexName,
               unique: isUnique,
               columns: columns,
-              originalDef: indexDef
+              originalDef: indexDef,
             });
           }
         });
       }
-      
+
       // Get foreign keys (store for later)
-      const fkResult = await pool.query(`
+      const fkResult = await pool.query(
+        `
         SELECT
           tc.constraint_name,
           kcu.column_name,
@@ -2415,10 +2558,12 @@ async function generateSQLDump() {
           AND rc.constraint_schema = tc.table_schema
         WHERE tc.constraint_type = 'FOREIGN KEY'
           AND tc.table_name = $1;
-      `, [table]);
-      
+      `,
+        [table]
+      );
+
       if (fkResult.rows.length > 0) {
-        fkResult.rows.forEach(fk => {
+        fkResult.rows.forEach((fk) => {
           allForeignKeys.push({
             table: table,
             constraint_name: fk.constraint_name,
@@ -2426,163 +2571,163 @@ async function generateSQLDump() {
             foreign_table: fk.foreign_table_name,
             foreign_column: fk.foreign_column_name,
             update_rule: fk.update_rule,
-            delete_rule: fk.delete_rule
+            delete_rule: fk.delete_rule,
           });
         });
       }
-      
     } catch (err) {
       console.error(`Error backing up table ${table}:`, err);
       sqlDump += `-- Error backing up table ${table}: ${err.message}\n\n`;
     }
   }
-  
+
   // Add all indexes at the end
   if (allIndexes.length > 0) {
     sqlDump += `\n-- ============================\n`;
     sqlDump += `-- Indexes (Universal SQL)\n`;
     sqlDump += `-- ============================\n\n`;
-    
-    allIndexes.forEach(idx => {
-      const uniqueStr = idx.unique ? 'UNIQUE ' : '';
+
+    allIndexes.forEach((idx) => {
+      const uniqueStr = idx.unique ? "UNIQUE " : "";
       sqlDump += `-- Index: ${idx.name} on ${idx.table}\n`;
       sqlDump += `CREATE ${uniqueStr}INDEX ${idx.name} ON ${idx.table} (${idx.columns});\n\n`;
     });
   }
-  
+
   // Add all foreign keys at the end
   if (allForeignKeys.length > 0) {
     sqlDump += `\n-- ============================\n`;
     sqlDump += `-- Foreign Key Constraints (Universal SQL)\n`;
     sqlDump += `-- ============================\n\n`;
-    
-    allForeignKeys.forEach(fk => {
+
+    allForeignKeys.forEach((fk) => {
       sqlDump += `-- Foreign key: ${fk.constraint_name} on ${fk.table}\n`;
       sqlDump += `ALTER TABLE ${fk.table}\n`;
       sqlDump += `  ADD CONSTRAINT ${fk.constraint_name}\n`;
       sqlDump += `  FOREIGN KEY (${fk.column_name})\n`;
       sqlDump += `  REFERENCES ${fk.foreign_table}(${fk.foreign_column})`;
-      
+
       // Add CASCADE rules if not default
-      if (fk.delete_rule && fk.delete_rule !== 'NO ACTION') {
+      if (fk.delete_rule && fk.delete_rule !== "NO ACTION") {
         sqlDump += `\n  ON DELETE ${fk.delete_rule}`;
       }
-      if (fk.update_rule && fk.update_rule !== 'NO ACTION') {
+      if (fk.update_rule && fk.update_rule !== "NO ACTION") {
         sqlDump += `\n  ON UPDATE ${fk.update_rule}`;
       }
-      
+
       sqlDump += `;\n\n`;
     });
   }
-  
+
   sqlDump += `\n-- ============================\n`;
   sqlDump += `-- Re-enable foreign key checks\n`;
   sqlDump += `-- ============================\n`;
   sqlDump += `-- MySQL: SET FOREIGN_KEY_CHECKS=1;\n`;
   sqlDump += `-- SQLite: PRAGMA foreign_keys = ON;\n\n`;
-  
+
   sqlDump += `-- ============================\n`;
   sqlDump += `-- Backup completed successfully\n`;
   sqlDump += `-- Total tables: ${tables.length}\n`;
   sqlDump += `-- Total indexes: ${allIndexes.length}\n`;
   sqlDump += `-- Total foreign keys: ${allForeignKeys.length}\n`;
   sqlDump += `-- ============================\n`;
-  
+
   return sqlDump;
 }
 
 // Generate JSON backup
 async function generateJSONBackup() {
   const tables = [
-    'customers',
-    'orders',
-    'order_items', 
-    'products',
-    'product_variants',
-    'carts',
-    'reviews',
-    'employee_login'
+    "customers",
+    "orders",
+    "order_items",
+    "products",
+    "product_variants",
+    "carts",
+    "reviews",
+    "employee_login",
   ];
-  
+
   const backup = {
     metadata: {
       timestamp: new Date().toISOString(),
-      version: '1.0',
-      database: 'mcland_pharma'
+      version: "1.0",
+      database: "mcland_pharma",
     },
-    tables: {}
+    tables: {},
   };
-  
+
   for (const table of tables) {
     try {
       const result = await pool.query(`SELECT * FROM ${table}`);
       backup.tables[table] = {
         count: result.rows.length,
-        data: result.rows
+        data: result.rows,
       };
     } catch (err) {
       console.error(`Error backing up table ${table}:`, err);
       backup.tables[table] = {
-        error: err.message
+        error: err.message,
       };
     }
   }
-  
+
   return backup;
 }
 
 // Generate CSV backup
 async function generateCSVBackup() {
   const tables = [
-    'customers',
-    'orders',
-    'order_items',
-    'products', 
-    'product_variants',
-    'carts',
-    'reviews',
-    'employee_login'
+    "customers",
+    "orders",
+    "order_items",
+    "products",
+    "product_variants",
+    "carts",
+    "reviews",
+    "employee_login",
   ];
-  
+
   const csvFiles = {};
-  
+
   for (const table of tables) {
     try {
       const result = await pool.query(`SELECT * FROM ${table}`);
-      
+
       if (result.rows.length === 0) {
         csvFiles[table] = `No data in ${table} table\n`;
         continue;
       }
-      
+
       // Get column headers
       const headers = Object.keys(result.rows[0]);
-      let csv = headers.join(',') + '\n';
-      
+      let csv = headers.join(",") + "\n";
+
       // Add rows
-      result.rows.forEach(row => {
-        const values = headers.map(header => {
+      result.rows.forEach((row) => {
+        const values = headers.map((header) => {
           const val = row[header];
-          if (val === null) return '';
-          if (typeof val === 'string') {
+          if (val === null) return "";
+          if (typeof val === "string") {
             // Escape quotes and wrap in quotes if contains comma
             const escaped = val.replace(/"/g, '""');
-            return val.includes(',') || val.includes('\n') ? `"${escaped}"` : escaped;
+            return val.includes(",") || val.includes("\n")
+              ? `"${escaped}"`
+              : escaped;
           }
           if (val instanceof Date) return val.toISOString();
           return val;
         });
-        csv += values.join(',') + '\n';
+        csv += values.join(",") + "\n";
       });
-      
+
       csvFiles[table] = csv;
-      
     } catch (err) {
       console.error(`Error backing up table ${table}:`, err);
       csvFiles[table] = `Error: ${err.message}\n`;
     }
   }
-  
+
   return csvFiles;
 }
 
@@ -2592,49 +2737,47 @@ async function generateCSVBackup() {
 app.get("/api/backup/info", async (req, res) => {
   try {
     const tables = [
-      'customers',
-      'orders',
-      'order_items',
-      'products',
-      'product_variants',
-      'carts',
-      'reviews',
-      'employee_login'
+      "customers",
+      "orders",
+      "order_items",
+      "products",
+      "product_variants",
+      "carts",
+      "reviews",
+      "employee_login",
     ];
-    
+
     const tableInfo = {};
-    
+
     for (const table of tables) {
       const result = await pool.query(`SELECT COUNT(*) as count FROM ${table}`);
       tableInfo[table] = parseInt(result.rows[0].count);
     }
-    
+
     res.json({
       success: true,
-      database: 'mcland_pharma',
+      database: "mcland_pharma",
       timestamp: new Date().toISOString(),
       tables: tableInfo,
       totalRecords: Object.values(tableInfo).reduce((a, b) => a + b, 0),
-      availableFormats: ['full', 'sql', 'json', 'csv'],
+      availableFormats: ["full", "sql", "json", "csv"],
       routes: {
-        full: '/api/backup/full',
-        sql: '/api/backup/sql',
-        json: '/api/backup/json',
-        csv: '/api/backup/csv',
-        info: '/api/backup/info'
-      }
+        full: "/api/backup/full",
+        sql: "/api/backup/sql",
+        json: "/api/backup/json",
+        csv: "/api/backup/csv",
+        info: "/api/backup/info",
+      },
     });
-    
   } catch (error) {
-    console.error('Error getting backup info:', error);
-    res.status(500).json({ 
-      success: false, 
-      error: 'Failed to get backup info',
-      details: error.message 
+    console.error("Error getting backup info:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to get backup info",
+      details: error.message,
     });
   }
 });
-
 
 // ============================================
 // IN-MEMORY CACHE FOR IP CHECKS
@@ -2647,14 +2790,14 @@ const MAX_CACHE_SIZE = 10000; // Prevent memory overflow
 setInterval(() => {
   const now = Date.now();
   let cleaned = 0;
-  
+
   for (const [ip, data] of ipCache.entries()) {
     if (now - data.timestamp > CACHE_DURATION) {
       ipCache.delete(ip);
       cleaned++;
     }
   }
-  
+
   if (cleaned > 0) {
     console.log(`🧹 Cache cleaned: ${cleaned} expired entries removed`);
   }
@@ -2669,18 +2812,18 @@ const MAX_API_CALLS_PER_MINUTE = 40; // Stay under ip-api's 45/min limit
 
 function canMakeApiCall() {
   const now = Date.now();
-  
+
   // Reset counter every minute
   if (now - lastResetTime > 60000) {
     apiCallCount = 0;
     lastResetTime = now;
   }
-  
+
   if (apiCallCount >= MAX_API_CALLS_PER_MINUTE) {
     console.warn("⚠️ API rate limit reached for this minute");
     return false;
   }
-  
+
   apiCallCount++;
   return true;
 }
@@ -2698,17 +2841,17 @@ const EMPLOYEE_IPS = new Set([
 // ROUTES TO SKIP VPN CHECK
 // ============================================
 const SKIP_VPN_CHECK_PATHS = [
-  '/assets/',
-  '/favicon.ico',
-  '/robots.txt',
-  '/sitemap.xml',
-  '/restricted.html',
-  '/retry',
-  '/api/backup/' // Skip VPN check for backup endpoints
+  "/assets/",
+  "/favicon.ico",
+  "/robots.txt",
+  "/sitemap.xml",
+  "/restricted.html",
+  "/retry",
+  "/api/backup/", // Skip VPN check for backup endpoints
 ];
 
 function shouldSkipVpnCheck(path) {
-  return SKIP_VPN_CHECK_PATHS.some(skipPath => path.startsWith(skipPath));
+  return SKIP_VPN_CHECK_PATHS.some((skipPath) => path.startsWith(skipPath));
 }
 
 // ============================================
@@ -2723,13 +2866,17 @@ async function blockVPN(req, res, next) {
 
     // ✅ Get client IP (handle proxy headers)
     const clientIp = (
-      req.headers["x-forwarded-for"]?.split(",")[0] || 
-      req.socket.remoteAddress || 
+      req.headers["x-forwarded-for"]?.split(",")[0] ||
+      req.socket.remoteAddress ||
       req.connection.remoteAddress
     ).trim();
 
     // ✅ Skip localhost/development IPs
-    if (clientIp === "::1" || clientIp === "127.0.0.1" || clientIp.startsWith("192.168.")) {
+    if (
+      clientIp === "::1" ||
+      clientIp === "127.0.0.1" ||
+      clientIp.startsWith("192.168.")
+    ) {
       console.log(`✅ Development IP allowed: ${clientIp}`);
       res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
       return next();
@@ -2739,8 +2886,9 @@ async function blockVPN(req, res, next) {
     if (req.cookies.vpn_blocked === "true") {
       console.log(`🚫 Blocked user (cookie): ${clientIp}`);
       // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
-      return res.status(403)
-          .sendFile(path.join(__dirname, "public", "restricted.html"));
+      return res
+        .status(403)
+        .sendFile(path.join(__dirname, "public", "restricted.html"));
     }
 
     // ✅ If cookie already says valid user → allow immediately (skip API check)
@@ -2759,14 +2907,15 @@ async function blockVPN(req, res, next) {
     const cached = ipCache.get(clientIp);
     if (cached) {
       const age = Date.now() - cached.timestamp;
-      
+
       if (age < CACHE_DURATION) {
         if (cached.isVpn) {
           console.log(`🚫 VPN/Proxy detected (cached): ${clientIp}`);
           res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
           // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
-          return res.status(403)
-          .sendFile(path.join(__dirname, "public", "restricted.html"));
+          return res
+            .status(403)
+            .sendFile(path.join(__dirname, "public", "restricted.html"));
         } else {
           console.log(`✅ Valid user (cached): ${clientIp}`);
           res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
@@ -2792,12 +2941,12 @@ async function blockVPN(req, res, next) {
 
     const response = await axios.get(
       `http://ip-api.com/json/${clientIp}?fields=proxy,hosting,status,message`,
-      { 
+      {
         signal: controller.signal,
-        timeout: 5000
+        timeout: 5000,
       }
     );
-    
+
     clearTimeout(timeoutId);
 
     const data = response.data;
@@ -2817,7 +2966,7 @@ async function blockVPN(req, res, next) {
     if (ipCache.size < MAX_CACHE_SIZE) {
       ipCache.set(clientIp, {
         isVpn,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
     }
 
@@ -2825,25 +2974,25 @@ async function blockVPN(req, res, next) {
       console.log(`🚫 VPN/Proxy detected: ${clientIp}`);
       res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
       // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
-      return res.status(403)
-          .sendFile(path.join(__dirname, "public", "restricted.html"));
+      return res
+        .status(403)
+        .sendFile(path.join(__dirname, "public", "restricted.html"));
     }
 
     // ✅ Valid user
     console.log(`✅ Valid user: ${clientIp}`);
     res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
     next();
-
   } catch (error) {
     // ✅ Handle errors gracefully
-    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+    if (error.code === "ECONNABORTED" || error.message.includes("timeout")) {
       console.error("⏱️ VPN check timeout:", error.message);
-    } else if (error.message.includes('aborted')) {
+    } else if (error.message.includes("aborted")) {
       console.error("⏱️ VPN check aborted (timeout)");
     } else {
       console.error("❌ VPN check error:", error.message);
     }
-    
+
     // Allow request on error (fail-open approach - better UX)
     next();
   }
@@ -2857,21 +3006,19 @@ app.use(blockVPN);
 // ============================================
 app.post("/retry", (req, res) => {
   const clientIp = (
-    req.headers["x-forwarded-for"]?.split(",")[0] || 
-    req.socket.remoteAddress
+    req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
   ).trim();
-  
+
   // Clear from cache
   ipCache.delete(clientIp);
-  
+
   // Clear cookies
   res.clearCookie("vpn_blocked");
   res.clearCookie("valid_user");
-  
+
   console.log(`🔄 Retry requested for ${clientIp}`);
   res.redirect("/");
 });
-
 
 app.use(express.static(path.join(__dirname, "public")));
 

@@ -327,6 +327,7 @@ button {
   text-align: center;
   position: relative;
   overflow: hidden;
+  height: 100vh;
 }
 
 .hero::before {
@@ -361,8 +362,15 @@ button {
 }
 
 .hero-container {
+      display: flex;
+      justify-content: center; /* Centers horizontally */
+      align-items: center; /* Centers vertically */
+      gap: 20px; /* Adds space between flex items */
+
+      
   max-width: 800px;
   margin: 0 auto;
+  height: 50vh;
   position: relative;
   z-index: 1;
   animation: fadeInUp 0.8s ease-out;
@@ -411,7 +419,8 @@ button {
 
 .search-container {
   max-width: 600px;
-  margin: 0 auto;
+  width: 60vw;
+  /* margin: 0 auto; */
   position: relative;
 }
 
@@ -983,6 +992,12 @@ button {
 svg {
   width: 24px;
   height: 24px;
+}
+
+#hero-suggestions{
+  position: absolute;
+  width: 90%;
+
 }
 
 #hero-suggestions li {

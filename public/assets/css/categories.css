@@ -840,3 +840,12 @@ body {
   cursor: pointer;
   transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
+
+.Offer-avail{
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  width: 90px;
+  height: auto;
+}

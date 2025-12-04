@@ -338,8 +338,7 @@ async function getProducts() {
 // Build search options for the datalist
 async function buildProductSearch() {
   try {
-    
-    const products =  await getProducts();;
+    const products = await getProducts();
 
     const searchInput = document.getElementById("search-input");
     const searchButton = document.getElementById("search-button");
@@ -653,18 +652,31 @@ function displayVariantOptions(variants, selectedMg, unitType) {
     const tr = document.createElement("tr");
     tr.setAttribute("data-mg", variant.unit_value);
 
+    let finalPrice = variant.offer_price
+      ? variant.offer_price
+      : variant.price_per_box;
+
+    let priceHtml = variant.offer_price
+      ? `<span style="text-decoration: line-through; color:red;">
+       ${variant.price_per_box}
+     </span>
+     <span style="color:green; font-weight:bold;">
+       ${variant.offer_price}
+     </span>`
+      : `${variant.price_per_box}`;
+
     tr.innerHTML = `
             
             <td>${variant.qty}</td>
             <td>${variant.price_per_pill || "$0.00 per pill"}</td>
-            <td>${variant.price_per_box || "$0.00"}</td>
+             <td>${priceHtml}</td>
             <td>
               <button class="btn btn--add" 
                 data-variant-id="${variant.product_id}"
                 data-catogary-id="${variant.category_id}"
                 data-quantity="${variant.qty}"
                 data-mg="${variant.unit_type}${variant.unit_value}"
-                data-price="${variant.price_per_box}
+                data-price="${finalPrice}
                 ">
                 Add To Cart
               </button>
@@ -687,9 +699,9 @@ function refreshPage() {
 function setupAddToCartButtons() {
   document.querySelectorAll(".btn--add").forEach((button) => {
     button.addEventListener("click", function () {
-      const cartCountSpan = localStorage.getItem("cartCount") 
-      
-      localStorage.setItem("cartCount", parseInt( cartCountSpan) + 1);
+      const cartCountSpan = localStorage.getItem("cartCount");
+
+      localStorage.setItem("cartCount", parseInt(cartCountSpan) + 1);
 
       const variantId = this.getAttribute("data-variant-id");
 
