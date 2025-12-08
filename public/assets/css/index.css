@@ -13,7 +13,30 @@
   --background-alt: #f9fafb;
   --border: #e5e7eb;
   --success: #059669;
+  --footer-background : #1f2937;
+  --footer-text : #ffffff;
 }
+
+:root.dark {
+  --primary: #0ddac0;
+  --primary-dark: #0bb39b;
+  --success: #10b981;
+
+  --text-primary: #f3f4f6;      /* light text */
+  --text-secondary: #9ca3af;    /* soft gray text */
+
+  --background: #111827;        /* main dark background */
+  --background-alt: #1f2937;    /* slightly lighter sections */
+
+  --border: #374151;            /* darker border */
+
+  --success: #10b981;           /* green for success */
+  --footer-background : #ffffff ;
+  --footer-text :  #1f2937;
+  --footer-background: #1f2937;
+  --footer-text: #f3f4f6;
+}
+
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
@@ -212,7 +235,7 @@ button {
   position: absolute;
   top: 100%;
   left: 0;
-  background: #fff;
+  background: var(--background);
   border-radius: 0.75rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   margin-top: 0.5rem;
@@ -251,6 +274,7 @@ button {
   color: var(--text-primary);
   text-decoration: none;
   font-size: 0.95rem;
+  font-size: 0.95rem; /* 15.2px */
   font-weight: 500;
   transition: all 0.3s;
   /* padding: 0.5rem 0; */
@@ -263,6 +287,7 @@ button {
   bottom: 0;
   left: 0;
   width: 0;
+  width: 0%;
   height: 2px;
   background: var(--primary);
   transition: width 0.3s;
@@ -274,6 +299,7 @@ button {
 
 .nav-link:hover::after {
   width: 100%;
+  width: 100%; /* Underline on hover */
 }
 
 .header-actions {
@@ -519,7 +545,7 @@ button {
   width: 70px;
   height: 70px;
   margin: 0 auto 1.5rem;
-  background: linear-gradient(135deg, var(--background-alt), #ffffff);
+  background: linear-gradient(135deg, var(--background-alt), var(text-primary));
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -856,8 +882,8 @@ button {
 
 /* Footer */
 .footer {
-  background: var(--text-primary);
-  color: white;
+  background: var(--footer-background);
+  color: var(--footer-text);
   padding: 4rem 2rem 2rem;
 }
 
@@ -885,7 +911,7 @@ button {
 }
 
 .footer-section a {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--footer-text);
   text-decoration: none;
   transition: color 0.2s;
   font-size: 0.95rem;
@@ -896,7 +922,7 @@ button {
 }
 
 .footer-section p {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--footer-text);
   line-height: 1.7;
   font-size: 0.95rem;
 }
@@ -905,8 +931,9 @@ button {
   max-width: 1280px;
   margin: 0 auto;
   padding-top: 2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--footer-background);
   text-align: center;
+  text-align: center; /* Center copyright */
 }
 
 .payment-methods {
@@ -919,7 +946,8 @@ button {
 
 .payment-method {
   padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem 1rem; /* 8px 16px */
+  background: var(--footer-background);
   border-radius: 8px;
   font-size: 0.9rem;
   transition: all 0.3s;
@@ -931,7 +959,8 @@ button {
 }
 
 .copyright {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--footer-text);
+  color: var(--text-secondary); /* Softer color */
   font-size: 0.9rem;
   margin-top: 1.5rem;
 }
@@ -996,7 +1025,7 @@ svg {
 
 #hero-suggestions{
   position: absolute;
-  width: 90%;
+  width: 95%;
 
 }
 

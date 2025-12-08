@@ -26,7 +26,6 @@
     <meta property="og:type" content="website" />
     <meta name="theme-color" content="#ffffff" />
 
-    
     <!-- <link rel="icon" type="image/x-icon" href="./assets/image2/logo.png"> 
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/image2/logo.png">
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/image2/logo.png"> -->
@@ -51,9 +50,15 @@
     />
 
     <link rel="stylesheet" href="./assets/css/index.css" />
+    <link rel="stylesheet" href="./assets/css/snowfall.css" />
+    <link rel="stylesheet" href="./assets/css/lightDark.css" />
+    <!-- <script src="./assets/js/lightDark.js"></script> -->
+    <script src="./assets/js/snowfall.js"></script>
   </head>
-  <style></style>
   <body>
+    <!-- Christmas Effects Container -->
+    <div class="christmas-effects" id="christmasEffects"></div>
+
     <!-- Trust Banner -->
     <div class="trust-banner">
       <div class="trust-item">
@@ -239,6 +244,16 @@
           <button class="search-submit">Search</button>
           <ul id="hero-suggestions" class="search-suggestions"></ul>
         </div> -->
+        <div class="theme-toggle">
+          <input type="checkbox" id="theme-switch" />
+          <label for="theme-switch" class="toggle-label">
+            <span class="toggle-icon sun">☀️</span>
+            <span class="toggle-icon moon">🌙</span>
+          </label>
+        </div>
+        
+        <script src="./assets/js/lightDark.js"></script>
+
         <div class="header-actions">
           <!-- <button class="search-btn">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -683,7 +698,11 @@
         <div class="footer-section">
           <h3>About MCland Pharma</h3>
           <p>
-            Founded in 2025, we are committed to providing high-quality products with exceptional customer service. Our team of experts carefully curates each item to ensure it meets our strict quality standards. Sustainability and ethical sourcing are at the heart of everything we do.
+            Founded in 2025, we are committed to providing high-quality products
+            with exceptional customer service. Our team of experts carefully
+            curates each item to ensure it meets our strict quality standards.
+            Sustainability and ethical sourcing are at the heart of everything
+            we do.
           </p>
         </div>
       </div>

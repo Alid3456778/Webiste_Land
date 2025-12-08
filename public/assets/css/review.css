@@ -1,7 +1,40 @@
+
+:root {
+  --primary: #028c7e;
+  --primary-dark: #017463;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --background: #ffffff;
+  --background-alt: #f9fafb;
+  --border: #e5e7eb;
+  --success: #059669;
+  --footer-background : #1f2937;
+  --footer-text : #ffffff;
+}
+
+:root.dark {
+  --primary: #0ddac0;
+  --primary-dark: #0bb39b;
+  --success: #10b981;
+
+  --text-primary: #f3f4f6;      /* light text */
+  --text-secondary: #9ca3af;    /* soft gray text */
+
+  --background: #111827;        /* main dark background */
+  --background-alt: #1f2937;    /* slightly lighter sections */
+
+  --border: #374151;            /* darker border */
+
+  --success: #10b981;           /* green for success */
+  --footer-background : #ffffff ;
+  --footer-text :  #1f2937;
+  --footer-background: #1f2937;
+  --footer-text: #f3f4f6;
+} 
  /* ==== Review Section ==== */
       .review-section {
         margin-top: 25px;
-        background: #fafafa;
+        background: var(--background-alt);
         padding: 20px;
         border-radius: 12px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
@@ -10,7 +43,7 @@
       .review-section h3,
       .review-section h4 {
         margin-bottom: 10px;
-        color: #222;
+        color: var(--text-primary);
         font-weight: 600;
       }
 
@@ -35,8 +68,8 @@
       }
 
       .review-section button {
-        background: linear-gradient(90deg, #007bff, #0056b3);
-        color: white;
+        background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+        color: var(--text-primary);
         border: none;
         border-radius: 6px;
         padding: 10px;
@@ -45,7 +78,7 @@
         transition: 0.3s ease;
       }
       .review-section button:hover {
-        background: linear-gradient(90deg, #0056b3, #004097);
+        background: linear-gradient(90deg, var(--primary), var(--primary-dark));
       }
 
       /* ==== Star Rating ==== */
@@ -53,7 +86,7 @@
         display: flex;
         gap: 8px;
         font-size: 28px;
-        color: #ccc;
+        color: #ffbb00;
         cursor: pointer;
         margin-bottom: 10px;
         user-select: none;
@@ -77,7 +110,7 @@
       /* ==== Review Card ==== */
       .review-card {
         border: 1px solid #eee;
-        background: white;
+        background: var(--background);
         padding: 12px;
         border-radius: 8px;
         margin-bottom: 10px;
@@ -85,19 +118,19 @@
       }
 
       .review-card strong {
-        color: #111;
+        color: var(--text-primary);
         font-weight: 600;
       }
       .review-card small {
-        color: #666;
+        color: var(--text-secondary);
       }
 
       .show-more-btn {
   display: block;
   margin: 1rem auto;
   padding: 8px 16px;
-  background: #222;
-  color: #fff;
+  background: var(--background);
+  color: var(--text-secondary);
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -106,6 +139,6 @@
 }
 
 .show-more-btn:hover {
-  background: #444;
+  background: var(--background-alt);
   transform: translateY(-2px);
 }

@@ -5,30 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Categories | Mcland Pharma</title>
 
-    <meta name="description" content="Browse our comprehensive categories of pharmaceutical products and health solutions at MCland Pharma. Find quality medications and wellness items.">
-    <meta name="keywords" content="pharmacy, medications, health products, pharmaceutical, wellness">
-    <meta name="author" content="MCland Pharma">
-    <meta name="robots" content="index, follow">
-    <meta property="og:title" content="Categories | MCland Pharma">
-    <meta property="og:description" content="Explore our product categories and find the pharmaceutical products you need.">
-    <meta property="og:type" content="website">
-    <meta name="theme-color" content="#ffffff">
-    <link rel="icon" type="image/x-icon" href="./assets/image2/logo.png"> 
-    <link rel="icon" type="image/png" sizes="32x32" href="./assets/image2/logo.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="./assets/image2/logo.png">
+    <meta
+      name="description"
+      content="Browse our comprehensive categories of pharmaceutical products and health solutions at MCland Pharma. Find quality medications and wellness items."
+    />
+    <meta
+      name="keywords"
+      content="pharmacy, medications, health products, pharmaceutical, wellness"
+    />
+    <meta name="author" content="MCland Pharma" />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content="Categories | MCland Pharma" />
+    <meta
+      property="og:description"
+      content="Explore our product categories and find the pharmaceutical products you need."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" type="image/x-icon" href="./assets/image2/logo.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./assets/image2/logo.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./assets/image2/logo.png"
+    />
 
     <link rel="stylesheet" href="./assets/css/categories.css" />
     <script type="module" src="./assets/js/categories.js"></script>
+    <link rel="stylesheet" href="./assets/css/snowfall.css" />
+    <link rel="stylesheet" href="./assets/css/lightDark.css" />
+    <!-- <script src="./assets/js/lightDark.js"></script> -->
+    <script src="./assets/js/snowfall.js"></script>
   </head>
   <body>
+    <!-- Christmas Effects Container -->
+    <div class="christmas-effects" id="christmasEffects"></div>
     <!-- HEADER / NAVBAR -->
     <header class="header">
       <div class="header-container">
-          <div class="logo-section">
-              <div class="logo-icon">
-               <a href="/"> <img src="./assets/image2/logo.png" alt=""> </a>
-              </div>
-              <!-- <div>
+        <div class="logo-section">
+          <div class="logo-icon">
+            <a href="/"> <img src="./assets/image2/logo.png" alt="" /> </a>
+          </div>
+          <!-- <div>
                   <span class="brand-name">MCland Pharma</span>
                   <span class="verified-badge">
                       <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24">
@@ -37,11 +61,20 @@
                       Verified
                   </span>
               </div> -->
+        </div>
+
+        <div class="header-right">
+          <div class="theme-toggle">
+            <input type="checkbox" id="theme-switch" />
+            <label for="theme-switch" class="toggle-label">
+              <span class="toggle-icon sun">☀️</span>
+              <span class="toggle-icon moon">🌙</span>
+            </label>
           </div>
-    
-    <div class="header-right">
-      <!-- SEARCH BAR (kept from your categories.html) -->
-      <!-- <div class="search">
+
+          <script src="./assets/js/lightDark.js"></script>
+          <!-- SEARCH BAR (kept from your categories.html) -->
+          <!-- <div class="search">
         <input
           type="text"
           placeholder="Search products..."
@@ -62,45 +95,55 @@
           </svg>
         </button>
       </div> -->
-      <div class="search">
-          <input
-            type="text"
-            placeholder="Search products..."
-            class="search__input"
-            id="search-input"
-            autocomplete="off"
-          />
-          <ul id="suggestions" class="search-suggestions"></ul>
+          <div class="search">
+            <input
+              type="text"
+              placeholder="Search products..."
+              class="search__input"
+              id="search-input"
+              autocomplete="off"
+            />
+            <ul id="suggestions" class="search-suggestions"></ul>
 
-          <button class="btn btn--search" id="search-button">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              width="20"
-              height="20"
-              fill="currentColor"
-            >
-              <path
-                d="M10 2a8 8 0 015.292 13.708l4.5 4.5a1 1 0 01-1.415 1.414l-4.5-4.5A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"
-              />
-            </svg>
-          </button>
+            <button class="btn btn--search" id="search-button">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+                fill="currentColor"
+              >
+                <path
+                  d="M10 2a8 8 0 015.292 13.708l4.5 4.5a1 1 0 01-1.415 1.414l-4.5-4.5A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <!-- CART BUTTON (kept from your categories.html) -->
+          <a href="cart" id="cart-a-section" class="cart-link">
+            <button class="btn btn--icon cart-button">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path
+                  d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"
+                ></path>
+              </svg>
+            </button>
+            <span id="cart-count" class="cart-count">0</span>
+          </a>
         </div>
-
-      <!-- CART BUTTON (kept from your categories.html) -->
-      <a href="cart" id="cart-a-section" class="cart-link">
-        <button class="btn btn--icon cart-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="9" cy="21" r="1"></circle>
-            <circle cx="20" cy="21" r="1"></circle>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-          </svg>
-        </button>
-        <span id="cart-count" class="cart-count">0</span>
-      </a>
-    </div>
-  </div>
-</header>
+      </div>
+    </header>
     <!-- PRODUCT GRID SECTION -->
     <section id="product-grid">
       <div id="loading-message" class="loading-message">LOADING...</div>
@@ -108,51 +151,59 @@
 
     <!-- FOOTER FROM INDEX2.HTML -->
     <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-section">
-                <h3>Customer Service</h3>
-                <ul>
-                    <li><a href="#">Shipping Information</a></li>
-                    <li><a href="#">Returns & Refunds</a></li>
-                    <li><a href="#">Track Your Order</a></li>
-                    <li><a href="#">FAQs</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-section">
-                <h3>Company</h3>
-                <ul>
-                    <li><a href="#">About Us</a></li>
-                    <li><a href="#">Contact Us</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Terms & Conditions</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-section">
-                <h3>Contact</h3>
-                <p>Email: customerinfo2024@gmail.com</p>
-                <p>Phone: +1 209 593 7171</p>
-                <p>Available 24/7</p>
-            </div>
-
-            <div class="footer-section">
-                <h3>About MCland Pharma</h3>
-                <p>Founded in 2025, we are committed to providing high-quality products with exceptional customer service. Our team of experts carefully curates each item to ensure it meets our strict quality standards. Sustainability and ethical sourcing are at the heart of everything we do.</p>
-            </div>
+      <div class="footer-container">
+        <div class="footer-section">
+          <h3>Customer Service</h3>
+          <ul>
+            <li><a href="#">Shipping Information</a></li>
+            <li><a href="#">Returns & Refunds</a></li>
+            <li><a href="#">Track Your Order</a></li>
+            <li><a href="#">FAQs</a></li>
+          </ul>
         </div>
 
-        <div class="footer-bottom">
-            <h3 style="margin-bottom: 1rem; font-size: 1rem;">Secure Payment Methods</h3>
-            <div class="payment-methods">
-                <span class="payment-method">Cash App</span>
-                <span class="payment-method">Zelle</span>
-                <span class="payment-method">Venmo</span>
-                <span class="payment-method">PayPal</span>
-                <span class="payment-method">Bitcoin</span>
-            </div>
-            <p class="copyright">© 2024 MCland Pharma. All rights reserved.</p>
+        <div class="footer-section">
+          <h3>Company</h3>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms & Conditions</a></li>
+          </ul>
         </div>
+
+        <div class="footer-section">
+          <h3>Contact</h3>
+          <p>Email: customerinfo2024@gmail.com</p>
+          <p>Phone: +1 209 593 7171</p>
+          <p>Available 24/7</p>
+        </div>
+
+        <div class="footer-section">
+          <h3>About MCland Pharma</h3>
+          <p>
+            Founded in 2025, we are committed to providing high-quality products
+            with exceptional customer service. Our team of experts carefully
+            curates each item to ensure it meets our strict quality standards.
+            Sustainability and ethical sourcing are at the heart of everything
+            we do.
+          </p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <h3 style="margin-bottom: 1rem; font-size: 1rem">
+          Secure Payment Methods
+        </h3>
+        <div class="payment-methods">
+          <span class="payment-method">Cash App</span>
+          <span class="payment-method">Zelle</span>
+          <span class="payment-method">Venmo</span>
+          <span class="payment-method">PayPal</span>
+          <span class="payment-method">Bitcoin</span>
+        </div>
+        <p class="copyright">© 2024 MCland Pharma. All rights reserved.</p>
+      </div>
     </footer>
   </body>
 </html>

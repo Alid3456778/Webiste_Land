@@ -13,8 +13,14 @@
     <link rel="stylesheet" href="./assets/css/product_overview.css" />
     <link rel="stylesheet" href="./assets/css/review.css" />
     <script src="./assets/js/product_overview.js"></script>
+       <link rel="stylesheet" href="./assets/css/snowfall.css" />
+    <link rel="stylesheet" href="./assets/css/lightDark.css" />
+    <!-- <script src="./assets/js/lightDark.js"></script> -->
+    <script src="./assets/js/snowfall.js"></script>
   </head>
   <body>
+       <!-- Christmas Effects Container -->
+    <div class="christmas-effects" id="christmasEffects"></div>
     <!-- HEADER -->
     <header class="header">
       <div class="header__brand">
@@ -23,6 +29,16 @@
         /></a>
       </div>
       <div class="header__search-cart header__right">
+        <div class="theme-toggle">
+          <input type="checkbox" id="theme-switch" />
+          <label for="theme-switch" class="toggle-label">
+            <span class="toggle-icon sun">☀️</span>
+            <span class="toggle-icon moon">🌙</span>
+          </label>
+        </div>
+        
+        <script src="./assets/js/lightDark.js"></script>
+
         <div class="search">
           <input
             type="text"

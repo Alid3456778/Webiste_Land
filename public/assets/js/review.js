@@ -229,6 +229,10 @@ async function handleReviewSubmit(event) {
 document.addEventListener("DOMContentLoaded", () => {
   const urlParams = new URLSearchParams(window.location.search);
   const productId = urlParams.get("product_ID");
+
+  
+  // console.log("Reviews");
+
   if (productId) loadReviews(productId);
   setupStarRating();
 

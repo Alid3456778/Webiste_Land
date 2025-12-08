@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const response = await fetch(`/products?categoryID=${categoryID}`);
       const products = await response.json();
-
+      // console.log("Product ",products);
       // const pricesResponse = await fetch("/product-prices");
       // const prices = await pricesResponse.json();
 
@@ -80,6 +80,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // Function to display a batch of products
   function displayBatch(products, start, end, tableBody) {
     const batch = products.slice(start, end);
+
+    // Helper function to generate stars from rating
+    function generateStars(rating) {
+      const fullStars = Math.round(rating);
+      let starsHTML = '';
+      for (let i = 0; i < fullStars; i++) {
+        starsHTML += '⭐';
+      }
+      return starsHTML;
+    }
+    
+    // Display each product in the batch
     batch.forEach((product) => {
       const productID = product.id;
       
@@ -114,6 +126,9 @@ document.addEventListener("DOMContentLoaded", () => {
                       ? `<p style="font-weight: bold;">(4-5 Day's Delivery)</p>`
                       : `<p style="font-weight: bold;"></p>`
                   }
+                  <div class="rating">
+                    <small class="rating__count">${generateStars(product.rating)}</small>
+                  </div>
                   <div class="product-buttons">
                     <a href="./product_overview.html?product_ID=${
                       product.product_id
