@@ -90,7 +90,7 @@ body {
 .header__search-cart {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  /* gap: 1rem; */
 }
 
 /* ———————— Search Bar ———————— */
@@ -782,7 +782,7 @@ img {
   .header {
     padding: 0.75rem 1rem;
     /* flex-wrap: wrap; */
-    gap: 1rem;
+    /* gap: 1rem; */
   }
 
   .header__search-cart {
@@ -794,7 +794,7 @@ img {
   .search {
     flex: 1;
     max-width: none;
-    margin-right: 1rem;
+    /* margin-right: 1rem; */
   }
 
   .search__input {
