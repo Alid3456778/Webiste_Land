@@ -82,8 +82,8 @@
   text-shadow: 0 0 5px #ffef9a;
 }
 
-/* @media (max-width: 768px) {
+@media (max-width: 768px) {
 .theme-toggle{
   display: none;
 }
-} */
+}
