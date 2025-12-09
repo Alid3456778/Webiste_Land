@@ -352,7 +352,7 @@ button {
       align-items: center; /* Centers vertically */
   /* background: linear-gradient(135deg, #028c7e 0%, #017463 100%); */
   background-position: center;
-  background-size: cover;
+  background-size: contain;
   background-repeat: no-repeat;
   color: white;
   /* padding: 5rem 2rem 6rem; */
@@ -978,6 +978,12 @@ button {
   }
   .nav {
     display: none;
+  }
+
+  .hero{
+    height: 40vh;
+    align-items: flex-start;
+    margin-top: 8px;
   }
 
   .hero-title {

@@ -413,9 +413,9 @@ if (heroImages.length === 0) {
   function changeHeroImage() {
     currentIndex = (currentIndex + 1) % heroImages.length;
     heroSection.style.backgroundImage = `url(assets/image2/christmas.png)`;
-    heroSection.style.backgroundSize = "cover";
+    heroSection.style.backgroundSize = "contain";
     heroSection.style.backgroundPosition = "center";
-    heroSection.style.height = "80vh";
+    // heroSection.style.height = "80vh";
     heroSection.style.width = "100vw";
   }
 
