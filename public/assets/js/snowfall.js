@@ -245,46 +245,46 @@ const christmasAnimations = {
     }
   },
 
-  //   toggleLights() {
-  //     if (!this.init()) return;
+    toggleLights() {
+      if (!this.init()) return;
 
-  //     this.activeAnimations.lights = !this.activeAnimations.lights;
+      this.activeAnimations.lights = !this.activeAnimations.lights;
 
-  //     if (this.activeAnimations.lights) {
-  //       for (let i = 0; i < this.config.lights.count; i++) {
-  //         this.createLight(i);
-  //       }
-  //     } else {
-  //       this.removeElements('.light');
-  //     }
-  //   },
+      if (this.activeAnimations.lights) {
+        for (let i = 0; i < this.config.lights.count; i++) {
+          this.createLight(i);
+        }
+      } else {
+        this.removeElements('.light');
+      }
+    },
 
-  //   toggleStars() {
-  //     if (!this.init()) return;
+    toggleStars() {
+      if (!this.init()) return;
 
-  //     this.activeAnimations.stars = !this.activeAnimations.stars;
+      this.activeAnimations.stars = !this.activeAnimations.stars;
 
-  //     if (this.activeAnimations.stars) {
-  //       for (let i = 0; i < this.config.stars.count; i++) {
-  //         this.createStar(i);
-  //       }
-  //     } else {
-  //       this.removeElements('.star');
-  //     }
-  //   },
+      if (this.activeAnimations.stars) {
+        for (let i = 0; i < this.config.stars.count; i++) {
+          this.createStar(i);
+        }
+      } else {
+        this.removeElements('.star');
+      }
+    },
 
-  //   toggleConfetti() {
-  //     if (!this.init()) return;
+    toggleConfetti() {
+      if (!this.init()) return;
 
-  //     this.activeAnimations.confetti = !this.activeAnimations.confetti;
+      this.activeAnimations.confetti = !this.activeAnimations.confetti;
 
-  //     if (this.activeAnimations.confetti) {
-  //       this.intervals.confetti = setInterval(() => this.createConfetti(), 150);
-  //     } else {
-  //       clearInterval(this.intervals.confetti);
-  //       this.removeElements('.confetti');
-  //     }
-  //   },
+      if (this.activeAnimations.confetti) {
+        this.intervals.confetti = setInterval(() => this.createConfetti(), 150);
+      } else {
+        clearInterval(this.intervals.confetti);
+        this.removeElements('.confetti');
+      }
+    },
 
   // Remove elements by selector
   removeElements(selector) {
@@ -298,7 +298,7 @@ const christmasAnimations = {
     if (!this.init()) return;
 
     if (!this.activeAnimations.snow) this.toggleSnow();
-    if (!this.activeAnimations.ornaments) this.toggleOrnaments();
+    // if (!this.activeAnimations.ornaments) this.toggleOrnaments();
     // if (!this.activeAnimations.lights) this.toggleLights();
     // if (!this.activeAnimations.stars) this.toggleStars();
     // if (!this.activeAnimations.confetti) this.toggleConfetti();

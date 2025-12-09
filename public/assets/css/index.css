@@ -352,14 +352,14 @@ button {
       align-items: center; /* Centers vertically */
   /* background: linear-gradient(135deg, #028c7e 0%, #017463 100%); */
   background-position: center;
-  background-size: contain;
+  background-size: cover;
   background-repeat: no-repeat;
   color: white;
   /* padding: 5rem 2rem 6rem; */
   text-align: center;
   position: relative;
   overflow: hidden;
-  height: 80vh;
+  height: 60vh;
 }
 
 .hero::before {
@@ -406,6 +406,7 @@ button {
   position: relative;
   z-index: 1;
   animation: fadeInUp 0.8s ease-out;
+  margin-bottom: 200px;
 }
 
 .search-suggestions {
@@ -983,7 +984,11 @@ button {
   .hero{
     height: 40vh;
     align-items: flex-start;
-    margin-top: 8px;
+    /* margin-top: 8px; */
+  }
+
+  .hero-container{
+    margin-top: 10px;
   }
 
   .hero-title {
