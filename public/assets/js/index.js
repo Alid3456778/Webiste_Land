@@ -388,8 +388,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // Your banner images
 const heroImages = [
-  "assets/image2/Blackfriday.jpeg",
-  "assets/image2/thanksgiving.jpeg"
+  "assets/image2/christmas.png"
 ];
 
 if (heroImages.length === 0) {
@@ -397,13 +396,13 @@ if (heroImages.length === 0) {
 } else {
   let currentIndex = 0;
   // Set styles for hero-section class
-  const heropartSection = document.querySelector(".hero-container");
-  heropartSection.style.maxWidth = "800px";
-  heropartSection.style.margin = "0 auto";
-  heropartSection.style.color = "black";
-  heropartSection.style.position = "relative";
-  heropartSection.style.zIndex = "1";
-  heropartSection.style.animation = "fadeInDown 0.8s ease-out";
+  // const heropartSection = document.querySelector(".hero-container");
+  // heropartSection.style.maxWidth = "800px";
+  // heropartSection.style.margin = "0 auto";
+  // heropartSection.style.color = "black";
+  // heropartSection.style.position = "relative";
+  // heropartSection.style.zIndex = "1";
+  // heropartSection.style.animation = "fadeInDown 0.8s ease-out";
   // heropartSection.style.ease - out;
 
   // Select the hero section
@@ -413,9 +412,11 @@ if (heroImages.length === 0) {
 
   function changeHeroImage() {
     currentIndex = (currentIndex + 1) % heroImages.length;
-    heroSection.style.backgroundImage = `url(${heroImages[currentIndex]})`;
+    heroSection.style.backgroundImage = `url(assets/image2/christmas.png)`;
     heroSection.style.backgroundSize = "cover";
     heroSection.style.backgroundPosition = "center";
+    heroSection.style.height = "80vh";
+    heroSection.style.width = "100vw";
   }
 
   // Set first image immediately

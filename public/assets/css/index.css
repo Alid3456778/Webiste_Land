@@ -347,13 +347,19 @@ button {
 
 /* Hero Section */
 .hero {
-  background: linear-gradient(135deg, #028c7e 0%, #017463 100%);
+        display: flex;
+      justify-content: center; /* Centers horizontally */
+      align-items: center; /* Centers vertically */
+  /* background: linear-gradient(135deg, #028c7e 0%, #017463 100%); */
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
   color: white;
-  padding: 5rem 2rem 6rem;
+  /* padding: 5rem 2rem 6rem; */
   text-align: center;
   position: relative;
   overflow: hidden;
-  height: 100vh;
+  height: 80vh;
 }
 
 .hero::before {
@@ -394,9 +400,9 @@ button {
       gap: 20px; /* Adds space between flex items */
 
       
-  max-width: 800px;
-  margin: 0 auto;
-  height: 50vh;
+  /* max-width: 800px; */
+  /* margin: 0 auto; */
+  /* height: 50vh; */
   position: relative;
   z-index: 1;
   animation: fadeInUp 0.8s ease-out;
@@ -1037,6 +1043,8 @@ svg {
   border-bottom: 1px solid #f0f0f0;
   transition: background-color 0.2s ease;
   z-index: 1100;
+  background-color: var(--background);
+  color: var(--text-primary);
 }
 
 #hero-suggestions li:last-child {
@@ -1045,6 +1053,7 @@ svg {
 
 #hero-suggestions li:hover {
   background-color: #f8f9ff;
+  color: #111827;
 }
 
 #hero-suggestions li:first-child {
@@ -1067,6 +1076,6 @@ svg {
 #hero-suggestions li span {
   font-size: 16px;
   font-weight: 500;
-  color: #333;
+  /* color: #333; */
   font-family: var(--font);
 }

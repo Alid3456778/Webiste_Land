@@ -1262,7 +1262,7 @@ app.post("/api/set_products", async (req, res) => {
 
 app.delete("/api/products/delete/:id", async (req, res) => {
   const { id } = req.params;
-  console.log("Received ID for deletion:", id); // Debug log
+  // console.log("Received ID for deletion:", id); // Debug log
 
   if (isNaN(id)) {
     return res

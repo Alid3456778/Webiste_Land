@@ -276,41 +276,27 @@
         </div>
       </div>
     </header>
+<style>
 
+.hero-banner-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0; /* Behind everything */
+  cursor: pointer;
+}
+
+
+
+
+</style>
     <!-- Hero -->
     <section class="hero">
+      <a href="categories.html?catogeries_ID=1" class="hero-banner-link" aria-label="View banner offer"></a>
+ 
       <div class="hero-container">
-        <!-- <div class="security-badges">
-          <div class="security-badge">
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-              />
-            </svg>
-            Committed to Safe Healthcare
-          </div>
-          <div class="security-badge">
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-              />
-            </svg>
-            SSL Encrypted
-          </div>
-          <div class="security-badge">
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Trusted Since 2024
-          </div>
-        </div> -->
-
-        <!-- <h1 class="hero-title">Your Trusted Healthcare Partner</h1>
-        <p class="hero-subtitle">
-          Quality medications delivered with care, discretion, and
-          pharmaceutical expertise
-        </p> -->
-
         <div class="search-container">
           <input
             type="text"
@@ -320,24 +306,16 @@
           <button class="search-submit">Search</button>
           <ul id="hero-suggestions" class="search-suggestions"></ul>
         </div>
-
-        <!-- <div class="hero-stats">
-          <div class="stat-item">
-            <span class="stat-number">Dedicated</span>
-            <span class="stat-label">Customer Care Team</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-number">High</span>
-            <span class="stat-label">Customer Satisfaction</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-number">24/7</span>
-            <span class="stat-label">Expert Support</span>
-          </div>
-        </div> -->
       </div>
     </section>
-
+<script>
+  document.querySelector('.hero').addEventListener('click', function(e) {
+  // Only redirect if clicking the background, not inner elements
+  if (e.target === this || e.target === this.querySelector('::before')) {
+    window.location.href = 'categories.html?catogeries_ID=1';
+  }
+});
+</script>
     <!-- Live Indicators -->
     <!-- <section class="live-section">
       <div class="live-container">
@@ -715,7 +693,7 @@
           <span class="payment-method">Cash App</span>
           <span class="payment-method">Zelle</span>
           <span class="payment-method">Venmo</span>
-          <span class="payment-method">PayPal</span>
+          <!-- <span class="payment-method">PayPal</span> -->
           <span class="payment-method">Bitcoin</span>
         </div>
         <p class="copyright">
