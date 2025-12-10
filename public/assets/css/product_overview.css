@@ -18,7 +18,7 @@
   --footer-text : #ffffff;
   --border: #dce3ec;
 
-  --color-primary: #028c7e;
+  --primary: #028c7e;
   --color-accent: #d4af37;
   --color-gray-100: #f7f7f7;
   --color-gray-200: #e2e2e2;
@@ -30,7 +30,7 @@
 }
 
 :root.dark {
-  --color-primary: #0ddac0;
+  --primary: #0ddac0;
   --primary-dark: #0bb39b;
 
   --text-primary: #f3f4f6;      /* light text */
@@ -145,7 +145,7 @@ body {
 
 .btn--search {
   background: transparent;
-  color: var(--color-primary);
+  color: var(--primary);
   border: none;
   border-radius: 10px;
   padding: 0.5rem;
@@ -298,7 +298,7 @@ img {
 }
 
 .btn--toggle.btn--active {
-  background: var(--color-primary);
+  background: var(--primary);
   color: var(--background);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
@@ -535,7 +535,7 @@ img {
 
 /* ADD TO CART BUTTON */
 .btn--add {
-  background: var(--color-primary);
+  background: var(--primary);
   color: #fff;
   border: none;
   padding: 0.5rem 1rem;
@@ -1334,7 +1334,7 @@ img {
 .review-item:hover {
   transform: translateX(4px);
   box-shadow: 0 8px 24px rgba(2, 140, 126, 0.12);
-  border-color: var(--color-primary);
+  border-color: var(--primary);
 }
 
 /* Review Header */
@@ -1493,7 +1493,7 @@ img {
 #reviewForm button[type="submit"] {
   width: 100%;
   padding: 1rem 2rem;
-  background: linear-gradient(135deg, var(--color-primary) 0%, #02a592 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark ) 100%);
   color: var(--text-primary);
   border: none;
   border-radius: 8px;
@@ -1511,7 +1511,7 @@ img {
 #reviewForm button[type="submit"]:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(2, 140, 126, 0.35);
-  background: linear-gradient(135deg, #02a592 0%, var(--color-primary) 100%);
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
 }
 
 #reviewForm button[type="submit"]:active {
@@ -1755,7 +1755,7 @@ img {
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  background: linear-gradient(90deg, var(--primary) 0%, var(--color-accent) 100%);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.4s ease;

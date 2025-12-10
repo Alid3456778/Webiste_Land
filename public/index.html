@@ -54,6 +54,10 @@
     <link rel="stylesheet" href="./assets/css/lightDark.css" />
     <!-- <script src="./assets/js/lightDark.js"></script> -->
     <script src="./assets/js/snowfall.js"></script>
+
+    <link rel="stylesheet" href="./assets/css/searchBar.css">
+    <link rel="stylesheet" href="./assets/css/root.css">
+   
   </head>
   <body>
     <!-- Christmas Effects Container -->
@@ -136,26 +140,8 @@
           </div>
           <div>
             <span class="brand-name">MCland Pharma</span>
-            <!-- <span class="verified-badge">
-              <svg
-                width="12"
-                height="12"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Verified
-            </span> -->
           </div>
         </div>
-
-        <!-- <nav class="nav">
-          <a href="#" class="nav-link">Medicine</a>
-          <a href="#" class="nav-link">Wellness</a>
-          <a href="#" class="nav-link">Beauty</a>
-          <a href="#" class="nav-link">About</a>
-        </nav> -->
         <nav class="header__nav nav">
           <div class="nav__item">
             <button class="nav__btn nav-link" data-menu="medicine">
@@ -254,6 +240,31 @@
         
         <script src="./assets/js/lightDark.js"></script>
 
+        <div class="search">
+            <input
+              type="text"
+              placeholder="Search products..."
+              class="search__input"
+              id="search-input"
+              autocomplete="off"
+            />
+            <ul id="suggestions" class="search-suggestions"></ul>
+
+            <button class="btn btn--search" id="search-button">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+                fill="currentColor"
+              >
+                <path
+                  d="M10 2a8 8 0 015.292 13.708l4.5 4.5a1 1 0 01-1.415 1.414l-4.5-4.5A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"
+                />
+              </svg>
+            </button>
+          </div>
+           <script src="./assets/js/SearchBar.js"></script>
         <div class="header-actions">
           <!-- <button class="search-btn">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -276,24 +287,13 @@
         </div>
       </div>
     </header>
-<style>
 
-.hero-banner-link {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0; /* Behind everything */
-  cursor: pointer;
-}
-
-</style>
     <!-- Hero -->
     <section class="hero">
       <a href="categories.html?catogeries_ID=1" class="hero-banner-link" aria-label="View banner offer"></a>
  
-      <div class="hero-container">
+      <!-- BIG SEARCH BUTTON AREA (UNDO AFTER SOME TIME)-->
+      <!-- <div class="hero-container">
         <div class="search-container">
           <input
             type="text"
@@ -303,16 +303,9 @@
           <button class="search-submit">Search</button>
           <ul id="hero-suggestions" class="search-suggestions"></ul>
         </div>
-      </div>
+      </div> -->
     </section>
-<script>
-  document.querySelector('.hero').addEventListener('click', function(e) {
-  // Only redirect if clicking the background, not inner elements
-  if (e.target === this || e.target === this.querySelector('::before')) {
-    window.location.href = 'categories.html?catogeries_ID=1';
-  }
-});
-</script>
+
     <!-- Live Indicators -->
     <!-- <section class="live-section">
       <div class="live-container">

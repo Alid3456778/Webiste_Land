@@ -425,3 +425,10 @@ if (heroImages.length === 0) {
   // Change image every 5 seconds
   setInterval(changeHeroImage, 5000);
 }
+
+  document.querySelector('.hero').addEventListener('click', function(e) {
+  // Only redirect if clicking the background, not inner elements
+  if (e.target === this || e.target === this.querySelector('::before')) {
+    window.location.href = 'categories.html?catogeries_ID=1';
+  }
+});
