@@ -775,6 +775,7 @@ img {
   }
 
   #differ {
+    width: 98vw;
     grid-column: 1;
     grid-row: 4;
   }
@@ -1011,7 +1012,7 @@ img {
     font-size: 1.2rem;
   }
   .product-info {
-    width: 100vw;
+    width: 98vw;
   }
 }
 
