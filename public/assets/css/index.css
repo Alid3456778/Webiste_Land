@@ -987,6 +987,7 @@ button {
   .hero{
     height: 40vh;
     align-items: flex-start;
+    /* background-size: contain; */
     /* margin-top: 8px; */
   }
 

@@ -18,6 +18,8 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <link rel="stylesheet" href="./assets/css/employee.css" />
+    <link rel="stylesheet" href="./assets/css/lightDark.css">
+    <script src="./assets/js/lightDark.js"></script>
   </head>
 
   <body>
@@ -84,6 +86,13 @@
           <i class="fas fa-search"></i>
           <input type="text" placeholder="Search..." />
         </div> -->
+        <div class="theme-toggle">
+          <input type="checkbox" id="theme-switch" />
+          <label for="theme-switch" class="toggle-label">
+            <span class="toggle-icon sun">☀️</span>
+            <span class="toggle-icon moon">🌙</span>
+          </label>
+        </div>
           <button id="logoutBtn" class="header-btn">
             <i class="fas fa-sign-out-alt"></i>
             Logout
