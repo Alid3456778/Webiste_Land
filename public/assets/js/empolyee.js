@@ -46,7 +46,7 @@ async function loadDashboardData() {
     document.getElementById("paymentPending").textContent = pending;
     document.getElementById("paymentDone").textContent = done;
     document.getElementById("pendingRequests").textContent =
-      processing + tracking + delivered + paid; // or adjust as needed
+      processing + tracking + delivered ; // or adjust as needed
   } catch (err) {
     console.error("Error loading dashboard data:", err);
   }
