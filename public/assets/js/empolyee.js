@@ -34,7 +34,7 @@ async function loadDashboardData() {
       const status = o.payment_status || o.status || "pending";
 
       if (status === "pending") pending++;
-      else if (status === "completed") done++;
+      else if (status === "paid") done++;
       else if (status === "process") processing++;
       else if (status === "tracking") tracking++;
       else if (status === "delivered") delivered++;
