@@ -2885,276 +2885,8 @@ function shouldSkipVpnCheck(path) {
   return SKIP_VPN_CHECK_PATHS.some((skipPath) => path.startsWith(skipPath));
 }
 
-// // ============================================
-// // VPN BLOCKING MIDDLEWARE
-// // ============================================
-// async function blockVPN(req, res, next) {
-//   try {
-//     // ✅ Skip VPN check for static assets and specific routes
-//     if (shouldSkipVpnCheck(req.path)) {
-//       return next();
-//     }
-
-//     // ✅ Get client IP (handle proxy headers)
-//     const clientIp = (
-//       req.headers["x-forwarded-for"]?.split(",")[0] ||
-//       req.socket.remoteAddress ||
-//       req.connection.remoteAddress
-//     ).trim();
-
-//     // ✅ Skip localhost/development IPs
-//     if (
-//       clientIp === "::1" ||
-//       clientIp === "127.0.0.1" ||
-//       clientIp.startsWith("192.168.")
-//     ) {
-//       console.log(`✅ Development IP allowed: ${clientIp}`);
-//       res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
-//       return next();
-//     }
-
-//     // ✅ If cookie already says blocked → deny immediately
-//     if (req.cookies.vpn_blocked === "true") {
-//       console.log(`🚫 Blocked user (cookie): ${clientIp}`);
-//       // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
-//       return res
-//         .status(403)
-//         .sendFile(path.join(__dirname, "public", "restricted.html"));
-//     }
-
-//     // ✅ If cookie already says valid user → allow immediately (skip API check)
-//     if (req.cookies.valid_user === "true") {
-//       return next();
-//     }
-
-//     // ✅ Check employee whitelist
-//     if (EMPLOYEE_IPS.has(clientIp)) {
-//       console.log(`👔 Employee IP allowed: ${clientIp}`);
-//       res.cookie("valid_user", "true", { maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
-//       return next();
-//     }
-
-//     // ✅ Check cache first (before making API call)
-//     const cached = ipCache.get(clientIp);
-//     if (cached) {
-//       const age = Date.now() - cached.timestamp;
-
-//       if (age < CACHE_DURATION) {
-//         if (cached.isVpn) {
-//           console.log(`🚫 VPN/Proxy detected (cached): ${clientIp}`);
-//           res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
-//           // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
-//           return res
-//             .status(403)
-//             .sendFile(path.join(__dirname, "public", "restricted.html"));
-//         } else {
-//           console.log(`✅ Valid user (cached): ${clientIp}`);
-//           res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
-//           return next();
-//         }
-//       } else {
-//         // Cache expired, remove it
-//         ipCache.delete(clientIp);
-//       }
-//     }
-
-//     // ✅ Check if we can make an API call (rate limiting)
-//     if (!canMakeApiCall()) {
-//       console.warn(`⚠️ Rate limit reached, allowing ${clientIp} without check`);
-//       res.cookie("valid_user", "true", { maxAge: 60 * 60 * 1000 }); // 1 hour temp cookie
-//       return next();
-//     }
-
-//     // ✅ Make API call with timeout
-//     console.log(`📡 Making API call for: ${clientIp}`);
-//     const controller = new AbortController();
-//     const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-
-//     const response = await axios.get(
-//       `http://ip-api.com/json/${clientIp}?fields=proxy,hosting,status,message`,
-//       {
-//         signal: controller.signal,
-//         timeout: 5000,
-//       }
-//     );
-
-//     clearTimeout(timeoutId);
-
-//     const data = response.data;
-
-//     // ✅ Check if API request was successful
-//     if (data.status === "fail") {
-//       console.error(`❌ IP API failed for ${clientIp}: ${data.message}`);
-//       // Allow on API failure (fail-open approach)
-//       res.cookie("valid_user", "true", { maxAge: 60 * 60 * 1000 });
-//       return next();
-//     }
-
-//     // ✅ Determine if VPN/Proxy
-//     const isVpn = data.proxy === true || data.hosting === true;
-
-//     // ✅ Store result in cache
-//     if (ipCache.size < MAX_CACHE_SIZE) {
-//       ipCache.set(clientIp, {
-//         isVpn,
-//         timestamp: Date.now(),
-//       });
-//     }
-
-//     if (isVpn) {
-//       console.log(`🚫 VPN/Proxy detected: ${clientIp}`);
-//       res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
-//       // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
-//       return res
-//         .status(403)
-//         .sendFile(path.join(__dirname, "public", "restricted.html"));
-//     }
-
-//     // ✅ Valid user
-//     console.log(`✅ Valid user: ${clientIp}`);
-//     res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
-//     next();
-//   } catch (error) {
-//     // ✅ Handle errors gracefully
-//     if (error.code === "ECONNABORTED" || error.message.includes("timeout")) {
-//       console.error("⏱️ VPN check timeout:", error.message);
-//     } else if (error.message.includes("aborted")) {
-//       console.error("⏱️ VPN check aborted (timeout)");
-//     } else {
-//       console.error("❌ VPN check error:", error.message);
-//     }
-
-//     // Allow request on error (fail-open approach - better UX)
-//     next();
-//   }
-// }
-
-// // ✅ Apply VPN blocking middleware (ONLY ONCE)
-// app.use(blockVPN);
-
 // ============================================
-// IP LOGGING SYSTEM
-// ============================================
-const ipLogs = new Map(); // Store detailed logs for each IP
-const MAX_LOG_ENTRIES = 1000; // Prevent memory overflow
-
-// Log structure for each IP check
-function logIpCheck(clientIp, decision, reason, apiData = null) {
-  const logEntry = {
-    timestamp: new Date().toISOString(),
-    ip: clientIp,
-    decision: decision, // 'ALLOWED', 'BLOCKED', 'ERROR'
-    reason: reason,
-    apiData: apiData,
-    userAgent: null // Will be set from request
-  };
-
-  // Store in memory
-  if (!ipLogs.has(clientIp)) {
-    ipLogs.set(clientIp, []);
-  }
-  
-  const logs = ipLogs.get(clientIp);
-  logs.push(logEntry);
-  
-  // Keep only last 10 entries per IP
-  if (logs.length > 10) {
-    logs.shift();
-  }
-
-  // Also log to console for immediate visibility
-  console.log(`[IP CHECK] ${decision}: ${clientIp} - ${reason}`);
-  if (apiData) {
-    console.log(`[API DATA]`, JSON.stringify(apiData, null, 2));
-  }
-
-  // Clean old entries if map gets too large
-  if (ipLogs.size > MAX_LOG_ENTRIES) {
-    const firstKey = ipLogs.keys().next().value;
-    ipLogs.delete(firstKey);
-  }
-
-  return logEntry;
-}
-
-// ============================================
-// ADMIN ENDPOINT: View IP Logs
-// ============================================
-app.get("/api/admin/ip-logs/:ip?", (req, res) => {
-  const { ip } = req.params;
-  const adminKey = req.query.key;
-
-  // Basic admin authentication
-  if (adminKey !== process.env.ADMIN_KEY) {
-    return res.status(403).json({ error: "Unauthorized" });
-  }
-
-  if (ip) {
-    // Get logs for specific IP
-    const logs = ipLogs.get(ip) || [];
-    const cached = ipCache.get(ip);
-    
-    return res.json({
-      ip: ip,
-      logs: logs,
-      cachedData: cached ? {
-        isVpn: cached.isVpn,
-        timestamp: new Date(cached.timestamp).toISOString(),
-        ageMinutes: Math.floor((Date.now() - cached.timestamp) / 60000)
-      } : null,
-      totalChecks: logs.length
-    });
-  }
-
-  // Get all IPs with logs
-  const allLogs = {};
-  for (const [ip, logs] of ipLogs.entries()) {
-    allLogs[ip] = {
-      totalChecks: logs.length,
-      lastCheck: logs[logs.length - 1],
-      blocked: logs.filter(l => l.decision === 'BLOCKED').length,
-      allowed: logs.filter(l => l.decision === 'ALLOWED').length
-    };
-  }
-
-  res.json({
-    totalIPs: ipLogs.size,
-    cacheSize: ipCache.size,
-    logs: allLogs
-  });
-});
-
-// ============================================
-// ADMIN ENDPOINT: Clear IP from blocklist
-// ============================================
-app.post("/api/admin/unblock-ip", (req, res) => {
-  const { ip, adminKey } = req.body;
-
-  if (adminKey !== process.env.ADMIN_KEY) {
-    return res.status(403).json({ error: "Unauthorized" });
-  }
-
-  if (!ip) {
-    return res.status(400).json({ error: "IP address required" });
-  }
-
-  // Clear from cache
-  const wasInCache = ipCache.has(ip);
-  ipCache.delete(ip);
-
-  // Log the unblock action
-  logIpCheck(ip, 'UNBLOCKED', 'Manually unblocked by admin');
-
-  res.json({
-    success: true,
-    ip: ip,
-    wasInCache: wasInCache,
-    message: `IP ${ip} has been unblocked and removed from cache`
-  });
-});
-
-// ============================================
-// ENHANCED VPN BLOCKING MIDDLEWARE
+// VPN BLOCKING MIDDLEWARE
 // ============================================
 async function blockVPN(req, res, next) {
   try {
@@ -3165,38 +2897,40 @@ async function blockVPN(req, res, next) {
 
     // ✅ Get client IP (handle proxy headers)
     const clientIp = (
-      req.headers["x-forwarded-for"]?.split(",")[0] || 
-      req.socket.remoteAddress || 
+      req.headers["x-forwarded-for"]?.split(",")[0] ||
+      req.socket.remoteAddress ||
       req.connection.remoteAddress
     ).trim();
 
-    // Store user agent for logging
-    const userAgent = req.headers["user-agent"] || "Unknown";
-
     // ✅ Skip localhost/development IPs
-    if (clientIp === "::1" || clientIp === "127.0.0.1" || clientIp.startsWith("192.168.")) {
-      logIpCheck(clientIp, 'ALLOWED', 'Development/localhost IP');
+    if (
+      clientIp === "::1" ||
+      clientIp === "127.0.0.1" ||
+      clientIp.startsWith("192.168.")
+    ) {
+      console.log(`✅ Development IP allowed: ${clientIp}`);
       res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
       return next();
     }
 
     // ✅ If cookie already says blocked → deny immediately
     if (req.cookies.vpn_blocked === "true") {
-      logIpCheck(clientIp, 'BLOCKED', 'Previously blocked (cookie exists)');
-      return res.status(403)
+      console.log(`🚫 Blocked user (cookie): ${clientIp}`);
+      // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+      return res
+        .status(403)
         .sendFile(path.join(__dirname, "public", "restricted.html"));
     }
 
     // ✅ If cookie already says valid user → allow immediately (skip API check)
     if (req.cookies.valid_user === "true") {
-      logIpCheck(clientIp, 'ALLOWED', 'Valid user cookie exists (skipped API check)');
       return next();
     }
 
     // ✅ Check employee whitelist
     if (EMPLOYEE_IPS.has(clientIp)) {
-      logIpCheck(clientIp, 'ALLOWED', 'Employee IP whitelist');
-      res.cookie("valid_user", "true", { maxAge: 7 * 24 * 60 * 60 * 1000 });
+      console.log(`👔 Employee IP allowed: ${clientIp}`);
+      res.cookie("valid_user", "true", { maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
       return next();
     }
 
@@ -3204,54 +2938,54 @@ async function blockVPN(req, res, next) {
     const cached = ipCache.get(clientIp);
     if (cached) {
       const age = Date.now() - cached.timestamp;
-      
+
       if (age < CACHE_DURATION) {
         if (cached.isVpn) {
-          logIpCheck(clientIp, 'BLOCKED', `Cached as VPN/Proxy (${Math.floor(age/60000)} min old)`, {
-            cached: true,
-            cacheAge: age
-          });
+          console.log(`🚫 VPN/Proxy detected (cached): ${clientIp}`);
           res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
-          return res.status(403)
+          // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+          return res
+            .status(403)
             .sendFile(path.join(__dirname, "public", "restricted.html"));
         } else {
-          logIpCheck(clientIp, 'ALLOWED', `Cached as valid (${Math.floor(age/60000)} min old)`);
+          console.log(`✅ Valid user (cached): ${clientIp}`);
           res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
           return next();
         }
       } else {
         // Cache expired, remove it
         ipCache.delete(clientIp);
-        logIpCheck(clientIp, 'INFO', 'Cache expired, will re-check with API');
       }
     }
 
     // ✅ Check if we can make an API call (rate limiting)
     if (!canMakeApiCall()) {
-      logIpCheck(clientIp, 'ALLOWED', 'Rate limit reached, allowed without check (fail-open)');
-      res.cookie("valid_user", "true", { maxAge: 60 * 60 * 1000 });
+      console.warn(`⚠️ Rate limit reached, allowing ${clientIp} without check`);
+      res.cookie("valid_user", "true", { maxAge: 60 * 60 * 1000 }); // 1 hour temp cookie
       return next();
     }
 
     // ✅ Make API call with timeout
     console.log(`📡 Making API call for: ${clientIp}`);
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
     const response = await axios.get(
-      `http://ip-api.com/json/${clientIp}?fields=proxy,hosting,status,message,country,isp,org,query`,
-      { 
+      `http://ip-api.com/json/${clientIp}?fields=proxy,hosting,status,message`,
+      {
         signal: controller.signal,
-        timeout: 5000
+        timeout: 5000,
       }
     );
-    
+
     clearTimeout(timeoutId);
+
     const data = response.data;
 
     // ✅ Check if API request was successful
     if (data.status === "fail") {
-      logIpCheck(clientIp, 'ALLOWED', `API failed: ${data.message} (fail-open)`, data);
+      console.error(`❌ IP API failed for ${clientIp}: ${data.message}`);
+      // Allow on API failure (fail-open approach)
       res.cookie("valid_user", "true", { maxAge: 60 * 60 * 1000 });
       return next();
     }
@@ -3259,126 +2993,44 @@ async function blockVPN(req, res, next) {
     // ✅ Determine if VPN/Proxy
     const isVpn = data.proxy === true || data.hosting === true;
 
-    // Create detailed API data for logging
-    const apiLogData = {
-      proxy: data.proxy,
-      hosting: data.hosting,
-      country: data.country,
-      isp: data.isp,
-      org: data.org,
-      query: data.query
-    };
-
     // ✅ Store result in cache
     if (ipCache.size < MAX_CACHE_SIZE) {
       ipCache.set(clientIp, {
         isVpn,
         timestamp: Date.now(),
-        apiData: apiLogData
       });
     }
 
     if (isVpn) {
-      const reason = data.proxy ? 'API detected proxy=true' : 'API detected hosting=true';
-      logIpCheck(clientIp, 'BLOCKED', reason, apiLogData);
+      console.log(`🚫 VPN/Proxy detected: ${clientIp}`);
       res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
-      return res.status(403)
+      // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+      return res
+        .status(403)
         .sendFile(path.join(__dirname, "public", "restricted.html"));
     }
 
     // ✅ Valid user
-    logIpCheck(clientIp, 'ALLOWED', 'API check passed (proxy=false, hosting=false)', apiLogData);
+    console.log(`✅ Valid user: ${clientIp}`);
     res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
     next();
-
   } catch (error) {
-    const clientIp = (
-      req.headers["x-forwarded-for"]?.split(",")[0] || 
-      req.socket.remoteAddress
-    )?.trim() || 'unknown';
-
     // ✅ Handle errors gracefully
-    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
-      logIpCheck(clientIp, 'ALLOWED', 'API timeout - fail-open', { error: error.message });
-    } else if (error.message.includes('aborted')) {
-      logIpCheck(clientIp, 'ALLOWED', 'API aborted - fail-open', { error: error.message });
+    if (error.code === "ECONNABORTED" || error.message.includes("timeout")) {
+      console.error("⏱️ VPN check timeout:", error.message);
+    } else if (error.message.includes("aborted")) {
+      console.error("⏱️ VPN check aborted (timeout)");
     } else {
-      logIpCheck(clientIp, 'ALLOWED', 'API error - fail-open', { error: error.message });
+      console.error("❌ VPN check error:", error.message);
     }
-    
-    // Allow request on error (fail-open approach)
+
+    // Allow request on error (fail-open approach - better UX)
     next();
   }
 }
 
-// ✅ Apply VPN blocking middleware
+// ✅ Apply VPN blocking middleware (ONLY ONCE)
 app.use(blockVPN);
-
-// ============================================
-// ADMIN DASHBOARD ENDPOINT
-// ============================================
-app.get("/api/admin/dashboard", (req, res) => {
-  const adminKey = req.query.key;
-
-  if (adminKey !== process.env.ADMIN_KEY) {
-    return res.status(403).json({ error: "Unauthorized" });
-  }
-
-  // Calculate statistics
-  const blockedIPs = [];
-  const allowedIPs = [];
-  
-  for (const [ip, logs] of ipLogs.entries()) {
-    const lastLog = logs[logs.length - 1];
-    if (lastLog.decision === 'BLOCKED') {
-      blockedIPs.push({ ip, ...lastLog });
-    } else if (lastLog.decision === 'ALLOWED') {
-      allowedIPs.push({ ip, ...lastLog });
-    }
-  }
-
-  res.json({
-    timestamp: new Date().toISOString(),
-    statistics: {
-      totalIPsTracked: ipLogs.size,
-      cacheSize: ipCache.size,
-      apiCallsThisMinute: apiCallCount,
-      lastResetTime: new Date(lastResetTime).toISOString()
-    },
-    recentlyBlocked: blockedIPs.slice(-20),
-    recentlyAllowed: allowedIPs.slice(-20),
-    cacheStatus: Array.from(ipCache.entries()).map(([ip, data]) => ({
-      ip,
-      isVpn: data.isVpn,
-      ageMinutes: Math.floor((Date.now() - data.timestamp) / 60000)
-    }))
-  });
-});
-
-// ============================================
-// USER-FACING ENDPOINT: Check My IP Status
-// ============================================
-app.get("/api/my-ip-status", (req, res) => {
-  const clientIp = (
-    req.headers["x-forwarded-for"]?.split(",")[0] || 
-    req.socket.remoteAddress
-  ).trim();
-
-  const logs = ipLogs.get(clientIp) || [];
-  const cached = ipCache.get(clientIp);
-  const lastLog = logs[logs.length - 1];
-
-  res.json({
-    yourIP: clientIp,
-    status: lastLog ? lastLog.decision : 'UNKNOWN',
-    lastCheck: lastLog ? lastLog.timestamp : null,
-    reason: lastLog ? lastLog.reason : null,
-    cachedStatus: cached ? (cached.isVpn ? 'BLOCKED' : 'ALLOWED') : 'NOT_CACHED',
-    message: lastLog?.decision === 'BLOCKED' 
-      ? 'Your IP has been blocked. If you believe this is an error, please contact support.'
-      : 'Your IP is allowed to access the site.'
-  });
-});
 
 // ============================================
 // RETRY ROUTE (Clear blocked cookie)
