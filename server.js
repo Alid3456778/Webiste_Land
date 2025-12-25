@@ -2885,176 +2885,820 @@ function shouldSkipVpnCheck(path) {
   return SKIP_VPN_CHECK_PATHS.some((skipPath) => path.startsWith(skipPath));
 }
 
+// // ============================================
+// // VPN BLOCKING MIDDLEWARE
+// // ============================================
+// async function blockVPN(req, res, next) {
+//   try {
+//     // ✅ Skip VPN check for static assets and specific routes
+//     if (shouldSkipVpnCheck(req.path)) {
+//       return next();
+//     }
+
+//     // ✅ Get client IP (handle proxy headers)
+//     const clientIp = (
+//       req.headers["x-forwarded-for"]?.split(",")[0] ||
+//       req.socket.remoteAddress ||
+//       req.connection.remoteAddress
+//     ).trim();
+
+//     // ✅ Skip localhost/development IPs
+//     if (
+//       clientIp === "::1" ||
+//       clientIp === "127.0.0.1" ||
+//       clientIp.startsWith("192.168.")
+//     ) {
+//       console.log(`✅ Development IP allowed: ${clientIp}`);
+//       res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
+//       return next();
+//     }
+
+//     // ✅ If cookie already says blocked → deny immediately
+//     if (req.cookies.vpn_blocked === "true") {
+//       console.log(`🚫 Blocked user (cookie): ${clientIp}`);
+//       // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+//       return res
+//         .status(403)
+//         .sendFile(path.join(__dirname, "public", "restricted.html"));
+//     }
+
+//     // ✅ If cookie already says valid user → allow immediately (skip API check)
+//     if (req.cookies.valid_user === "true") {
+//       return next();
+//     }
+
+//     // ✅ Check employee whitelist
+//     if (EMPLOYEE_IPS.has(clientIp)) {
+//       console.log(`👔 Employee IP allowed: ${clientIp}`);
+//       res.cookie("valid_user", "true", { maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
+//       return next();
+//     }
+
+//     // ✅ Check cache first (before making API call)
+//     const cached = ipCache.get(clientIp);
+//     if (cached) {
+//       const age = Date.now() - cached.timestamp;
+
+//       if (age < CACHE_DURATION) {
+//         if (cached.isVpn) {
+//           console.log(`🚫 VPN/Proxy detected (cached): ${clientIp}`);
+//           res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
+//           // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+//           return res
+//             .status(403)
+//             .sendFile(path.join(__dirname, "public", "restricted.html"));
+//         } else {
+//           console.log(`✅ Valid user (cached): ${clientIp}`);
+//           res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
+//           return next();
+//         }
+//       } else {
+//         // Cache expired, remove it
+//         ipCache.delete(clientIp);
+//       }
+//     }
+
+//     // ✅ Check if we can make an API call (rate limiting)
+//     if (!canMakeApiCall()) {
+//       console.warn(`⚠️ Rate limit reached, allowing ${clientIp} without check`);
+//       res.cookie("valid_user", "true", { maxAge: 60 * 60 * 1000 }); // 1 hour temp cookie
+//       return next();
+//     }
+
+//     // ✅ Make API call with timeout
+//     console.log(`📡 Making API call for: ${clientIp}`);
+//     const controller = new AbortController();
+//     const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+//     const response = await axios.get(
+//       `http://ip-api.com/json/${clientIp}?fields=proxy,hosting,status,message`,
+//       {
+//         signal: controller.signal,
+//         timeout: 5000,
+//       }
+//     );
+
+//     clearTimeout(timeoutId);
+
+//     const data = response.data;
+
+//     // ✅ Check if API request was successful
+//     if (data.status === "fail") {
+//       console.error(`❌ IP API failed for ${clientIp}: ${data.message}`);
+//       // Allow on API failure (fail-open approach)
+//       res.cookie("valid_user", "true", { maxAge: 60 * 60 * 1000 });
+//       return next();
+//     }
+
+//     // ✅ Determine if VPN/Proxy
+//     const isVpn = data.proxy === true || data.hosting === true;
+
+//     // ✅ Store result in cache
+//     if (ipCache.size < MAX_CACHE_SIZE) {
+//       ipCache.set(clientIp, {
+//         isVpn,
+//         timestamp: Date.now(),
+//       });
+//     }
+
+//     if (isVpn) {
+//       console.log(`🚫 VPN/Proxy detected: ${clientIp}`);
+//       res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
+//       // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+//       return res
+//         .status(403)
+//         .sendFile(path.join(__dirname, "public", "restricted.html"));
+//     }
+
+//     // ✅ Valid user
+//     console.log(`✅ Valid user: ${clientIp}`);
+//     res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
+//     next();
+//   } catch (error) {
+//     // ✅ Handle errors gracefully
+//     if (error.code === "ECONNABORTED" || error.message.includes("timeout")) {
+//       console.error("⏱️ VPN check timeout:", error.message);
+//     } else if (error.message.includes("aborted")) {
+//       console.error("⏱️ VPN check aborted (timeout)");
+//     } else {
+//       console.error("❌ VPN check error:", error.message);
+//     }
+
+//     // Allow request on error (fail-open approach - better UX)
+//     next();
+//   }
+// }
+
+// // ✅ Apply VPN blocking middleware (ONLY ONCE)
+// app.use(blockVPN);
+
+// // ============================================
+// // RETRY ROUTE (Clear blocked cookie)
+// // ============================================
+// app.post("/retry", (req, res) => {
+//   const clientIp = (
+//     req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
+//   ).trim();
+
+//   // Clear from cache
+//   ipCache.delete(clientIp);
+
+//   // Clear cookies
+//   res.clearCookie("vpn_blocked");
+//   res.clearCookie("valid_user");
+
+//   console.log(`🔄 Retry requested for ${clientIp}`);
+//   res.redirect("/");
+// });
+
+// ============================================
+// MULTI-LAYERED VPN DETECTION SYSTEM
+// Long-lasting solution with minimal API dependency
+// ============================================
+
+const fs = require('fs').promises;
+// const path = require('path');
+
+// ============================================
+// CONFIGURATION
+// ============================================
+const VPN_CONFIG = {
+  // Cache duration: 7 days (reduce API calls dramatically)
+  CACHE_DURATION: 7 * 24 * 60 * 60 * 1000,
+  
+  // Persistent storage file
+  STORAGE_FILE: path.join(__dirname, 'data', 'ip-cache.json'),
+  
+  // API providers (fallback to multiple sources)
+  API_PROVIDERS: [
+    {
+      name: 'ip-api',
+      url: (ip) => `http://ip-api.com/json/${ip}?fields=proxy,hosting,status,message,country,isp,org`,
+      parseResponse: (data) => ({
+        isVpn: data.proxy === true || data.hosting === true,
+        provider: 'ip-api',
+        details: { proxy: data.proxy, hosting: data.hosting, isp: data.isp }
+      }),
+      rateLimit: { calls: 45, per: 60000 } // 45 per minute
+    },
+    {
+      name: 'ipapi',
+      url: (ip) => `https://ipapi.co/${ip}/json/`,
+      parseResponse: (data) => ({
+        isVpn: data.threat?.is_proxy || data.threat?.is_vpn || false,
+        provider: 'ipapi',
+        details: { threat: data.threat, org: data.org }
+      }),
+      rateLimit: { calls: 1000, per: 24 * 60 * 60 * 1000 } // 1000 per day
+    },
+    {
+      name: 'ipinfo',
+      url: (ip) => `https://ipinfo.io/${ip}/json`,
+      parseResponse: (data) => ({
+        isVpn: data.privacy?.vpn || data.privacy?.proxy || data.privacy?.hosting || false,
+        provider: 'ipinfo',
+        details: { privacy: data.privacy, org: data.org }
+      }),
+      rateLimit: { calls: 50000, per: 30 * 24 * 60 * 60 * 1000 } // 50k per month
+    }
+  ],
+  
+  // Maximum cache size
+  MAX_CACHE_SIZE: 50000,
+  
+  // Confidence threshold (require multiple indicators)
+  CONFIDENCE_THRESHOLD: 2
+};
+
+// ============================================
+// PERSISTENT CACHE SYSTEM
+// ============================================
+class PersistentIPCache {
+  constructor() {
+    this.cache = new Map();
+    this.logs = new Map();
+    this.loadFromDisk();
+  }
+
+  async loadFromDisk() {
+    try {
+      // Ensure data directory exists
+      const dataDir = path.dirname(VPN_CONFIG.STORAGE_FILE);
+      await fs.mkdir(dataDir, { recursive: true });
+
+      // Load cache from disk
+      const data = await fs.readFile(VPN_CONFIG.STORAGE_FILE, 'utf8');
+      const parsed = JSON.parse(data);
+      
+      // Restore cache
+      this.cache = new Map(Object.entries(parsed.cache || {}));
+      this.logs = new Map(Object.entries(parsed.logs || {}));
+      
+      console.log(`✅ Loaded ${this.cache.size} IPs from persistent cache`);
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        console.error('Error loading IP cache:', error.message);
+      }
+      // File doesn't exist or is corrupted, start fresh
+      this.cache = new Map();
+      this.logs = new Map();
+    }
+  }
+
+  async saveToDisk() {
+    try {
+      const data = {
+        cache: Object.fromEntries(this.cache),
+        logs: Object.fromEntries(this.logs),
+        lastSaved: new Date().toISOString()
+      };
+      
+      await fs.writeFile(
+        VPN_CONFIG.STORAGE_FILE,
+        JSON.stringify(data, null, 2),
+        'utf8'
+      );
+    } catch (error) {
+      console.error('Error saving IP cache:', error.message);
+    }
+  }
+
+  get(ip) {
+    return this.cache.get(ip);
+  }
+
+  set(ip, data) {
+    this.cache.set(ip, data);
+    
+    // Auto-save periodically (throttled)
+    if (!this.saveTimeout) {
+      this.saveTimeout = setTimeout(() => {
+        this.saveToDisk();
+        this.saveTimeout = null;
+      }, 5000); // Save every 5 seconds max
+    }
+
+    // Enforce max size
+    if (this.cache.size > VPN_CONFIG.MAX_CACHE_SIZE) {
+      // Remove oldest entry
+      const firstKey = this.cache.keys().next().value;
+      this.cache.delete(firstKey);
+    }
+  }
+
+  delete(ip) {
+    this.cache.delete(ip);
+    this.saveToDisk();
+  }
+
+  log(ip, entry) {
+    if (!this.logs.has(ip)) {
+      this.logs.set(ip, []);
+    }
+    
+    const logs = this.logs.get(ip);
+    logs.push(entry);
+    
+    // Keep only last 20 entries per IP
+    if (logs.length > 20) {
+      logs.shift();
+    }
+  }
+
+  getLogs(ip) {
+    return this.logs.get(ip) || [];
+  }
+
+  getAllLogs() {
+    return Object.fromEntries(this.logs);
+  }
+}
+
+// Initialize persistent cache
+const persistentCache = new PersistentIPCache();
+
+// ============================================
+// API RATE LIMITER
+// ============================================
+class APIRateLimiter {
+  constructor() {
+    this.providers = new Map();
+    
+    VPN_CONFIG.API_PROVIDERS.forEach(provider => {
+      this.providers.set(provider.name, {
+        calls: 0,
+        resetTime: Date.now() + provider.rateLimit.per
+      });
+    });
+  }
+
+  canMakeCall(providerName) {
+    const provider = VPN_CONFIG.API_PROVIDERS.find(p => p.name === providerName);
+    if (!provider) return false;
+
+    const limiter = this.providers.get(providerName);
+    
+    // Reset if time window passed
+    if (Date.now() > limiter.resetTime) {
+      limiter.calls = 0;
+      limiter.resetTime = Date.now() + provider.rateLimit.per;
+    }
+
+    // Check if under limit
+    if (limiter.calls < provider.rateLimit.calls) {
+      limiter.calls++;
+      return true;
+    }
+
+    return false;
+  }
+
+  getAvailableProvider() {
+    for (const provider of VPN_CONFIG.API_PROVIDERS) {
+      if (this.canMakeCall(provider.name)) {
+        return provider;
+      }
+    }
+    return null;
+  }
+}
+
+const rateLimiter = new APIRateLimiter();
+
+// ============================================
+// KNOWN VPN/DATACENTER PATTERNS
+// ============================================
+const VPN_INDICATORS = {
+  // Common VPN provider keywords in ISP/ORG names
+  keywords: [
+    'vpn', 'proxy', 'datacenter', 'hosting', 'server', 'cloud',
+    'digital ocean', 'aws', 'amazon', 'google cloud', 'azure',
+    'linode', 'ovh', 'hetzner', 'vultr', 'upstream'
+  ],
+  
+  // Known VPN/Proxy ASN ranges
+  suspiciousASNs: new Set([
+    'AS14061', // DigitalOcean
+    'AS16509', // Amazon AWS
+    'AS15169', // Google Cloud
+    'AS8075',  // Microsoft Azure
+    'AS20473', // Choopa (Vultr)
+    // Add more as you discover them
+  ]),
+
+  // Check if ISP/ORG name suggests VPN/hosting
+  checkOrgName(orgName) {
+    if (!orgName) return false;
+    
+    const lowerOrg = orgName.toLowerCase();
+    return this.keywords.some(keyword => lowerOrg.includes(keyword));
+  }
+};
+
+// ============================================
+// HEURISTIC VPN DETECTION
+// ============================================
+function analyzeIPHeuristics(ip, apiData) {
+  let suspicionScore = 0;
+  const reasons = [];
+
+  // Check 1: Datacenter/hosting flag from API
+  if (apiData?.hosting === true) {
+    suspicionScore += 2;
+    reasons.push('Datacenter/hosting IP');
+  }
+
+  // Check 2: Proxy flag from API
+  if (apiData?.proxy === true) {
+    suspicionScore += 3;
+    reasons.push('Proxy detected by API');
+  }
+
+  // Check 3: Organization name analysis
+  if (apiData?.org || apiData?.isp) {
+    const orgName = apiData.org || apiData.isp;
+    if (VPN_INDICATORS.checkOrgName(orgName)) {
+      suspicionScore += 2;
+      reasons.push(`Suspicious org: ${orgName}`);
+    }
+  }
+
+  // Check 4: Known ASN
+  if (apiData?.asn && VPN_INDICATORS.suspiciousASNs.has(apiData.asn)) {
+    suspicionScore += 1;
+    reasons.push('Known datacenter ASN');
+  }
+
+  return {
+    suspicionScore,
+    reasons,
+    isVpn: suspicionScore >= VPN_CONFIG.CONFIDENCE_THRESHOLD
+  };
+}
+
+// ============================================
+// ENHANCED VPN DETECTION
+// ============================================
+async function detectVPN(clientIp) {
+  try {
+    // Try to get available API provider
+    const provider = rateLimiter.getAvailableProvider();
+    
+    if (!provider) {
+      console.warn(`⚠️ All API providers rate limited for ${clientIp}`);
+      
+      // Use cached data if available (even if expired)
+      const cached = persistentCache.get(clientIp);
+      if (cached) {
+        console.log(`📦 Using stale cache for ${clientIp} (no API available)`);
+        return {
+          isVpn: cached.isVpn,
+          source: 'stale-cache',
+          cached: true
+        };
+      }
+      
+      // No cache, no API - allow by default (fail-open)
+      return {
+        isVpn: false,
+        source: 'no-api-no-cache',
+        cached: false
+      };
+    }
+
+    // Make API call with timeout
+    console.log(`📡 Checking ${clientIp} with ${provider.name}`);
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+    const response = await axios.get(provider.url(clientIp), {
+      signal: controller.signal,
+      timeout: 5000,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; VPNDetection/1.0)'
+      }
+    });
+
+    clearTimeout(timeoutId);
+
+    // Parse response using provider-specific parser
+    const parsed = provider.parseResponse(response.data);
+    
+    // Apply heuristic analysis
+    const heuristics = analyzeIPHeuristics(clientIp, response.data);
+
+    // Combine API result with heuristics
+    const isVpn = parsed.isVpn || heuristics.isVpn;
+
+    // Cache result for 7 days
+    const cacheData = {
+      isVpn,
+      timestamp: Date.now(),
+      provider: provider.name,
+      details: parsed.details,
+      heuristics: heuristics.reasons,
+      suspicionScore: heuristics.suspicionScore
+    };
+
+    persistentCache.set(clientIp, cacheData);
+
+    // Log the check
+    persistentCache.log(clientIp, {
+      timestamp: new Date().toISOString(),
+      decision: isVpn ? 'BLOCKED' : 'ALLOWED',
+      provider: provider.name,
+      reasons: heuristics.reasons
+    });
+
+    return {
+      isVpn,
+      source: provider.name,
+      cached: false,
+      details: cacheData
+    };
+
+  } catch (error) {
+    console.error(`❌ VPN detection error for ${clientIp}:`, error.message);
+
+    // Try to use cached data (even if old)
+    const cached = persistentCache.get(clientIp);
+    if (cached) {
+      console.log(`📦 Using cached data after error for ${clientIp}`);
+      return {
+        isVpn: cached.isVpn,
+        source: 'cache-after-error',
+        cached: true
+      };
+    }
+
+    // No cache available - fail open
+    return {
+      isVpn: false,
+      source: 'error-fail-open',
+      cached: false,
+      error: error.message
+    };
+  }
+}
+
 // ============================================
 // VPN BLOCKING MIDDLEWARE
 // ============================================
 async function blockVPN(req, res, next) {
   try {
-    // ✅ Skip VPN check for static assets and specific routes
+    // Skip for specific routes
     if (shouldSkipVpnCheck(req.path)) {
       return next();
     }
 
-    // ✅ Get client IP (handle proxy headers)
+    // Get client IP
     const clientIp = (
       req.headers["x-forwarded-for"]?.split(",")[0] ||
       req.socket.remoteAddress ||
       req.connection.remoteAddress
     ).trim();
 
-    // ✅ Skip localhost/development IPs
-    if (
-      clientIp === "::1" ||
-      clientIp === "127.0.0.1" ||
-      clientIp.startsWith("192.168.")
-    ) {
-      console.log(`✅ Development IP allowed: ${clientIp}`);
-      res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
+    // Skip localhost
+    if (clientIp === "::1" || clientIp === "127.0.0.1" || clientIp.startsWith("192.168.")) {
       return next();
     }
 
-    // ✅ If cookie already says blocked → deny immediately
+    // Check if already blocked by cookie
     if (req.cookies.vpn_blocked === "true") {
-      console.log(`🚫 Blocked user (cookie): ${clientIp}`);
-      // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
-      return res
-        .status(403)
+      persistentCache.log(clientIp, {
+        timestamp: new Date().toISOString(),
+        decision: 'BLOCKED',
+        reason: 'Cookie-based block'
+      });
+      return res.status(403)
         .sendFile(path.join(__dirname, "public", "restricted.html"));
     }
 
-    // ✅ If cookie already says valid user → allow immediately (skip API check)
+    // Check if already validated by cookie
     if (req.cookies.valid_user === "true") {
       return next();
     }
 
-    // ✅ Check employee whitelist
+    // Check employee whitelist
     if (EMPLOYEE_IPS.has(clientIp)) {
-      console.log(`👔 Employee IP allowed: ${clientIp}`);
-      res.cookie("valid_user", "true", { maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
+      res.cookie("valid_user", "true", { maxAge: 30 * 24 * 60 * 60 * 1000 });
       return next();
     }
 
-    // ✅ Check cache first (before making API call)
-    const cached = ipCache.get(clientIp);
-    if (cached) {
-      const age = Date.now() - cached.timestamp;
-
-      if (age < CACHE_DURATION) {
-        if (cached.isVpn) {
-          console.log(`🚫 VPN/Proxy detected (cached): ${clientIp}`);
-          res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
-          // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
-          return res
-            .status(403)
-            .sendFile(path.join(__dirname, "public", "restricted.html"));
-        } else {
-          console.log(`✅ Valid user (cached): ${clientIp}`);
-          res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
-          return next();
-        }
+    // Check cache first (7 day cache)
+    const cached = persistentCache.get(clientIp);
+    if (cached && (Date.now() - cached.timestamp < VPN_CONFIG.CACHE_DURATION)) {
+      if (cached.isVpn) {
+        console.log(`🚫 VPN detected (cached): ${clientIp}`);
+        persistentCache.log(clientIp, {
+          timestamp: new Date().toISOString(),
+          decision: 'BLOCKED',
+          reason: 'Cached as VPN'
+        });
+        res.cookie("vpn_blocked", "true", { maxAge: 7 * 24 * 60 * 60 * 1000 });
+        return res.status(403)
+          .sendFile(path.join(__dirname, "public", "restricted.html"));
       } else {
-        // Cache expired, remove it
-        ipCache.delete(clientIp);
+        console.log(`✅ Valid user (cached): ${clientIp}`);
+        res.cookie("valid_user", "true", { maxAge: 7 * 24 * 60 * 60 * 1000 });
+        return next();
       }
     }
 
-    // ✅ Check if we can make an API call (rate limiting)
-    if (!canMakeApiCall()) {
-      console.warn(`⚠️ Rate limit reached, allowing ${clientIp} without check`);
-      res.cookie("valid_user", "true", { maxAge: 60 * 60 * 1000 }); // 1 hour temp cookie
-      return next();
-    }
+    // Perform VPN detection
+    const result = await detectVPN(clientIp);
 
-    // ✅ Make API call with timeout
-    console.log(`📡 Making API call for: ${clientIp}`);
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-
-    const response = await axios.get(
-      `http://ip-api.com/json/${clientIp}?fields=proxy,hosting,status,message`,
-      {
-        signal: controller.signal,
-        timeout: 5000,
-      }
-    );
-
-    clearTimeout(timeoutId);
-
-    const data = response.data;
-
-    // ✅ Check if API request was successful
-    if (data.status === "fail") {
-      console.error(`❌ IP API failed for ${clientIp}: ${data.message}`);
-      // Allow on API failure (fail-open approach)
-      res.cookie("valid_user", "true", { maxAge: 60 * 60 * 1000 });
-      return next();
-    }
-
-    // ✅ Determine if VPN/Proxy
-    const isVpn = data.proxy === true || data.hosting === true;
-
-    // ✅ Store result in cache
-    if (ipCache.size < MAX_CACHE_SIZE) {
-      ipCache.set(clientIp, {
-        isVpn,
-        timestamp: Date.now(),
+    if (result.isVpn) {
+      console.log(`🚫 VPN/Proxy detected: ${clientIp} (${result.source})`);
+      persistentCache.log(clientIp, {
+        timestamp: new Date().toISOString(),
+        decision: 'BLOCKED',
+        source: result.source,
+        details: result.details
       });
-    }
-
-    if (isVpn) {
-      console.log(`🚫 VPN/Proxy detected: ${clientIp}`);
-      res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
-      // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
-      return res
-        .status(403)
+      res.cookie("vpn_blocked", "true", { maxAge: 7 * 24 * 60 * 60 * 1000 });
+      return res.status(403)
         .sendFile(path.join(__dirname, "public", "restricted.html"));
     }
 
-    // ✅ Valid user
-    console.log(`✅ Valid user: ${clientIp}`);
-    res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
+    // Valid user
+    console.log(`✅ Valid user: ${clientIp} (${result.source})`);
+    persistentCache.log(clientIp, {
+      timestamp: new Date().toISOString(),
+      decision: 'ALLOWED',
+      source: result.source
+    });
+    res.cookie("valid_user", "true", { maxAge: 7 * 24 * 60 * 60 * 1000 });
     next();
-  } catch (error) {
-    // ✅ Handle errors gracefully
-    if (error.code === "ECONNABORTED" || error.message.includes("timeout")) {
-      console.error("⏱️ VPN check timeout:", error.message);
-    } else if (error.message.includes("aborted")) {
-      console.error("⏱️ VPN check aborted (timeout)");
-    } else {
-      console.error("❌ VPN check error:", error.message);
-    }
 
-    // Allow request on error (fail-open approach - better UX)
-    next();
+  } catch (error) {
+    console.error("❌ VPN middleware error:", error.message);
+    next(); // Fail open
   }
 }
 
-// ✅ Apply VPN blocking middleware (ONLY ONCE)
-// app.use(blockVPN);
-const vpnBlocker = require("./vpn/vpnCheck");
-
-// Apply BEFORE sensitive routes
-app.use("/api", vpnBlocker);
-
-
-
 // ============================================
-// RETRY ROUTE (Clear blocked cookie)
+// ADMIN ENDPOINTS
 // ============================================
-app.post("/retry", (req, res) => {
+
+// View IP logs
+app.get("/api/admin/ip-logs/:ip?", (req, res) => {
+  const { ip } = req.params;
+  const adminKey = req.query.key;
+
+  if (adminKey !== process.env.ADMIN_KEY) {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+
+  if (ip) {
+    const cached = persistentCache.get(ip);
+    const logs = persistentCache.getLogs(ip);
+    
+    return res.json({
+      ip,
+      cached: cached || null,
+      logs: logs,
+      totalChecks: logs.length
+    });
+  }
+
+  res.json({
+    totalIPs: persistentCache.cache.size,
+    allLogs: persistentCache.getAllLogs()
+  });
+});
+
+// Unblock IP
+app.post("/api/admin/unblock-ip", async (req, res) => {
+  const { ip, adminKey } = req.body;
+
+  if (adminKey !== process.env.ADMIN_KEY) {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+
+  persistentCache.delete(ip);
+  
+  res.json({
+    success: true,
+    message: `IP ${ip} unblocked and removed from cache`
+  });
+});
+
+// Add IP to whitelist
+app.post("/api/admin/whitelist-ip", (req, res) => {
+  const { ip, adminKey } = req.body;
+
+  if (adminKey !== process.env.ADMIN_KEY) {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+
+  EMPLOYEE_IPS.add(ip);
+  persistentCache.delete(ip);
+  
+  res.json({
+    success: true,
+    message: `IP ${ip} added to whitelist`
+  });
+});
+
+// Force refresh IP check
+app.post("/api/admin/refresh-ip", async (req, res) => {
+  const { ip, adminKey } = req.body;
+
+  if (adminKey !== process.env.ADMIN_KEY) {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+
+  persistentCache.delete(ip);
+  const result = await detectVPN(ip);
+  
+  res.json({
+    success: true,
+    ip,
+    result
+  });
+});
+
+// Dashboard
+app.get("/api/admin/dashboard", (req, res) => {
+  const adminKey = req.query.key;
+
+  if (adminKey !== process.env.ADMIN_KEY) {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+
+  const blocked = [];
+  const allowed = [];
+
+  for (const [ip, data] of persistentCache.cache.entries()) {
+    if (data.isVpn) {
+      blocked.push({ ip, ...data });
+    } else {
+      allowed.push({ ip, ...data });
+    }
+  }
+
+  res.json({
+    timestamp: new Date().toISOString(),
+    statistics: {
+      totalIPsCached: persistentCache.cache.size,
+      blockedCount: blocked.length,
+      allowedCount: allowed.length
+    },
+    recentBlocked: blocked.slice(-50),
+    recentAllowed: allowed.slice(-50)
+  });
+});
+
+// User-facing endpoint
+app.get("/api/my-ip-status", (req, res) => {
   const clientIp = (
-    req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
+    req.headers["x-forwarded-for"]?.split(",")[0] ||
+    req.socket.remoteAddress
   ).trim();
 
-  // Clear from cache
-  ipCache.delete(clientIp);
+  const cached = persistentCache.get(clientIp);
+  const logs = persistentCache.getLogs(clientIp);
 
-  // Clear cookies
+  res.json({
+    yourIP: clientIp,
+    status: cached?.isVpn ? 'BLOCKED' : 'ALLOWED',
+    lastCheck: cached?.timestamp ? new Date(cached.timestamp).toISOString() : null,
+    cacheAge: cached ? Math.floor((Date.now() - cached.timestamp) / 60000) + ' minutes' : null,
+    recentChecks: logs.length
+  });
+});
+
+// Retry route
+app.post("/retry", (req, res) => {
+  const clientIp = (
+    req.headers["x-forwarded-for"]?.split(",")[0] ||
+    req.socket.remoteAddress
+  ).trim();
+
+  persistentCache.delete(clientIp);
   res.clearCookie("vpn_blocked");
   res.clearCookie("valid_user");
 
   console.log(`🔄 Retry requested for ${clientIp}`);
   res.redirect("/");
+});
+
+// Apply middleware
+app.use(blockVPN);
+
+// Graceful shutdown - save cache
+process.on('SIGTERM', async () => {
+  console.log('💾 Saving IP cache before shutdown...');
+  await persistentCache.saveToDisk();
+  process.exit(0);
+});
+
+process.on('SIGINT', async () => {
+  console.log('💾 Saving IP cache before shutdown...');
+  await persistentCache.saveToDisk();
+  process.exit(0);
 });
 
 app.use(express.static(path.join(__dirname, "public")));
