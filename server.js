@@ -3030,7 +3030,13 @@ async function blockVPN(req, res, next) {
 }
 
 // ✅ Apply VPN blocking middleware (ONLY ONCE)
-app.use(blockVPN);
+// app.use(blockVPN);
+const vpnBlocker = require("./vpn/vpnCheck");
+
+// Apply BEFORE sensitive routes
+app.use("/api", vpnBlocker);
+
+
 
 // ============================================
 // RETRY ROUTE (Clear blocked cookie)
