@@ -3052,8 +3052,8 @@ function shouldSkipVpnCheck(path) {
 // });
 
 // ============================================
-// MULTI-LAYERED VPN DETECTION SYSTEM
-// Long-lasting solution with minimal API dependency
+// STRICT MULTI-LAYERED VPN DETECTION SYSTEM
+// Enhanced with comprehensive VPN/proxy detection
 // ============================================
 
 const fs = require('fs').promises;
@@ -3063,51 +3063,190 @@ const fs = require('fs').promises;
 // CONFIGURATION
 // ============================================
 const VPN_CONFIG = {
-  // Cache duration: 7 days (reduce API calls dramatically)
-  CACHE_DURATION: 7 * 24 * 60 * 60 * 1000,
-  
-  // Persistent storage file
+  CACHE_DURATION: 7 * 24 * 60 * 60 * 1000, // 7 days
   STORAGE_FILE: path.join(__dirname, 'data', 'ip-cache.json'),
+  MAX_CACHE_SIZE: 50000,
   
-  // API providers (fallback to multiple sources)
+  // Stricter: Block on ANY positive indicator
+  BLOCK_ON_SINGLE_INDICATOR: true,
+  
+  // Multiple API providers with different strengths
   API_PROVIDERS: [
     {
       name: 'ip-api',
-      url: (ip) => `http://ip-api.com/json/${ip}?fields=proxy,hosting,status,message,country,isp,org`,
-      parseResponse: (data) => ({
-        isVpn: data.proxy === true || data.hosting === true,
-        provider: 'ip-api',
-        details: { proxy: data.proxy, hosting: data.hosting, isp: data.isp }
-      }),
-      rateLimit: { calls: 45, per: 60000 } // 45 per minute
+      url: (ip) => `http://ip-api.com/json/${ip}?fields=proxy,hosting,mobile,status,message,country,isp,org,as,query`,
+      parseResponse: (data) => {
+        const indicators = [];
+        if (data.proxy === true) indicators.push('proxy_flag');
+        if (data.hosting === true) indicators.push('hosting_flag');
+        if (data.mobile === false && data.hosting === true) indicators.push('datacenter');
+        
+        return {
+          isVpn: data.proxy === true || data.hosting === true,
+          indicators,
+          provider: 'ip-api',
+          details: { 
+            proxy: data.proxy, 
+            hosting: data.hosting,
+            mobile: data.mobile,
+            isp: data.isp,
+            org: data.org,
+            as: data.as
+          }
+        };
+      },
+      rateLimit: { calls: 45, per: 60000 }
     },
     {
       name: 'ipapi',
       url: (ip) => `https://ipapi.co/${ip}/json/`,
-      parseResponse: (data) => ({
-        isVpn: data.threat?.is_proxy || data.threat?.is_vpn || false,
-        provider: 'ipapi',
-        details: { threat: data.threat, org: data.org }
-      }),
-      rateLimit: { calls: 1000, per: 24 * 60 * 60 * 1000 } // 1000 per day
+      parseResponse: (data) => {
+        const indicators = [];
+        if (data.privacy?.vpn) indicators.push('vpn_detected');
+        if (data.privacy?.proxy) indicators.push('proxy_detected');
+        if (data.privacy?.tor) indicators.push('tor_detected');
+        if (data.privacy?.hosting) indicators.push('hosting_detected');
+        
+        return {
+          isVpn: indicators.length > 0,
+          indicators,
+          provider: 'ipapi',
+          details: { 
+            privacy: data.privacy,
+            org: data.org,
+            asn: data.asn
+          }
+        };
+      },
+      rateLimit: { calls: 1000, per: 24 * 60 * 60 * 1000 }
     },
     {
       name: 'ipinfo',
       url: (ip) => `https://ipinfo.io/${ip}/json`,
-      parseResponse: (data) => ({
-        isVpn: data.privacy?.vpn || data.privacy?.proxy || data.privacy?.hosting || false,
-        provider: 'ipinfo',
-        details: { privacy: data.privacy, org: data.org }
-      }),
-      rateLimit: { calls: 50000, per: 30 * 24 * 60 * 60 * 1000 } // 50k per month
+      parseResponse: (data) => {
+        const indicators = [];
+        if (data.privacy?.vpn) indicators.push('vpn_flag');
+        if (data.privacy?.proxy) indicators.push('proxy_flag');
+        if (data.privacy?.hosting) indicators.push('hosting_flag');
+        if (data.privacy?.relay) indicators.push('relay_flag');
+        
+        return {
+          isVpn: indicators.length > 0,
+          indicators,
+          provider: 'ipinfo',
+          details: { 
+            privacy: data.privacy,
+            org: data.org,
+            asn: data.asn
+          }
+        };
+      },
+      rateLimit: { calls: 1000, per: 24 * 60 * 60 * 1000 }
+    },
+    {
+      name: 'ipqualityscore',
+      url: (ip) => `https://www.ipqualityscore.com/api/json/ip/${process.env.IPQS_KEY || 'free'}/${ip}?strictness=1`,
+      parseResponse: (data) => {
+        const indicators = [];
+        if (data.vpn) indicators.push('vpn_detected');
+        if (data.proxy) indicators.push('proxy_detected');
+        if (data.tor) indicators.push('tor_detected');
+        if (data.active_vpn) indicators.push('active_vpn');
+        if (data.active_tor) indicators.push('active_tor');
+        
+        return {
+          isVpn: data.vpn || data.proxy || data.tor || data.active_vpn || data.active_tor,
+          indicators,
+          provider: 'ipqualityscore',
+          details: {
+            fraud_score: data.fraud_score,
+            vpn: data.vpn,
+            proxy: data.proxy,
+            tor: data.tor,
+            isp: data.ISP
+          }
+        };
+      },
+      rateLimit: { calls: 5000, per: 30 * 24 * 60 * 60 * 1000 }
     }
+  ]
+};
+
+// ============================================
+// COMPREHENSIVE VPN/PROXY/DATACENTER DATABASE
+// ============================================
+const VPN_INDICATORS = {
+  // Expanded VPN/Proxy/Hosting keywords
+  keywords: [
+    // VPN Services
+    'vpn', 'virtual private', 'nordvpn', 'expressvpn', 'surfshark',
+    'protonvpn', 'cyberghost', 'ipvanish', 'purevpn', 'privatevpn',
+    'tunnelbear', 'windscribe', 'mullvad', 'private internet access',
+    
+    // Proxy Services
+    'proxy', 'proxies', 'socks', 'anonymizer', 'hide my', 'anonymous',
+    
+    // Tor
+    'tor', 'onion', 'tor relay', 'tor exit',
+    
+    // Cloud/Hosting Providers
+    'datacenter', 'data center', 'hosting', 'server', 'cloud',
+    'digital ocean', 'digitalocean', 'aws', 'amazon', 'ec2',
+    'google cloud', 'gce', 'azure', 'microsoft cloud',
+    'linode', 'vultr', 'ovh', 'hetzner', 'contabo',
+    'scaleway', 'rackspace', 'liquidweb', 'godaddy',
+    
+    // CDN/Edge Networks
+    'cloudflare', 'fastly', 'akamai', 'cdn',
+    
+    // Other suspicious terms
+    'colocation', 'colo', 'upstream', 'transit', 'backbone',
+    'relay', 'tunneling', 'vpn gateway'
   ],
   
-  // Maximum cache size
-  MAX_CACHE_SIZE: 50000,
-  
-  // Confidence threshold (require multiple indicators)
-  CONFIDENCE_THRESHOLD: 2
+  // Known datacenter/VPN ASNs (Autonomous System Numbers)
+  suspiciousASNs: new Set([
+    // Major Cloud Providers
+    'AS14061', 'AS16509', 'AS15169', 'AS8075', 'AS20473',
+    'AS19551', 'AS26496', 'AS13335', 'AS16276', 'AS32934',
+    
+    // VPN Providers
+    'AS174', 'AS3356', 'AS1299', 'AS2914', 'AS6939',
+    
+    // Add more as discovered
+  ]),
+
+  // Comprehensive organization name check
+  checkOrgName(orgName) {
+    if (!orgName) return { match: false, keyword: null };
+    
+    const lowerOrg = orgName.toLowerCase();
+    
+    for (const keyword of this.keywords) {
+      if (lowerOrg.includes(keyword)) {
+        return { match: true, keyword };
+      }
+    }
+    
+    return { match: false, keyword: null };
+  },
+
+  // Check ASN
+  checkASN(asn) {
+    if (!asn) return false;
+    
+    // Extract ASN number (handles formats like "AS14061" or "14061")
+    const asnNum = asn.toString().replace(/[^\d]/g, '');
+    const asnFormatted = `AS${asnNum}`;
+    
+    return this.suspiciousASNs.has(asnFormatted);
+  },
+
+  // Port scanning detection (common VPN behavior)
+  isCommonVPNPort(port) {
+    const vpnPorts = [1194, 1723, 4500, 500, 443, 1701, 8888, 8080];
+    return vpnPorts.includes(port);
+  }
 };
 
 // ============================================
@@ -3117,31 +3256,33 @@ class PersistentIPCache {
   constructor() {
     this.cache = new Map();
     this.logs = new Map();
+    this.blocklist = new Set(); // Permanent blocklist
+    this.whitelist = new Set(); // Permanent whitelist
     this.loadFromDisk();
   }
 
   async loadFromDisk() {
     try {
-      // Ensure data directory exists
       const dataDir = path.dirname(VPN_CONFIG.STORAGE_FILE);
       await fs.mkdir(dataDir, { recursive: true });
 
-      // Load cache from disk
       const data = await fs.readFile(VPN_CONFIG.STORAGE_FILE, 'utf8');
       const parsed = JSON.parse(data);
       
-      // Restore cache
       this.cache = new Map(Object.entries(parsed.cache || {}));
       this.logs = new Map(Object.entries(parsed.logs || {}));
+      this.blocklist = new Set(parsed.blocklist || []);
+      this.whitelist = new Set(parsed.whitelist || []);
       
-      console.log(`✅ Loaded ${this.cache.size} IPs from persistent cache`);
+      console.log(`✅ Loaded cache: ${this.cache.size} IPs, ${this.blocklist.size} blocked, ${this.whitelist.size} whitelisted`);
     } catch (error) {
       if (error.code !== 'ENOENT') {
         console.error('Error loading IP cache:', error.message);
       }
-      // File doesn't exist or is corrupted, start fresh
       this.cache = new Map();
       this.logs = new Map();
+      this.blocklist = new Set();
+      this.whitelist = new Set();
     }
   }
 
@@ -3150,6 +3291,8 @@ class PersistentIPCache {
       const data = {
         cache: Object.fromEntries(this.cache),
         logs: Object.fromEntries(this.logs),
+        blocklist: Array.from(this.blocklist),
+        whitelist: Array.from(this.whitelist),
         lastSaved: new Date().toISOString()
       };
       
@@ -3163,6 +3306,30 @@ class PersistentIPCache {
     }
   }
 
+  isBlocked(ip) {
+    return this.blocklist.has(ip);
+  }
+
+  isWhitelisted(ip) {
+    return this.whitelist.has(ip);
+  }
+
+  addToBlocklist(ip) {
+    this.blocklist.add(ip);
+    this.saveToDisk();
+  }
+
+  addToWhitelist(ip) {
+    this.whitelist.add(ip);
+    this.blocklist.delete(ip); // Remove from blocklist if present
+    this.saveToDisk();
+  }
+
+  removeFromBlocklist(ip) {
+    this.blocklist.delete(ip);
+    this.saveToDisk();
+  }
+
   get(ip) {
     return this.cache.get(ip);
   }
@@ -3170,17 +3337,14 @@ class PersistentIPCache {
   set(ip, data) {
     this.cache.set(ip, data);
     
-    // Auto-save periodically (throttled)
     if (!this.saveTimeout) {
       this.saveTimeout = setTimeout(() => {
         this.saveToDisk();
         this.saveTimeout = null;
-      }, 5000); // Save every 5 seconds max
+      }, 5000);
     }
 
-    // Enforce max size
     if (this.cache.size > VPN_CONFIG.MAX_CACHE_SIZE) {
-      // Remove oldest entry
       const firstKey = this.cache.keys().next().value;
       this.cache.delete(firstKey);
     }
@@ -3199,7 +3363,6 @@ class PersistentIPCache {
     const logs = this.logs.get(ip);
     logs.push(entry);
     
-    // Keep only last 20 entries per IP
     if (logs.length > 20) {
       logs.shift();
     }
@@ -3214,7 +3377,6 @@ class PersistentIPCache {
   }
 }
 
-// Initialize persistent cache
 const persistentCache = new PersistentIPCache();
 
 // ============================================
@@ -3238,13 +3400,11 @@ class APIRateLimiter {
 
     const limiter = this.providers.get(providerName);
     
-    // Reset if time window passed
     if (Date.now() > limiter.resetTime) {
       limiter.calls = 0;
       limiter.resetTime = Date.now() + provider.rateLimit.per;
     }
 
-    // Check if under limit
     if (limiter.calls < provider.rateLimit.calls) {
       limiter.calls++;
       return true;
@@ -3266,73 +3426,104 @@ class APIRateLimiter {
 const rateLimiter = new APIRateLimiter();
 
 // ============================================
-// KNOWN VPN/DATACENTER PATTERNS
-// ============================================
-const VPN_INDICATORS = {
-  // Common VPN provider keywords in ISP/ORG names
-  keywords: [
-    'vpn', 'proxy', 'datacenter', 'hosting', 'server', 'cloud',
-    'digital ocean', 'aws', 'amazon', 'google cloud', 'azure',
-    'linode', 'ovh', 'hetzner', 'vultr', 'upstream'
-  ],
-  
-  // Known VPN/Proxy ASN ranges
-  suspiciousASNs: new Set([
-    'AS14061', // DigitalOcean
-    'AS16509', // Amazon AWS
-    'AS15169', // Google Cloud
-    'AS8075',  // Microsoft Azure
-    'AS20473', // Choopa (Vultr)
-    // Add more as you discover them
-  ]),
-
-  // Check if ISP/ORG name suggests VPN/hosting
-  checkOrgName(orgName) {
-    if (!orgName) return false;
-    
-    const lowerOrg = orgName.toLowerCase();
-    return this.keywords.some(keyword => lowerOrg.includes(keyword));
-  }
-};
-
-// ============================================
-// HEURISTIC VPN DETECTION
+// ENHANCED HEURISTIC ANALYSIS
 // ============================================
 function analyzeIPHeuristics(ip, apiData) {
   let suspicionScore = 0;
   const reasons = [];
+  const allIndicators = [];
 
-  // Check 1: Datacenter/hosting flag from API
+  // Check 1: Hosting/Datacenter flag (HIGH PRIORITY)
   if (apiData?.hosting === true) {
-    suspicionScore += 2;
-    reasons.push('Datacenter/hosting IP');
-  }
-
-  // Check 2: Proxy flag from API
-  if (apiData?.proxy === true) {
     suspicionScore += 3;
-    reasons.push('Proxy detected by API');
+    reasons.push('🏢 Datacenter/Hosting IP detected');
+    allIndicators.push('hosting');
   }
 
-  // Check 3: Organization name analysis
-  if (apiData?.org || apiData?.isp) {
-    const orgName = apiData.org || apiData.isp;
-    if (VPN_INDICATORS.checkOrgName(orgName)) {
-      suspicionScore += 2;
-      reasons.push(`Suspicious org: ${orgName}`);
+  // Check 2: Proxy flag (CRITICAL)
+  if (apiData?.proxy === true) {
+    suspicionScore += 5;
+    reasons.push('🚫 Proxy flag detected');
+    allIndicators.push('proxy');
+  }
+
+  // Check 3: Mobile flag check (datacenters usually have mobile=false)
+  if (apiData?.mobile === false && apiData?.hosting === true) {
+    suspicionScore += 2;
+    reasons.push('📱 Non-mobile datacenter detected');
+    allIndicators.push('non_mobile_hosting');
+  }
+
+  // Check 4: Organization/ISP name analysis (COMPREHENSIVE)
+  const orgCheck = VPN_INDICATORS.checkOrgName(apiData?.org || apiData?.isp || '');
+  if (orgCheck.match) {
+    suspicionScore += 3;
+    reasons.push(`🔍 Suspicious org keyword: "${orgCheck.keyword}"`);
+    allIndicators.push(`org_keyword_${orgCheck.keyword}`);
+  }
+
+  // Check 5: ASN check
+  const asnCheck = VPN_INDICATORS.checkASN(apiData?.as || apiData?.asn);
+  if (asnCheck) {
+    suspicionScore += 2;
+    reasons.push(`🌐 Known datacenter ASN: ${apiData?.as || apiData?.asn}`);
+    allIndicators.push('suspicious_asn');
+  }
+
+  // Check 6: Privacy flags from other APIs
+  if (apiData?.privacy) {
+    if (apiData.privacy.vpn) {
+      suspicionScore += 5;
+      reasons.push('🔒 VPN flag detected');
+      allIndicators.push('vpn_flag');
+    }
+    if (apiData.privacy.proxy) {
+      suspicionScore += 5;
+      reasons.push('🔒 Proxy flag detected');
+      allIndicators.push('proxy_privacy_flag');
+    }
+    if (apiData.privacy.tor) {
+      suspicionScore += 5;
+      reasons.push('🧅 Tor network detected');
+      allIndicators.push('tor');
+    }
+    if (apiData.privacy.relay) {
+      suspicionScore += 3;
+      reasons.push('🔄 Relay detected');
+      allIndicators.push('relay');
     }
   }
 
-  // Check 4: Known ASN
-  if (apiData?.asn && VPN_INDICATORS.suspiciousASNs.has(apiData.asn)) {
-    suspicionScore += 1;
-    reasons.push('Known datacenter ASN');
+  // Check 7: Threat indicators
+  if (apiData?.threat) {
+    if (apiData.threat.is_vpn) {
+      suspicionScore += 5;
+      reasons.push('⚠️ Threat: VPN detected');
+      allIndicators.push('threat_vpn');
+    }
+    if (apiData.threat.is_proxy) {
+      suspicionScore += 5;
+      reasons.push('⚠️ Threat: Proxy detected');
+      allIndicators.push('threat_proxy');
+    }
+    if (apiData.threat.is_tor) {
+      suspicionScore += 5;
+      reasons.push('⚠️ Threat: Tor detected');
+      allIndicators.push('threat_tor');
+    }
   }
+
+  // STRICT MODE: Block on ANY positive indicator
+  const isVpn = VPN_CONFIG.BLOCK_ON_SINGLE_INDICATOR 
+    ? allIndicators.length > 0
+    : suspicionScore >= 3;
 
   return {
     suspicionScore,
     reasons,
-    isVpn: suspicionScore >= VPN_CONFIG.CONFIDENCE_THRESHOLD
+    indicators: allIndicators,
+    isVpn,
+    timestamp: new Date().toISOString()
   };
 }
 
@@ -3341,118 +3532,152 @@ function analyzeIPHeuristics(ip, apiData) {
 // ============================================
 async function detectVPN(clientIp) {
   try {
-    // Try to get available API provider
+    // Check permanent blocklist first
+    if (persistentCache.isBlocked(clientIp)) {
+      return {
+        isVpn: true,
+        source: 'permanent-blocklist',
+        cached: true,
+        reasons: ['Permanently blocked']
+      };
+    }
+
+    // Check whitelist
+    if (persistentCache.isWhitelisted(clientIp)) {
+      return {
+        isVpn: false,
+        source: 'whitelist',
+        cached: true,
+        reasons: ['Whitelisted IP']
+      };
+    }
+
     const provider = rateLimiter.getAvailableProvider();
     
     if (!provider) {
       console.warn(`⚠️ All API providers rate limited for ${clientIp}`);
       
-      // Use cached data if available (even if expired)
       const cached = persistentCache.get(clientIp);
       if (cached) {
-        console.log(`📦 Using stale cache for ${clientIp} (no API available)`);
+        console.log(`📦 Using stale cache for ${clientIp}`);
         return {
           isVpn: cached.isVpn,
           source: 'stale-cache',
-          cached: true
+          cached: true,
+          reasons: cached.reasons || []
         };
       }
       
-      // No cache, no API - allow by default (fail-open)
+      // STRICT: Block unknown IPs when no API available
+      console.warn(`🚫 No cache, no API - BLOCKING ${clientIp} (strict mode)`);
       return {
-        isVpn: false,
-        source: 'no-api-no-cache',
-        cached: false
+        isVpn: true,
+        source: 'no-api-strict-mode',
+        cached: false,
+        reasons: ['API unavailable, blocked for safety']
       };
     }
 
-    // Make API call with timeout
     console.log(`📡 Checking ${clientIp} with ${provider.name}`);
     
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
 
     const response = await axios.get(provider.url(clientIp), {
       signal: controller.signal,
-      timeout: 5000,
+      timeout: 8000,
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; VPNDetection/1.0)'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
       }
     });
 
     clearTimeout(timeoutId);
 
-    // Parse response using provider-specific parser
     const parsed = provider.parseResponse(response.data);
-    
-    // Apply heuristic analysis
     const heuristics = analyzeIPHeuristics(clientIp, response.data);
 
-    // Combine API result with heuristics
-    const isVpn = parsed.isVpn || heuristics.isVpn;
+    // Combine all indicators
+    const allIndicators = [
+      ...parsed.indicators,
+      ...heuristics.indicators
+    ];
 
-    // Cache result for 7 days
+    const allReasons = [
+      ...heuristics.reasons
+    ];
+
+    // STRICT: Block if ANY indicator present
+    const isVpn = parsed.isVpn || heuristics.isVpn || allIndicators.length > 0;
+
     const cacheData = {
       isVpn,
       timestamp: Date.now(),
       provider: provider.name,
       details: parsed.details,
       heuristics: heuristics.reasons,
-      suspicionScore: heuristics.suspicionScore
+      indicators: allIndicators,
+      suspicionScore: heuristics.suspicionScore,
+      reasons: allReasons
     };
 
     persistentCache.set(clientIp, cacheData);
 
-    // Log the check
     persistentCache.log(clientIp, {
       timestamp: new Date().toISOString(),
       decision: isVpn ? 'BLOCKED' : 'ALLOWED',
       provider: provider.name,
-      reasons: heuristics.reasons
+      reasons: allReasons,
+      score: heuristics.suspicionScore
     });
+
+    // Add to permanent blocklist if VPN detected
+    if (isVpn) {
+      persistentCache.addToBlocklist(clientIp);
+    }
 
     return {
       isVpn,
       source: provider.name,
       cached: false,
-      details: cacheData
+      details: cacheData,
+      reasons: allReasons
     };
 
   } catch (error) {
     console.error(`❌ VPN detection error for ${clientIp}:`, error.message);
 
-    // Try to use cached data (even if old)
     const cached = persistentCache.get(clientIp);
     if (cached) {
       console.log(`📦 Using cached data after error for ${clientIp}`);
       return {
         isVpn: cached.isVpn,
         source: 'cache-after-error',
-        cached: true
+        cached: true,
+        reasons: cached.reasons || []
       };
     }
 
-    // No cache available - fail open
+    // STRICT: Block on error when no cache
+    console.warn(`🚫 Error and no cache - BLOCKING ${clientIp} (strict mode)`);
     return {
-      isVpn: false,
-      source: 'error-fail-open',
+      isVpn: true,
+      source: 'error-strict-mode',
       cached: false,
-      error: error.message
+      error: error.message,
+      reasons: ['Detection error, blocked for safety']
     };
   }
 }
 
 // ============================================
-// VPN BLOCKING MIDDLEWARE
+// STRICT VPN BLOCKING MIDDLEWARE
 // ============================================
 async function blockVPN(req, res, next) {
   try {
-    // Skip for specific routes
     if (shouldSkipVpnCheck(req.path)) {
       return next();
     }
 
-    // Get client IP
     const clientIp = (
       req.headers["x-forwarded-for"]?.split(",")[0] ||
       req.socket.remoteAddress ||
@@ -3464,38 +3689,41 @@ async function blockVPN(req, res, next) {
       return next();
     }
 
-    // Check if already blocked by cookie
-    if (req.cookies.vpn_blocked === "true") {
-      persistentCache.log(clientIp, {
-        timestamp: new Date().toISOString(),
-        decision: 'BLOCKED',
-        reason: 'Cookie-based block'
-      });
+    // Check permanent blocklist FIRST
+    if (persistentCache.isBlocked(clientIp)) {
+      console.log(`🚫 BLOCKED (permanent blocklist): ${clientIp}`);
       return res.status(403)
         .sendFile(path.join(__dirname, "public", "restricted.html"));
     }
 
-    // Check if already validated by cookie
+    // Check whitelist
+    if (persistentCache.isWhitelisted(clientIp)) {
+      return next();
+    }
+
+    // Check cookies
+    if (req.cookies.vpn_blocked === "true") {
+      console.log(`🚫 BLOCKED (cookie): ${clientIp}`);
+      return res.status(403)
+        .sendFile(path.join(__dirname, "public", "restricted.html"));
+    }
+
     if (req.cookies.valid_user === "true") {
       return next();
     }
 
     // Check employee whitelist
     if (EMPLOYEE_IPS.has(clientIp)) {
+      persistentCache.addToWhitelist(clientIp);
       res.cookie("valid_user", "true", { maxAge: 30 * 24 * 60 * 60 * 1000 });
       return next();
     }
 
-    // Check cache first (7 day cache)
+    // Check cache
     const cached = persistentCache.get(clientIp);
     if (cached && (Date.now() - cached.timestamp < VPN_CONFIG.CACHE_DURATION)) {
       if (cached.isVpn) {
         console.log(`🚫 VPN detected (cached): ${clientIp}`);
-        persistentCache.log(clientIp, {
-          timestamp: new Date().toISOString(),
-          decision: 'BLOCKED',
-          reason: 'Cached as VPN'
-        });
         res.cookie("vpn_blocked", "true", { maxAge: 7 * 24 * 60 * 60 * 1000 });
         return res.status(403)
           .sendFile(path.join(__dirname, "public", "restricted.html"));
@@ -3506,43 +3734,37 @@ async function blockVPN(req, res, next) {
       }
     }
 
-    // Perform VPN detection
+    // Perform detection
     const result = await detectVPN(clientIp);
 
     if (result.isVpn) {
-      console.log(`🚫 VPN/Proxy detected: ${clientIp} (${result.source})`);
-      persistentCache.log(clientIp, {
-        timestamp: new Date().toISOString(),
-        decision: 'BLOCKED',
-        source: result.source,
-        details: result.details
-      });
+      console.log(`🚫 VPN/PROXY DETECTED: ${clientIp}`);
+      console.log(`   Source: ${result.source}`);
+      console.log(`   Reasons:`, result.reasons);
+      
       res.cookie("vpn_blocked", "true", { maxAge: 7 * 24 * 60 * 60 * 1000 });
       return res.status(403)
         .sendFile(path.join(__dirname, "public", "restricted.html"));
     }
 
-    // Valid user
     console.log(`✅ Valid user: ${clientIp} (${result.source})`);
-    persistentCache.log(clientIp, {
-      timestamp: new Date().toISOString(),
-      decision: 'ALLOWED',
-      source: result.source
-    });
     res.cookie("valid_user", "true", { maxAge: 7 * 24 * 60 * 60 * 1000 });
     next();
 
   } catch (error) {
     console.error("❌ VPN middleware error:", error.message);
-    next(); // Fail open
+    
+    // STRICT: Block on middleware error
+    console.warn(`🚫 Middleware error - BLOCKING (strict mode)`);
+    return res.status(403)
+      .sendFile(path.join(__dirname, "public", "restricted.html"));
   }
 }
 
 // ============================================
-// ADMIN ENDPOINTS
+// ADMIN ENDPOINTS (same as before, enhanced)
 // ============================================
 
-// View IP logs
 app.get("/api/admin/ip-logs/:ip?", (req, res) => {
   const { ip } = req.params;
   const adminKey = req.query.key;
@@ -3559,17 +3781,20 @@ app.get("/api/admin/ip-logs/:ip?", (req, res) => {
       ip,
       cached: cached || null,
       logs: logs,
+      isBlocked: persistentCache.isBlocked(ip),
+      isWhitelisted: persistentCache.isWhitelisted(ip),
       totalChecks: logs.length
     });
   }
 
   res.json({
     totalIPs: persistentCache.cache.size,
+    blockedCount: persistentCache.blocklist.size,
+    whitelistedCount: persistentCache.whitelist.size,
     allLogs: persistentCache.getAllLogs()
   });
 });
 
-// Unblock IP
 app.post("/api/admin/unblock-ip", async (req, res) => {
   const { ip, adminKey } = req.body;
 
@@ -3577,15 +3802,15 @@ app.post("/api/admin/unblock-ip", async (req, res) => {
     return res.status(403).json({ error: "Unauthorized" });
   }
 
+  persistentCache.removeFromBlocklist(ip);
   persistentCache.delete(ip);
   
   res.json({
     success: true,
-    message: `IP ${ip} unblocked and removed from cache`
+    message: `IP ${ip} unblocked`
   });
 });
 
-// Add IP to whitelist
 app.post("/api/admin/whitelist-ip", (req, res) => {
   const { ip, adminKey } = req.body;
 
@@ -3593,34 +3818,14 @@ app.post("/api/admin/whitelist-ip", (req, res) => {
     return res.status(403).json({ error: "Unauthorized" });
   }
 
-  EMPLOYEE_IPS.add(ip);
-  persistentCache.delete(ip);
+  persistentCache.addToWhitelist(ip);
   
   res.json({
     success: true,
-    message: `IP ${ip} added to whitelist`
+    message: `IP ${ip} whitelisted`
   });
 });
 
-// Force refresh IP check
-app.post("/api/admin/refresh-ip", async (req, res) => {
-  const { ip, adminKey } = req.body;
-
-  if (adminKey !== process.env.ADMIN_KEY) {
-    return res.status(403).json({ error: "Unauthorized" });
-  }
-
-  persistentCache.delete(ip);
-  const result = await detectVPN(ip);
-  
-  res.json({
-    success: true,
-    ip,
-    result
-  });
-});
-
-// Dashboard
 app.get("/api/admin/dashboard", (req, res) => {
   const adminKey = req.query.key;
 
@@ -3643,15 +3848,18 @@ app.get("/api/admin/dashboard", (req, res) => {
     timestamp: new Date().toISOString(),
     statistics: {
       totalIPsCached: persistentCache.cache.size,
+      permanentlyBlocked: persistentCache.blocklist.size,
+      whitelisted: persistentCache.whitelist.size,
       blockedCount: blocked.length,
       allowedCount: allowed.length
     },
     recentBlocked: blocked.slice(-50),
-    recentAllowed: allowed.slice(-50)
+    recentAllowed: allowed.slice(-50),
+    permanentBlocklist: Array.from(persistentCache.blocklist),
+    whitelist: Array.from(persistentCache.whitelist)
   });
 });
 
-// User-facing endpoint
 app.get("/api/my-ip-status", (req, res) => {
   const clientIp = (
     req.headers["x-forwarded-for"]?.split(",")[0] ||
@@ -3660,45 +3868,40 @@ app.get("/api/my-ip-status", (req, res) => {
 
   const cached = persistentCache.get(clientIp);
   const logs = persistentCache.getLogs(clientIp);
+  const isBlocked = persistentCache.isBlocked(clientIp);
+  const isWhitelisted = persistentCache.isWhitelisted(clientIp);
 
   res.json({
     yourIP: clientIp,
-    status: cached?.isVpn ? 'BLOCKED' : 'ALLOWED',
+    status: isBlocked ? 'PERMANENTLY_BLOCKED' : (isWhitelisted ? 'WHITELISTED' : (cached?.isVpn ? 'BLOCKED' : 'ALLOWED')),
+    isPermanentlyBlocked: isBlocked,
+    isWhitelisted: isWhitelisted,
     lastCheck: cached?.timestamp ? new Date(cached.timestamp).toISOString() : null,
-    cacheAge: cached ? Math.floor((Date.now() - cached.timestamp) / 60000) + ' minutes' : null,
+    reasons: cached?.reasons || [],
+    indicators: cached?.indicators || [],
+    suspicionScore: cached?.suspicionScore || 0,
     recentChecks: logs.length
   });
 });
 
-// Retry route
 app.post("/retry", (req, res) => {
   const clientIp = (
     req.headers["x-forwarded-for"]?.split(",")[0] ||
     req.socket.remoteAddress
   ).trim();
 
-  persistentCache.delete(clientIp);
-  res.clearCookie("vpn_blocked");
-  res.clearCookie("valid_user");
+  // Only allow retry if not permanently blocked
+  if (!persistentCache.isBlocked(clientIp)) {
+    persistentCache.delete(clientIp);
+    res.clearCookie("vpn_blocked");
+    res.clearCookie("valid_user");
+    console.log(`🔄 Retry allowed for ${clientIp}`);
+    res.redirect("/");
+  }
+else{
+    res.redirect("ERROR");
 
-  console.log(`🔄 Retry requested for ${clientIp}`);
-  res.redirect("/");
-});
-
-// Apply middleware
-app.use(blockVPN);
-
-// Graceful shutdown - save cache
-process.on('SIGTERM', async () => {
-  console.log('💾 Saving IP cache before shutdown...');
-  await persistentCache.saveToDisk();
-  process.exit(0);
-});
-
-process.on('SIGINT', async () => {
-  console.log('💾 Saving IP cache before shutdown...');
-  await persistentCache.saveToDisk();
-  process.exit(0);
+}
 });
 
 app.use(express.static(path.join(__dirname, "public")));
