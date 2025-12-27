@@ -14,6 +14,8 @@ const { simpleParser } = require("mailparser");
 // const fetch = require("node-fetch");
 const axios = require("axios");
 
+const fs = require("fs");
+
 const app = express();
 
 // Middleware
@@ -2810,246 +2812,481 @@ app.get("/api/backup/info", async (req, res) => {
   }
 });
 
-// ============================================
-// IN-MEMORY CACHE FOR IP CHECKS
-// ============================================
-const ipCache = new Map();
-const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
-const MAX_CACHE_SIZE = 10000; // Prevent memory overflow
+// // ============================================
+// // IN-MEMORY CACHE FOR IP CHECKS
+// // ============================================
+// const ipCache = new Map();
+// const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+// const MAX_CACHE_SIZE = 10000; // Prevent memory overflow
 
-// Clean old cache entries periodically (every hour)
-setInterval(() => {
-  const now = Date.now();
-  let cleaned = 0;
+// // Clean old cache entries periodically (every hour)
+// setInterval(() => {
+//   const now = Date.now();
+//   let cleaned = 0;
 
-  for (const [ip, data] of ipCache.entries()) {
-    if (now - data.timestamp > CACHE_DURATION) {
-      ipCache.delete(ip);
-      cleaned++;
+//   for (const [ip, data] of ipCache.entries()) {
+//     if (now - data.timestamp > CACHE_DURATION) {
+//       ipCache.delete(ip);
+//       cleaned++;
+//     }
+//   }
+
+//   if (cleaned > 0) {
+//     console.log(`🧹 Cache cleaned: ${cleaned} expired entries removed`);
+//   }
+// }, 60 * 60 * 1000);
+
+// // ============================================
+// // RATE LIMITER FOR API CALLS
+// // ============================================
+// let apiCallCount = 0;
+// let lastResetTime = Date.now();
+// const MAX_API_CALLS_PER_MINUTE = 40; // Stay under ip-api's 45/min limit
+
+// function canMakeApiCall() {
+//   const now = Date.now();
+
+//   // Reset counter every minute
+//   if (now - lastResetTime > 60000) {
+//     apiCallCount = 0;
+//     lastResetTime = now;
+//   }
+
+//   if (apiCallCount >= MAX_API_CALLS_PER_MINUTE) {
+//     console.warn("⚠️ API rate limit reached for this minute");
+//     return false;
+//   }
+
+//   apiCallCount++;
+//   return true;
+// }
+
+// // ============================================
+// // IP WHITELIST FOR EMPLOYEES
+// // ============================================
+// const EMPLOYEE_IPS = new Set([
+//   // Add your office/employee IP addresses here
+//   // Example: "203.0.113.0", "198.51.100.0"
+//   // To find your IP, visit: https://www.whatismyipaddress.com/
+// ]);
+
+// // ============================================
+// // ROUTES TO SKIP VPN CHECK
+// // ============================================
+// const SKIP_VPN_CHECK_PATHS = [
+//   "/assets/",
+//   "/favicon.ico",
+//   "/robots.txt",
+//   "/sitemap.xml",
+//   "/restricted.html",
+//   "/retry",
+//   "/api/backup/", // Skip VPN check for backup endpoints
+// ];
+
+// function shouldSkipVpnCheck(path) {
+//   return SKIP_VPN_CHECK_PATHS.some((skipPath) => path.startsWith(skipPath));
+// }
+
+// // ============================================
+// // VPN BLOCKING MIDDLEWARE
+// // ============================================
+// async function blockVPN(req, res, next) {
+//   try {
+//     // ✅ Skip VPN check for static assets and specific routes
+//     if (shouldSkipVpnCheck(req.path)) {
+//       return next();
+//     }
+
+//     // ✅ Get client IP (handle proxy headers)
+//     const clientIp = (
+//       req.headers["x-forwarded-for"]?.split(",")[0] ||
+//       req.socket.remoteAddress ||
+//       req.connection.remoteAddress
+//     ).trim();
+
+//     // ✅ Skip localhost/development IPs
+//     if (
+//       clientIp === "::1" ||
+//       clientIp === "127.0.0.1" ||
+//       clientIp.startsWith("192.168.")
+//     ) {
+//       console.log(`✅ Development IP allowed: ${clientIp}`);
+//       res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
+//       return next();
+//     }
+
+//     // ✅ If cookie already says blocked → deny immediately
+//     if (req.cookies.vpn_blocked === "true") {
+//       console.log(`🚫 Blocked user (cookie): ${clientIp}`);
+//       // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+//       return res
+//         .status(403)
+//         .sendFile(path.join(__dirname, "public", "restricted.html"));
+//     }
+
+//     // ✅ If cookie already says valid user → allow immediately (skip API check)
+//     if (req.cookies.valid_user === "true") {
+//       return next();
+//     }
+
+//     // ✅ Check employee whitelist
+//     if (EMPLOYEE_IPS.has(clientIp)) {
+//       console.log(`👔 Employee IP allowed: ${clientIp}`);
+//       res.cookie("valid_user", "true", { maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
+//       return next();
+//     }
+
+//     // ✅ Check cache first (before making API call)
+//     const cached = ipCache.get(clientIp);
+//     if (cached) {
+//       const age = Date.now() - cached.timestamp;
+
+//       if (age < CACHE_DURATION) {
+//         if (cached.isVpn) {
+//           console.log(`🚫 VPN/Proxy detected (cached): ${clientIp}`);
+//           res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
+//           // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+//           return res
+//             .status(403)
+//             .sendFile(path.join(__dirname, "public", "restricted.html"));
+//         } else {
+//           console.log(`✅ Valid user (cached): ${clientIp}`);
+//           res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
+//           return next();
+//         }
+//       } else {
+//         // Cache expired, remove it
+//         ipCache.delete(clientIp);
+//       }
+//     }
+
+//     // ✅ Check if we can make an API call (rate limiting)
+//     if (!canMakeApiCall()) {
+//       console.warn(`⚠️ Rate limit reached, allowing ${clientIp} without check`);
+//       res.cookie("valid_user", "true", { maxAge: 60 * 60 * 1000 }); // 1 hour temp cookie
+//       return next();
+//     }
+
+//     // ✅ Make API call with timeout
+//     console.log(`📡 Making API call for: ${clientIp}`);
+//     const controller = new AbortController();
+//     const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+//     const response = await axios.get(
+//       `http://ip-api.com/json/${clientIp}?fields=proxy,hosting,status,message`,
+//       {
+//         signal: controller.signal,
+//         timeout: 5000,
+//       }
+//     );
+
+//     clearTimeout(timeoutId);
+
+//     const data = response.data;
+
+//     // ✅ Check if API request was successful
+//     if (data.status === "fail") {
+//       console.error(`❌ IP API failed for ${clientIp}: ${data.message}`);
+//       // Allow on API failure (fail-open approach)
+//       res.cookie("valid_user", "true", { maxAge: 60 * 60 * 1000 });
+//       return next();
+//     }
+
+//     // ✅ Determine if VPN/Proxy
+//     const isVpn = data.proxy === true || data.hosting === true;
+
+//     // ✅ Store result in cache
+//     if (ipCache.size < MAX_CACHE_SIZE) {
+//       ipCache.set(clientIp, {
+//         isVpn,
+//         timestamp: Date.now(),
+//       });
+//     }
+
+//     if (isVpn) {
+//       console.log(`🚫 VPN/Proxy detected: ${clientIp}`);
+//       res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
+//       // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+//       return res
+//         .status(403)
+//         .sendFile(path.join(__dirname, "public", "restricted.html"));
+//     }
+
+//     // ✅ Valid user
+//     console.log(`✅ Valid user: ${clientIp}`);
+//     res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
+//     next();
+//   } catch (error) {
+//     // ✅ Handle errors gracefully
+//     if (error.code === "ECONNABORTED" || error.message.includes("timeout")) {
+//       console.error("⏱️ VPN check timeout:", error.message);
+//     } else if (error.message.includes("aborted")) {
+//       console.error("⏱️ VPN check aborted (timeout)");
+//     } else {
+//       console.error("❌ VPN check error:", error.message);
+//     }
+
+//     // Allow request on error (fail-open approach - better UX)
+//     next();
+//   }
+// }
+
+// // ✅ Apply VPN blocking middleware (ONLY ONCE)
+// app.use(blockVPN);
+
+// // ============================================
+// // RETRY ROUTE (Clear blocked cookie)
+// // ============================================
+// app.post("/retry", (req, res) => {
+//   const clientIp = (
+//     req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
+//   ).trim();
+
+//   // Clear from cache
+//   ipCache.delete(clientIp);
+
+//   // Clear cookies
+//   res.clearCookie("vpn_blocked");
+//   res.clearCookie("valid_user");
+
+//   console.log(`🔄 Retry requested for ${clientIp}`);
+//   res.redirect("/");
+// });
+
+
+const VPN_DATA_DIR = path.join(__dirname, "vpn-data");
+const VPN_IP_FILE = path.join(VPN_DATA_DIR, "vpn_ips.json");
+const SAFE_IP_FILE = path.join(VPN_DATA_DIR, "safe_ips.json");
+
+// Ensure files exist
+if (!fs.existsSync(VPN_DATA_DIR)) fs.mkdirSync(VPN_DATA_DIR);
+if (!fs.existsSync(VPN_IP_FILE)) fs.writeFileSync(VPN_IP_FILE, "[]");
+if (!fs.existsSync(SAFE_IP_FILE)) fs.writeFileSync(SAFE_IP_FILE, "[]");
+
+function readJson(file) {
+  return JSON.parse(fs.readFileSync(file, "utf8"));
+}
+
+function writeJson(file, data) {
+  fs.writeFileSync(file, JSON.stringify(data, null, 2));
+}
+
+// async function checkWithApis(ip) {
+//   const results = [];
+
+//   // API 1: ip-api
+//   try {
+//     const r1 = await axios.get(
+//       `http://ip-api.com/json/${ip}?fields=proxy,hosting,status`,
+//       { timeout: 4000 }
+//     );
+//     console.log(r1.data);
+//     results.push(r1.data.proxy || r1.data.hosting);
+//   } catch {}
+
+//   // API 2: ipwho.is
+//   try {
+//     const r2 = await axios.get(
+//       `https://ipwho.is/${ip}?fields=proxy,hosting`,
+//       { timeout: 4000 }
+//     );
+//     console.log(r2.data);
+//     results.push(r2.data.proxy || r2.data.hosting);
+//   } catch {}
+
+//   // API 3: vpnapi.io (optional – requires key)
+//   /*
+//   try {
+//     const r3 = await axios.get(
+//       `https://vpnapi.io/api/${ip}?key=YOUR_KEY`,
+//       { timeout: 4000 }
+//     );
+//     results.push(r3.data.security.vpn || r3.data.security.proxy);
+//   } catch {}
+//   */
+
+//   return results.some(Boolean); // if ANY says VPN → true
+// }
+
+const API_COOLDOWN = 10 * 60 * 1000; // 10 minutes
+
+const apiHealth = {
+  ipApi: { downUntil: 0 },
+  ipWho: { downUntil: 0 },
+  ipInfo: { downUntil: 0 },
+};
+
+function apiAvailable(api) {
+  return Date.now() > apiHealth[api].downUntil;
+}
+
+function markApiDown(api) {
+  apiHealth[api].downUntil = Date.now() + API_COOLDOWN;
+  console.warn(`🚫 ${api} marked DOWN for 10 minutes`);
+}
+
+async function checkWithApis(ip) {
+
+  // ============================
+  // API 1: ip-api (PRIMARY)
+  // ============================
+  if (apiAvailable("ipApi")) {
+    try {
+      const r1 = await axios.get(
+        `http://ip-api.com/json/${ip}?fields=proxy,hosting,status`,
+        { timeout: 4000 }
+      );
+
+      if (r1.data.status === "success") {
+        const isVpn = r1.data.proxy === true || r1.data.hosting === true;
+        console.log("✅ ip-api decided:", isVpn);
+        return isVpn;
+      }
+    } catch (err) {
+      markApiDown("ipApi");
     }
   }
 
-  if (cleaned > 0) {
-    console.log(`🧹 Cache cleaned: ${cleaned} expired entries removed`);
-  }
-}, 60 * 60 * 1000);
+  // ============================
+  // API 2: ipwho.is (BACKUP)
+  // ============================
+  if (apiAvailable("ipWho")) {
+    try {
+      const r2 = await axios.get(
+        `https://ipwho.is/${ip}?fields=proxy,hosting,success`,
+        { timeout: 4000 }
+      );
 
-// ============================================
-// RATE LIMITER FOR API CALLS
-// ============================================
-let apiCallCount = 0;
-let lastResetTime = Date.now();
-const MAX_API_CALLS_PER_MINUTE = 40; // Stay under ip-api's 45/min limit
-
-function canMakeApiCall() {
-  const now = Date.now();
-
-  // Reset counter every minute
-  if (now - lastResetTime > 60000) {
-    apiCallCount = 0;
-    lastResetTime = now;
-  }
-
-  if (apiCallCount >= MAX_API_CALLS_PER_MINUTE) {
-    console.warn("⚠️ API rate limit reached for this minute");
-    return false;
+      if (r2.data.success === true) {
+        const isVpn = r2.data.proxy === true || r2.data.hosting === true;
+        console.log("✅ ipwho decided:", isVpn);
+        return isVpn;
+      }
+    } catch (err) {
+      markApiDown("ipWho");
+    }
   }
 
-  apiCallCount++;
-  return true;
+  // ============================
+  // API 3: ipinfo.io (LAST RESORT)
+  // ============================
+  if (apiAvailable("ipInfo")) {
+    try {
+      const r3 = await axios.get(
+        `https://ipinfo.io/${ip}/json`,
+        { timeout: 4000 }
+      );
+
+      const org = (r3.data.org || "").toLowerCase();
+      const vpnKeywords = [
+        "vpn",
+        "proxy",
+        "hosting",
+        "cloud",
+        "digitalocean",
+        "aws",
+        "google",
+        "azure",
+        "ovh",
+        "vultr",
+      ];
+
+      const isVpn = vpnKeywords.some(k => org.includes(k));
+      console.log("✅ ipinfo decided:", isVpn);
+      return isVpn;
+    } catch (err) {
+      markApiDown("ipInfo");
+    }
+  }
+
+  // ============================
+  // FAIL-OPEN (UX SAFE)
+  // ============================
+  console.warn("⚠️ All VPN APIs unavailable → allowing user");
+  return false;
 }
 
-// ============================================
-// IP WHITELIST FOR EMPLOYEES
-// ============================================
-const EMPLOYEE_IPS = new Set([
-  // Add your office/employee IP addresses here
-  // Example: "203.0.113.0", "198.51.100.0"
-  // To find your IP, visit: https://www.whatismyipaddress.com/
-]);
 
-// ============================================
-// ROUTES TO SKIP VPN CHECK
-// ============================================
-const SKIP_VPN_CHECK_PATHS = [
-  "/assets/",
-  "/favicon.ico",
-  "/robots.txt",
-  "/sitemap.xml",
-  "/restricted.html",
-  "/retry",
-  "/api/backup/", // Skip VPN check for backup endpoints
-];
 
-function shouldSkipVpnCheck(path) {
-  return SKIP_VPN_CHECK_PATHS.some((skipPath) => path.startsWith(skipPath));
-}
-
-// ============================================
-// VPN BLOCKING MIDDLEWARE
-// ============================================
 async function blockVPN(req, res, next) {
   try {
-    // ✅ Skip VPN check for static assets and specific routes
-    if (shouldSkipVpnCheck(req.path)) {
-      return next();
-    }
-
-    // ✅ Get client IP (handle proxy headers)
     const clientIp = (
       req.headers["x-forwarded-for"]?.split(",")[0] ||
-      req.socket.remoteAddress ||
-      req.connection.remoteAddress
-    ).trim();
+      req.socket.remoteAddress
+    )
+      .replace("::ffff:", "")
+      .trim();
 
-    // ✅ Skip localhost/development IPs
+    // Allow localhost
     if (
-      clientIp === "::1" ||
       clientIp === "127.0.0.1" ||
+      clientIp === "::1" ||
       clientIp.startsWith("192.168.")
     ) {
-      console.log(`✅ Development IP allowed: ${clientIp}`);
-      res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
+      res.cookie("valid_user", "true", { maxAge: 86400000 });
       return next();
     }
 
-    // ✅ If cookie already says blocked → deny immediately
+    // 1️⃣ COOKIE CHECK
     if (req.cookies.vpn_blocked === "true") {
-      console.log(`🚫 Blocked user (cookie): ${clientIp}`);
-      // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
       return res
         .status(403)
         .sendFile(path.join(__dirname, "public", "restricted.html"));
     }
 
-    // ✅ If cookie already says valid user → allow immediately (skip API check)
     if (req.cookies.valid_user === "true") {
       return next();
     }
 
-    // ✅ Check employee whitelist
-    if (EMPLOYEE_IPS.has(clientIp)) {
-      console.log(`👔 Employee IP allowed: ${clientIp}`);
-      res.cookie("valid_user", "true", { maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
-      return next();
-    }
+    // 2️⃣ LIBRARY CHECK
+    const vpnIps = readJson(VPN_IP_FILE);
+    const safeIps = readJson(SAFE_IP_FILE);
 
-    // ✅ Check cache first (before making API call)
-    const cached = ipCache.get(clientIp);
-    if (cached) {
-      const age = Date.now() - cached.timestamp;
-
-      if (age < CACHE_DURATION) {
-        if (cached.isVpn) {
-          console.log(`🚫 VPN/Proxy detected (cached): ${clientIp}`);
-          res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
-          // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
-          return res
-            .status(403)
-            .sendFile(path.join(__dirname, "public", "restricted.html"));
-        } else {
-          console.log(`✅ Valid user (cached): ${clientIp}`);
-          res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
-          return next();
-        }
-      } else {
-        // Cache expired, remove it
-        ipCache.delete(clientIp);
-      }
-    }
-
-    // ✅ Check if we can make an API call (rate limiting)
-    if (!canMakeApiCall()) {
-      console.warn(`⚠️ Rate limit reached, allowing ${clientIp} without check`);
-      res.cookie("valid_user", "true", { maxAge: 60 * 60 * 1000 }); // 1 hour temp cookie
-      return next();
-    }
-
-    // ✅ Make API call with timeout
-    console.log(`📡 Making API call for: ${clientIp}`);
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-
-    const response = await axios.get(
-      `http://ip-api.com/json/${clientIp}?fields=proxy,hosting,status,message`,
-      {
-        signal: controller.signal,
-        timeout: 5000,
-      }
-    );
-
-    clearTimeout(timeoutId);
-
-    const data = response.data;
-
-    // ✅ Check if API request was successful
-    if (data.status === "fail") {
-      console.error(`❌ IP API failed for ${clientIp}: ${data.message}`);
-      // Allow on API failure (fail-open approach)
-      res.cookie("valid_user", "true", { maxAge: 60 * 60 * 1000 });
-      return next();
-    }
-
-    // ✅ Determine if VPN/Proxy
-    const isVpn = data.proxy === true || data.hosting === true;
-
-    // ✅ Store result in cache
-    if (ipCache.size < MAX_CACHE_SIZE) {
-      ipCache.set(clientIp, {
-        isVpn,
-        timestamp: Date.now(),
-      });
-    }
-
-    if (isVpn) {
-      console.log(`🚫 VPN/Proxy detected: ${clientIp}`);
-      res.cookie("vpn_blocked", "true", { maxAge: 24 * 60 * 60 * 1000 });
-      // return res.sendFile(path.join(__dirname, "public", "restricted.html"));
+    if (vpnIps.includes(clientIp)) {
+      res.cookie("vpn_blocked", "true", { maxAge: 86400000 });
       return res
         .status(403)
         .sendFile(path.join(__dirname, "public", "restricted.html"));
     }
 
-    // ✅ Valid user
-    console.log(`✅ Valid user: ${clientIp}`);
-    res.cookie("valid_user", "true", { maxAge: 24 * 60 * 60 * 1000 });
-    next();
-  } catch (error) {
-    // ✅ Handle errors gracefully
-    if (error.code === "ECONNABORTED" || error.message.includes("timeout")) {
-      console.error("⏱️ VPN check timeout:", error.message);
-    } else if (error.message.includes("aborted")) {
-      console.error("⏱️ VPN check aborted (timeout)");
-    } else {
-      console.error("❌ VPN check error:", error.message);
+    if (safeIps.includes(clientIp)) {
+      res.cookie("valid_user", "true", { maxAge: 86400000 });
+      return next();
     }
 
-    // Allow request on error (fail-open approach - better UX)
+    // 3️⃣ ONLINE CHECK
+    const isVpn = await checkWithApis(clientIp);
+
+    if (isVpn) {
+      vpnIps.push(clientIp);
+      writeJson(VPN_IP_FILE, vpnIps);
+
+      res.cookie("vpn_blocked", "true", { maxAge: 86400000 });
+      return res
+        .status(403)
+        .sendFile(path.join(__dirname, "public", "restricted.html"));
+    }
+
+    // 4️⃣ SAFE USER
+    safeIps.push(clientIp);
+    writeJson(SAFE_IP_FILE, safeIps);
+
+    res.cookie("valid_user", "true", { maxAge: 86400000 });
     next();
+  } catch (err) {
+    console.error("VPN check error:", err.message);
+    next(); // fail-open
   }
 }
 
-// ✅ Apply VPN blocking middleware (ONLY ONCE)
 app.use(blockVPN);
 
-// ============================================
-// RETRY ROUTE (Clear blocked cookie)
-// ============================================
 app.post("/retry", (req, res) => {
-  const clientIp = (
-    req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
-  ).trim();
-
-  // Clear from cache
-  ipCache.delete(clientIp);
-
-  // Clear cookies
   res.clearCookie("vpn_blocked");
   res.clearCookie("valid_user");
-
-  console.log(`🔄 Retry requested for ${clientIp}`);
   res.redirect("/");
 });
+
 
 app.use(express.static(path.join(__dirname, "public")));
 
