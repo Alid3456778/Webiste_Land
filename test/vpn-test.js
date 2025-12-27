@@ -113,7 +113,8 @@ async testVPNUserBlocked() {
   try {
     // Simulate a VPN IP by using an IP that ip-api identifies as proxy/hosting
     const vpnIPs = [
-      '217.148.141.47'  // Proxy server
+       '217.148.141.47'  // Proxy server
+      // '203.0.113.42'
     ];
     const testIP = vpnIPs[0];
     
