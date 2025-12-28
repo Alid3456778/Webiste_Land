@@ -3008,7 +3008,8 @@ async function blockVPN(req, res, next) {
         .sendFile(path.join(__dirname, "public", "restricted.html"));
     }
 
-    if (safeIps.includes(clientIp)) {
+    // if (safeIps.includes(clientIp)) {
+    if (isIpInList(clientIp, safeIps)) {
       res.cookie("valid_user", "true", { maxAge: 86400000 });
       return next();
     }
