@@ -3046,7 +3046,6 @@ app.post("/retry", (req, res) => {
   res.clearCookie("valid_user");
   res.redirect("/");
 });
-//clearance
 
 app.use(express.static(path.join(__dirname, "public")));
 
