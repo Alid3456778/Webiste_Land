@@ -1401,6 +1401,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const response = await fetch(`/api/requests`);
       const requests = await response.json();
+      // console.log("Fetched requests:", requests);
       const grouped = {};
       requests.forEach((order) => {
         const date = new Date(order.created_at).toISOString().split("T")[0];
@@ -1465,8 +1466,11 @@ document.addEventListener("DOMContentLoaded", () => {
       //                   style="background: linear-gradient(135deg, #ef4444, #dc2626);">
       //               <i class="fas fa-trash"></i> Delete
       // </button>
+      
+      let date = new Date(request.created_at);
 
       row.innerHTML = `
+            <td>${date.toString().slice(0, 10) + " " + date.toString().slice(11, 25)}</td>
             <td>${request.serial}</td>
             <td>${name_or_id}</td>
             <td>${request.user_id}</td>
