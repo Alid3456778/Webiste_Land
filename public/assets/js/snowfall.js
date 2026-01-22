@@ -297,11 +297,11 @@ const christmasAnimations = {
   startAll() {
     if (!this.init()) return;
 
-    if (!this.activeAnimations.snow) this.toggleSnow();
+    // if (!this.activeAnimations.snow) this.toggleSnow();
     // if (!this.activeAnimations.ornaments) this.toggleOrnaments();
     // if (!this.activeAnimations.lights) this.toggleLights();
     // if (!this.activeAnimations.stars) this.toggleStars();
-    if (!this.activeAnimations.confetti) this.toggleConfetti();
+    // if (!this.activeAnimations.confetti) this.toggleConfetti();
   },
 
   // Stop all animations
