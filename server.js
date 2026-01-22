@@ -1300,10 +1300,10 @@ app.get("/products", async (req, res) => {
     let params = [];
     if (categoryID === "all") {
       query = "SELECT * FROM products ORDER BY product_name";
-    } else {
+    } else { 
       query =
         `SELECT
-    p.*,
+     p.category_id,p.image_url,p.product_name,p.trade_names,p.product_id,p.stocks,
     min_price.min_offer_price AS offer_price,
     pr.average_rating AS rating
 FROM
