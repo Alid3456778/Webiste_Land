@@ -1449,7 +1449,7 @@ img {
 }
 
 .star-rating span {
-  color: var(--background-alt);
+  color: var(--border);
   transition: all 0.2s ease;
   cursor: pointer;
 }
