@@ -615,7 +615,15 @@ button {
 }
 
 .section-header {
-  max-width: 1280px;
+/* border: var(--background-alt) 2px solid ;
+  border-radius: 20px;
+  background-color:var(--primary) ;
+  max-width: 600px;
+  color: var(--text-primary); */
+
+  color: var(--primary);
+
+  
   margin: 0 auto 3rem;
   text-align: center;
   animation: fadeInUp 0.6s ease-out;
@@ -629,7 +637,7 @@ button {
 }
 
 .section-subtitle {
-  color: var(--text-secondary);
+  /* color: var(--text-secondary); */
   font-size: 1.1rem;
 }
 

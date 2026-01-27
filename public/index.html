@@ -128,6 +128,15 @@
         </svg>
         24/7 Support
       </div>
+
+       <div class="theme-toggle trust-item">
+          <input type="checkbox" id="theme-switch" />
+          <label for="theme-switch" class="toggle-label">
+            <span class="toggle-icon sun">☀️</span>
+            <span class="toggle-icon moon">🌙</span>
+          </label>
+        </div>
+
     </div>
 
     <!-- Header -->
@@ -141,7 +150,7 @@
             <span class="brand-name">MCland Pharma</span>
           </div>
         </div>
-        <nav class="header__nav nav">
+        <!-- <nav class="header__nav nav">
           <div class="nav__item">
             <button class="nav__btn nav-link" data-menu="medicine">
               Medicine ▾
@@ -219,7 +228,7 @@
               </li>
             </ul>
           </div>
-        </nav>
+        </nav> -->
         <!-- <div class="search-container">
           <input
             type="text"
@@ -229,17 +238,11 @@
           <button class="search-submit">Search</button>
           <ul id="hero-suggestions" class="search-suggestions"></ul>
         </div> -->
-        <div class="theme-toggle">
-          <input type="checkbox" id="theme-switch" />
-          <label for="theme-switch" class="toggle-label">
-            <span class="toggle-icon sun">☀️</span>
-            <span class="toggle-icon moon">🌙</span>
-          </label>
-        </div>
+       
 
         <script src="./assets/js/lightDark.js"></script>
 
-        <!-- <div class="search">
+        <div class="search">
           <input
             type="text"
             placeholder="Search products..."
@@ -262,7 +265,7 @@
               />
             </svg>
           </button>
-        </div> -->
+        </div>
         <div class="header-actions">
           <!-- <button class="search-btn">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -295,7 +298,7 @@
       ></a> -->
 
       <!-- BIG SEARCH BUTTON AREA (UNDO AFTER SOME TIME)-->
-      <div class="hero-container">
+      <!-- <div class="hero-container">
         <div class="search-container">
           <input
             type="text"
@@ -305,7 +308,7 @@
           <button class="search-submit">Search</button>
           <ul id="hero-suggestions" class="search-suggestions"></ul>
         </div>
-      </div>
+      </div> -->
     </section>
 
     <!-- Live Indicators -->
@@ -336,7 +339,7 @@
     </section> -->
 
     <!-- Features -->
-    <section class="features">
+    <!-- <section class="features">
       <div class="features-container">
         <div class="feature-card">
           <div class="feature-icon">
@@ -392,7 +395,7 @@
           </p>
         </div>
       </div>
-    </section>
+    </section> -->
 
     <!-- Categories -->
     <section class="categories">
@@ -404,7 +407,7 @@
       </div>
 
       <div class="categories-grid">
-        <a href="categories.html?catogeries_ID=1" class="category-card">
+        <a href="categories.html?catogeries_ID=1" class="category-card" id="category-card">
           <div class="category-icon">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -628,7 +631,7 @@
           Join thousands of satisfied customers who trust MCland Pharma for
           their healthcare needs
         </p>
-        <a href="categories.html" class="cta-button">Shop Now</a>
+        <a href="categories.html?catogeries_ID=1" class="cta-button">Shop Now</a>
       </div>
     </section>
 
@@ -660,7 +663,7 @@
 
         <div class="footer-section">
           <h3>Contact</h3>
-          <p><i class="fa fa-envelope"></i> customerinfo2024@gmail.com</p>
+          <p><i class="fa fa-envelope"></i> <a  href="https://mail.google.com/mail/?view=cm&to=customerinfo2024@gmail.com" target="_blank"> customerinfo2024@gmail.com </a></p>
           <p><i class="fa fa-phone"></i>+1 209 593 7171</p>
           <p>Available 24/7</p>
         </div>

@@ -432,3 +432,9 @@ if (heroImages.length === 0) {
     window.location.href = 'categories.html?catogeries_ID=1';
   }
 });
+
+// const catogery_card = document.getElementById("category-card");
+
+// if(catogery_card){
+//   catogery_card.style.backgroundImage = `url("../assets/image/USA-Premium.png")`;
+// }
