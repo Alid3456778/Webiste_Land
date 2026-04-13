@@ -903,7 +903,7 @@ tbody td {
 /* Toast Notification */
 .toast {
   position: fixed;
-  bottom: 2rem;
+  top: 2rem;
   right: 2rem;
   background: white;
   padding: 1rem 1.5rem;

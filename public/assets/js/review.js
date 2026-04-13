@@ -44,6 +44,7 @@ async function loadReviews(productId) {
   const ratingStars = document.querySelectorAll("#rating span[data-value]");
   const ratingCount = document.querySelector("#rating .rating__count");
 
+  if (!reviewList) return;
   reviewList.innerHTML = "<p>Loading reviews...</p>";
 
   try {
@@ -65,17 +66,21 @@ async function loadReviews(productId) {
       result.reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews;
 
     // ✅ Update average stars display
-    ratingStars.forEach((star) => {
-      const starValue = parseInt(star.dataset.value);
-      if (starValue <= Math.round(avgRating)) {
-        star.style.color = "#FFD700"; // Gold for filled stars
-      } else {
-        star.style.color = "#ccc"; // Gray for unfilled
-      }
-    });
+    if (ratingStars.length > 0) {
+      ratingStars.forEach((star) => {
+        const starValue = parseInt(star.dataset.value);
+        if (starValue <= Math.round(avgRating)) {
+          star.style.color = "#FFD700"; // Gold for filled stars
+        } else {
+          star.style.color = "#ccc"; // Gray for unfilled
+        }
+      });
+    }
 
     // ✅ Update review count text
-    ratingCount.textContent = `(${totalReviews} reviews)`;
+    if (ratingCount) {
+      ratingCount.textContent = `(${totalReviews} reviews)`;
+    }
 
     // // ✅ Show reviews below
     // reviewList.innerHTML = result.reviews
@@ -183,7 +188,7 @@ async function loadReviews(productId) {
 async function handleReviewSubmit(event) {
   event.preventDefault();
   const urlParams = new URLSearchParams(window.location.search);
-  const product_id = urlParams.get("product_ID");
+  const product_id = urlParams.get("product_ID") || 1 ;
 
   const name = document.getElementById("review-name").value.trim();
   const email = document.getElementById("review-email").value.trim();
@@ -193,6 +198,14 @@ async function handleReviewSubmit(event) {
     alert("Please fill all fields and select a star rating!");
     return;
   }
+  console.log("Submitting review:", {
+    product_id,
+    name,
+    email,
+    rating: selectedRating,
+    review_text,
+    created_at: new Date(),
+  });
 
   try {
     const response = await fetch("/api/reviews", {

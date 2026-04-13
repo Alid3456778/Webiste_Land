@@ -10,7 +10,21 @@ window.CRISP_WEBSITE_ID = "68987257-808e-403d-a06c-35b3ec18c3ef";
 
 let selectedPayment = null;
 
+function resetPaymentModalView() {
+  const content = document.querySelector(".modal-content1");
+  const container = document.getElementById("qr-container");
+  const qr = document.getElementById("qr-code");
+  const qrText = document.getElementById("qrtext_id");
+
+  if (content) content.classList.remove("is-qr");
+  if (container) container.style.display = "none";
+  if (qr) qr.src = "";
+  if (qrText) qrText.textContent = "";
+  selectedPayment = null;
+}
+
 function openPaymentModal() {
+  resetPaymentModalView();
   document.getElementById("paymentModal").style.display = "flex";
 }
 
@@ -19,43 +33,58 @@ function selectPayment(method) {
   const qr = document.getElementById("qr-code");
   const qr_text_id = document.getElementById("qrtext_id");
   const container = document.getElementById("qr-container");
+  const content = document.querySelector(".modal-content1");
+
+  if (content) content.classList.add("is-qr");
   container.style.display = "block";
 
   if (method === "Zelle") {
-    qr_text_id.textContent = "Yet Not Available";
-    qr.src = "./assets/image/";
+    qr_text_id.textContent = "Zelle is not available right now. Please choose another option.";
+    qr.src = "";
   } else if (method === "Bitcoin") {
     qr.src = "./assets/image/bitcoinScanner.jpg";
-    qr_text_id.textContent =
-      "Bitcoin (BTC) Address: bc1q4mgysdwjsxhw3qwzycnzgtvh2xc2akf5xfaras";
+    qr_text_id.innerHTML =
+      'Bitcoin (BTC) Address:<br><code>bc1q4mgysdwjsxhw3qwzycnzgtvh2xc2akf5xfaras</code>';
   } else if (method === "Venmo") {
-    qr_text_id.textContent = "Yet Not Available";
+    qr_text_id.textContent = "Venmo is not available right now. Please choose another option.";
     // qr.src = "./assets/image/venom.jpg";
   }
 }
 
 function confirmPayment() {
+  if (!selectedPayment) {
+    if (window.showToast) {
+      window.showToast("Please select a payment method first.");
+      return;
+    }
+    alert("Please select a payment method first.");
+    return;
+  }
   document.getElementById("paymentModal").style.display = "none";
   placeOrder(); // Only now place order
 }
 
 function cancelPayment() {
-  selectedPayment = null;
+  resetPaymentModalView();
   document.getElementById("paymentModal").style.display = "none";
-  document.getElementById("qr-container").style.display = "none";
 }
 
 // Hide modal when clicked outside content
 window.addEventListener("click", function (event) {
   const modal = document.getElementById("paymentModal");
-  const content = document.querySelector(".modal-content");
 
   if (event.target === modal) {
+    resetPaymentModalView();
     modal.style.display = "none";
-    document.getElementById("qr-container").style.display = "none";
-    selectedPayment = null;
   }
 });
+
+function setSubmittingModalVisible(isVisible) {
+  const modal = document.getElementById("submittingModal");
+  if (!modal) return;
+  modal.style.display = isVisible ? "flex" : "none";
+  modal.setAttribute("aria-hidden", isVisible ? "false" : "true");
+}
 
 // Global variables
 let cartData = [];
@@ -575,6 +604,7 @@ async function placeOrder() {
 
     // Update button to show submission status
     placeOrderBtn.textContent = "Submitting Order...";
+    setSubmittingModalVisible(true);
 
     // Submit order to API
     console.log("📨 Submitting order to backend...");
@@ -614,6 +644,7 @@ async function placeOrder() {
       document.getElementById("modal-order-number").textContent = "#" + orderId;
 
       // Show success modal
+      setSubmittingModalVisible(false);
       openConfirmationPopup();
     } else {
       throw new Error(
@@ -639,6 +670,7 @@ async function placeOrder() {
     // console.log("  - Order Summary Loaded:", orderSummaryLoaded);
   } finally {
     // Always restore button state
+    setSubmittingModalVisible(false);
     placeOrderBtn.disabled = false;
     placeOrderBtn.textContent = originalText;
     placeOrderBtn.classList.remove("loading");

@@ -36,6 +36,7 @@
     />
 
     <link rel="stylesheet" href="./assets/css/categories.css" />
+    <link rel="stylesheet" href="./assets/css/footer.css" />
     <script type="module" src="./assets/js/categories.js"></script>
     <link rel="stylesheet" href="./assets/css/snowfall.css" />
     <link rel="stylesheet" href="./assets/css/lightDark.css" />
@@ -107,17 +108,7 @@
             <ul id="suggestions" class="search-suggestions"></ul>
 
             <button class="btn btn--search" id="search-button">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                width="20"
-                height="20"
-                fill="currentColor"
-              >
-                <path
-                  d="M10 2a8 8 0 015.292 13.708l4.5 4.5a1 1 0 01-1.415 1.414l-4.5-4.5A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"
-                />
-              </svg>
+              <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <rect width="24" height="24" fill="tranparent"></rect> <path fill-rule="evenodd" clip-rule="evenodd" d="M2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12ZM9 11.5C9 10.1193 10.1193 9 11.5 9C12.8807 9 14 10.1193 14 11.5C14 12.8807 12.8807 14 11.5 14C10.1193 14 9 12.8807 9 11.5ZM11.5 7C9.01472 7 7 9.01472 7 11.5C7 13.9853 9.01472 16 11.5 16C12.3805 16 13.202 15.7471 13.8957 15.31L15.2929 16.7071C15.6834 17.0976 16.3166 17.0976 16.7071 16.7071C17.0976 16.3166 17.0976 15.6834 16.7071 15.2929L15.31 13.8957C15.7471 13.202 16 12.3805 16 11.5C16 9.01472 13.9853 7 11.5 7Z" fill="#028c7e"></path> </g></svg>
             </button>
           </div> 
           
@@ -157,27 +148,27 @@
         <div class="footer-section">
           <h3>Customer Service</h3>
           <ul>
-            <li><a href="#">Shipping Information</a></li>
-            <li><a href="#">Returns & Refunds</a></li>
-            <li><a href="#">Track Your Order</a></li>
-            <li><a href="#">FAQs</a></li>
+            <li><a href="info.html#shipping">Shipping</a></li>
+            <li><a href="info.html#payment">Payment Methods</a></li>
+            <li><a href="info.html#faqs">FAQs</a></li>
           </ul>
         </div>
 
         <div class="footer-section">
           <h3>Company</h3>
           <ul>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Contact Us</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms & Conditions</a></li>
+            <li><a href="info.html#about">About Us</a></li>
+            <li><a href="info.html#contact">Contact Us</a></li>
+            <li><a href="info.html#terms">Terms & Conditions</a></li>
+            <li><a href="info.html#privacy">Privacy Policy</a></li>
+            <li><a href="info.html#cancellation">Cancellation Policy</a></li>
           </ul>
         </div>
 
         <div class="footer-section">
           <h3>Contact</h3>
-          <p>Email: customerinfo2024@gmail.com</p>
-          <p>Phone: +1 209 593 7171</p>
+          <p><a href="mailto:customerinfo2024@gmail.com">customerinfo2024@gmail.com</a></p>
+          <p><a href="tel:+12095937171">+1 209 593 7171</a></p>
           <p>Available 24/7</p>
         </div>
 
@@ -194,9 +185,7 @@
       </div>
 
       <div class="footer-bottom">
-        <h3 style="margin-bottom: 1rem; font-size: 1rem">
-          Secure Payment Methods
-        </h3>
+        <button type="button" class="footer-top-btn">Back to top</button>
         <div class="payment-methods">
           <span class="payment-method">Cash App</span>
           <span class="payment-method">Zelle</span>
@@ -207,5 +196,6 @@
         <p class="copyright">© 2024 MCland Pharma. All rights reserved.</p>
       </div>
     </footer>
+    <script src="./assets/js/ui.js"></script>
   </body>
 </html>

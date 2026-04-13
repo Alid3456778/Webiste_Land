@@ -351,7 +351,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
  
     // Filter verified reviews only
-    const verifiedReviews = data.reviews.filter((r) => r.verified);
+    const verifiedReviews = data.reviews;
 
     if (!verifiedReviews.length) {
       container.innerHTML = "<p>No verified customer reviews yet.</p>";
@@ -366,15 +366,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="testimonial">
           <div class="stars">${"★".repeat(r.rating)}</div>
           <p class="testimonial-text">
-            "${r.review_text}"
+            ${r.review_text}
           </p>
           <p class="testimonial-author">— ${r.name}</p>
-          <div class="verified-purchase">
-            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Verified Purchase
-          </div>
+          ${
+            r.verified
+              ? '  <div class="verified-purchase"> <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"> <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /> </svg> Verified Purchase  </div>'
+              : ' <div class="unverified-purchase"></div>'
+          }
         </div>
       `
       )

@@ -307,14 +307,16 @@ body {
         align-items: center;
       }
 
-      .modal-content {
-        background: #fff;
-        border-radius: 12px;
-        padding: 30px;
-        width: 400px;
-        text-align: center;
-        animation: fadeIn 0.3s ease;
-      }
+       .modal-content {
+         background: #fff;
+         border-radius: 12px;
+         padding: 20px;
+         width: min(420px, 92vw);
+         max-height: 90vh;
+         overflow: auto;
+         text-align: center;
+         animation: fadeIn 0.3s ease;
+       }
 
       .modal-content h2 {
         margin-bottom: 10px;
@@ -414,9 +416,12 @@ body {
 
 .modal-content {
   background: #fff;
-  padding: 30px;
+  padding: 20px;
   border-radius: 8px;
   text-align: center;
+  width: min(420px, 92vw);
+  max-height: 90vh;
+  overflow: auto;
 }
 
 .payment-options img {
@@ -457,31 +462,88 @@ body {
   border-radius: 10px;
   width: 90%;
   max-width: 500px;
+  max-height: 90vh;
+  overflow: auto;
   text-align: center;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
+.modal-content1 h2 {
+  margin: 0 0 12px;
+}
+
+.payment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 6px 0 10px;
+}
+
 /* Payment buttons container */
 .Payment_Button {
-  background: none;
-  border: none;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   cursor: pointer;
-  margin: 10px;
+  padding: 8px;
   transition: transform 0.2s ease;
+  width: 100%;
+  min-height: 72px;
+  display: grid;
+  place-items: center;
+}
+
+.Payment_Button img {
+  width: 100%;
+  max-width: clamp(52px, 18vw, 90px);
+  height: auto;
+  object-fit: contain;
 }
 
 .modal-content1 button:hover {
-  transform: scale(1.1);
+  transform: scale(1.04);
 }
 
 /* QR container */
 #qr-container {
-  margin-top: 20px;
+  display: none;
+  margin-top: 12px;
 }
 
-/* Payment options horizontal */
-.modal-content1 > button {
+.modal-content1.is-qr #qr-container {
+  display: block;
+}
+
+#qr-code {
+  width: min(240px, 70vw);
+  height: auto;
+  max-width: 100%;
+  border-radius: 10px;
+  margin: 10px auto 8px;
+  display: block;
+}
+
+.qr-text {
+  font-size: 0.95rem;
+  line-height: 1.35;
+  color: #111827;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.qr-text code {
   display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  font-size: 0.9rem;
+  background: #f3f4f6;
+  padding: 6px 8px;
+  border-radius: 10px;
+  margin-top: 8px;
+}
+
+.X_button {
+  width: 100%;
 }
 
 /* Responsive adjustments */
@@ -493,6 +555,35 @@ body {
 
   .modal-content1 button img {
     max-width: 80px;
+  }
+}
+
+@media screen and (max-width: 420px) {
+  .modal-content1 button img {
+    max-width: 72px;
+  }
+}
+
+/* Submitting modal */
+.submitting-content {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  text-align: center;
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 4px solid rgba(1, 101, 93, 0.2);
+  border-top-color: #01655D;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 

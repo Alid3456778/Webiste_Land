@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const stockOverlay =
         product.stocks === 0
           ? `<div class="stock-overlay">
-                     <img src="./assets/image2/out-of-stock.png" alt="Out of Stock" />
+                    <p>Out of Stock</p>
                    </div>`
           : "";
 
@@ -108,12 +108,14 @@ document.addEventListener("DOMContentLoaded", () => {
               }" data-product-id="${productID}">
                 ${stockOverlay}
                  ${
-                    product.offer_price != null ?`<p  > <img src="./assets/image2/off-image.png" class="Offer-avail" ></img></p>` : ``
+                    product.offer_price != null ?`<p  > </p>` : ``
                   }
-                <img src="${
+                  <a href="./product_overview.html?product_ID=${product.product_id}"> 
+                <img class="product-image" src="${
                   product.image_url || ""
                 }" alt="Product Image" loading="lazy"
                   onload="this.style.opacity='1'" />
+                  </a>
                 <div class="product-details">
                   <h3>${product.product_name || "No Description"}</h3>
                   <p id="pric">${

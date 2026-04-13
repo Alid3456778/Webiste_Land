@@ -698,11 +698,9 @@ function refreshPage() {
 // Set up "Add To Cart" buttons
 function setupAddToCartButtons() {
   document.querySelectorAll(".btn--add").forEach((button) => {
-    button.addEventListener("click", function () {
-      const cartCountSpan = localStorage.getItem("cartCount");
-
-      localStorage.setItem("cartCount", parseInt(cartCountSpan) + 1);
-
+    button.addEventListener("click", async function () {
+      if (this.disabled) return;
+      this.disabled = true;
       const variantId = this.getAttribute("data-variant-id");
 
       const quantity = this.getAttribute("data-quantity") || 1;
@@ -713,40 +711,74 @@ function setupAddToCartButtons() {
       const immg = imgg;
       const name = name_dabba;
       console.log("catogery", categoryId);
-      addToCart(variantId, categoryId, quantity, mg, price, name, immg);
+      const ok = await addToCart(
+        variantId,
+        categoryId,
+        quantity,
+        mg,
+        price,
+        name,
+        immg
+      );
+
+      if (ok) {
+        const currentCount = parseInt(localStorage.getItem("cartCount") || "0", 10);
+        const nextCount = Number.isFinite(currentCount) ? currentCount + 1 : 1;
+        localStorage.setItem("cartCount", String(nextCount));
+
+        const badge = document.getElementById("cart-count");
+        if (badge) {
+          badge.textContent = String(nextCount);
+          badge.style.display = "inline-block";
+        }
+
+        if (window.showToast) {
+          window.showToast("Added to cart");
+        }
+      }
+
+      this.disabled = false;
     });
   });
 }
 
 // Send a POST request to add the item to cart
-function addToCart(variantId, categoryId, quantity, mg, price, name, immg) {
-  fetch("/add-to-cart", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      productId: variantId,
-      quantity: quantity,
-      mg: mg,
-      price: price,
-      name: name,
-      image_url: immg,
-      categoryId: categoryId,
-    }),
-  })
-    .then((response) => response.json())
-    .then((result) => {
-      if (result.success) {
-        //apna code dalna hey
-        // alert("Item added to cart!");
-        refreshPage();
-      } else {
-        alert("Error: " + result.message);
-      }
-    })
-    .catch((error) => {
-      console.error("Error adding to cart:", error);
-      alert("Server error, please try again later.");
+async function addToCart(variantId, categoryId, quantity, mg, price, name, immg) {
+  try {
+    const response = await fetch("/add-to-cart", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        productId: variantId,
+        quantity: quantity,
+        mg: mg,
+        price: price,
+        name: name,
+        image_url: immg,
+        categoryId: categoryId,
+      }),
     });
+
+    const result = await response.json();
+
+    if (result.success) return true;
+
+    if (window.showToast) {
+      window.showToast(result.message ? `Error: ${result.message}` : "Could not add to cart");
+      return false;
+    }
+
+    alert("Error: " + result.message);
+    return false;
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+    if (window.showToast) {
+      window.showToast("Server error, please try again later.");
+      return false;
+    }
+    alert("Server error, please try again later.");
+    return false;
+  }
 }
 
 // Display error messages in designated areas

@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" href="./assets/css/navbar_footer.css" />
     <link rel="stylesheet" href="./assets/css/checkout.css" />
+    <link rel="stylesheet" href="./assets/css/footer.css" />
     <script src="./assets/js/checkout1.js"></script>
   </head>
   <body>
@@ -18,33 +19,40 @@
     <div id="paymentModal" class="modal1">
       <div class="modal-content1">
         <h2>Select Payment Method</h2>
-        <button onclick="selectPayment('Zelle')" class="Payment_Button">
-          <img src="./assets/image/zelle.png" alt="" style="max-width: 100px" />
-        </button>
-        <button onclick="selectPayment('Bitcoin')" class="Payment_Button">
-          <img
-            src="./assets/image/bitcoin.png"
-            alt=""
-            style="max-width: 100px"
-          />
-        </button>
-        <button onclick="selectPayment('Venmo')" class="Payment_Button">
-          <img src="./assets/image/venmo.png" alt="" style="max-width: 100px" />
-        </button>
-        <button onclick="confirmPayment()" class="X_button">
-          Cancel Payment
-        </button>
-        <div id="qr-container" style="margin-top: 20px; display: none">
-          <img id="qr-code" src="" alt="QR Code" style="max-width: 200px" />
+        <div class="payment-grid" aria-label="Payment methods">
+          <button onclick="selectPayment('Zelle')" class="Payment_Button">
+            <img src="./assets/image/zelle.png" alt="Zelle" />
+          </button>
+          <button onclick="selectPayment('Bitcoin')" class="Payment_Button">
+            <img src="./assets/image/bitcoin.png" alt="Bitcoin" />
+          </button>
+          <button onclick="selectPayment('Venmo')" class="Payment_Button">
+            <img src="./assets/image/venmo.png" alt="Venmo" />
+          </button>
+        </div>
+        <div id="qr-container">
+          <img id="qr-code" src="" alt="QR Code" />
 
-          <h3 id="qrtext_id"></h3>
+          <div id="qrtext_id" class="qr-text"></div>
           <br />
           <button onclick="confirmPayment()" class="Ok_Button">OK</button>
           <!-- <button onclick="cancelPayment()">Cancel</button> -->
-          <button onclick="confirmPayment()" class="Cancel_Button">
+          <button onclick="cancelPayment()" class="Cancel_Button">
             Cancel
           </button>
         </div>
+        <button onclick="cancelPayment()" class="X_button">
+          Cancel Payment
+        </button>
+      </div>
+    </div>
+
+    <!-- Submitting Modal -->
+    <div id="submittingModal" class="modal" aria-hidden="true">
+      <div class="modal-content submitting-content" role="status" aria-live="polite">
+        <div class="spinner" aria-hidden="true"></div>
+        <h2>Submitting your order…</h2>
+        <p>Please wait. Do not close this page.</p>
       </div>
     </div>
 
@@ -289,5 +297,54 @@
         </section>
       </div>
     </main>
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>Customer Service</h3>
+          <ul>
+            <li><a href="info.html#shipping">Shipping</a></li>
+            <li><a href="info.html#payment">Payment Methods</a></li>
+            <li><a href="info.html#faqs">FAQs</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>Company</h3>
+          <ul>
+            <li><a href="info.html#about">About Us</a></li>
+            <li><a href="info.html#contact">Contact Us</a></li>
+            <li><a href="info.html#terms">Terms & Conditions</a></li>
+            <li><a href="info.html#privacy">Privacy Policy</a></li>
+            <li><a href="info.html#cancellation">Cancellation Policy</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>Contact</h3>
+          <p><a href="mailto:customerinfo2024@gmail.com">customerinfo2024@gmail.com</a></p>
+          <p><a href="tel:+12095937171">+1 209 593 7171</a></p>
+          <p>Available 24/7</p>
+        </div>
+
+        <div class="footer-section">
+          <h3>About MCland Pharma</h3>
+          <p>
+            Founded in 2025, we are committed to providing high-quality products
+            with exceptional customer service.
+          </p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="payment-methods" aria-label="Payment methods">
+          <span class="payment-method">Cash App</span>
+          <span class="payment-method">Zelle</span>
+          <span class="payment-method">Venmo</span>
+          <span class="payment-method">Bitcoin</span>
+        </div>
+        <p class="copyright">&copy; 2024 MCland Pharma. All rights reserved.</p>
+      </div>
+    </footer>
+    <script src="./assets/js/ui.js"></script>
   </body>
 </html>

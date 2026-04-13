@@ -54,7 +54,7 @@
         display: flex;
         gap: 8px;
         font-size: 28px;
-        color: #ffbb00;
+        /* color: #ffbb00; */
         cursor: pointer;
         margin-bottom: 10px;
         user-select: none;

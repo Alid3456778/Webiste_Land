@@ -290,7 +290,7 @@ body {
 
 .toast {
   position: fixed;
-  bottom: 30px;
+  top: 30px;
   right: 30px;
   background: var(--background);
   color: var(--text-primary);
