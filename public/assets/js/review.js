@@ -252,3 +252,5 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("reviewForm");
   if (form) form.addEventListener("submit", handleReviewSubmit);
 });
+
+

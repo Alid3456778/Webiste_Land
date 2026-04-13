@@ -1224,3 +1224,131 @@ svg:not([width]):not([height]) {
   height: 20px;
   color: var(--text-primary);
 } */
+
+/* ===== REVIEW SECTION (INDEX ONLY) ===== */
+.review-section {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 25px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  font-family: Arial, sans-serif;
+}
+
+/* Title */
+.review-section h4 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 20px;
+  color: #222;
+}
+
+/* Form layout */
+#reviewForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Inputs */
+.review-section input,
+.review-section textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #f7f7f7;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.review-section input:focus,
+.review-section textarea:focus {
+  border-color: #028c7e;
+  background: #fff;
+  outline: none;
+}
+
+/* Textarea */
+.review-section textarea {
+  resize: none;
+  height: 90px;
+}
+
+/* Button */
+.review-section button {
+  background: #028c7e;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.review-section button:hover {
+  background: #026f63;
+}
+
+/* ===== STAR RATING ===== */
+.star-rating {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* Default stars */
+.star-rating span {
+  color: #ccc;
+  transition: 0.2s;
+}
+
+/* Hover effect */
+.star-rating span:hover,
+.star-rating span:hover ~ span {
+  color: #ccc;
+}
+
+.star-rating span:hover {
+  color: #ffc107;
+}
+
+/* Active selected stars */
+.star-rating .active {
+  color: #ffc107;
+}
+
+/* Smooth animation */
+.star-rating span:hover {
+  transform: scale(1.2);
+}
+
+ /* ==== Star Rating ==== */
+      .star-rating {
+        display: flex;
+        gap: 8px;
+        font-size: 28px;
+        /* color: #ffbb00; */
+        cursor: pointer;
+        margin-bottom: 10px;
+        user-select: none;
+        transition: 0.3s ease;
+      }
+
+      .star-rating span {
+        transition: transform 0.2s ease, color 0.3s ease;
+      }
+
+      .star-rating span:hover {
+        transform: scale(1.2);
+        color: #ffbb00;
+      }
+
+      .star-rating .selected,
+      .star-rating .hovered {
+        color: #ffd700;
+      }
