@@ -107,7 +107,7 @@ body {
   display: flex;
   align-items: center;
   background: var(--background-alt);
-  border: 1px solid var(--border);
+  border: solid var(--primary);
   border-radius: 12px;
   padding: 0.5rem 1rem;
   transition: all 0.3s ease;
@@ -134,19 +134,18 @@ body {
 .btn--search {
   background: none;
   border: none;
-  color: var(--primary);
+  background-color: var(--primary);
+  color: var(--text);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  /* padding: 0.5rem; */
-  border-radius: 8px;
+  padding: 0.5rem;
+  border-radius: 20px;
   transition: all 0.3s ease;
+  font-weight: bold;
 }
 
-.btn--search:hover {
-  background: rgba(2, 140, 126, 0.1);
-}
 
 /* Search Suggestions */
 .search-suggestions {
@@ -677,6 +676,7 @@ body {
 
 /* Responsive for trust banner */
 @media (max-width: 768px) {
+  
     .trust-banner {
         padding: 0.5rem 1rem;
         font-size: 0.813rem;
@@ -699,6 +699,7 @@ body {
   animation: slideInFromLeft 0.5s ease-out;
 }
 
+
 .header-container {
   max-width: 1280px;
   margin: 0 auto;
@@ -706,7 +707,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 2rem;
+  /* gap: 2rem; */
 }
 
 .logo-section {
@@ -900,4 +901,17 @@ body {
     letter-spacing: 0.5px;
     box-shadow: var(--shadow-md);
     z-index: 10;
+}
+
+@media (max-width: 768px) {
+ .header-container{
+  padding: 0.5rem;
+}
+
+}
+
+@media (max-width: 480px) {
+  .header-container{
+    padding: 0.5rem;
+  }
 }

@@ -40,6 +40,7 @@
   --success: #059669;
   --footer-background : #1f2937;
   --footer-text : #ffffff;
+  --text : black;
 }
 
 :root.dark {
@@ -60,4 +61,6 @@
   --footer-text :  #1f2937;
   --footer-background: #1f2937;
   --footer-text: #f3f4f6;
+
+  --text : white;
 }
