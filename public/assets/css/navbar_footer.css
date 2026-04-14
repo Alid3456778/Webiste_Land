@@ -1,6 +1,6 @@
 /* Navbar */
   .navbar {
-    background-color: #ffffff;
+    background-color: var(--background);
     color: #2eb9b5;
     padding: 10px 20px;
    

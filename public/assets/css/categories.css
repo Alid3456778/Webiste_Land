@@ -141,7 +141,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 0.5rem;
-  border-radius: 20px;
+  border-radius: 10px;
   transition: all 0.3s ease;
   font-weight: bold;
 }
@@ -832,7 +832,7 @@ body {
   align-items: center;
   background: var(--background);
   padding: 0.5rem 1rem;
-  border-radius: 2rem;
+  border-radius: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.3s, background 0.3s;
 }

@@ -40,7 +40,7 @@
   align-items: center;
   justify-content: center;
   padding: 0.6rem;
-  border-radius: 18px;
+  border-radius: 10px;
   border: solid var(--primary) 1px;
   transition: all 0.3s ease;
 }
@@ -86,7 +86,7 @@
   width: 50%;
   background: var(--background);
   padding: 0.5rem 1rem;
-  border-radius: 2rem;
+  border-radius: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.3s, background 0.3s;
 }

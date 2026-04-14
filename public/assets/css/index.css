@@ -83,7 +83,7 @@ button {
   font-weight: 500;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 2rem;
   flex-wrap: wrap;
   animation: fadeIn 0.6s ease-out;
@@ -534,7 +534,8 @@ button {
   width: 70px;
   height: 70px;
   margin: 0 auto 1.5rem;
-  background: linear-gradient(135deg, var(--background-alt), var(text-primary));
+  /* background: linear-gradient(135deg, var(--background-alt), var(text-primary)); */
+  background: linear-gradient(135deg, var(--background-alt), var(--background));
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -1021,7 +1022,7 @@ button {
   }
 
   .trust-text {
-    display: none;
+    display: inline;
   }
 }
 
@@ -1414,3 +1415,87 @@ svg:not([width]):not([height]) {
 
         }
       }
+
+
+      .review-section {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 25px;
+  background: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border);
+}
+
+.review-section h4 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 20px;
+  color: var(--text-primary);
+}
+
+/* Inputs */
+.review-section input,
+.review-section textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--background-alt);
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.review-section input:focus,
+.review-section textarea:focus {
+  border-color: var(--primary);
+  background: var(--background);
+  outline: none;
+}
+
+/* Button */
+.review-section button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.review-section button:hover {
+  background: var(--primary-dark);
+}
+
+.dropdown__link {
+  color: var(--color-gray-700);
+}
+
+.dropdown__link {
+  color: var(--text-secondary);
+}
+
+.dropdown__link:hover {
+  background: var(--background-alt);
+  color: var(--text-primary);
+}
+
+.live-indicator {
+  background: white;
+}
+
+.live-indicator {
+  background: var(--card-bg);
+}
+
+#hero-suggestions li:hover {
+  background-color: #f8f9ff;
+  color: #111827;
+}
+
+#hero-suggestions li:hover {
+  background-color: var(--background-alt);
+  color: var(--text-primary);
+}

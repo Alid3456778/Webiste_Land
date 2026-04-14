@@ -99,9 +99,10 @@ body {
   align-items: center;
   background: var(--background);
   padding: 0.5rem 1rem;
-  border-radius: 2rem;
+  border-radius: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.3s, background 0.3s;
+  border: solid var(--primary);
 }
 
 .search:focus-within {
@@ -146,17 +147,18 @@ body {
 .btn--search {
   background: transparent;
   background: var(--primary);
-  color: var(--background);
+  color: var(--text);
   border: none;
-  border-radius: 20px;
+  border-radius: 10px;
   padding: 0.5rem;
   margin-left: 0.5rem;
+  font-weight: bold;
 }
 
-.btn--search:hover {
-  /* transform: scale(1.05); */
+/* .btn--search:hover {
+  transform: scale(1.05);
   background: rgba(2, 140, 126, 0.1);
-}
+} */
 
 .btn--search:active {
   transform: scale(0.95);
@@ -737,9 +739,9 @@ img {
     padding: 1rem 1.5rem;
   }
 
-  .search {
+  /* .search {
     max-width: 250px;
-  }
+  } */
 
   .product-info__title {
     font-size: 1.75rem;
