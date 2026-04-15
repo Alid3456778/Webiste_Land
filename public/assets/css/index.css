@@ -143,8 +143,8 @@ button {
 }
 
 .logo-icon {
-  width: 45px;
-  height: 45px;
+  width: 75px;
+  height: 75px;
   /* background: linear-gradient(135deg, var(--primary), var(--primary-dark)); */
   /* border-radius: 12px; */
   display: flex;
@@ -157,8 +157,8 @@ button {
 }
 
 .logo-icon img {
-  width: 80%;
-  height: 80%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 
@@ -167,6 +167,11 @@ button {
   font-weight: 700;
   color: var(--primary);
   letter-spacing: -0.02em;
+}
+
+.brand-name img{
+  width: 130px;
+  
 }
 
 .verified-badge {
