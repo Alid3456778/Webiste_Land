@@ -200,41 +200,37 @@ app.post("/api/checkout", async (req, res) => {
 
     // 2) ✅ Insert order WITH customer snapshot
     // This preserves the customer data as it was at order time
-    const orderRes = await client.query(
-      `INSERT INTO orders (
-        user_id, 
-        total_amount, 
-        shipping,
-        customer_first_name,
-        customer_last_name,
-        customer_email,
-        customer_phone,
-        customer_company,
-        customer_country,
-        customer_street_address,
-        customer_apartment,
-        customer_city,
-        customer_state,
-        customer_zip_code
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-      RETURNING order_id`,
-      [
-        userId,
-        totalCost,
-        shippingCost,
-        firstName,
-        lastName,
-        email,
-        phone,
-        companyName || null,
-        country,
-        billingStreetAddress,
-        apartment || null,
-        billingCity,
-        billingState,
-        billingZip,
-      ]
-    );
+    const SOURCE = process.env.SOURCE || "mcland"; // set per server
+
+const orderRes = await client.query(
+  `INSERT INTO orders (
+    user_id, total_amount, shipping,
+    customer_first_name, customer_last_name,
+    customer_email, customer_phone,
+    customer_company, customer_country,
+    customer_street_address, customer_apartment,
+    customer_city, customer_state, customer_zip_code,
+    source   -- ✅ NEW
+  ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+  RETURNING order_id`,
+  [
+    userId,
+    totalCost,
+    shippingCost,
+    firstName,
+    lastName,
+    email,
+    phone,
+    companyName || null,
+    country,
+    billingStreetAddress,
+    apartment || null,
+    billingCity,
+    billingState,
+    billingZip,
+    SOURCE   // ✅ THIS IS THE KEY
+  ]
+);
     const orderId = orderRes.rows[0].order_id;
 
     // 3) Insert order items
