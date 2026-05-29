@@ -706,11 +706,12 @@ function setupAddToCartButtons() {
       const quantity = this.getAttribute("data-quantity") || 1;
       const mg = this.getAttribute("data-mg") || "default_mg_value";
       const price =
-        this.getAttribute("data-price").replace(/[^0-9,.]/g, "") ||
+        this.getAttribute("data-price")||
         "default_price";
       const immg = imgg;
       const name = name_dabba;
-      console.log("catogery", categoryId);
+      // console.log("catogery", categoryId);
+      // console.log("variantId", variantId, "quantity", quantity, "mg", mg, "price", price);
       const ok = await addToCart(
         variantId,
         categoryId,

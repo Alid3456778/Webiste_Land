@@ -29,6 +29,7 @@ async function loadCartItems() {
     container.innerHTML = "";
     let subtotal = 0;
     for (const item of cartItems) {
+      // console.log("Cart Item:", item);
       const price = parseFloat(item.price.replace(/[^\d.-]/g, "")) || 0;
       subtotal += price;
       const mgText = item.mg ? ` (${item.mg} MG)` : "";
@@ -44,7 +45,7 @@ async function loadCartItems() {
             }')">Remove</button>
           </div>
           <div class="product-detail-2">
-            <p>Price: ₹${price.toFixed(2)}</p>
+            <p>Price: ${item.price}</p>
             <p>Quantity: ${item.quantity}</p>
           </div>
         </div>
