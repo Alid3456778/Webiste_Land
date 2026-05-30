@@ -28,11 +28,13 @@ async function loadCartItems() {
 
     container.innerHTML = "";
     let subtotal = 0;
+    let currencySymbol = "$"; // Default currency
     for (const item of cartItems) {
       // console.log("Cart Item:", item);
+      if (item.price && item.price.includes("€")) currencySymbol = "€";
       const price = parseFloat(item.price.replace(/[^\d.-]/g, "")) || 0;
       subtotal += price;
-      const mgText = item.mg ? ` (${item.mg} MG)` : "";
+      const mgText = item.mg ? ` (${item.mg})` : "";
       const div = document.createElement("div");
       div.className = "cart-item";
       div.innerHTML = `
@@ -53,8 +55,8 @@ async function loadCartItems() {
       container.appendChild(div);
     }
 
-    document.getElementById("subtotal").textContent = `$${subtotal.toFixed(2)}`;
-    document.getElementById("total").textContent = `$${subtotal.toFixed(2)}`;
+    document.getElementById("subtotal").textContent = `${currencySymbol}${subtotal.toFixed(2)}`;
+    document.getElementById("total").textContent = `${currencySymbol}${subtotal.toFixed(2)}`;
   } catch (err) {
     console.error(err);
     document.getElementById("cart-items").innerHTML =

@@ -403,8 +403,9 @@ async function loadCartItems() {
       // Validate cart data structure
       const validatedCartData = cartData.map((item, index) => {
         console.log(`🔍 Validating cart item ${index + 1}:`, item);
-        const cleanPrice = item.price
-          .toString()
+        const priceStr = item.price.toString();
+        const symbol = priceStr.includes("€") ? "€" : "$";
+        const cleanPrice = priceStr
           .replace(/,/g, "")
           .replace(/[^0-9.]/g, "");
         // Ensure all required fields exist
@@ -415,6 +416,7 @@ async function loadCartItems() {
           mg: item.mg || item.strength || "",
           quantity: parseInt(item.quantity || 1, 10),
           price: parseFloat(cleanPrice).toFixed(2),
+          currency: symbol,
           category_id: item.category_id || item.categoryId || 1,
         };
 
@@ -473,15 +475,11 @@ function displayCartItems() {
   const shippingCostElement = document.getElementById("shipping-cost");
 
   let subtotal = 0;
+  let currencySymbol = "$";
   cartItemsElement.innerHTML = "";
   // Display each cart item
   cartData.forEach((item) => {
-    const cleanPrice = item.price
-      .toString()
-      .replace(/,/g, "")
-      .replace(/[^0-9.]/g, "");
-    const itemPrice = parseFloat(item.price);
-    console.log("pricing is ", cleanPrice);
+    if (item.currency === "€") currencySymbol = "€";
     subtotal += parseFloat(item.price);
 
     const row = `
@@ -489,7 +487,7 @@ function displayCartItems() {
               <td>${item.name} ${item.mg ? item.mg + "mg" : ""} × ${
       item.quantity
     }</td>
-              <td>$${item.price}</td>
+              <td>${item.currency || "$"}${item.price}</td>
             </tr>
           `;
     cartItemsElement.innerHTML += row;
@@ -499,8 +497,8 @@ function displayCartItems() {
   const shippingCost = calculateShippingCost(subtotal, cartData);
   const totalCost = subtotal + shippingCost;
 
-  shippingCostElement.textContent = `$${shippingCost.toFixed(2)}`;
-  totalCostElement.textContent = `$${totalCost.toFixed(2)}`;
+  shippingCostElement.textContent = `${currencySymbol}${shippingCost.toFixed(2)}`;
+  totalCostElement.textContent = `${currencySymbol}${totalCost.toFixed(2)}`;
 
   // Show the order content and hide loading
   document.getElementById("order-loading").style.display = "none";
@@ -590,11 +588,13 @@ async function placeOrder() {
         mg: item.mg,
         quantity: parseInt(item.quantity, 10),
         price: parseFloat(item.price),
+        currency: item.currency,
       })),
 
       // Pricing (matching your backend)
       shippingCost: parseFloat(shippingCost.toFixed(2)),
       totalCost: parseFloat(totalCost.toFixed(2)),
+      currency: cartData.length > 0 ? cartData[0].currency : "$",
     };
 
     console.log(

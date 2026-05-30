@@ -50,11 +50,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Get product data (from Local Storage or API)
 async function getProducts() {
-  const cached = localStorage.getItem("SearchProducts");
+  // const cached = localStorage.getItem("SearchProducts");
 
-  if (cached) {
-    return JSON.parse(cached); // Use localStorage data
-  }
+  // if (cached) {
+  //   return JSON.parse(cached); // Use localStorage data
+  // }
 
   const response = await fetch("/products");
   const products = await response.json();

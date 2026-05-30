@@ -40,9 +40,9 @@
       `;
     }
 
-    function formatCurrency(amount) {
+    function formatCurrency(amount, symbol = '$') {
       const num = parseFloat(amount);
-      return isNaN(num) ? '$0.00' : `$${num.toFixed(2)}`;
+      return isNaN(num) ? `${symbol}0.00` : `${symbol}${num.toFixed(2)}`;
     }
 
     function formatAddress(streetAddress, apartment) {
@@ -92,6 +92,7 @@
     function displayOrderDetails(order) {
       try {
         console.log('🎨 Displaying order details...');
+        const currencySymbol = order.currency || '$';
 
         // Fill customer details with fallback values
         document.getElementById('firstName').textContent = order.firstName || 'N/A';
@@ -164,12 +165,11 @@
             row.innerHTML = `
               <td>${name}${mg}</td>
               <td>${quantity}</td>
-              <td>${formatCurrency(unitPrice)}</td>
-             
+              <td>${formatCurrency(unitPrice, currencySymbol)}</td>
             `;
             tbody.appendChild(row);
 
-            console.log(`✅ Added product: ${name} - Qty: ${quantity} - Price: ${formatCurrency(totalPrice)} - Shipping: ${itemShipping > 0 ? formatCurrency(itemShipping) : 'Free'}`);
+            console.log(`✅ Added product: ${name} - Qty: ${quantity} - Price: ${formatCurrency(totalPrice, currencySymbol)} - Shipping: ${itemShipping > 0 ? formatCurrency(itemShipping, currencySymbol) : 'Free'}`);
           });
         }
 
@@ -177,14 +177,14 @@
         const orderShipping = parseFloat(order.shippingCost || 0);
         const finalTotal = subtotal + orderShipping;
 
-        document.getElementById('subtotal').textContent = formatCurrency(subtotal);
-        document.getElementById('shippingTotal').textContent = formatCurrency(orderShipping);
-        document.getElementById('total').textContent = formatCurrency(finalTotal);
+        document.getElementById('subtotal').textContent = formatCurrency(subtotal, currencySymbol);
+        document.getElementById('shippingTotal').textContent = formatCurrency(orderShipping, currencySymbol);
+        document.getElementById('total').textContent = formatCurrency(finalTotal, currencySymbol);
 
         console.log('💰 Final Calculations:');
-        console.log(`  - Subtotal: ${formatCurrency(subtotal)}`);
-        console.log(`  - Shipping: ${formatCurrency(orderShipping)}`);
-        console.log(`  - Total: ${formatCurrency(finalTotal)}`);
+        console.log(`  - Subtotal: ${formatCurrency(subtotal, currencySymbol)}`);
+        console.log(`  - Shipping: ${formatCurrency(orderShipping, currencySymbol)}`);
+        console.log(`  - Total: ${formatCurrency(finalTotal, currencySymbol)}`);
 
         // Show the invoice content and hide loading
         document.getElementById('loading-message').style.display = 'none';
