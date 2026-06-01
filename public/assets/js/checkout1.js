@@ -42,12 +42,17 @@ function selectPayment(method) {
     qr_text_id.textContent = "Zelle is not available right now. Please choose another option.";
     qr.src = "";
   } else if (method === "Bitcoin") {
-    qr.src = "./assets/image/bitcoinScanner.jpg";
+    qr.src = "./assets/image/bitcoinScanner.jpeg";
     qr_text_id.innerHTML =
-      'Bitcoin (BTC) Address:<br><code>bc1q4mgysdwjsxhw3qwzycnzgtvh2xc2akf5xfaras</code>';
+      'Bitcoin (BTC) Address:<br><code>112FdeNrNu3emKuw8gA8HPKU75AcjHBnSe</code>';
   } else if (method === "Venmo") {
     qr_text_id.textContent = "Venmo is not available right now. Please choose another option.";
     // qr.src = "./assets/image/venom.jpg";
+  }
+  else if(method === "tether"){
+    qr.src = "./assets/image/trxScanner.jpeg";
+    qr_text_id.innerHTML =
+      'Tether (USDT) Address:<br><code>TDPEiBKdNFKVo2HfZL2qaixT2a6kdME9a3</code>';
   }
 }
 

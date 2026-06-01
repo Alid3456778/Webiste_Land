@@ -642,6 +642,10 @@ app.post("/api/manual-order", async (req, res) => {
 
     await client.query("COMMIT");
 
+    const currencySymbol =
+  cartItems?.[0]?.currency ||
+  (cartItems?.[0]?.price?.toString().includes("€") ? "€" : "$");
+
     // ✅ STEP 4: Send confirmation email
     try {
       const transporter = nodemailer.createTransport({
@@ -703,9 +707,7 @@ app.post("/api/manual-order", async (req, res) => {
                                     <td>${item.name}</td>
                                     <td>${item.mg}</td>
                                     <td>${item.quantity}</td>
-                                    <td>$${parseFloat(item.price).toFixed(
-                                      2
-                                    )}</td>
+                                    <td>${currencySymbol}${parseFloat(item.price).toFixed(2)}}</td>
                                 </tr>
                             `
                               )
@@ -713,12 +715,8 @@ app.post("/api/manual-order", async (req, res) => {
                         </tbody>
                     </table>
                     <div class="total">
-                        <p>Shipping Cost: $${parseFloat(shippingCost).toFixed(
-                          2
-                        )}</p>
-                        <p>Total Amount: $${parseFloat(totalCost).toFixed(
-                          2
-                        )}</p>
+                        <p>Shipping Cost: ${currencySymbol}${parseFloat(shippingCost).toFixed(2)}</p>
+                        <p>Total Amount: ${currencySymbol}${parseFloat(totalCost).toFixed(2)}</p>
                     </div>
                 </div>
                 <div class="footer">
