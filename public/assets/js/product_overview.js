@@ -670,16 +670,23 @@ function displayVariantOptions(variants, selectedMg, unitType) {
             <td>${variant.qty}</td>
             <td>${variant.price_per_pill || "$0.00 per pill"}</td>
              <td>${priceHtml}</td>
-            <td>
-              <button class="btn btn--add" 
+            <td><button class="btn btn--buy btn--design"
                 data-variant-id="${variant.product_id}"
                 data-catogary-id="${variant.category_id}"
                 data-quantity="${variant.qty}"
                 data-mg="${variant.unit_type}${variant.unit_value}"
-                data-price="${finalPrice}
-                ">
-                Add To Cart
+                data-price="${finalPrice}">
+                Let's Buy It
               </button>
+              <button class="btn btn--add btn--design" 
+                data-variant-id="${variant.product_id}"
+                data-catogary-id="${variant.category_id}"
+                data-quantity="${variant.qty}"
+                data-mg="${variant.unit_type}${variant.unit_value}"
+                data-price="${finalPrice}">
+                +
+              </button>
+              
             </td>
           `;
 
@@ -736,6 +743,51 @@ function setupAddToCartButtons() {
         if (window.showToast) {
           window.showToast("Added to cart");
         }
+      }
+
+      this.disabled = false;
+    });
+  });
+  // Set up "Buy" buttons: add item to cart then go directly to checkout
+  document.querySelectorAll(".btn--buy").forEach((button) => {
+    button.addEventListener("click", async function () {
+      if (this.disabled) return;
+      this.disabled = true;
+      const variantId = this.getAttribute("data-variant-id");
+
+      const quantity = this.getAttribute("data-quantity") || 1;
+      const mg = this.getAttribute("data-mg") || "default_mg_value";
+      const price = this.getAttribute("data-price") || "default_price";
+      const immg = imgg;
+      const name = name_dabba;
+
+      const ok = await addToCart(
+        variantId,
+        categoryId,
+        quantity,
+        mg,
+        price,
+        name,
+        immg
+      );
+
+      if (ok) {
+        const currentCount = parseInt(localStorage.getItem("cartCount") || "0", 10);
+        const nextCount = Number.isFinite(currentCount) ? currentCount + 1 : 1;
+        localStorage.setItem("cartCount", String(nextCount));
+
+        const badge = document.getElementById("cart-count");
+        if (badge) {
+          badge.textContent = String(nextCount);
+          badge.style.display = "inline-block";
+        }
+
+        if (window.showToast) {
+          window.showToast("Added to cart — redirecting to checkout");
+        }
+
+        // Redirect to checkout so the user can complete purchase
+        window.location.href = "./checkout1.html";
       }
 
       this.disabled = false;

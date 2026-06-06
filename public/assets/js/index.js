@@ -62,7 +62,7 @@ async function getProducts() {
     throw new Error("Invalid product data");
   }
   else{
-    console.log("Fetched products from API:", products);
+    // console.log("Fetched products from API:", products);
   }
   localStorage.setItem("SearchProducts", JSON.stringify(products)); // Save data
   return products;

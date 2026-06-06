@@ -9,6 +9,7 @@ window.CRISP_WEBSITE_ID = "68987257-808e-403d-a06c-35b3ec18c3ef";
 })();
 
 let selectedPayment = null;
+let orderSaved = false;
 
 function resetPaymentModalView() {
   const content = document.querySelector(".modal-content1");
@@ -56,17 +57,21 @@ function selectPayment(method) {
   }
 }
 
-function confirmPayment() {
+async function confirmPayment() {
   if (!selectedPayment) {
-    if (window.showToast) {
-      window.showToast("Please select a payment method first.");
-      return;
+    if (!orderSaved) {
+      const saved = await placeOrder(false);
+      if (saved) {
+        openPaymentModal();
+      }
+    } else {
+      openPaymentModal();
     }
-    alert("Please select a payment method first.");
     return;
   }
+
   document.getElementById("paymentModal").style.display = "none";
-  placeOrder(); // Only now place order
+  openConfirmationPopup();
 }
 
 function cancelPayment() {
@@ -511,22 +516,22 @@ function displayCartItems() {
 }
 
 // Function to handle form submission and place order
-async function placeOrder() {
+async function placeOrder(showConfirmation = true) {
   console.log("🚀 Starting order placement process...");
 
   if (!orderSummaryLoaded) {
     alert("Please wait for the cart to load before placing your order.");
-    return;
+    return false;
   }
 
   if (cartData.length === 0) {
     alert("Your cart is empty!");
-    return;
+    return false;
   }
 
   if (!validateForm()) {
     alert("Please fix the errors in the form before proceeding.");
-    return;
+    return false;
   }
 
   const placeOrderBtn = document.getElementById("place-order-btn");
@@ -544,7 +549,8 @@ async function placeOrder() {
       lastName: document.getElementById("last-name").value.trim(),
       phone: document.getElementById("phone").value.trim(),
       email: document.getElementById("email").value.trim(),
-
+      companyName: "",
+      apartment: "",
       country: document.getElementById("country").value,
       billingStreetAddress: document
         .getElementById("street-address")
@@ -578,10 +584,10 @@ async function placeOrder() {
       lastName: formData.lastName,
       phone: formData.phone,
       email: formData.email,
-      companyName: formData.companyName,
+      companyName: formData.companyName || "",
       country: formData.country,
       billingStreetAddress: formData.billingStreetAddress,
-      apartment: formData.apartment,
+      apartment: formData.apartment || "",
       billingCity: formData.billingCity,
       billingState: formData.billingState,
       billingZip: formData.billingZip,
@@ -647,10 +653,16 @@ async function placeOrder() {
 
       // Update modal with order number
       document.getElementById("modal-order-number").textContent = "#" + orderId;
+      orderSaved = true;
 
-      // Show success modal
-      setSubmittingModalVisible(false);
-      openConfirmationPopup();
+      if (showConfirmation) {
+        setSubmittingModalVisible(false);
+        openConfirmationPopup();
+      } else {
+        setSubmittingModalVisible(false);
+      }
+
+      return true;
     } else {
       throw new Error(
         result.message || "Order placement failed - no success status"
@@ -710,12 +722,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   // Handle place order button click
-  document.getElementById("place-order-btn").addEventListener("click", () => {
+  document.getElementById("place-order-btn").addEventListener("click", async () => {
     if (!validateForm()) {
       alert("Please enter the Form Detail before proceeding.");
       return;
     }
-    openPaymentModal();
+    await confirmPayment();
   });
 
   // Real-time form validation

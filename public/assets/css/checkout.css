@@ -620,3 +620,9 @@ body {
   font-size: 16px;
   margin-top: 20px;
 }
+
+.payment-icon{
+  width: 24px;
+  height: 24px;
+  background: transparent;
+}

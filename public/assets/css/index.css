@@ -162,6 +162,12 @@ button {
   object-fit: contain;
 }
 
+.payment-icon{
+  width: 24px;
+  height: 24px;
+  background: transparent;
+}
+
 .brand-name {
   font-size: 1.5rem;
   font-weight: 700;
