@@ -76,6 +76,7 @@ async function confirmPayment() {
 
 function cancelPayment() {
   resetPaymentModalView();
+  window.location.href = "/";
   document.getElementById("paymentModal").style.display = "none";
 }
 
