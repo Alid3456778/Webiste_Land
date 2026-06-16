@@ -1443,6 +1443,7 @@ document.addEventListener("DOMContentLoaded", () => {
     tableBody.appendChild(headerRow);
 
     page.orders.forEach((request) => {
+      console.log("Rendering request:", request);
       const row = document.createElement("tr");
       const paymentStatus =
         request.payment_status || request.status || "pending";
@@ -1466,7 +1467,9 @@ document.addEventListener("DOMContentLoaded", () => {
         src === "mcland"
           ? `<span class="source-badge" title="Source: McLand">MCLAND</span>`
           : src === "truemed"
-          ? `<span class="source-dot" title="Source: TrueMeds"></span>`
+          ? `<span class="source-badge" title="Source: TrueMeds">Truemeds</span>`
+          : src === "syncore"
+          ? `<span class="source-badge" title="Source: Syncore">Syncore</span>`
           : "";
 
       //This code was used to delete order requests If neend add this into the future code ...
