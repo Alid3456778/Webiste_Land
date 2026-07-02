@@ -1293,7 +1293,7 @@ app.get("/products", async (req, res) => {
     let query;
     let params = [];
     if (categoryID === "all") {
-      query = "SELECT * FROM products ORDER BY product_name";
+      query = "SELECT * FROM products ORDER BY category_id";
     } else { 
       query =
         `SELECT
