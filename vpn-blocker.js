@@ -367,6 +367,16 @@ setInterval(() => {
 // ============================================================
 // PROXYCHECK.IO FALLBACK (only for IPs the local lists can't resolve)
 // ============================================================
+// proxycheck.io's own guidance: with &vpn=1, a "VPN" type hit also fires for
+// plain datacenter/business infrastructure (corporate VPN gateways, Zscaler/
+// Palo Alto-style security proxies, Apple Private Relay, etc), not just
+// commercial VPN apps. Blocking every "type: VPN" hit outright over-blocks
+// real customers sitting behind that kind of legitimate infrastructure.
+// Their docs recommend only blocking "VPN" hits once the risk score crosses
+// a threshold; anything flagged as an actual proxy/TOR/compromised server
+// (not "VPN") is much higher-confidence and stays blocked regardless.
+const VPN_RISK_BLOCK_THRESHOLD = Number(process.env.VPN_RISK_BLOCK_THRESHOLD) || 67;
+
 let apiCallsToday = 0;
 let apiCallDay = new Date().toDateString();
 
@@ -381,25 +391,36 @@ function canMakeApiCall() {
   return true;
 }
 
-// Returns 'blocked' | 'allowed' | 'unknown' (unknown = couldn't determine, fail open)
+// Returns { verdict: 'blocked'|'allowed'|'unknown', reason }
 async function checkWithProxyCheckApi(ip) {
   if (!canMakeApiCall()) {
     console.warn(`proxycheck.io daily quota reached, allowing ${ip} without an API check`);
-    return "unknown";
+    return { verdict: "unknown", reason: "api-quota" };
   }
   try {
     const keyParam = PROXYCHECK_API_KEY ? `&key=${PROXYCHECK_API_KEY}` : "";
-    const url = `https://proxycheck.io/v2/${ip}?vpn=1&asn=0${keyParam}`;
+    const url = `https://proxycheck.io/v2/${ip}?vpn=1&asn=0&risk=1${keyParam}`;
     const res = await axios.get(url, { timeout: PROXYCHECK_TIMEOUT_MS });
     const data = res.data && res.data[ip];
-    if (!data) return "unknown";
+    if (!data) return { verdict: "unknown", reason: "api-empty" };
 
-    if (data.proxy === "yes") return "blocked"; // covers VPN, proxy, TOR, etc.
-    if (data.isocode === "IN") return "blocked"; // belt-and-suspenders on country
-    return "allowed";
+    if (data.proxy === "yes") {
+      if (data.type === "VPN") {
+        const risk = Number(data.risk) || 0;
+        if (risk >= VPN_RISK_BLOCK_THRESHOLD) {
+          return { verdict: "blocked", reason: `api:vpn-risk-${risk}` };
+        }
+        return { verdict: "allowed", reason: `api:vpn-low-risk-${risk}` };
+      }
+      // Non-VPN proxy types (open HTTP/SOCKS proxy, TOR, compromised server,
+      // inference engine) are much higher-confidence bad actors -- block outright.
+      return { verdict: "blocked", reason: `api:proxy-${data.type || "unknown"}` };
+    }
+    if (data.isocode === "IN") return { verdict: "blocked", reason: "api:country-IN" };
+    return { verdict: "allowed", reason: "api:clean" };
   } catch (err) {
     console.error(`proxycheck.io check failed for ${ip}: ${err.message}`);
-    return "unknown";
+    return { verdict: "unknown", reason: "api-error" };
   }
 }
 
@@ -497,14 +518,14 @@ async function vpnCountryBlocker(req, res, next) {
     // 7) Ambiguous -> fall back to the rate-limited API (residential proxies,
     //    unlisted ranges, IPv6 addresses)
     if (verdict === null) {
-      const apiVerdict = await checkWithProxyCheckApi(ip);
-      if (apiVerdict === "unknown") {
+      const apiResult = await checkWithProxyCheckApi(ip);
+      if (apiResult.verdict === "unknown") {
         // Fail open, but re-check soon rather than trusting this permanently
-        setCacheEntry(ip, "allowed", "api-unavailable", CACHE_TTL_ON_ERROR_MS);
+        setCacheEntry(ip, "allowed", apiResult.reason, CACHE_TTL_ON_ERROR_MS);
         return next();
       }
-      verdict = apiVerdict;
-      reason = apiVerdict === "blocked" ? "api:vpn-or-country" : "api:clean";
+      verdict = apiResult.verdict;
+      reason = apiResult.reason;
     }
 
     setCacheEntry(ip, verdict, reason, CACHE_TTL_MS);
