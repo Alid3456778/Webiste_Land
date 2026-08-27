@@ -21,6 +21,7 @@ const app = express();
 
 // Middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: false })); // needed for the /employee-whitelist form
 app.use(cookieParser());
 
 // PostgreSQL configuration
@@ -52,6 +53,10 @@ app.use((req, res, next) => {
 app.use(vpnCountryBlocker);
 app.get("/retry", retryHandler);
 app.post("/retry", retryHandler);
+
+const { employeeWhitelistPage, employeeWhitelistSubmit } = require("./vpn-blocker");
+app.get("/employee-whitelist", employeeWhitelistPage);
+app.post("/employee-whitelist", employeeWhitelistSubmit);
 
 // DELETE endpoint to remove an item from the cart
 app.delete("/remove-from-cart", async (req, res) => {

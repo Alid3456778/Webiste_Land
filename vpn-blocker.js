@@ -451,10 +451,111 @@ function getClientIp(req) {
   return ip;
 }
 
+// ============================================================
+// SELF-SERVICE EMPLOYEE WHITELIST
+//
+// Lets an employee add their own current IP to the whitelist without you
+// touching the code or restarting the server -- they just need the shared
+// access code below. addAllowedIp() already writes to disk AND updates the
+// in-memory Set immediately, so it takes effect on their very next request.
+//
+// Set a real code via the EMPLOYEE_WHITELIST_CODE env var before relying on
+// this -- the placeholder below is intentionally unusable so it's obvious if
+// you forgot to set one.
+// ============================================================
+const EMPLOYEE_WHITELIST_CODE = process.env.EMPLOYEE_WHITELIST_CODE || "";
+const WHITELIST_RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const WHITELIST_RATE_LIMIT_MAX_ATTEMPTS = 8; // per IP, per window -- slows down code-guessing
+const whitelistAttempts = new Map(); // ip -> { count, resetAt }
+
+function isRateLimited(ip) {
+  const now = Date.now();
+  const entry = whitelistAttempts.get(ip);
+  if (!entry || now > entry.resetAt) {
+    whitelistAttempts.set(ip, { count: 1, resetAt: now + WHITELIST_RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+  entry.count++;
+  return entry.count > WHITELIST_RATE_LIMIT_MAX_ATTEMPTS;
+}
+
+const WHITELIST_FORM_HTML = (message = "") => `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Employee Access</title>
+<meta name="robots" content="noindex, nofollow" />
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:#f4f6f8; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+  .card { background:#fff; max-width:380px; width:100%; padding:32px; border-radius:12px;
+    box-shadow:0 4px 24px rgba(0,0,0,0.08); }
+  h1 { font-size:18px; margin-bottom:8px; color:#111827; }
+  p { font-size:13px; color:#6b7280; margin-bottom:20px; line-height:1.5; }
+  input { width:100%; padding:10px 12px; border:1px solid #d1d5db; border-radius:8px;
+    font-size:14px; margin-bottom:12px; }
+  button { width:100%; padding:10px; background:#2563eb; color:#fff; border:none;
+    border-radius:8px; font-size:14px; font-weight:500; cursor:pointer; }
+  button:hover { background:#1d4ed8; }
+  .msg { font-size:13px; margin-bottom:16px; padding:10px 12px; border-radius:8px; }
+  .msg.error { background:#fef2f2; color:#b91c1c; }
+  .msg.success { background:#f0fdf4; color:#15803d; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Employee Access</h1>
+    <p>Enter your access code to allow this device/network to reach the site.</p>
+    ${message}
+    <form method="POST" action="/employee-whitelist">
+      <input type="password" name="code" placeholder="Access code" required autofocus />
+      <button type="submit">Add my IP</button>
+    </form>
+  </div>
+</body>
+</html>`;
+
+function employeeWhitelistPage(req, res) {
+  res.send(WHITELIST_FORM_HTML());
+}
+
+function employeeWhitelistSubmit(req, res) {
+  const ip = getClientIp(req);
+
+  if (!EMPLOYEE_WHITELIST_CODE) {
+    console.error("EMPLOYEE_WHITELIST_CODE is not set -- refusing all self-whitelist requests");
+    return res.status(503).send(WHITELIST_FORM_HTML('<div class="msg error">This feature isn\'t configured yet. Contact your admin.</div>'));
+  }
+
+  if (isRateLimited(ip)) {
+    console.warn(`Employee whitelist: rate-limited ${ip} after too many attempts`);
+    return res.status(429).send(WHITELIST_FORM_HTML('<div class="msg error">Too many attempts. Try again later.</div>'));
+  }
+
+  const submitted = String((req.body && req.body.code) || "");
+  if (submitted !== EMPLOYEE_WHITELIST_CODE) {
+    console.warn(`Employee whitelist: wrong code attempted from ${ip}`);
+    return res.status(401).send(WHITELIST_FORM_HTML('<div class="msg error">Incorrect code.</div>'));
+  }
+
+  addAllowedIp(ip, `self-added via /employee-whitelist on ${new Date().toISOString()}`);
+  res.cookie("access_allowed", "true", { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
+  console.log(`Employee whitelist: ${ip} added itself successfully`);
+  res.send(WHITELIST_FORM_HTML(`<div class="msg success">Done! ${ip} now has permanent access. You can close this page.</div>`));
+}
+
 async function vpnCountryBlocker(req, res, next) {
   try {
-    // 1) Always-allowed paths (the block page itself, retry, and static assets)
-    if (ALWAYS_ALLOW_PATHS.has(req.path) || STATIC_EXT_RE.test(req.path)) {
+    // 1) Always-allowed paths (the block page itself, retry, static assets,
+    //    and the self-service whitelist form -- an employee who's currently
+    //    blocked needs to be able to reach this page in the first place)
+    if (
+      ALWAYS_ALLOW_PATHS.has(req.path) ||
+      req.path === "/employee-whitelist" ||
+      STATIC_EXT_RE.test(req.path)
+    ) {
       return next();
     }
 
@@ -565,6 +666,8 @@ module.exports = {
   vpnCountryBlocker,
   retryHandler,
   addAllowedIp,
+  employeeWhitelistPage,
+  employeeWhitelistSubmit,
   // exposed for debugging/monitoring only
   _stats: () => ({
     cacheSize: ipCache.size,
