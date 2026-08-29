@@ -4,3 +4,5 @@ vpn-data/*.json
 data/ip-cache.json
 data/
 data/list/
+.env
+.env.*
