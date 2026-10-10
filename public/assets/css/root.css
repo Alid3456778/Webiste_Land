@@ -1,25 +1,45 @@
-:root {
-  /* BRAND */
+/* :root {
   --primary: #028c7e;
   --primary-dark: #017463;
   --success: #059669;
 
-  /* TEXT */
   --text-primary: #111827;
   --text-secondary: #6b7280;
 
-  /* BACKGROUND */
   --background: #ffffff;
   --background-alt: #f9fafb;
 
-  /* UI */
   --border: #e5e7eb;
   --card-bg: #ffffff;
 
-  /* FOOTER */
+  
   --footer-background: #111827;
   --footer-text: #f9fafb;
+} */
+
+:root {
+  /* BRAND */
+  --primary: #db8345;
+  --primary-dark: #c6621fe3;
+  --success: #66bb6a;
+
+  /* TEXT */
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+
+  /* BACKGROUND */
+  --background: #0d0d11;
+  --background-alt: #16161f;
+
+  /* UI */
+  --border: #2d2d3d;
+  --card-bg: #1b1b26;
+
+  /* FOOTER */
+  --footer-background: #09090d;
+  --footer-text: #e5e7eb;
 }
+
 
 /* DARK MODE */
 :root.dark {

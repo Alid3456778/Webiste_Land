@@ -80,7 +80,7 @@
 
 
 .search {
-  border: var(--primary) solid;
+  /* border: var(--primary) solid; */
   display: flex;
   align-items: center;
   width: 50%;

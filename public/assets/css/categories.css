@@ -107,7 +107,7 @@ body {
   display: flex;
   align-items: center;
   background: var(--background-alt);
-  border: solid var(--primary);
+  /* border: solid var(--primary); */
   border-radius: 12px;
   padding: 0.5rem 1rem;
   transition: all 0.3s ease;
