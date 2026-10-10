@@ -117,7 +117,7 @@ button {
 
 /* Header */
 .header {
-  background: var(--background);
+  background: var(--background-alt);
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
